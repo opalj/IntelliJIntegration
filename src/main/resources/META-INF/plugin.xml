@@ -30,4 +30,11 @@
     <actions>
         <!-- Add your actions here -->
     </actions>
+
+    <application-components>
+        <!-- Add your application components here -->
+        <component>
+            <implementation-class>loadClassFile.LoadClassFileComponent</implementation-class>
+        </component>
+    </application-components>
 </idea-plugin>
