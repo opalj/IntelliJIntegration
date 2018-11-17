@@ -1,5 +1,6 @@
 package loadClassFile;
 
+import Compile.Compiler;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 
@@ -11,6 +12,10 @@ public class LoadClassFileAction extends AnAction {
     }
 
     public void actionPerformed(AnActionEvent event) {
-        // TODO
+        Compiler comp = new Compiler();
+        if(comp.make(event.getProject().getBasePath())){
+            // TODO
+            // COMPILE THAT OPAL .
+        }
     }
 }
