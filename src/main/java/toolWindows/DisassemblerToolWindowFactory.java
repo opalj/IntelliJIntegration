@@ -24,9 +24,16 @@ public class DisassemblerToolWindowFactory implements ToolWindowFactory {
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
+        WindowCommManager.getInstance().setDisassemblerInstance(this);
+
         this.toolWindow = toolWindow;
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(toolWindowContent, "XYZ",false);
         this.toolWindow.getContentManager().addContent(content);
     }
+
+    public void setText(String text) {
+        labelToDisplay.setText(text);
+    }
+
 }

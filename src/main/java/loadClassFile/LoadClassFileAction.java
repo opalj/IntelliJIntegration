@@ -1,8 +1,11 @@
 package loadClassFile;
 
 import Compile.Compiler;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.vfs.VirtualFile;
+import loadFile.LoadFile;
+import loadFile.exceptions.*;
+import toolWindows.WindowCommManager;
 
 public class LoadClassFileAction extends AnAction {
 
@@ -12,10 +15,22 @@ public class LoadClassFileAction extends AnAction {
     }
 
     public void actionPerformed(AnActionEvent event) {
-        Compiler comp = new Compiler();
+        // All files selected in the "Project"-View
+        VirtualFile [] virtualFiles = event.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY);
+
+        try {
+            byte [] fileData = LoadFile.loadFile(virtualFiles[0].getPath());
+            WindowCommManager.getInstance().setDissasemblerText(""+fileData.length);
+        } catch (Exception e) {
+            WindowCommManager.getInstance().setDissasemblerText(e.getMessage());
+        }
+
+
+        /*Compiler comp = new Compiler();
         if(comp.make(event.getProject().getBasePath())){
             // TODO
             // COMPILE THAT OPAL .
-        }
+        }*/
     }
+
 }

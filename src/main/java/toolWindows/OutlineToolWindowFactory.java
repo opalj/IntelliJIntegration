@@ -23,6 +23,8 @@ public class OutlineToolWindowFactory implements ToolWindowFactory {
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
+        WindowCommManager.getInstance().setOutlineInstance(this);
+
         this.toolWindow = toolWindow;
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         // "Content" will appear above the panel (keep in order to remind yourself later)
