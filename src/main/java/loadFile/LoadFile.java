@@ -39,11 +39,13 @@ public class LoadFile {
                 int amount = dsi.read(buffer);
 
                 if( amount < BUFFER_SIZE ) {
-                    byte [] tempBytes = new byte[amount];
-                    for(int i = 0;i < amount;i++) {
-                        tempBytes[i] = buffer[i];
+                    if( amount > 0 ) {
+                        byte [] tempBytes = new byte[amount];
+                        for(int i = 0;i < amount;i++) {
+                            tempBytes[i] = buffer[i];
+                        }
+                        bytes.add(tempBytes);
                     }
-                    bytes.add(tempBytes);
                     break;
                 } else {
                     bytes.add(buffer);
