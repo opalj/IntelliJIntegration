@@ -4,7 +4,6 @@ import Compile.Compiler;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.vfs.VirtualFile;
 import loadFile.LoadFile;
-import loadFile.exceptions.*;
 import toolWindows.WindowCommManager;
 
 public class LoadClassFileAction extends AnAction {
@@ -26,11 +25,11 @@ public class LoadClassFileAction extends AnAction {
         }
 
 
-        /*Compiler comp = new Compiler();
+        Compiler comp = new Compiler();
         if(comp.make(event.getProject().getBasePath())){
             // TODO
             // COMPILE THAT OPAL .
-        }*/
+        }
     }
 
 }
