@@ -31,17 +31,23 @@ public class Compiler {
         }
             return "";
     }
+    /*
+            recursive helpfunction for the find method
+     */
     static private String find(@NotNull  File fl){
         for(File f : fl.listFiles()){
             if(f.isDirectory() && f.getName().equals(".idea"))
-                return f.getAbsolutePath();
+                return f.getParentFile().getAbsolutePath();
             else if(f.isFile() && f.getName().endsWith(".ipr"))
-                return f.getAbsolutePath();
+                return f.getAbsolutePath(); // nocht nicht getestet
             else if(f.isDirectory())
                 return find(f);
         }
         return null;
     }
+    /*
+            compile a project with a given (open) Project-Object
+     */
     public static boolean make(@NotNull final Project project){
 
         CompilerManager compManager = CompilerManager.getInstance(project);
@@ -55,7 +61,9 @@ public class Compiler {
             return true;
         }
     }
-
+    /*
+            compile a project with a given filePath-String, searches naivly the first .idea-Dir or *.ipr-file
+     */
     public static boolean make(@NotNull String filePath )  {
         filePath = find(filePath);
         if(filePath == null)
@@ -74,7 +82,6 @@ public class Compiler {
             project = projectManager.loadAndOpenProject(filePath);
             if(project == null)
                 return false;
-            System.out.println("mP"+ project.getProjectFilePath());
             boolean bMade = make(project);
             projectManager.closeProject(project);
             return bMade;
