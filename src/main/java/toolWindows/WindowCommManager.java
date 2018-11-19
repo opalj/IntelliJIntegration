@@ -24,7 +24,7 @@ public class WindowCommManager {
         outlineWindow = i;
     }
 
-    public final void setDissasemblerText(String text) {
+    public final void setDisassemblerText(String text) {
         if( dissasemblerWindow != null ) {
             dissasemblerWindow.setText(text);
         }

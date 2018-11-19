@@ -8,18 +8,24 @@ import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.awt.*;
 
 // note: having XML, one factory class may suffice ... but keep things separated for now
 public class DisassemblerToolWindowFactory implements ToolWindowFactory {
 
     ToolWindow toolWindow;
-    JLabel labelToDisplay;
     JPanel toolWindowContent;
+    JTextArea textArea = null;
 
     public DisassemblerToolWindowFactory() {
-        labelToDisplay = new JLabel("Here goes the bytecode analysis");
         toolWindowContent = new JPanel();
-        toolWindowContent.add(labelToDisplay);
+        toolWindowContent.setLayout(new BorderLayout());
+
+        textArea = new JTextArea("");
+        textArea.setEditable(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        toolWindowContent.add(textArea, BorderLayout.CENTER);
     }
 
     @Override
@@ -28,12 +34,12 @@ public class DisassemblerToolWindowFactory implements ToolWindowFactory {
 
         this.toolWindow = toolWindow;
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(toolWindowContent, "XYZ",false);
+        Content content = contentFactory.createContent(toolWindowContent, "Content",false);
         this.toolWindow.getContentManager().addContent(content);
     }
 
     public void setText(String text) {
-        labelToDisplay.setText(text);
+        textArea.setText(text);
     }
 
 }
