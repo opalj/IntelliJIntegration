@@ -31,27 +31,32 @@ public class LoadClassFileAction extends AnAction {
     }
 
     public void actionPerformed(AnActionEvent event) {
-        // All files selected in the "Project"-View
-        if(event.getProject()!= null && Compiler.make(event.getProject())){
-        VirtualFile[] virtualFiles = event.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY);
+        if( event.getProject() != null && Compiler.make(event.getProject())){
+            // All files selected in the "Project"-View
+            VirtualFile[] virtualFiles = event.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY);
 
-        // Load the file
-        /*try {
-            byte [] fileData = LoadFile.loadFile(virtualFiles[0].getPath());
-            WindowCommManager.getInstance().setDisassemblerText(""+fileData.length);
-        } catch (Exception e) {
-            WindowCommManager.getInstance().setDisassemblerText(e.getMessage());
-        }*/
+            // Load the file
+            /*try {
+                byte [] fileData = LoadFile.loadFile(virtualFiles[0].getPath());
+                WindowCommManager.getInstance().setDisassemblerText(""+fileData.length);
+            } catch (Exception e) {
+                WindowCommManager.getInstance().setDisassemblerText(e.getMessage());
+            }*/
 
+            openClassFile(new File(virtualFiles[0].getPath()));
+        }
+    }
 
-        // Return if the selected file is not a *.class file
-        String classPath = virtualFiles[0].getPath();
-        String classFileEnding = getEnding(virtualFiles[0].getName());
+    public static final void openClassFile(File classFile) {
+
+        String classFileEnding = getEnding(classFile.getName());
         if (classFileEnding == null || !classFileEnding.toUpperCase().equals("CLASS")) {
-            JOptionPane.showMessageDialog(null, "The selected file is not a class-file.\nCan only decompile " +
+            JOptionPane.showMessageDialog(null, "The given file is not a class-file.\nCan only decompile " +
                     "class-files.", "Error", JOptionPane.OK_OPTION);
             return;
         }
+
+        String classPath = classFile.getPath();
 
         // Decompile class-file
         String dec = null;
@@ -89,7 +94,7 @@ public class LoadClassFileAction extends AnAction {
             }
         }
 
-        File classFile = new File(classPath);
+        //File classFile = new File(classPath); ##########################################################################################
         String noEnding = classFile.getName();
         if (noEnding.contains(".")) {
             String[] parts = noEnding.split("\\.");
@@ -125,7 +130,6 @@ public class LoadClassFileAction extends AnAction {
         FileEditorManager.getInstance(currentProject).openFile(
                 LocalFileSystem.getInstance().refreshAndFindFileByIoFile(disassembledFile)
                 , true);
-    }
     }
 
     private static final String getEnding(String fileName) {

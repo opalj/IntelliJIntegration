@@ -17,9 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 
-
-
-
 public class OutlineToolWindowFactory implements ToolWindowFactory {
 
     private final JEditorPane toolWindowContent;
