@@ -1,5 +1,6 @@
 package HTMLEditor;
 
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
@@ -12,6 +13,8 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
+
+//
 public class MyHtmlEditorUI extends JPanel {
 
     private JFXPanel fxPanel;
@@ -34,6 +37,7 @@ public class MyHtmlEditorUI extends JPanel {
             fxPanel.setScene(scene);
         });
         this.setLayout(new BorderLayout());
+        // TODO: get default color scheme (editor.getColorsScheme().getDefaultBackground())
         this.setBackground(Color.WHITE);
         this.add(fxPanel);
         fxPanel.addComponentListener(new ComponentAdapter() {
@@ -55,7 +59,5 @@ public class MyHtmlEditorUI extends JPanel {
 
             webView.setPrefSize(this.getSize().width,this.getSize().height);
         });
-
-
-
-    }}
+    }
+}

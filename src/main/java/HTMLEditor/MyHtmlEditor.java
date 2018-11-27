@@ -1,6 +1,7 @@
 package HTMLEditor;
 
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
+import com.intellij.openapi.actionSystem.DataProvider;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
@@ -29,6 +30,9 @@ public class MyHtmlEditor implements FileEditor {
     private final VirtualFile virtualFile;
     private boolean disposed;
 
+
+    DataProvider dt;
+
     public MyHtmlEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
         this.project = project;
         this.virtualFile = virtualFile;
@@ -51,7 +55,7 @@ public class MyHtmlEditor implements FileEditor {
         setValue(virtualFile);
     }
 
-    // TODO
+    // TODO - not sure if needed
     void setValue(VirtualFile virtualFile) {
         try {
 
