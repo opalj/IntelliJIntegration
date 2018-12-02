@@ -10,8 +10,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
-import runCommand.ErrorRunningCommandException;
-import runCommand.RunCommand;
+import opalintegration.Opal;
 import saveFile.SaveFile;
 import saveFile.exceptions.ErrorWritingFileException;
 import saveFile.exceptions.InputNullException;
@@ -56,12 +55,14 @@ public class LoadClassFileAction extends AnAction {
 
             // Decompile class-file
             String dec = null;
-            try {
-                dec = RunCommand.runJavap(classPath);
-            } catch (ErrorRunningCommandException e0) {
+            Opal opal = new Opal();
+            //try {
+                //dec = RunCommand.runJavap(classPath);
+                dec = opal.ThreeWayDisAssembler(classPath);
+            /*} catch (ErrorRunningCommandException e0) {
                 dec = e0.getMessage();
             }
-
+            */
             // Give the decompiled code to the disassembler-window
             WindowCommManager.getInstance().setDisassemblerText(dec);
 
