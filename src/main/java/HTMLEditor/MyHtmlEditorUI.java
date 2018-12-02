@@ -1,6 +1,6 @@
 package HTMLEditor;
 
-import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.ui.JBColor;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
@@ -37,8 +37,7 @@ public class MyHtmlEditorUI extends JPanel {
             fxPanel.setScene(scene);
         });
         this.setLayout(new BorderLayout());
-        // TODO: get default color scheme (editor.getColorsScheme().getDefaultBackground())
-        this.setBackground(Color.WHITE);
+        this.setBackground(JBColor.background());
         this.add(fxPanel);
         fxPanel.addComponentListener(new ComponentAdapter() {
             @Override
