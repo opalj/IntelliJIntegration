@@ -8,6 +8,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+
 /*
  * @example: https://github.com/JetBrains/intellij-community/blob/master/images/src/org/intellij/images/editor/impl/ImageFileEditorProvider.java
  */
@@ -23,13 +25,21 @@ public class MyFileEditorProvider implements FileEditorProvider {
 
     @NotNull
     @Override
-    public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
+    public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file)  {
         // this method here is only called if MyFileEditorProvider.accept() returns true
         // this method should NEVER return null
 
+
+
         // TODO: this seems to be a bit harder ... will have to return "MyHtmlEditor"
-        MyHtmlEditor htmlEditor = new MyHtmlEditor(project, file);
-        return htmlEditor;
+        try {
+            MyHtmlEditor htmlEditor = new MyHtmlEditor(project, file);
+            return htmlEditor;
+        } catch(IOException e) {
+            return null;
+        }
+
+//        return htmlEditor;
     }
 
     @NotNull
@@ -44,4 +54,6 @@ public class MyFileEditorProvider implements FileEditorProvider {
         // "Do not create default IDEA's editor (if any) for the file"
         return FileEditorPolicy.PLACE_BEFORE_DEFAULT_EDITOR;
     }
+
+
 }

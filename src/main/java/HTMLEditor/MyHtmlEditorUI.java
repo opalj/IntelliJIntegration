@@ -23,7 +23,7 @@ public class MyHtmlEditorUI extends JPanel {
     private WebView webView;
     private WebEngine webEngine;
 
-    public MyHtmlEditorUI() {
+    public MyHtmlEditorUI(String html) {
         // init the JavaFX-File
         JFXPanel fxPanel = new JFXPanel();
         Platform.setImplicitExit(false);
@@ -32,7 +32,7 @@ public class MyHtmlEditorUI extends JPanel {
             scene = new Scene(root);
             webView = new WebView();
             webEngine = webView.getEngine();
-            webEngine.load("http://www.google.de/");
+            webEngine.loadContent(html);
             root.getChildren().add(webView);
             fxPanel.setScene(scene);
         });

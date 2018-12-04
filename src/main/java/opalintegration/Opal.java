@@ -19,9 +19,9 @@ import java.nio.file.Paths;
 
 
 public class Opal {
-    private Project<URL> uriProject;
-    private JavaProject javaProject;
-    Function1<Method, TACode<TACMethodParameter, DUVar<KnownTypedValue>>> methodTACodeFunction;
+    private static Project<URL> uriProject;
+    private static JavaProject javaProject;
+    static Function1<Method, TACode<TACMethodParameter, DUVar<KnownTypedValue>>> methodTACodeFunction;
 
     private static void Test(String filepath) {
         Project<URL> uriProject = Project.apply(new File(filepath));
@@ -72,7 +72,7 @@ public class Opal {
         }
     }
 
-    public String ThreeWayDisAssemblerString(String filepath) {
+    public static String ThreeWayDisAssemblerString(String filepath) {
         String tacCodeString = "";
         uriProject = Project.apply(new File(filepath));
         javaProject = new JavaProject(uriProject);
@@ -92,9 +92,17 @@ public class Opal {
                 }
             }
         }
+
+        // TODO
+//        try {
+//            return new String(tacCodeString.getBytes(), "UTF-8");
+//        } catch(UnsupportedEncodingException e) {
+//            return null;
+//        }
+
         return tacCodeString;
     }
-    public String toHTMLForm(String classPath) throws IOException{
+    public static String toHTMLForm(String classPath) throws IOException{
         Path path = Paths.get(classPath);
         File file = path.toFile();
 
