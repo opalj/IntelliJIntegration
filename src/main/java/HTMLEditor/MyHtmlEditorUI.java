@@ -59,4 +59,11 @@ public class MyHtmlEditorUI extends JPanel {
             webView.setPrefSize(this.getSize().width,this.getSize().height);
         });
     }
+    public void setWebSite(String filepath){
+        Platform.setImplicitExit(false);
+        Platform.runLater(
+                () -> {
+                    webEngine.load(filepath);
+                });
+    }
 }

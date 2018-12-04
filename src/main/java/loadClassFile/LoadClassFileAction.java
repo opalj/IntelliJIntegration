@@ -58,7 +58,7 @@ public class LoadClassFileAction extends AnAction {
             Opal opal = new Opal();
             //try {
                 //dec = RunCommand.runJavap(classPath);
-                dec = opal.ThreeWayDisAssembler(classPath);
+                dec = opal.ThreeWayDisAssemblerString(classPath);
             /*} catch (ErrorRunningCommandException e0) {
                 dec = e0.getMessage();
             }
