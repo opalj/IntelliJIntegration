@@ -2,19 +2,12 @@ package HTMLEditor;
 
 import Compile.Compiler;
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
-import com.intellij.openapi.actionSystem.DataKey;
-import com.intellij.openapi.actionSystem.DataProvider;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.*;
-import com.intellij.openapi.vfs.newvfs.RefreshQueue;
 import globalData.GlobalData;
 import opalintegration.Opal;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +17,6 @@ import saveFile.exceptions.ErrorWritingFileException;
 import saveFile.exceptions.InputNullException;
 import saveFile.exceptions.IsNotAFileException;
 import saveFile.exceptions.NotEnoughRightsException;
-import toolWindows.DisassemblerToolWindowFactory;
 import toolWindows.WindowCommManager;
 
 import javax.swing.*;
@@ -40,59 +32,24 @@ import java.util.ArrayList;
 public class MyHtmlEditor implements FileEditor {
 
     private final MyHtmlEditorUI editorUI;
-
-    private FileEditorState fileEditorState;
-    private final Project project;
     private final VirtualFile virtualFile;
     private boolean disposed;
 
 
-    DataProvider dt;
-
-    public MyHtmlEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) throws IOException {
-        this.project = project;
+    public MyHtmlEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
         this.virtualFile = virtualFile;
 
-        // TODO first compile stuff
-        // 1. compile project file
-        // 2. OPAL: toHtml()
-        // 3. return html-file (with LoadFile)
-        // 4. pass file to editor
         String html = prepareHtml(project, virtualFile);
-
         editorUI = new MyHtmlEditorUI(html);
+
+        // show TAC (currently all methods) in toolWindow
+        // TODO: show TAC only for selected methods
         showTAC(project, virtualFile);
-        // TODO ...
-        fileEditorState = FileEditorState.INSTANCE;
-        // end
-        VirtualFileManager.getInstance().addVirtualFileListener(new VirtualFileListener() {
-            @Override
-            public void propertyChanged(@NotNull VirtualFilePropertyEvent event) {
-                MyHtmlEditor.this.propertyChanged(event);
-            }
-
-            @Override
-            public void contentsChanged(@NotNull VirtualFileEvent event) {
-                MyHtmlEditor.this.contentsChanged(event);
-            }
-        });
-
-        setValue(virtualFile);
-    }
-
-    // TODO - not sure if needed
-    void setValue(VirtualFile virtualFile) {
-        try {
-
-        } catch(Exception e) {
-
-        }
     }
 
     @NotNull
     @Override
     public JComponent getComponent() {
-        // TODO: currently unable to select/mark HTML content on JPanel
         return editorUI;
     }
 
@@ -105,24 +62,24 @@ public class MyHtmlEditor implements FileEditor {
     @NotNull
     @Override
     public String getName() {
-        // TODO: is this OK?
-        return "HTML Viewer";
+        return "OPAL HTML";
     }
 
     @Override
     public void setState(@NotNull FileEditorState state) {
-        fileEditorState = state;
+        // TODO
+//        fileEditorState = state;
     }
 
     @Override
     public boolean isModified() {
-        // for now assume read-only document
+        // TODO
         return false;
     }
 
     @Override
     public boolean isValid() {
-        // valid as long as NOT disposed AND its contents are still valid (e.g. not deleted)
+        // valid as long as NOT disposed AND its contents are still valid (e.g. file not deleted)
         return !disposed && virtualFile.isValid();
     }
 
@@ -172,65 +129,33 @@ public class MyHtmlEditor implements FileEditor {
 
     }
 
-
-    // TODO
-    void propertyChanged(@NotNull VirtualFilePropertyEvent event) {
-        if(virtualFile.equals(event.getFile())) {
-            // change document
-            Runnable postRunnable = () -> {
-                String fileExtension = virtualFile.getExtension();
-                if(fileExtension != null && fileExtension.equals("class")) {
-                    setValue(virtualFile);
-                }
-                else {
-                    setValue(null);
-                    // close editor
-                    FileEditorManager editorManager = FileEditorManager.getInstance(project);
-                    editorManager.closeFile(virtualFile);
-                }
-            }; // postRunnable
-
-            virtualFile.refresh(true, false, postRunnable);
-        }
-    }
-
-    // TODO (what does this do?)
-    void contentsChanged(@NotNull VirtualFileEvent event) {
-        if(virtualFile.equals(event.getFile())) {
-            // change document
-            Runnable postRunnable = () -> setValue(virtualFile);
-            RefreshQueue.getInstance().refresh(true, false, postRunnable,
-                    ModalityState.current(), virtualFile);
-        }
-    }
-
-
-
     // =================================================================
 
-    void showTAC(@NotNull Project project, @NotNull VirtualFile virtualFile) {
+    private void showTAC(@NotNull Project project, @NotNull VirtualFile virtualFile) {
         String tac = Opal.ThreeWayDisAssemblerString(virtualFile.getPath());
         WindowCommManager wcm = WindowCommManager.getInstance();
-//        wcm.setDisassemblerInstance(new DisassemblerToolWindowFactory());
         wcm.setDisassemblerText(tac);
     }
 
-    String prepareHtml(@NotNull Project project, @NotNull VirtualFile virtualFile) throws IOException {
+    // 1. compile project file
+    // 2. OPAL: toHtml()
+    // 3. return html-file
+    // 4. pass file to editor
+    // TODO: this currently does more (e.g. create dir for disassembled files)
+    private String prepareHtml(@NotNull Project project, @NotNull VirtualFile virtualFile) {
         // All files selected in the "Project"-View
-        if(project != null && Compiler.make(project)) {
+        if(Compiler.make(project)) {
             String classPath = virtualFile.getPath();
 
-            // Decompile class-file
-            String dec = null;
-            dec = Opal.toHTMLForm(classPath);
-//            WindowCommManager.getInstance().setDisassemblerText(dec);
+            // get the HTML format of the class file
+            String classHtmlForm = Opal.toHTMLForm(classPath);
 
             // Save the decompiled code to a file
             String basePath = project.getBasePath();
 
             File baseDir = new File(basePath);
             File temp = (new File(classPath)).getParentFile();
-            ArrayList<String> dirNames = new ArrayList<String>();
+            ArrayList<String> dirNames = new ArrayList<>();
             while (!temp.getAbsolutePath().equals(baseDir.getAbsolutePath())) {
                 dirNames.add(temp.getName());
                 temp = temp.getParentFile();
@@ -274,33 +199,16 @@ public class MyHtmlEditor implements FileEditor {
             }
 
             try {
-                SaveFile.saveFile(dec, disassembledFile.getAbsolutePath());
+                SaveFile.saveFile(classHtmlForm, disassembledFile.getAbsolutePath());
             } catch (InputNullException e0) {
             } catch (NotEnoughRightsException e1) {
             } catch (IsNotAFileException e2) {
             } catch (ErrorWritingFileException e3) {
             }
 
-            // Open the just saved file in an editor
-
-            FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-            fileEditorManager.openFile(
-                    LocalFileSystem.getInstance().refreshAndFindFileByIoFile(disassembledFile)
-                    , true);
-
-            return dec;
+            return classHtmlForm;
         }
 
         return null;
     } // prepareHtml()
-
-
-    final String getEnding(String fileName) {
-        if( fileName.contains(".") ) {
-            String [] parts = fileName.split("\\.");
-            return parts[(parts.length - 1)];
-        } else {
-            return null;
-        }
-    }
 }

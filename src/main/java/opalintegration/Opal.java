@@ -17,7 +17,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-
 public class Opal {
     private static Project<URL> uriProject;
     private static JavaProject javaProject;
@@ -43,6 +42,8 @@ public class Opal {
                     return 1;
                 });
     }
+
+
     @Deprecated
     public void ThreeWayDisAssemblerOutput(String filepath) throws IOException {
         uriProject = Project.apply(new File(filepath));
@@ -72,6 +73,7 @@ public class Opal {
         }
     }
 
+
     public static String ThreeWayDisAssemblerString(String filepath) {
         String tacCodeString = "";
         uriProject = Project.apply(new File(filepath));
@@ -94,30 +96,33 @@ public class Opal {
         }
 
         // TODO
-//        try {
-//            return new String(tacCodeString.getBytes(), "UTF-8");
-//        } catch(UnsupportedEncodingException e) {
-//            return null;
-//        }
+        try {
+            return new String(tacCodeString.getBytes(), "UTF-8");
+        } catch(UnsupportedEncodingException e) {
+            return null;
+        }
 
-        return tacCodeString;
+//        return tacCodeString;
     }
-    public static String toHTMLForm(String classPath) throws IOException{
+
+
+    public static String toHTMLForm(String classPath) {
         Path path = Paths.get(classPath);
         File file = path.toFile();
 
-//TODO        scala.collection.immutable.List<Object> classFileList;
+        // TODO scala.collection.immutable.List<Object> classFileList;
 
-                FileInputStream fis = new FileInputStream(file);
-                DataInputStream dis = new DataInputStream(fis);
-
-            // ...
-            // in this representation (?), the returned list always contains
-            // a single class file object
+        String toHtmlAsString;
+        try(FileInputStream fis = new FileInputStream(file);
+            DataInputStream dis = new DataInputStream(fis)) {
+            // get the class file and construct the HTML string
             org.opalj.da.ClassFile cf = (org.opalj.da.ClassFile) ClassFileReader.ClassFile(dis).head();
-            String toHtmlAsString = "<style>" + cf.TheCSS() + "</style>" + cf.classFileToXHTML(new Some(classPath)).toString();
+            toHtmlAsString = "<style>" + cf.TheCSS() + "</style>" + cf.classFileToXHTML(new Some(classPath)).toString();
+        } catch(IOException e) {
+            e.printStackTrace();
+            toHtmlAsString = "<html>Something went wrong in Opal.toHTMLForm()</html>";
+        }
 
         return toHtmlAsString;
-    }
-
+    } // toHTMLForm()
 }
