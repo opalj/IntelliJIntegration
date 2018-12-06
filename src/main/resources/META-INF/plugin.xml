@@ -25,6 +25,8 @@
                     factoryClass="toolWindows.DisassemblerToolWindowFactory"
                     anchor="right"
                     secondary="true"/>
+        <fileEditorProvider implementation="HTMLEditor.MyFileEditorProvider"
+                            id="My File Editor Provider"/>
     </extensions>
 
     <actions>

@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
 public final class Compiler {
 
@@ -54,7 +55,12 @@ public final class Compiler {
         if(!compManager.isUpToDate(projectCompileScope)){
             //ApplicationManager.getApplication().invokeAndWait( () -
             compManager.make(null);
-            while(!compManager.isUpToDate(projectCompileScope));//compManager.isCompilationActive())
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            while(compManager.isCompilationActive() );//compManager.isCompilationActive())
         }   return true;
     }
     /*
