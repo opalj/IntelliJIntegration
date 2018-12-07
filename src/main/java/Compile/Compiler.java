@@ -1,26 +1,26 @@
 package Compile;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
-public class Compiler {
+public final class Compiler {
 
     /*
         Finds filebased or dirbased Projectpaths
      */
-
-    static private String find(String filePath) {
+    private String find(String filePath) {
         Path path =  Paths.get(filePath);
         String s;
         while(path != null) {
@@ -29,12 +29,13 @@ public class Compiler {
                 return s;
             path = path.getParent();
         }
-            return "";
+        return "";
     }
     /*
             recursive helpfunction for the find method
      */
-    static private String find(@NotNull  File fl){
+    @Nullable
+    private String find(@NotNull  File fl){
         for(File f : fl.listFiles()){
             if(f.isDirectory() && f.getName().equals(".idea"))
                 return f.getParentFile().getAbsolutePath();
@@ -48,23 +49,24 @@ public class Compiler {
     /*
             compile a project with a given (open) Project-Object
      */
-    public static boolean make(@NotNull final Project project){
-
+    static public boolean make(@NotNull final Project project){
         CompilerManager compManager = CompilerManager.getInstance(project);
         CompileScope projectCompileScope = compManager.createProjectCompileScope(project);
         if(!compManager.isUpToDate(projectCompileScope)){
-            ApplicationManager.getApplication().invokeAndWait( () -> compManager.make(null));
-            return true;
-        }else{
-            //TODO
-            // OPALFRAMEWORKINGER ADD OR BOOLEANINGER
-            return true;
-        }
+            //ApplicationManager.getApplication().invokeAndWait( () -
+            compManager.make(null);
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            while(compManager.isCompilationActive() );//compManager.isCompilationActive())
+        }   return true;
     }
     /*
             compile a project with a given filePath-String, searches naivly the first .idea-Dir or *.ipr-file
      */
-    public static boolean make(@NotNull String filePath )  {
+    public boolean make(@NotNull String filePath)  {
         filePath = find(filePath);
         if(filePath == null)
             return false;
@@ -90,6 +92,4 @@ public class Compiler {
         }
         return false;
     }
-
-
 }
