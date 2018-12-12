@@ -1,0 +1,15 @@
+language: java
+
+jdk:
+    # can have multiple versions if need be (e.g. below append "-openjdk8")
+    - oraclejdk8
+
+script:
+    - chmod +x ./gradlew
+    - ./gradlew clean build
+    
+notifications:
+    email:
+        recipients:
+            bekiroe@hotmail.de
+            schoenstatt18@gmx.de
