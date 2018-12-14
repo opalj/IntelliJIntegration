@@ -1,9 +1,8 @@
 package HTMLEditor;
 
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.actionSystem.*;
 import com.intellij.ui.JBColor;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import javafx.application.Platform;
@@ -12,7 +11,8 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 // DataProvider: Allows a component hosting actions to provide context information to the actions.
 // CopyProvider: performs copy, enables/disables copy, shows/hide copy

@@ -1,12 +1,12 @@
 package loadClassFile;
 
-import Compile.Compiler;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import Compile.Compiler;
 import globalData.GlobalData;
 import java.io.File;
 import java.io.IOException;
@@ -124,15 +124,20 @@ public class LoadClassFileAction extends AnAction {
       try {
         disassembledFile.createNewFile();
       } catch (IOException e) {
+        // empty
       }
     }
 
     try {
       SaveFile.saveFile(dec, disassembledFile.getAbsolutePath());
     } catch (InputNullException e0) {
+      // empty
     } catch (NotEnoughRightsException e1) {
+      // empty
     } catch (IsNotAFileException e2) {
+      // empty
     } catch (ErrorWritingFileException e3) {
+      // empty
     }
 
     // Open the just saved file in an editor

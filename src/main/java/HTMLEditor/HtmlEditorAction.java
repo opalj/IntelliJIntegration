@@ -25,7 +25,7 @@ public class HtmlEditorAction extends AnAction {
     Messages.showInfoMessage(defaultScheme + "", "Color Scheme");
 
     // make sure it's a ".class" file!
-    //        FileEditor htmlEditor = new MyHtmlEditor(project, virtualFile);
+    //        FileEditor HTMLEditor = new MyHtmlEditor(project, virtualFile);
     MyFileEditorProvider provider = new MyFileEditorProvider();
     provider.createEditor(project, virtualFile); // this will call MyHtmlEditor() !!
   }

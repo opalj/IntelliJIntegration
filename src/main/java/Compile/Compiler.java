@@ -23,28 +23,34 @@ public final class Compiler {
     String s;
     while (path != null) {
       s = find(path.toFile());
-      if (s != null) return s;
+      if (s != null) {
+        return s;
+      }
       path = path.getParent();
     }
     return "";
   }
+
   /*
-         recursive helpfunction for the find method
-  */
+   * recursive helpfunction for the find method
+   */
   @Nullable
   private String find(@NotNull File fl) {
     for (File f : fl.listFiles()) {
-      if (f.isDirectory() && f.getName().equals(".idea"))
+      if (f.isDirectory() && f.getName().equals(".idea")) {
         return f.getParentFile().getAbsolutePath();
-      else if (f.isFile() && f.getName().endsWith(".ipr"))
+      } else if (f.isFile() && f.getName().endsWith(".ipr")) {
         return f.getAbsolutePath(); // nocht nicht getestet
-      else if (f.isDirectory()) return find(f);
+      } else if (f.isDirectory()) {
+        return find(f);
+      }
     }
     return null;
   }
+
   /*
-         compile a project with a given (open) Project-Object
-  */
+   * Compile a project with a given (open) Project-Object
+   */
   public static boolean make(@NotNull final Project project) {
     CompilerManager compManager = CompilerManager.getInstance(project);
     CompileScope projectCompileScope = compManager.createProjectCompileScope(project);
@@ -56,16 +62,25 @@ public final class Compiler {
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
-      while (compManager.isCompilationActive()) ; // compManager.isCompilationActive())
+
+      while (compManager.isCompilationActive()) {
+        // compManager.isCompilationActive())
+        // empty
+      }
     }
+
     return true;
   }
+
   /*
-         compile a project with a given filePath-String, searches naivly the first .idea-Dir or *.ipr-file
-  */
+   * Compile a project with a given filePath-String,
+   * searches naively the first .idea-Dir or *.ipr-file
+   */
   public boolean make(@NotNull String filePath) {
     filePath = find(filePath);
-    if (filePath == null) return false;
+    if (filePath == null) {
+      return false;
+    }
     ProjectManager projectManager = ProjectManager.getInstance();
     Project project;
     // Look for OpenProjects
@@ -78,7 +93,9 @@ public final class Compiler {
     // try to open project
     try {
       project = projectManager.loadAndOpenProject(filePath);
-      if (project == null) return false;
+      if (project == null) {
+        return false;
+      }
       boolean bMade = make(project);
       projectManager.closeProject(project);
       return bMade;

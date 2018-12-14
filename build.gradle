@@ -23,23 +23,6 @@ dependencies {
     compile 'de.opal-project:bytecode-disassembler_2.12:2.0.1:'
 }
 
-//runIde {
-//    dependsOn 'check'
-//}
-
-// build.dependsOn(check), which means that 'check' will be executed whenever 'build' will be executed
-check {
-    // googleJavaFormat will report "NO-SOURCE" if everything is properly formatted (-> not harmful in any way, can ignore)
-    dependsOn 'googleJavaFormat'
-
-    // dependsOn [checkstyle, pmd and spotbugsMain] per default
-
-    // TODO maybe spotbugsMain as first task to be executed (if fails -> no time wasted with the rest)
-    tasks.findByName('checkstyleMain').mustRunAfter('googleJavaFormat')
-    tasks.findByName('pmdMain').mustRunAfter('checkstyleMain')
-    tasks.findByName('spotbugsMain').mustRunAfter('pmdMain')
-}
-
 intellij {
     version '2018.2.2'
 }
@@ -49,6 +32,21 @@ patchPluginXml {
       <em>most HTML tags may be used</em>"""
 }
 
+// ================
+// Overriding tasks
+// ================
+
+// build.dependsOn(check), which means that 'check' will be executed whenever 'build' will be executed
+check {
+    // googleJavaFormat will report "NO-SOURCE" if everything is properly formatted (-> not harmful in any way, can ignore)
+    dependsOn 'googleJavaFormat'
+
+    // dependsOn [checkstyle, pmd and spotbugsMain] per default
+
+    tasks.findByName('checkstyleMain').mustRunAfter('googleJavaFormat')
+    tasks.findByName('pmdMain').mustRunAfter('checkstyleMain')
+    tasks.findByName('spotbugsMain').mustRunAfter('pmdMain')
+}
 
 tasks.withType(com.github.spotbugs.SpotBugsTask) {
     reports {
@@ -62,9 +60,6 @@ tasks.withType(com.github.spotbugs.SpotBugsTask) {
 
 checkstyle {
     toolVersion "8.10.1"
-//    configFile = file("${rootDir}/config/checkstyle/ckeckstyle.xml")
     config = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml')
-
-    maxErrors 2
+//    maxErrors 20
 }
-

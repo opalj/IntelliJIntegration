@@ -1,18 +1,20 @@
 package HTMLEditor;
 
-import Compile.Compiler;
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
-import com.intellij.openapi.fileEditor.*;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorLocation;
+import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
-import com.intellij.openapi.vfs.*;
+import com.intellij.openapi.vfs.VirtualFile;
+import Compile.Compiler;
 import globalData.GlobalData;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import javax.swing.*;
+import javax.swing.JComponent;
 import opalintegration.Opal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -134,12 +136,12 @@ public class MyHtmlEditor implements FileEditor {
   // =================================================================
 
   private void showTAC(@NotNull Project project, @NotNull VirtualFile virtualFile) {
-    String tac = Opal.ThreeWayDisAssemblerString(virtualFile.getPath());
+    String tac = Opal.threeWayDisassemblerString(virtualFile.getPath());
     WindowCommManager wcm = WindowCommManager.getInstance();
     wcm.setDisassemblerText(tac);
   }
 
-  // 1. compile project file
+  // 1. Compile project file
   // 2. OPAL: toHtml()
   // 3. return html-file
   // 4. pass file to editor
@@ -205,15 +207,20 @@ public class MyHtmlEditor implements FileEditor {
         try {
           disassembledFile.createNewFile();
         } catch (IOException e) {
+          // empty
         }
       }
 
       try {
         SaveFile.saveFile(classHtmlForm, disassembledFile.getAbsolutePath());
       } catch (InputNullException e0) {
+        // empty
       } catch (NotEnoughRightsException e1) {
+        // empty
       } catch (IsNotAFileException e2) {
+        // empty
       } catch (ErrorWritingFileException e3) {
+        // empty
       }
 
       return classHtmlForm;

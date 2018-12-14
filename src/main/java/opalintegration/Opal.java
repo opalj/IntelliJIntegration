@@ -48,7 +48,7 @@ public class Opal {
   }
 
   @Deprecated
-  public void ThreeWayDisAssemblerOutput(String filepath) throws IOException {
+  public void threeWayDisassemblerOutput(String filepath) throws IOException {
     uriProject = Project.apply(new File(filepath));
     JavaProject javaProject = new JavaProject(uriProject);
     ConstArray<org.opalj.br.ClassFile> classFileConstArray =
@@ -79,8 +79,8 @@ public class Opal {
     }
   }
 
-  public static String ThreeWayDisAssemblerString(String filepath) {
-    String tacCodeString = "";
+  public static String threeWayDisassemblerString(String filepath) {
+    StringBuilder tacCodeString = new StringBuilder();
     uriProject = Project.apply(new File(filepath));
     javaProject = new JavaProject(uriProject);
     ConstArray<org.opalj.br.ClassFile> classFileConstArray =
@@ -97,14 +97,14 @@ public class Opal {
           System.out.println(method.toJava());
           TACode<TACMethodParameter, DUVar<KnownTypedValue>> TacCode =
               methodTACodeFunction.apply(method);
-          tacCodeString = tacCodeString + ToTxt.apply(TacCode).mkString("\n");
+          tacCodeString.append(ToTxt.apply(TacCode).mkString("\n"));
         }
-      }
-    }
+      } // for(j)
+    } // for(i)
 
     // TODO
     try {
-      return new String(tacCodeString.getBytes(), "UTF-8");
+      return new String(tacCodeString.toString().getBytes(), "UTF-8");
     } catch (UnsupportedEncodingException e) {
       return null;
     }
