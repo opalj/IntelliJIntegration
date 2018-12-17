@@ -12,6 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.*;
+
+import opalintegration.Opal;
 import runCommand.ErrorRunningCommandException;
 import runCommand.RunCommand;
 import saveFile.SaveFile;
@@ -128,8 +130,19 @@ public class LoadClassFileAction extends AnAction {
       }
     }
 
+
+
+
+
+
+    String tac = Opal.threeWayDisassemblerString(classFile.getAbsolutePath());
+
+
+
+
+
     try {
-      SaveFile.saveFile(dec, disassembledFile.getAbsolutePath());
+      SaveFile.saveFile(tac, disassembledFile.getAbsolutePath());
     } catch (InputNullException e0) {
       // empty
     } catch (NotEnoughRightsException e1) {
