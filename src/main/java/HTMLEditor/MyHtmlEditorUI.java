@@ -12,10 +12,10 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 import com.sun.webkit.WebPage;
-import com.teamdev.jxbrowser.chromium.Browser;
-import com.teamdev.jxbrowser.chromium.BrowserContext;
-import com.teamdev.jxbrowser.chromium.BrowserContextParams;
-import com.teamdev.jxbrowser.chromium.swing.BrowserView;
+//import com.teamdev.jxbrowser.chromium.Browser;
+//import com.teamdev.jxbrowser.chromium.BrowserContext;
+//import com.teamdev.jxbrowser.chromium.BrowserContextParams;
+//import com.teamdev.jxbrowser.chromium.swing.BrowserView;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
