@@ -15,12 +15,19 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    maven { url = 'http://maven.teamdev.com/repository/products' }
+}
+
+ext {
+    jxBrowserVersion = '7.0'
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'de.opal-project:abstract-interpretation-framework_2.12:2.0.1'
     compile 'de.opal-project:bytecode-disassembler_2.12:2.0.1:'
+    //compile "com.teamdev.jxbrowser:jxbrowser-cross-platform:${jxBrowserVersion}"
+    //compile files('Q:/Documents/IntelliJ/intellijintegration/build/libs/jxbrowser-6.22.1.jar')
 }
 
 intellij {
