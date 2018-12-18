@@ -1,0 +1,20 @@
+{
+  parserClass="syntaxHighlighting.TAC_parser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="TAC"
+  psiImplClassSuffix="Impl"
+  psiPackage="syntaxHighlighting"
+  psiImplPackage="syntaxHighlighting.impl"
+
+  elementTypeHolderClass="syntaxHighlighting.TAC_elementTypeHolder"
+  elementTypeClass="syntaxHighlighting.TAC_elementType"
+  tokenTypeClass="syntaxHighlighting.TAC_tokenType"
+}
+
+tacFile ::= item_*
+
+private item_ ::= (property|COMMENT|CRLF)
+
+property ::= (KEY? SEPARATOR VALUE?) | KEY
