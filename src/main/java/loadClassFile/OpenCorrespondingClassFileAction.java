@@ -9,10 +9,14 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.ProjectFileIndex;
-import com.intellij.openapi.vfs.*;
+import com.intellij.openapi.vfs.VfsUtilCore;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.vfs.VirtualFileVisitor;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
 
 public class OpenCorrespondingClassFileAction extends AnAction {
 
@@ -68,30 +72,37 @@ public class OpenCorrespondingClassFileAction extends AnAction {
 
     // collect all classFiles in the output directory
     List<VirtualFile> classFiles = new ArrayList<>();
+    boolean done = false;
     VfsUtilCore.visitChildrenRecursively(
         outputPath,
         new VirtualFileVisitor<VirtualFile>() {
           @NotNull
           @Override
           public Result visitFileEx(@NotNull VirtualFile file) {
-            // TODO: could be improved by e.g. breaking at the right moment and returning the last
-            // element
-            if (!file.isDirectory()) {
-              classFiles.add(file);
+            if (!file.isDirectory() ) {
+              if(file.getName().equals(classFileName)) {
+                classFiles.add(file);
+                VirtualFileVisitor.limit(-1);
+                return VirtualFileVisitor.SKIP_CHILDREN;
+              }
             }
-
+            //if(done)
+              //return VirtualFileVisitor.SKIP_CHILDREN;
             return CONTINUE;
           }
         });
-
-    // find the classFile we need, and return it
-    VirtualFile classFile = classFiles.get(0);
-    for (VirtualFile cf : classFiles) {
-      if (cf.getName().equals(classFileName)) {
-        classFile = cf;
-        break;
-      }
+    VirtualFile classFile = null;
+    if(!classFiles.isEmpty()) {
+      classFile = classFiles.get(0);
     }
+    // find the classFile we need, and return it
+    //VirtualFile classFile = classFiles.get(0);
+//    for (VirtualFile cf : classFiles) {
+//      if (cf.getName().equals(classFileName)) {
+//        classFile = cf;
+//        break;
+//      }
+//    }
 
     return classFile;
   } // getCorrespondingClassFile()

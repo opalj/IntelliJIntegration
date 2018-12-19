@@ -1,5 +1,6 @@
 package HTMLEditor;
 
+import Compile.Compiler;
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
@@ -8,13 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
-import Compile.Compiler;
 import globalData.GlobalData;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import javax.swing.JComponent;
 import opalintegration.Opal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,6 +19,12 @@ import saveFile.exceptions.InputNullException;
 import saveFile.exceptions.IsNotAFileException;
 import saveFile.exceptions.NotEnoughRightsException;
 import toolWindows.WindowCommManager;
+
+import javax.swing.*;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 /*
  * @example: https://github.com/JetBrains/intellij-community/blob/master/images/src/org/intellij/images/editor/impl/ImageEditorImpl.java
@@ -152,7 +153,7 @@ public class MyHtmlEditor implements FileEditor {
       String classPath = virtualFile.getPath();
 
       // get the HTML format of the class file
-      String classHtmlForm = Opal.toHTMLForm(classPath);
+      String classHtmlForm = Opal.JavaClasstoHTMLForm(classPath);
 
       // Save the decompiled code to a file
       String basePath = project.getBasePath();

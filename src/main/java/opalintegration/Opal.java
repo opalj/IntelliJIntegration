@@ -1,9 +1,6 @@
 package opalintegration;
 
-import java.io.*;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.opalj.ai.ValuesDomain;
 import org.opalj.br.Method;
 import org.opalj.br.analyses.JavaProject;
@@ -16,11 +13,20 @@ import org.opalj.value.KnownTypedValue;
 import scala.Function1;
 import scala.Some;
 
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class Opal {
+  // uriProject wird benötigt um die OpalFrameworks mit dem Project zu verbinden.
   private static Project<URL> uriProject;
+  // noch nicht wichtig könnted
   private static JavaProject javaProject;
   static Function1<Method, TACode<TACMethodParameter, DUVar<KnownTypedValue>>> methodTACodeFunction;
-
+  // INTELIJ VARS
+  private static com.intellij.openapi.project.Project project;
+  private static String classPath;
   private static void Test(String filepath) {
     Project<URL> uriProject = Project.apply(new File(filepath));
     JavaProject javaProject = new JavaProject(uriProject);
@@ -48,7 +54,7 @@ public class Opal {
   }
 
   @Deprecated
-  public void threeWayDisassemblerOutput(String filepath) throws IOException {
+  private void threeWayDisassemblerOutput(String filepath) throws IOException {
     uriProject = Project.apply(new File(filepath));
     JavaProject javaProject = new JavaProject(uriProject);
     ConstArray<org.opalj.br.ClassFile> classFileConstArray =
@@ -89,7 +95,7 @@ public class Opal {
     for (int i = 0; i < classFileConstArray.length(); i++) {
       org.opalj.br.ClassFile classFile = classFileConstArray.apply(i);
       RefArray<Method> methods = classFile.methods();
-      //            TODO     classFile.fields();
+      //            TODO     classFile.fields(); soll nicht
       //            TODO     classFile.attributes();
       for (int j = 0; j < methods.length(); j++) {
         Method method = methods.apply(j);
@@ -112,27 +118,37 @@ public class Opal {
     //        return tacCodeString;
   }
 
-  public static String toHTMLForm(String classPath) {
+  public static String JavaClasstoHtmlForm(VirtualFile virtualClassFile){
+      classPath = virtualClassFile.getPath();
+    String JavaHTMLClass = JavaClasstoHTMLForm(classPath);
+    return JavaHTMLClass;
+  }
+  public static String JavaClasstoHTMLForm(String classPath) {
     Path path = Paths.get(classPath);
     File file = path.toFile();
-
     // TODO scala.collection.immutable.List<Object> classFileList;
-
     String toHtmlAsString;
     try (FileInputStream fis = new FileInputStream(file);
         DataInputStream dis = new DataInputStream(fis)) {
       // get the class file and construct the HTML string
       org.opalj.da.ClassFile cf = (org.opalj.da.ClassFile) ClassFileReader.ClassFile(dis).head();
+      // ordentliches HTML Code
       toHtmlAsString =
-          "<style>"
+          "<html>\n<head>\n<style>"
               + cf.TheCSS()
-              + "</style>"
-              + cf.classFileToXHTML(new Some(classPath)).toString();
+              + "</style>\n</head>\n<body>\n"
+              + cf.classFileToXHTML(new Some(classPath)).toString()
+              + "\n</body>\n</html>";
     } catch (IOException e) {
       e.printStackTrace();
-      toHtmlAsString = "<html>Something went wrong in Opal.toHTMLForm()</html>";
+      // fehlerausgabe im HTMLFormat für den Editor
+      toHtmlAsString = "<html><body><h1>Something went wrong in Opal.toHTMLForm()</h1></body></html>";
     }
 
     return toHtmlAsString;
   } // toHTMLForm()
+  public static void setProject(com.intellij.openapi.project.Project inteliProject){
+     project = inteliProject;
+  }
+
 }
