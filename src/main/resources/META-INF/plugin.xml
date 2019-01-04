@@ -16,22 +16,26 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <!--
+
          NOT NEEDED ANYMORE
         <toolWindow id="Outline"
-                      factoryClass="toolWindows.OutlineToolWindowFactory"
-                      anchor="left"
-                      secondary="true"/>
+                    factoryClass="toolWindows.OutlineToolWindowFactory"
+                    anchor="left"
+                    secondary="true"/>
 
-          <toolWindow id="Disassembler"
-                      factoryClass="toolWindows.DisassemblerToolWindowFactory"
-                      anchor="right"
-                      secondary="true"/>
-          -->
+        <toolWindow id="Disassembler"
+                    factoryClass="toolWindows.DisassemblerToolWindowFactory"
+                    anchor="right"
+                    secondary="true"/>
         <fileEditorProvider implementation="HTMLEditor.MyFileEditorProvider"
+                            id="My File Editor Provider"/>
+        <fileTypeFactory implementation="syntaxHighlighting.TAC_fileTypeFactory"/>
+        <lang.parserDefinition language="TAC" implementationClass="syntaxHighlighting.TAC_parserDefinition"/>
+        <lang.syntaxHighlighterFactory language="TAC"
+                                       implementationClass="syntaxHighlighting.TAC_syntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="syntaxHighlighting.TAC_colorSettingsPage"/>
                             id="OpalHTMLEditorProvider"/>
-        <fileEditorProvider implementation="FileEditor.TacFileEditor"
-                            id="OpalTACEditorProvider"/>
+
     </extensions>
 
     <actions>

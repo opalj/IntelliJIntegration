@@ -10,6 +10,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
+import opalintegration.Opal;
 import runCommand.ErrorRunningCommandException;
 import runCommand.RunCommand;
 import saveFile.SaveFile;
@@ -31,29 +32,15 @@ public class LoadClassFileAction extends AnAction {
         super("Load Class-file into bytecode disassembler");
     }
 
-    public void actionPerformed(AnActionEvent event) {
-        if( event.getProject() != null && Compiler.make(event.getProject())){
-            // All files selected in the "Project"-View
-            VirtualFile[] virtualFiles = event.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY);
-
-            // Load the file
-            /*try {
-                byte [] fileData = LoadFile.loadFile(virtualFiles[0].getPath());
-                WindowCommManager.getInstance().setDisassemblerText(""+fileData.length);
-            } catch (Exception e) {
-                WindowCommManager.getInstance().setDisassemblerText(e.getMessage());
-            }*/
-
-            openClassFile(new File(virtualFiles[0].getPath()));
-        }
-    }
-
     public static final void openClassFile(File classFile) {
 
         String classFileEnding = getEnding(classFile.getName());
         if (classFileEnding == null || !classFileEnding.toUpperCase().equals("CLASS")) {
-            JOptionPane.showMessageDialog(null, "The given file is not a class-file.\nCan only decompile " +
-                    "class-files.", "Error", JOptionPane.OK_OPTION);
+            JOptionPane.showMessageDialog(
+                    null,
+                    "The given file is not a class-file.\nCan only decompile " + "class-files.",
+                    "Error",
+                    JOptionPane.OK_OPTION);
             return;
         }
 
@@ -89,13 +76,16 @@ public class LoadClassFileAction extends AnAction {
 
         temp = new File(disassembledDir.getAbsolutePath());
         for (int i = 0; i < dirNames.size(); i++) {
-            temp = new File(temp.getAbsolutePath() + File.separator + dirNames.get(dirNames.size() - (i + 1)));
+            temp =
+                    new File(
+                            temp.getAbsolutePath() + File.separator + dirNames.get(dirNames.size() - (i + 1)));
             if (!temp.exists()) {
                 temp.mkdir();
             }
         }
 
-        //File classFile = new File(classPath); ##########################################################################################
+        // File classFile = new File(classPath);
+        // ##########################################################################################
         String noEnding = classFile.getName();
         if (noEnding.contains(".")) {
             String[] parts = noEnding.split("\\.");
@@ -109,37 +99,64 @@ public class LoadClassFileAction extends AnAction {
             }
             noEnding = tempNoEnding;
         }
-        File disassembledFile = new File(temp.getAbsolutePath() + File.separator + noEnding + "." +
-                GlobalData.TAC_FILE_ENDING);
+        File disassembledFile =
+                new File(
+                        temp.getAbsolutePath()
+                                + File.separator
+                                + noEnding
+                                + "."
+                                + GlobalData.DISASSEMBLED_FILE_ENDING_TAC);
 
         if (!disassembledFile.exists()) {
             try {
                 disassembledFile.createNewFile();
             } catch (IOException e) {
+                // empty
             }
         }
 
+        String tac = Opal.ThreeWayDisAssemblerString(classFile.getAbsolutePath());
+
         try {
-            SaveFile.saveFile(dec, disassembledFile.getAbsolutePath());
+            SaveFile.saveFile(tac, disassembledFile.getAbsolutePath());
         } catch (InputNullException e0) {
+            // empty
         } catch (NotEnoughRightsException e1) {
+            // empty
         } catch (IsNotAFileException e2) {
+            // empty
         } catch (ErrorWritingFileException e3) {
+            // empty
         }
 
         // Open the just saved file in an editor
-        FileEditorManager.getInstance(currentProject).openFile(
-                LocalFileSystem.getInstance().refreshAndFindFileByIoFile(disassembledFile)
-                , true);
+        FileEditorManager.getInstance(currentProject)
+                .openFile(LocalFileSystem.getInstance().refreshAndFindFileByIoFile(disassembledFile), true);
     }
 
     private static final String getEnding(String fileName) {
-        if( fileName.contains(".") ) {
-            String [] parts = fileName.split("\\.");
+        if (fileName.contains(".")) {
+            String[] parts = fileName.split("\\.");
             return parts[(parts.length - 1)];
         } else {
             return null;
         }
     }
 
+    public void actionPerformed(AnActionEvent event) {
+        if (event.getProject() != null && Compiler.make(event.getProject())) {
+            // All files selected in the "Project"-View
+            VirtualFile[] virtualFiles = event.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY);
+
+            // Load the file
+      /*try {
+          byte [] fileData = LoadFile.loadFile(virtualFiles[0].getPath());
+          WindowCommManager.getInstance().setDisassemblerText(""+fileData.length);
+      } catch (Exception e) {
+          WindowCommManager.getInstance().setDisassemblerText(e.getMessage());
+      }*/
+
+            openClassFile(new File(virtualFiles[0].getPath()));
+        }
+    }
 }

@@ -6,8 +6,9 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
-import com.intellij.openapi.vfs.*;
+import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
 import opalintegration.Opal;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-
 /*
  * @example: https://github.com/JetBrains/intellij-community/blob/master/images/src/org/intellij/images/editor/impl/ImageEditorImpl.java
  */
@@ -33,10 +33,11 @@ public class MyHtmlEditor implements FileEditor {
 
     private final MyHtmlEditorUI editorUI;
     private final VirtualFile virtualFile;
+    private final Project project; // TODO needed or not ?
     private boolean disposed;
 
-
     public MyHtmlEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
+        this.project = project;
         this.virtualFile = virtualFile;
 
         String html = prepareHtml(project, virtualFile);
@@ -45,6 +46,13 @@ public class MyHtmlEditor implements FileEditor {
         // show TAC (currently all methods) in toolWindow
         // TODO: show TAC only for selected methods
         showTAC(project, virtualFile);
+
+        Disposer.register(this, editorUI);
+    }
+
+    // TODO needed or not?
+    public Project getProject() {
+        return project;
     }
 
     @NotNull
@@ -68,7 +76,7 @@ public class MyHtmlEditor implements FileEditor {
     @Override
     public void setState(@NotNull FileEditorState state) {
         // TODO
-//        fileEditorState = state;
+        //        fileEditorState = state;
     }
 
     @Override
@@ -126,29 +134,28 @@ public class MyHtmlEditor implements FileEditor {
 
     @Override
     public <T> void putUserData(@NotNull Key<T> key, @Nullable T value) {
-
     }
 
     // =================================================================
 
     private void showTAC(@NotNull Project project, @NotNull VirtualFile virtualFile) {
-        String tac = Opal.ThreeWayDisAssemblerString(virtualFile.getPath());
+        String tac = Opal.threeWayDisassemblerString(virtualFile.getPath());
         WindowCommManager wcm = WindowCommManager.getInstance();
         wcm.setDisassemblerText(tac);
     }
 
-    // 1. compile project file
+    // 1. Compile project file
     // 2. OPAL: toHtml()
     // 3. return html-file
     // 4. pass file to editor
     // TODO: this currently does more (e.g. create dir for disassembled files)
     private String prepareHtml(@NotNull Project project, @NotNull VirtualFile virtualFile) {
         // All files selected in the "Project"-View
-        if(Compiler.make(project)) {
+        if (Compiler.make(project)) {
             String classPath = virtualFile.getPath();
 
             // get the HTML format of the class file
-            String classHtmlForm = Opal.toHTMLForm(classPath);
+            String classHtmlForm = Opal.JavaClasstoHTMLForm(classPath);
 
             // Save the decompiled code to a file
             String basePath = project.getBasePath();
@@ -161,14 +168,17 @@ public class MyHtmlEditor implements FileEditor {
                 temp = temp.getParentFile();
             }
 
-            File disassembledDir = new File(basePath + File.separator + GlobalData.DISASSEMBLED_FILES_DIR);
+            File disassembledDir =
+                    new File(basePath + File.separator + GlobalData.DISASSEMBLED_FILES_DIR);
             if (!disassembledDir.exists()) {
                 disassembledDir.mkdir();
             }
 
             temp = new File(disassembledDir.getAbsolutePath());
             for (int i = 0; i < dirNames.size(); i++) {
-                temp = new File(temp.getAbsolutePath() + File.separator + dirNames.get(dirNames.size() - (i + 1)));
+                temp =
+                        new File(
+                                temp.getAbsolutePath() + File.separator + dirNames.get(dirNames.size() - (i + 1)));
                 if (!temp.exists()) {
                     temp.mkdir();
                 }
@@ -188,22 +198,32 @@ public class MyHtmlEditor implements FileEditor {
                 }
                 noEnding = tempNoEnding;
             }
-            File disassembledFile = new File(temp.getAbsolutePath() + File.separator + noEnding + "." +
-                    GlobalData.DISASSEMBLED_FILE_ENDING);
+            File disassembledFile =
+                    new File(
+                            temp.getAbsolutePath()
+                                    + File.separator
+                                    + noEnding
+                                    + "."
+                                    + GlobalData.DISASSEMBLED_FILE_ENDING_HTML);
 
             if (!disassembledFile.exists()) {
                 try {
                     disassembledFile.createNewFile();
                 } catch (IOException e) {
+                    // empty
                 }
             }
 
             try {
                 SaveFile.saveFile(classHtmlForm, disassembledFile.getAbsolutePath());
             } catch (InputNullException e0) {
+                // empty
             } catch (NotEnoughRightsException e1) {
+                // empty
             } catch (IsNotAFileException e2) {
+                // empty
             } catch (ErrorWritingFileException e3) {
+                // empty
             }
 
             return classHtmlForm;
