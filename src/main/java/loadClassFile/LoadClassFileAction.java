@@ -1,14 +1,15 @@
 package loadClassFile;
 
 import Compile.Compiler;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
-import loadFile.LoadFile;
 import runCommand.ErrorRunningCommandException;
 import runCommand.RunCommand;
 import saveFile.SaveFile;
@@ -109,7 +110,7 @@ public class LoadClassFileAction extends AnAction {
             noEnding = tempNoEnding;
         }
         File disassembledFile = new File(temp.getAbsolutePath() + File.separator + noEnding + "." +
-                GlobalData.DISASSEMBLED_FILE_ENDING);
+                GlobalData.TAC_FILE_ENDING);
 
         if (!disassembledFile.exists()) {
             try {
