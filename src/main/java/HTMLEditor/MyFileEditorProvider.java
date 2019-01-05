@@ -14,7 +14,8 @@ import org.jetbrains.annotations.NotNull;
 public class MyFileEditorProvider implements FileEditorProvider {
   // TODO: should this class implement "DumbAware" ?
 
-  @NonNls private static final String EDITOR_TYPE_ID = "OPAL";
+  @NonNls
+  private static final String EDITOR_TYPE_ID = "OPAL";
 
   @Override
   public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {

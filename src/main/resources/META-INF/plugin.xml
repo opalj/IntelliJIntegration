@@ -31,7 +31,8 @@
                             id="OpalTACEditorProvider"/>
         <fileTypeFactory implementation="syntaxHighlighting.TAC_fileTypeFactory"/>
         <lang.parserDefinition language="TAC" implementationClass="syntaxHighlighting.TAC_parserDefinition"/>
-        <lang.syntaxHighlighterFactory language="TAC" implementationClass="syntaxHighlighting.TAC_syntaxHighlighterFactory"/>
+        <lang.syntaxHighlighterFactory language="TAC"
+                                       implementationClass="syntaxHighlighting.TAC_syntaxHighlighterFactory"/>
         <colorSettingsPage implementation="syntaxHighlighting.TAC_colorSettingsPage"/>
     </extensions>
 

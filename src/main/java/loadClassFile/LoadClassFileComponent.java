@@ -35,5 +35,6 @@ public class LoadClassFileComponent implements ApplicationComponent {
   }
 
   // Disposes system resources.
-  public void disposeComponent() {}
+  public void disposeComponent() {
+  }
 }

@@ -12,21 +12,21 @@ import java.awt.*;
 
 public class HtmlEditorAction extends AnAction {
 
-  @Override
-  public void actionPerformed(AnActionEvent e) {
-    final Project project = e.getProject();
-    final Editor editor = e.getData(CommonDataKeys.EDITOR);
+    @Override
+    public void actionPerformed(AnActionEvent e) {
+        final Project project = e.getProject();
+        final Editor editor = e.getData(CommonDataKeys.EDITOR);
 
-    FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-    VirtualFile virtualFile = project.getProjectFile();
-    fileEditorManager.openFile(virtualFile, true);
+        FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+        VirtualFile virtualFile = project.getProjectFile();
+        fileEditorManager.openFile(virtualFile, true);
 
-    Color defaultScheme = editor.getColorsScheme().getDefaultBackground();
-    Messages.showInfoMessage(defaultScheme + "", "Color Scheme");
+        Color defaultScheme = editor.getColorsScheme().getDefaultBackground();
+        Messages.showInfoMessage(defaultScheme + "", "Color Scheme");
 
-    // make sure it's a ".class" file!
-    //        FileEditor HTMLEditor = new MyHtmlEditor(project, virtualFile);
-    MyFileEditorProvider provider = new MyFileEditorProvider();
-    provider.createEditor(project, virtualFile); // this will call MyHtmlEditor() !!
-  }
+        // make sure it's a ".class" file!
+        //        FileEditor HTMLEditor = new MyHtmlEditor(project, virtualFile);
+        MyFileEditorProvider provider = new MyFileEditorProvider();
+        provider.createEditor(project, virtualFile); // this will call MyHtmlEditor() !!
+    }
 }

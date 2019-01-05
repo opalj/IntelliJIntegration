@@ -1,14 +1,22 @@
 package saveFile;
 
-import java.io.*;
-import saveFile.exceptions.*;
+import saveFile.exceptions.ErrorWritingFileException;
+import saveFile.exceptions.InputNullException;
+import saveFile.exceptions.IsNotAFileException;
+import saveFile.exceptions.NotEnoughRightsException;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class SaveFile {
 
-  private SaveFile() {}
+  private SaveFile() {
+  }
 
   public static final void saveFile(String data, String path)
-      throws InputNullException, NotEnoughRightsException, IsNotAFileException,
+          throws InputNullException, NotEnoughRightsException, IsNotAFileException,
           ErrorWritingFileException {
     if (path == null) {
       throw new InputNullException("The given parameter \"path\" is null.");
@@ -38,7 +46,6 @@ public class SaveFile {
     } catch (IOException e0) {
       throw new ErrorWritingFileException("IOException: " + e0.getMessage());
     }
-
     try {
       out.close();
     } catch (IOException e0) {

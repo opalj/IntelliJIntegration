@@ -6,40 +6,41 @@ import java.io.InputStreamReader;
 
 public class RunCommand {
 
-  private RunCommand() {}
-
-  public static final String runJavap(String path) throws ErrorRunningCommandException {
-    Runtime rt = Runtime.getRuntime();
-    String command = ("javap -p -constants -c " + path);
-    Process process = null;
-    try {
-      process = rt.exec(command);
-    } catch (IOException e0) {
-      throw new ErrorRunningCommandException("IOException: " + e0.getMessage());
+    private RunCommand() {
     }
 
-    BufferedReader input = null;
-    input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+    public static final String runJavap(String path) throws ErrorRunningCommandException {
+        Runtime rt = Runtime.getRuntime();
+        String command = ("javap -p -constants -c " + path);
+        Process process = null;
+        try {
+            process = rt.exec(command);
+        } catch (IOException e0) {
+            throw new ErrorRunningCommandException("IOException: " + e0.getMessage());
+        }
 
-    String tempString = null;
-    String result = null;
-    while (true) {
-      try {
-        tempString = input.readLine();
-      } catch (IOException e0) {
-        throw new ErrorRunningCommandException("IOException: " + e0.getMessage());
-      }
-      if (tempString == null) {
-        break;
-      }
+        BufferedReader input = null;
+        input = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-      if (result == null) {
-        result = ("" + tempString);
-      } else {
-        result = (result + "\n" + tempString);
-      }
+        String tempString = null;
+        String result = null;
+        while (true) {
+            try {
+                tempString = input.readLine();
+            } catch (IOException e0) {
+                throw new ErrorRunningCommandException("IOException: " + e0.getMessage());
+            }
+            if (tempString == null) {
+                break;
+            }
+
+            if (result == null) {
+                result = ("" + tempString);
+            } else {
+                result = (result + "\n" + tempString);
+            }
+        }
+
+        return result;
     }
-
-    return result;
-  }
 }
