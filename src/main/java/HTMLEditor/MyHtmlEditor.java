@@ -6,6 +6,7 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
@@ -30,204 +31,202 @@ import java.util.ArrayList;
  */
 public class MyHtmlEditor implements FileEditor {
 
-    private final MyHtmlEditorUI editorUI;
-    private final VirtualFile virtualFile;
-    private final Project project; // TODO needed or not ?
-    private boolean disposed;
+  private final MyHtmlEditorUI editorUI;
+  private final VirtualFile virtualFile;
+  private boolean disposed;
 
-    public MyHtmlEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
-        this.project = project;
-        this.virtualFile = virtualFile;
+  private final Project project; // TODO needed or not ?
 
-        String html = prepareHtml(project, virtualFile);
-        editorUI = new MyHtmlEditorUI(html);
+  public MyHtmlEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
+    this.project = project;
+    this.virtualFile = virtualFile;
 
-        // show TAC (currently all methods) in toolWindow
-        // TODO: show TAC only for selected methods
-        showTAC(project, virtualFile);
+    String html = prepareHtml(project, virtualFile);
+    editorUI = new MyHtmlEditorUI(html);
 
-        //Disposer.register(this, editorUI);
-    }
+    // show TAC (currently all methods) in toolWindow
+    // TODO: show TAC only for selected methods
+    showTAC(project, virtualFile);
 
-    // TODO needed or not?
-    public Project getProject() {
-        return project;
-    }
+    Disposer.register(this, editorUI);
+  }
 
-    @NotNull
-    @Override
-    public JComponent getComponent() {
-        return editorUI;
-    }
+  // TODO needed or not?
+  public Project getProject() {
+    return project;
+  }
 
-    @Nullable
-    @Override
-    public JComponent getPreferredFocusedComponent() {
-        return editorUI;
-    }
+  @NotNull
+  @Override
+  public JComponent getComponent() {
+    return editorUI;
+  }
 
-    @NotNull
-    @Override
-    public String getName() {
-        return "OPAL HTML";
-    }
+  @Nullable
+  @Override
+  public JComponent getPreferredFocusedComponent() {
+    return editorUI;
+  }
 
-    @Override
-    public void setState(@NotNull FileEditorState state) {
-        // TODO
-        //        fileEditorState = state;
-    }
+  @NotNull
+  @Override
+  public String getName() {
+    return "OPAL HTML";
+  }
 
-    @Override
-    public boolean isModified() {
-        // TODO
-        return false;
-    }
+  @Override
+  public void setState(@NotNull FileEditorState state) {
+    // TODO
+    //        fileEditorState = state;
+  }
 
-    @Override
-    public boolean isValid() {
-        // valid as long as NOT disposed AND its contents are still valid (e.g. file not deleted)
-        return !disposed && virtualFile.isValid();
-    }
+  @Override
+  public boolean isModified() {
+    // TODO
+    return false;
+  }
 
-    @Override
-    public void selectNotify() {
-        // for now can remain empty (called when editor is selected)
-    }
+  @Override
+  public boolean isValid() {
+    // valid as long as NOT disposed AND its contents are still valid (e.g. file not deleted)
+    return !disposed && virtualFile.isValid();
+  }
 
-    @Override
-    public void deselectNotify() {
-        // for now can remain empty (called when editor is deselected)
-    }
+  @Override
+  public void selectNotify() {
+    // for now can remain empty (called when editor is selected)
+  }
 
-    @Override
-    public void addPropertyChangeListener(@NotNull PropertyChangeListener listener) {
-    }
+  @Override
+  public void deselectNotify() {
+    // for now can remain empty (called when editor is deselected)
+  }
 
-    @Override
-    public void removePropertyChangeListener(@NotNull PropertyChangeListener listener) {
-    }
+  @Override
+  public void addPropertyChangeListener(@NotNull PropertyChangeListener listener) {}
 
-    @Nullable
-    @Override
-    public BackgroundEditorHighlighter getBackgroundHighlighter() {
-        return null;
-    }
+  @Override
+  public void removePropertyChangeListener(@NotNull PropertyChangeListener listener) {}
 
-    @Nullable
-    @Override
-    public FileEditorLocation getCurrentLocation() {
-        return null;
-    }
+  @Nullable
+  @Override
+  public BackgroundEditorHighlighter getBackgroundHighlighter() {
+    return null;
+  }
 
-    @Override
-    public void dispose() {
-        disposed = true;
-    }
+  @Nullable
+  @Override
+  public FileEditorLocation getCurrentLocation() {
+    return null;
+  }
 
-    @Nullable
-    @Override
-    public <T> T getUserData(@NotNull Key<T> key) {
-        return null;
-    }
+  @Override
+  public void dispose() {
+    disposed = true;
+  }
 
-    @Override
-    public <T> void putUserData(@NotNull Key<T> key, @Nullable T value) {
-    }
+  @Nullable
+  @Override
+  public <T> T getUserData(@NotNull Key<T> key) {
+    return null;
+  }
 
-    // =================================================================
+  @Override
+  public <T> void putUserData(@NotNull Key<T> key, @Nullable T value) {}
 
-    private void showTAC(@NotNull Project project, @NotNull VirtualFile virtualFile) {
-        String tac = Opal.threeWayDisassemblerString(virtualFile.getPath());
-        WindowCommManager wcm = WindowCommManager.getInstance();
-        wcm.setDisassemblerText(tac);
-    }
+  // =================================================================
 
-    // 1. Compile project file
-    // 2. OPAL: toHtml()
-    // 3. return html-file
-    // 4. pass file to editor
-    // TODO: this currently does more (e.g. create dir for disassembled files)
-    private String prepareHtml(@NotNull Project project, @NotNull VirtualFile virtualFile) {
-        // All files selected in the "Project"-View
-        if (Compiler.make(project)) {
-            String classPath = virtualFile.getPath();
+  private void showTAC(@NotNull Project project, @NotNull VirtualFile virtualFile) {
+    String tac = Opal.threeWayDisassemblerString(virtualFile.getPath());
+    WindowCommManager wcm = WindowCommManager.getInstance();
+    wcm.setDisassemblerText(tac);
+  }
 
-            // get the HTML format of the class file
-            String classHtmlForm = Opal.JavaClasstoHTMLForm(classPath);
+  // 1. Compile project file
+  // 2. OPAL: toHtml()
+  // 3. return html-file
+  // 4. pass file to editor
+  // TODO: this currently does more (e.g. create dir for disassembled files)
+  private String prepareHtml(@NotNull Project project, @NotNull VirtualFile virtualFile) {
+    // All files selected in the "Project"-View
+    if (Compiler.make(project)) {
+      String classPath = virtualFile.getPath();
 
-            // Save the decompiled code to a file
-            String basePath = project.getBasePath();
+      // get the HTML format of the class file
+      String classHtmlForm = Opal.JavaClasstoHTMLForm(classPath);
 
-            File baseDir = new File(basePath);
-            File temp = (new File(classPath)).getParentFile();
-            ArrayList<String> dirNames = new ArrayList<>();
-            while (!temp.getAbsolutePath().equals(baseDir.getAbsolutePath())) {
-                dirNames.add(temp.getName());
-                temp = temp.getParentFile();
-            }
+      // Save the decompiled code to a file
+      String basePath = project.getBasePath();
 
-            File disassembledDir =
-                    new File(basePath + File.separator + GlobalData.DISASSEMBLED_FILES_DIR);
-            if (!disassembledDir.exists()) {
-                disassembledDir.mkdir();
-            }
+      File baseDir = new File(basePath);
+      File temp = (new File(classPath)).getParentFile();
+      ArrayList<String> dirNames = new ArrayList<>();
+      while (!temp.getAbsolutePath().equals(baseDir.getAbsolutePath())) {
+        dirNames.add(temp.getName());
+        temp = temp.getParentFile();
+      }
 
-            temp = new File(disassembledDir.getAbsolutePath());
-            for (int i = 0; i < dirNames.size(); i++) {
-                temp =
-                        new File(
-                                temp.getAbsolutePath() + File.separator + dirNames.get(dirNames.size() - (i + 1)));
-                if (!temp.exists()) {
-                    temp.mkdir();
-                }
-            }
+      File disassembledDir =
+          new File(basePath + File.separator + GlobalData.DISASSEMBLED_FILES_DIR);
+      if (!disassembledDir.exists()) {
+        disassembledDir.mkdir();
+      }
 
-            File classFile = new File(classPath);
-            String noEnding = classFile.getName();
-            if (noEnding.contains(".")) {
-                String[] parts = noEnding.split("\\.");
-                String tempNoEnding = null;
-                for (int i = 0; i < (parts.length - 1); i++) {
-                    if (i == 0) {
-                        tempNoEnding = parts[0];
-                    } else {
-                        tempNoEnding = (tempNoEnding + "." + parts[i]);
-                    }
-                }
-                noEnding = tempNoEnding;
-            }
-            File disassembledFile =
-                    new File(
-                            temp.getAbsolutePath()
-                                    + File.separator
-                                    + noEnding
-                                    + "."
-                                    + GlobalData.DISASSEMBLED_FILE_ENDING_HTML);
-
-            if (!disassembledFile.exists()) {
-                try {
-                    disassembledFile.createNewFile();
-                } catch (IOException e) {
-                    // empty
-                }
-            }
-
-            try {
-                SaveFile.saveFile(classHtmlForm, disassembledFile.getAbsolutePath());
-            } catch (InputNullException e0) {
-                // empty
-            } catch (NotEnoughRightsException e1) {
-                // empty
-            } catch (IsNotAFileException e2) {
-                // empty
-            } catch (ErrorWritingFileException e3) {
-                // empty
-            }
-
-            return classHtmlForm;
+      temp = new File(disassembledDir.getAbsolutePath());
+      for (int i = 0; i < dirNames.size(); i++) {
+        temp =
+            new File(
+                temp.getAbsolutePath() + File.separator + dirNames.get(dirNames.size() - (i + 1)));
+        if (!temp.exists()) {
+          temp.mkdir();
         }
+      }
 
-        return null;
-    } // prepareHtml()
+      File classFile = new File(classPath);
+      String noEnding = classFile.getName();
+      if (noEnding.contains(".")) {
+        String[] parts = noEnding.split("\\.");
+        String tempNoEnding = null;
+        for (int i = 0; i < (parts.length - 1); i++) {
+          if (i == 0) {
+            tempNoEnding = parts[0];
+          } else {
+            tempNoEnding = (tempNoEnding + "." + parts[i]);
+          }
+        }
+        noEnding = tempNoEnding;
+      }
+      File disassembledFile =
+          new File(
+              temp.getAbsolutePath()
+                  + File.separator
+                  + noEnding
+                  + "."
+                  + GlobalData.DISASSEMBLED_FILE_ENDING);
+
+      if (!disassembledFile.exists()) {
+        try {
+          disassembledFile.createNewFile();
+        } catch (IOException e) {
+          // empty
+        }
+      }
+
+      try {
+        SaveFile.saveFile(classHtmlForm, disassembledFile.getAbsolutePath());
+      } catch (InputNullException e0) {
+        // empty
+      } catch (NotEnoughRightsException e1) {
+        // empty
+      } catch (IsNotAFileException e2) {
+        // empty
+      } catch (ErrorWritingFileException e3) {
+        // empty
+      }
+
+      return classHtmlForm;
+    }
+
+    return null;
+  } // prepareHtml()
 }

@@ -1,6 +1,7 @@
 package syntaxHighlighting;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
+import com.intellij.openapi.util.IconLoader;
 import globalData.GlobalData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

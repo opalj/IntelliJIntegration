@@ -16,8 +16,6 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-
-         NOT NEEDED ANYMORE
         <toolWindow id="Outline"
                     factoryClass="toolWindows.OutlineToolWindowFactory"
                     anchor="left"
@@ -28,14 +26,13 @@
                     anchor="right"
                     secondary="true"/>
         <fileEditorProvider implementation="HTMLEditor.MyFileEditorProvider"
-                            id="My File Editor Provider"/>
+                            id="OpalHTMLEditorProvider"/>
+        <fileEditorProvider implementation="FileEditor.TacFileEditor"
+                            id="OpalTACEditorProvider"/>
         <fileTypeFactory implementation="syntaxHighlighting.TAC_fileTypeFactory"/>
         <lang.parserDefinition language="TAC" implementationClass="syntaxHighlighting.TAC_parserDefinition"/>
-        <lang.syntaxHighlighterFactory language="TAC"
-                                       implementationClass="syntaxHighlighting.TAC_syntaxHighlighterFactory"/>
+        <lang.syntaxHighlighterFactory language="TAC" implementationClass="syntaxHighlighting.TAC_syntaxHighlighterFactory"/>
         <colorSettingsPage implementation="syntaxHighlighting.TAC_colorSettingsPage"/>
-                            id="OpalHTMLEditorProvider"/>
-
     </extensions>
 
     <actions>
