@@ -115,7 +115,7 @@ public class LoadClassFileAction extends AnAction {
             }
         }
 
-        String tac = Opal.ThreeWayDisAssemblerString(classFile.getAbsolutePath());
+        String tac = Opal.threeWayDisassemblerString(classFile.getAbsolutePath());
 
         try {
             SaveFile.saveFile(tac, disassembledFile.getAbsolutePath());

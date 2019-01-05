@@ -6,7 +6,6 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
@@ -47,7 +46,7 @@ public class MyHtmlEditor implements FileEditor {
         // TODO: show TAC only for selected methods
         showTAC(project, virtualFile);
 
-        Disposer.register(this, editorUI);
+        //Disposer.register(this, editorUI);
     }
 
     // TODO needed or not?
