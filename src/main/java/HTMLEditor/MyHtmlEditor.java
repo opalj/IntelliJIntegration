@@ -1,13 +1,19 @@
 package HTMLEditor;
 
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
+import com.intellij.ide.structureView.StructureViewBuilder;
+import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.xml.XmlFile;
 import opalintegration.Opal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +27,7 @@ import java.beans.PropertyChangeListener;
 public class MyHtmlEditor implements FileEditor {
 
     private final MyHtmlEditorUI editorUI;
-    private final VirtualFile virtualFile;
+    private final VirtualFile virtualFile; // HTMLVF
     private final Project project;
     private boolean disposed;
 
@@ -46,7 +52,7 @@ public class MyHtmlEditor implements FileEditor {
     @Nullable
     @Override
     public JComponent getPreferredFocusedComponent() {
-        return editorUI;
+        return editorUI.getPreferdComponent();
     }
 
     @NotNull
@@ -76,20 +82,20 @@ public class MyHtmlEditor implements FileEditor {
     @Override
     public void selectNotify() {
         // for now can remain empty (called when editor is selected)
+//    Messages.showInfoMessage("selectNotify(): " + virtualFile.getName(), "MyHtmlEditor");
     }
 
     @Override
     public void deselectNotify() {
         // for now can remain empty (called when editor is deselected)
+//    Messages.showInfoMessage("deselectNotify() " + virtualFile.getName(), "MyHtmlEditor");
     }
 
     @Override
-    public void addPropertyChangeListener(@NotNull PropertyChangeListener listener) {
-    }
+    public void addPropertyChangeListener(@NotNull PropertyChangeListener listener) {}
 
     @Override
-    public void removePropertyChangeListener(@NotNull PropertyChangeListener listener) {
-    }
+    public void removePropertyChangeListener(@NotNull PropertyChangeListener listener) {}
 
     @Nullable
     @Override
@@ -106,17 +112,47 @@ public class MyHtmlEditor implements FileEditor {
     @Override
     public void dispose() {
         disposed = true;
+        Disposer.dispose(editorUI);
     }
 
     @Nullable
     @Override
     public <T> T getUserData(@NotNull Key<T> key) {
-        return null;
+     return null;
     }
+
 
     @Override
     public <T> void putUserData(@NotNull Key<T> key, @Nullable T value) {
     }
+
     @Override
     public VirtualFile getFile() { return virtualFile; }
+    StructureViewBuilder structureViewBuilder;
+    @Nullable
+    @Override
+    public StructureViewBuilder getStructureViewBuilder() {
+//    LanguageFileTypeStructureViewBuilderProvider structureViewBuilderProvider =
+//        new LanguageFileTypeStructureViewBuilderProvider();
+//
+//    FileType xHtmlFileType = XHtmlFileType.INSTANCE;
+//    xHtmlFileType = StdFileTypes.JS;
+//    structureViewBuilder =
+//        structureViewBuilderProvider.getStructureViewBuilder(xHtmlFileType, virtualFile, project);
+//
+//    return structureViewBuilder;
+
+        // this creates a HTML-structure-view
+//        PsiFile psiFile = PsiFileFactory.getInstance(project).createFileFromText(
+//                StdLanguages.XHTML, prepareHtml(project, virtualFile)
+//        );
+
+       PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
+        StructureViewTreeElement root;
+        root = new MyStructureViewTreeElement(false, (XmlFile)psiFile);
+        Messages.showInfoMessage("root = " + root, "HtmlEditor#StructViewBuilder");
+        structureViewBuilder = new MyStructureViewBuilder(psiFile, root);
+
+        return structureViewBuilder;
+    }
 }

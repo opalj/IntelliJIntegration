@@ -48,6 +48,7 @@ public class OpenCorrespondingClassFileAction extends AnAction {
             VirtualFileManager.getInstance().syncRefresh();
             VirtualFile classFile = getCorrespondingClassFile(project, javaFile);
             FileEditorManager.getInstance(project).openFile(classFile, true);
+            FileEditorManager.getInstance(project).setSelectedEditor(classFile,"OPAL-HTML");
         } // if
     } // actionPerformed
 

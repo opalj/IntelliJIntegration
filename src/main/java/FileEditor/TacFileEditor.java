@@ -1,7 +1,6 @@
 package FileEditor;
 
 import com.intellij.openapi.fileEditor.FileEditor;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;
 import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider;
 import com.intellij.openapi.project.Project;
@@ -31,11 +30,11 @@ public class TacFileEditor extends TextEditorProvider {
     public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
         //TODO Tac soll auf die Classfile gelinked werden.
         // not best impl
-        FileEditor[] allEditors = FileEditorManager.getInstance(project).getAllEditors();
-        for(FileEditor editor : allEditors){
-            if(editor.getFile().equals(file))
-                return  editor;
-        }
+//        FileEditor[] allEditors = FileEditorManager.getInstance(project).getAllEditors();
+//        for(FileEditor editor : allEditors){
+//            if(editor.getFile().equals(file))
+//                return  editor;
+//        }
         if (!file.getExtension().equals(GlobalData.DISASSEMBLED_FILE_ENDING_TAC)) {
             //Eventuell eine eigene EditorKlasse?
             file = Opal.prepareTAC(project, file);
@@ -59,6 +58,6 @@ public class TacFileEditor extends TextEditorProvider {
     @Override
     public FileEditorPolicy getPolicy() {
         // This keeps the default editor so that one can switch between the two
-        return FileEditorPolicy.PLACE_AFTER_DEFAULT_EDITOR;
+        return FileEditorPolicy.NONE;
     }
 }

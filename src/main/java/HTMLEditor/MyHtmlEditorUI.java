@@ -113,7 +113,10 @@ public class MyHtmlEditorUI extends JPanel implements Disposable, DocumentListen
                     webEngine.load(filepath);
                 });
     }
-
+    public JComponent getPreferdComponent(){
+        //TODO maybe webEngine or webView
+        return fxPanel;
+    }
     @Override
     public void dispose() {
         // remove fxlisener;

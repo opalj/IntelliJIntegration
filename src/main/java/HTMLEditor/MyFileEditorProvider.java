@@ -15,13 +15,13 @@ public class MyFileEditorProvider implements FileEditorProvider {
   // TODO: should this class implement "DumbAware" ?
 
   @NonNls
-  private static final String EDITOR_TYPE_ID = "OPAL";
+  private static final String EDITOR_TYPE_ID = "OPAL-HTML";
 
   @Override
   public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
     // for now restrict to .class files only
     String fileExtension = file.getExtension();
-    return (fileExtension != null) && fileExtension.equals("class");
+    return (fileExtension != null) && fileExtension.equals("class") ;// || fileExtension.equals("html"));
   }
 
   @NotNull
@@ -42,6 +42,6 @@ public class MyFileEditorProvider implements FileEditorProvider {
   @Override
   public FileEditorPolicy getPolicy() {
     // This keeps the default editor so that one can switch between the two
-    return FileEditorPolicy.PLACE_BEFORE_DEFAULT_EDITOR;
+    return FileEditorPolicy.NONE;
   }
 }
