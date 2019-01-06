@@ -132,7 +132,7 @@ public class Opal {
     }
 
     //TODO rewrite Output VirutalFile
-    public static String prepareHtml(@NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
+    public static VirtualFile prepareHtml(@NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
         // All files selected in the "Project"-View
         if (Compiler.make(project)) {
             String classHtmlForm = Opal.JavaClasstoHtmlForm(virtualFile);
@@ -188,16 +188,16 @@ public class Opal {
                 // empty
             }
             //TODO better refresh siehe unten eventuell in die Save Datei ein Project Refresher
-            LocalFileSystem.getInstance().refreshAndFindFileByIoFile(disassembledFile);
-            return classHtmlForm;
+            return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(disassembledFile);
         }
         return null;
     } // prepareHtml()
 
     //TODO rewrite OUTPUT VirtualFile and clean up like above
-    public static File prepareTAC(@NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile classFile) {
+    public static VirtualFile prepareTAC(@NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile classFile) {
         if (Compiler.make(project)) {
             String basePath = project.getBasePath();
+            classPath = classFile.getPath();
             File baseDir = new File(basePath);
             File temp = (new File(classPath)).getParentFile();
             ArrayList<String> dirNames = new ArrayList<String>();
@@ -248,8 +248,7 @@ public class Opal {
                 // empty
             }
             // TODO noch nicht umgesetzt da keine Zeit also die VFS
-            LocalFileSystem.getInstance().refreshAndFindFileByIoFile(disassembledFile);
-            return disassembledFile;
+            return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(disassembledFile);
         }
         return null;
     }

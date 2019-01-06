@@ -2,15 +2,13 @@ package loadClassFile;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import opalintegration.Opal;
 
 import javax.swing.*;
-import java.io.File;
 
 public class LoadClassFileAction extends AnAction {
 
@@ -29,11 +27,9 @@ public class LoadClassFileAction extends AnAction {
                     JOptionPane.OK_OPTION);
             return;
         }
-        // Save the decompiled code to a file
-        File disassembledFile = Opal.prepareTAC(project, classFile);
-        // Open the just saved file in an editor
-        FileEditorManager.getInstance(project)
-                .openFile(LocalFileSystem.getInstance().refreshAndFindFileByIoFile(disassembledFile), true);
+        // Open class file with respect to TAC ending
+        FileEditorManager.getInstance(project).openFile(classFile, true);
+        FileEditorManager.getInstance(project).setSelectedEditor(classFile, "OPAL-TAC");
     }
 
     public void actionPerformed(AnActionEvent event) {
@@ -41,6 +37,15 @@ public class LoadClassFileAction extends AnAction {
         VirtualFile[] virtualFiles = event.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY);
         // Load the file
         openClassFile(event.getProject(), virtualFiles[0]);
+    }
+    @Override
+    public void update(AnActionEvent e) {
+        final Project project = e.getProject();
+        final VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
+        // show Action only for java files
+        e.getPresentation()
+                .setEnabledAndVisible(
+                        project != null && virtualFile != null && virtualFile.getExtension().equals("class"));
     }
 
 }

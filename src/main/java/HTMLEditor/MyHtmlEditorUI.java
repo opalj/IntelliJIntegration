@@ -1,6 +1,7 @@
 package HTMLEditor;
 
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBColor;
 import com.sun.webkit.WebPage;
 import javafx.application.Platform;
@@ -70,11 +71,34 @@ public class MyHtmlEditorUI extends JPanel implements Disposable, DocumentListen
         });
         this.addKeyListener(this);
     }
+    public MyHtmlEditorUI(VirtualFile html) {
+        // init the JavaFX-File
+        fxPanel = new JFXPanel();
+        Platform.setImplicitExit(false);
+        Platform.runLater(
+                () -> {
+                    root = new Group();
+                    scene = new Scene(root);
+                    webView = new WebView();
+                    webEngine = webView.getEngine();
+                    webEngine.load(html.getUrl());
+                    root.getChildren().add(webView);
+                    fxPanel.setScene(scene);
+                });
+        this.setLayout(new BorderLayout());
+        this.setBackground(JBColor.background());
 
-    public JComponent getContentComponent() {
-        return fxPanel;
+        fxPanel.addKeyListener(this);
+        this.add(fxPanel);
+        fxPanel.addComponentListener(
+                new ComponentAdapter() {
+                    @Override
+                    public void componentResized(ComponentEvent e) {
+                        setWebViewSize();
+                    }
+                });
+        this.addKeyListener(this);
     }
-
     private void setWebViewSize() {
         Platform.setImplicitExit(false);
         Platform.runLater(
@@ -82,7 +106,6 @@ public class MyHtmlEditorUI extends JPanel implements Disposable, DocumentListen
                     webView.setPrefSize(this.getSize().width, this.getSize().height);
         });
     }
-
     public void setWebSite(String filepath) {
         Platform.setImplicitExit(false);
         Platform.runLater(
@@ -93,16 +116,10 @@ public class MyHtmlEditorUI extends JPanel implements Disposable, DocumentListen
 
     @Override
     public void dispose() {
-        // TODO: dispose of this editor
-
-        // from Container ("grandpa of JPanel")
+        // remove fxlisener;
+        fxPanel.removeAll();
+        // remove all Component of UI;
         removeAll();
-
-        fxPanel = null;
-        webEngine = null;
-        webView = null;
-        scene = null;
-        root = null;
     }
 
     private void updateSearch(boolean forward) {

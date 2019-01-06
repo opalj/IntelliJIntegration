@@ -22,19 +22,17 @@ public class MyHtmlEditor implements FileEditor {
 
     private final MyHtmlEditorUI editorUI;
     private final VirtualFile virtualFile;
-    private final Project project; // TODO needed or not ?
+    private final Project project;
     private boolean disposed;
 
     public MyHtmlEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
         this.project = project;
-        this.virtualFile = virtualFile;
-
-        String html = Opal.prepareHtml(project, virtualFile);
-        editorUI = new MyHtmlEditorUI(html);
+        this.virtualFile = Opal.prepareHtml(project, virtualFile);
+        editorUI = new MyHtmlEditorUI(this.virtualFile);
         Disposer.register(this, editorUI);
     }
 
-    // TODO needed or not?
+    // TODO needed or n ot?
     public Project getProject() {
         return project;
     }
@@ -119,7 +117,6 @@ public class MyHtmlEditor implements FileEditor {
     @Override
     public <T> void putUserData(@NotNull Key<T> key, @Nullable T value) {
     }
-
-    // =================================================================
-
+    @Override
+    public VirtualFile getFile() { return virtualFile; }
 }
