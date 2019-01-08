@@ -14,14 +14,14 @@ import org.jetbrains.annotations.NotNull;
 public class MyFileEditorProvider implements FileEditorProvider {
   // TODO: should this class implement "DumbAware" ?
 
-  @NonNls
-  private static final String EDITOR_TYPE_ID = "OPAL-HTML";
+  @NonNls private static final String EDITOR_TYPE_ID = "OPAL-HTML";
 
   @Override
   public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
     // for now restrict to .class files only
     String fileExtension = file.getExtension();
-    return (fileExtension != null) && fileExtension.equals("class") ;// || fileExtension.equals("html"));
+    return (fileExtension != null)
+        && fileExtension.equals("class"); // || fileExtension.equals("html"));
   }
 
   @NotNull

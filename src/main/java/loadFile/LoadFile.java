@@ -1,19 +1,17 @@
 package loadFile;
 
-import loadFile.exceptions.*;
-
 import java.io.*;
 import java.util.ArrayList;
+import loadFile.exceptions.*;
 
 public class LoadFile {
 
   private static final int BUFFER_SIZE = 524288;
 
-  private LoadFile() {
-  }
+  private LoadFile() {}
 
   public static final byte[] loadFile(String path)
-          throws FileDoesNotExistException, InputNullException, CanNotReadException,
+      throws FileDoesNotExistException, InputNullException, CanNotReadException,
           IsNotAFileException, ErrorReadingFileException {
     if (path == null) {
       throw new InputNullException("The given parameter \"path\" is null.");

@@ -7,12 +7,11 @@ import org.jetbrains.annotations.NotNull;
 
 public class TACVisitor extends PsiElementVisitor {
 
-    public void visitProperty(@NotNull TACProperty o) {
-        visitPsiElement(o);
-    }
+  public void visitProperty(@NotNull TACProperty o) {
+    visitPsiElement(o);
+  }
 
-    public void visitPsiElement(@NotNull PsiElement o) {
-        visitElement(o);
-    }
-
+  public void visitPsiElement(@NotNull PsiElement o) {
+    visitElement(o);
+  }
 }

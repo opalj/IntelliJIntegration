@@ -10,17 +10,16 @@ import syntaxHighlighting.TACVisitor;
 
 public class TACPropertyImpl extends ASTWrapperPsiElement implements TACProperty {
 
-    public TACPropertyImpl(@NotNull ASTNode node) {
-        super(node);
-    }
+  public TACPropertyImpl(@NotNull ASTNode node) {
+    super(node);
+  }
 
-    public void accept(@NotNull TACVisitor visitor) {
-        visitor.visitProperty(this);
-    }
+  public void accept(@NotNull TACVisitor visitor) {
+    visitor.visitProperty(this);
+  }
 
-    public void accept(@NotNull PsiElementVisitor visitor) {
-        if (visitor instanceof TACVisitor) accept((TACVisitor) visitor);
-        else super.accept(visitor);
-    }
-
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof TACVisitor) accept((TACVisitor) visitor);
+    else super.accept(visitor);
+  }
 }

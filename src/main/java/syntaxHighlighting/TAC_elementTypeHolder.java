@@ -8,21 +8,21 @@ import syntaxHighlighting.impl.TACPropertyImpl;
 
 public interface TAC_elementTypeHolder {
 
-    IElementType PROPERTY = new TAC_elementType("PROPERTY");
+  IElementType PROPERTY = new TAC_elementType("PROPERTY");
 
-    IElementType COMMENT = new TAC_tokenType("COMMENT");
-    IElementType CRLF = new TAC_tokenType("CRLF");
-    IElementType KEY = new TAC_tokenType("KEY");
-    IElementType SEPARATOR = new TAC_tokenType("SEPARATOR");
-    IElementType VALUE = new TAC_tokenType("VALUE");
+  IElementType COMMENT = new TAC_tokenType("COMMENT");
+  IElementType CRLF = new TAC_tokenType("CRLF");
+  IElementType KEY = new TAC_tokenType("KEY");
+  IElementType SEPARATOR = new TAC_tokenType("SEPARATOR");
+  IElementType VALUE = new TAC_tokenType("VALUE");
 
-    class Factory {
-        public static PsiElement createElement(ASTNode node) {
-            IElementType type = node.getElementType();
-            if (type == PROPERTY) {
-                return new TACPropertyImpl(node);
-            }
-            throw new AssertionError("Unknown element type: " + type);
-        }
+  class Factory {
+    public static PsiElement createElement(ASTNode node) {
+      IElementType type = node.getElementType();
+      if (type == PROPERTY) {
+        return new TACPropertyImpl(node);
+      }
+      throw new AssertionError("Unknown element type: " + type);
     }
+  }
 }

@@ -14,34 +14,38 @@ import org.jetbrains.annotations.Nullable;
 
 public class MyStructureViewBuilder extends TreeBasedStructureViewBuilder {
 
-    OpalEditorBasedStructureViewModel model;
-    PsiFile psiFile;
-    StructureViewTreeElement root;
-    StructureView view;
-    FileEditor fileEditor;
+  OpalEditorBasedStructureViewModel model;
+  PsiFile psiFile;
+  StructureViewTreeElement root;
+  StructureView view;
+  FileEditor fileEditor;
 
-    public MyStructureViewBuilder(PsiFile psiFile, StructureViewTreeElement root) {
-        this.psiFile = psiFile;
-        this.root = root;
-    }
+  public MyStructureViewBuilder(PsiFile psiFile, StructureViewTreeElement root) {
+    this.psiFile = psiFile;
+    this.root = root;
+  }
 
-    @NotNull
-    @Override
-    public StructureViewModel createStructureViewModel(@Nullable Editor editor) {
-//        model = new OpalEditorBasedStructureViewModel(editor, psiFile, root);
-        return new OpalEditorBasedStructureViewModel(((MyHtmlEditor)fileEditor), psiFile, root);
-    }
+  @NotNull
+  @Override
+  public StructureViewModel createStructureViewModel(@Nullable Editor editor) {
+    //        model = new OpalEditorBasedStructureViewModel(editor, psiFile, root);
+    return new OpalEditorBasedStructureViewModel(((MyHtmlEditor) fileEditor), psiFile, root);
+  }
 
-    @Override
-    @NotNull
-    public StructureView createStructureView(FileEditor fileEditor, @NotNull Project project) {
-//        final StructureViewModel model = createStructureViewModel(fileEditor instanceof MyHtmlEditor ? ((MyHtmlEditor)fileEditor).getEditor() : null);
-//        StructureView view = StructureViewFactory.getInstance(project).createStructureView(fileEditor, model, project, isRootNodeShown());
-        this.fileEditor = fileEditor;
-        OpalEditorBasedStructureViewModel newModel = new OpalEditorBasedStructureViewModel(((MyHtmlEditor)fileEditor), psiFile, root);
-        view = new MyStructureView((MyHtmlEditor)fileEditor, newModel, project, isRootNodeShown());
-//        Disposer.register(view, () -> model.dispose());
-        Disposer.register(view, () -> newModel.dispose());
-        return view;
-    }
+  @Override
+  @NotNull
+  public StructureView createStructureView(FileEditor fileEditor, @NotNull Project project) {
+    //        final StructureViewModel model = createStructureViewModel(fileEditor instanceof
+    // MyHtmlEditor ? ((MyHtmlEditor)fileEditor).getEditor() : null);
+    //        StructureView view =
+    // StructureViewFactory.getInstance(project).createStructureView(fileEditor, model, project,
+    // isRootNodeShown());
+    this.fileEditor = fileEditor;
+    OpalEditorBasedStructureViewModel newModel =
+        new OpalEditorBasedStructureViewModel(((MyHtmlEditor) fileEditor), psiFile, root);
+    view = new MyStructureView((MyHtmlEditor) fileEditor, newModel, project, isRootNodeShown());
+    //        Disposer.register(view, () -> model.dispose());
+    Disposer.register(view, () -> newModel.dispose());
+    return view;
+  }
 }
