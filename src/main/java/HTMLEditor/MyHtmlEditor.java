@@ -3,6 +3,8 @@ package HTMLEditor;
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
 import com.intellij.ide.structureView.StructureViewBuilder;
 import com.intellij.ide.structureView.StructureViewTreeElement;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
 import com.intellij.openapi.fileEditor.FileEditorState;
@@ -14,12 +16,14 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
+import javafx.scene.web.WebEngine;
 import opalintegration.Opal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 
 /*
  * @example: https://github.com/JetBrains/intellij-community/blob/master/images/src/org/intellij/images/editor/impl/ImageEditorImpl.java
@@ -34,13 +38,21 @@ public class MyHtmlEditor implements FileEditor {
     public MyHtmlEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
         this.project = project;
         this.virtualFile = Opal.prepareHtml(project, virtualFile);
-        editorUI = new MyHtmlEditorUI(this.virtualFile);
+
+        String html = virtualFile.getUrl().replace("out", "disassembledClassFiles/out");
+        html = html.replace(".class", ".html");
+        html = html.replace('/', File.separatorChar);
+        editorUI = new MyHtmlEditorUI(html);
+
         Disposer.register(this, editorUI);
     }
 
-    // TODO needed or n ot?
     public Project getProject() {
         return project;
+    }
+
+    public WebEngine getWebEngine() {
+        return editorUI.getWebEngine();
     }
 
     @NotNull
@@ -128,29 +140,16 @@ public class MyHtmlEditor implements FileEditor {
 
     @Override
     public VirtualFile getFile() { return virtualFile; }
-    StructureViewBuilder structureViewBuilder;
+
     @Nullable
     @Override
     public StructureViewBuilder getStructureViewBuilder() {
-//    LanguageFileTypeStructureViewBuilderProvider structureViewBuilderProvider =
-//        new LanguageFileTypeStructureViewBuilderProvider();
-//
-//    FileType xHtmlFileType = XHtmlFileType.INSTANCE;
-//    xHtmlFileType = StdFileTypes.JS;
-//    structureViewBuilder =
-//        structureViewBuilderProvider.getStructureViewBuilder(xHtmlFileType, virtualFile, project);
-//
-//    return structureViewBuilder;
-
-        // this creates a HTML-structure-view
-//        PsiFile psiFile = PsiFileFactory.getInstance(project).createFileFromText(
-//                StdLanguages.XHTML, prepareHtml(project, virtualFile)
-//        );
+        StructureViewBuilder structureViewBuilder;
 
        PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
-        StructureViewTreeElement root;
-        root = new MyStructureViewTreeElement(false, (XmlFile)psiFile);
-        Messages.showInfoMessage("root = " + root, "HtmlEditor#StructViewBuilder");
+        StructureViewTreeElement root
+                = new MyStructureViewTreeElement(false, (XmlFile)psiFile, this);
+//        Messages.showInfoMessage("root = " + root, "HtmlEditor#StructViewBuilder");
         structureViewBuilder = new MyStructureViewBuilder(psiFile, root);
 
         return structureViewBuilder;

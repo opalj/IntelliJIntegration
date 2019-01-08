@@ -1,6 +1,10 @@
 package HTMLEditor;
 
+import com.intellij.codeInsight.documentation.DocumentationManager;
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBColor;
 import com.sun.webkit.WebPage;
@@ -10,6 +14,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -19,6 +24,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 import java.lang.reflect.Field;
 
 //import com.teamdev.jxbrowser.chromium.Browser;
@@ -43,6 +49,10 @@ public class MyHtmlEditorUI extends JPanel implements Disposable, DocumentListen
     private JTextField searchText;
     private boolean controlKeyDown = false;
 
+    public WebEngine getWebEngine() {
+        return webEngine;
+    }
+
     public MyHtmlEditorUI(String html) {
         // init the JavaFX-File
         fxPanel = new JFXPanel();
@@ -53,7 +63,7 @@ public class MyHtmlEditorUI extends JPanel implements Disposable, DocumentListen
                     scene = new Scene(root);
                     webView = new WebView();
                     webEngine = webView.getEngine();
-                    webEngine.loadContent(html);
+                    webEngine.load(html);
                     root.getChildren().add(webView);
                     fxPanel.setScene(scene);
         });
@@ -81,7 +91,8 @@ public class MyHtmlEditorUI extends JPanel implements Disposable, DocumentListen
                     scene = new Scene(root);
                     webView = new WebView();
                     webEngine = webView.getEngine();
-                    webEngine.load(html.getUrl());
+                    String newHtml = html.getUrl().replace("out", "disassembledClassFiles" + File.separator + "out");
+                    webEngine.load(newHtml.replace(".class", "html"));
                     root.getChildren().add(webView);
                     fxPanel.setScene(scene);
                 });

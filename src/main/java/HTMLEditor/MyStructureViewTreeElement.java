@@ -6,6 +6,8 @@ import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.ide.util.treeView.smartTree.TreeStructureUtil;
 import com.intellij.lang.html.structureView.Html5SectionsNodeProvider;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.filters.XmlTagFilter;
 import com.intellij.psi.scope.processor.FilterElementProcessor;
 import com.intellij.psi.xml.XmlDocument;
@@ -22,10 +24,26 @@ import java.util.List;
 
 public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
     private final boolean myInStructureViewPopup;
+    private MyHtmlEditor htmlEditor;
 
     MyStructureViewTreeElement(final boolean inStructureViewPopup, final XmlFile xmlFile) {
         super(xmlFile);
         myInStructureViewPopup = inStructureViewPopup;
+    }
+
+    // TODO: also need to call HtmlTagTreeElement constructors with MyHtmlEditor
+    MyStructureViewTreeElement(final boolean inStructureViewPopup, final XmlFile xmlFile, MyHtmlEditor htmlEditor) {
+        super(xmlFile);
+        myInStructureViewPopup = inStructureViewPopup;
+        this.htmlEditor = htmlEditor;
+    }
+
+    @Override
+    public void navigate(boolean requestFocus) {
+        // super.navigate(requestFocus);
+        // Messages.showInfoMessage("I'm here", "TreeElement.navigate()");
+
+        // this is the root only !!
     }
 
     @Override
@@ -53,17 +71,17 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
                 final XmlTag[] subTags = rootTag.getSubTags();
                 if (subTags.length == 1 &&
                         ("head".equalsIgnoreCase(subTags[0].getLocalName()) || "body".equalsIgnoreCase(subTags[0].getLocalName()))) {
-                    return new HtmlTagTreeElement(subTags[0]).getChildrenBase();
+                    return new HtmlTagTreeElement(subTags[0], htmlEditor).getChildrenBase();
                 }
-                return new HtmlTagTreeElement(rootTag).getChildrenBase();
+                return new HtmlTagTreeElement(rootTag, htmlEditor).getChildrenBase();
             }
 
-            return Collections.singletonList(new HtmlTagTreeElement(rootTag));
+            return Collections.singletonList(new HtmlTagTreeElement(rootTag, htmlEditor));
         }
         else {
             final Collection<StructureViewTreeElement> result = new ArrayList<>(rootTags.size());
             for (XmlTag tag : rootTags) {
-                result.add(new HtmlTagTreeElement(tag));
+                result.add(new HtmlTagTreeElement(tag, htmlEditor));
             }
             return result;
         }
@@ -89,11 +107,6 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
     @Override
     @Nullable
     public String getPresentableText() {
-        return toString(); // root element is not visible
-    }
-
-    @Override
-    public void navigate(boolean requestFocus) {
-        // TODO: need custom navigation
+        return toString();
     }
 }

@@ -1,6 +1,7 @@
 package opalintegration;
 
 import Compile.Compiler;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
@@ -116,13 +117,31 @@ public class Opal {
              DataInputStream dis = new DataInputStream(fis)) {
             // get the class file and construct the HTML string
             org.opalj.da.ClassFile cf = (org.opalj.da.ClassFile) ClassFileReader.ClassFile(dis).head();
+
+            // TODO: make constant or so
+
+
             // ordentliches HTML Code
             toHtmlAsString =
                     "<html>\n<head>\n<style>"
                             + cf.TheCSS()
-                            + "</style>\n</head>\n<body>\n"
+                            + "</style>\n</head>\n<body>\n<a href=\"#&lt;init&gt;()V\">toMain</a>\n"
+                            + "<script>\n" +
+                                "function scrollTo(elementId) {\n" +
+                                "    var element = document.getElementById(elementId);\n" +
+                                "    element.scrollIntoView(); \n" +
+                                "    element.open  = true;\n" +
+                                "    var orig = element.style.backgroundColor;\n" +
+                                "    element.style.backgroundColor = \"#FDFF47\";\n" +
+                                "    window.setTimeout(function(){\n" +
+                                "       element.style.backgroundColor = orig;\n" +
+                                "    }, 2000);\n" +
+                                "}\n" +
+                            "</script>"
                             + cf.classFileToXHTML(new Some(classPath)).toString()
                             + "\n</body>\n</html>";
+
+            toHtmlAsString = toHtmlAsString.replace("id=\"&lt;init&gt;()V\"", "id=\"init()V\"");
         } catch (IOException e) {
             e.printStackTrace();
             // fehlerausgabe im HTMLFormat für den Editor
