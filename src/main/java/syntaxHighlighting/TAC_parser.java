@@ -1,15 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package syntaxHighlighting;
 
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import static syntaxHighlighting.TAC_elementTypeHolder.*;
+
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.LightPsiParser;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
 import com.intellij.lang.PsiParser;
 import com.intellij.psi.tree.IElementType;
-
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-import static syntaxHighlighting.TAC_elementTypeHolder.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class TAC_parser implements PsiParser, LightPsiParser {
@@ -25,8 +25,7 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
     if (t == PROPERTY) {
       r = property(b, 0);
-    }
-    else {
+    } else {
       r = parse_root_(t, b, 0);
     }
     exit_section_(b, 0, m, t, r, true, TRUE_CONDITION);
@@ -97,5 +96,4 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     }
     return true;
   }
-
 }

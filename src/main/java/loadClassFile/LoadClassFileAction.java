@@ -1,18 +1,17 @@
 package loadClassFile;
 
+import Compile.Compiler;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import Compile.Compiler;
 import globalData.GlobalData;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.*;
-
 import opalintegration.Opal;
 import runCommand.ErrorRunningCommandException;
 import runCommand.RunCommand;
@@ -130,16 +129,7 @@ public class LoadClassFileAction extends AnAction {
       }
     }
 
-
-
-
-
-
     String tac = Opal.threeWayDisassemblerString(classFile.getAbsolutePath());
-
-
-
-
 
     try {
       SaveFile.saveFile(tac, disassembledFile.getAbsolutePath());

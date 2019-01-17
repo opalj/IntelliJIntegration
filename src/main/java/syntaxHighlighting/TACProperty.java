@@ -3,6 +3,4 @@ package syntaxHighlighting;
 
 import com.intellij.psi.PsiElement;
 
-public interface TACProperty extends PsiElement {
-
-}
+public interface TACProperty extends PsiElement {}

@@ -19,8 +19,7 @@ public class TACPropertyImpl extends ASTWrapperPsiElement implements TACProperty
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof TACVisitor) accept((TACVisitor)visitor);
+    if (visitor instanceof TACVisitor) accept((TACVisitor) visitor);
     else super.accept(visitor);
   }
-
 }

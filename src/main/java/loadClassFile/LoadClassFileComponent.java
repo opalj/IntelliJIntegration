@@ -17,7 +17,8 @@ public class LoadClassFileComponent implements ApplicationComponent {
   public void initComponent() {
     ActionManager am = ActionManager.getInstance();
     LoadClassFileAction action = new LoadClassFileAction();
-    OpenCorrespondingClassFileAction openCorrespondingClassFileAction = new OpenCorrespondingClassFileAction();
+    OpenCorrespondingClassFileAction openCorrespondingClassFileAction =
+        new OpenCorrespondingClassFileAction();
 
     // Passes an instance of your custom TextBoxes class to the registerAction method of the
     // ActionManager class.

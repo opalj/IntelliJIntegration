@@ -10,6 +10,11 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import javax.swing.*;
 import opalintegration.Opal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,12 +24,6 @@ import saveFile.exceptions.InputNullException;
 import saveFile.exceptions.IsNotAFileException;
 import saveFile.exceptions.NotEnoughRightsException;
 import toolWindows.WindowCommManager;
-
-import javax.swing.*;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 
 /*
  * @example: https://github.com/JetBrains/intellij-community/blob/master/images/src/org/intellij/images/editor/impl/ImageEditorImpl.java

@@ -1,6 +1,10 @@
 package opalintegration;
 
 import com.intellij.openapi.vfs.VirtualFile;
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.opalj.ai.ValuesDomain;
 import org.opalj.br.Method;
 import org.opalj.br.analyses.JavaProject;
@@ -13,11 +17,6 @@ import org.opalj.value.KnownTypedValue;
 import scala.Function1;
 import scala.Some;
 
-import java.io.*;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 public class Opal {
   // uriProject wird benötigt um die OpalFrameworks mit dem Project zu verbinden.
   private static Project<URL> uriProject;
@@ -27,6 +26,7 @@ public class Opal {
   // INTELIJ VARS
   private static com.intellij.openapi.project.Project project;
   private static String classPath;
+
   private static void Test(String filepath) {
     Project<URL> uriProject = Project.apply(new File(filepath));
     JavaProject javaProject = new JavaProject(uriProject);
@@ -118,11 +118,12 @@ public class Opal {
     //        return tacCodeString;
   }
 
-  public static String JavaClasstoHtmlForm(VirtualFile virtualClassFile){
-      classPath = virtualClassFile.getPath();
+  public static String JavaClasstoHtmlForm(VirtualFile virtualClassFile) {
+    classPath = virtualClassFile.getPath();
     String JavaHTMLClass = JavaClasstoHTMLForm(classPath);
     return JavaHTMLClass;
   }
+
   public static String JavaClasstoHTMLForm(String classPath) {
     Path path = Paths.get(classPath);
     File file = path.toFile();
@@ -142,13 +143,14 @@ public class Opal {
     } catch (IOException e) {
       e.printStackTrace();
       // fehlerausgabe im HTMLFormat für den Editor
-      toHtmlAsString = "<html><body><h1>Something went wrong in Opal.toHTMLForm()</h1></body></html>";
+      toHtmlAsString =
+          "<html><body><h1>Something went wrong in Opal.toHTMLForm()</h1></body></html>";
     }
 
     return toHtmlAsString;
   } // toHTMLForm()
-  public static void setProject(com.intellij.openapi.project.Project inteliProject){
-     project = inteliProject;
-  }
 
+  public static void setProject(com.intellij.openapi.project.Project inteliProject) {
+    project = inteliProject;
+  }
 }

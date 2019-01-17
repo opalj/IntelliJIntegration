@@ -13,10 +13,9 @@ import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 public class OpenCorrespondingClassFileAction extends AnAction {
 
@@ -79,30 +78,30 @@ public class OpenCorrespondingClassFileAction extends AnAction {
           @NotNull
           @Override
           public Result visitFileEx(@NotNull VirtualFile file) {
-            if (!file.isDirectory() ) {
-              if(file.getName().equals(classFileName)) {
+            if (!file.isDirectory()) {
+              if (file.getName().equals(classFileName)) {
                 classFiles.add(file);
                 VirtualFileVisitor.limit(-1);
                 return VirtualFileVisitor.SKIP_CHILDREN;
               }
             }
-            //if(done)
-              //return VirtualFileVisitor.SKIP_CHILDREN;
+            // if(done)
+            // return VirtualFileVisitor.SKIP_CHILDREN;
             return CONTINUE;
           }
         });
     VirtualFile classFile = null;
-    if(!classFiles.isEmpty()) {
+    if (!classFiles.isEmpty()) {
       classFile = classFiles.get(0);
     }
     // find the classFile we need, and return it
-    //VirtualFile classFile = classFiles.get(0);
-//    for (VirtualFile cf : classFiles) {
-//      if (cf.getName().equals(classFileName)) {
-//        classFile = cf;
-//        break;
-//      }
-//    }
+    // VirtualFile classFile = classFiles.get(0);
+    //    for (VirtualFile cf : classFiles) {
+    //      if (cf.getName().equals(classFileName)) {
+    //        classFile = cf;
+    //        break;
+    //      }
+    //    }
 
     return classFile;
   } // getCorrespondingClassFile()

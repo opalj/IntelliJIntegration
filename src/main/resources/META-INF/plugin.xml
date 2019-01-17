@@ -1,15 +1,19 @@
 <idea-plugin>
     <id>23.bytecode-disassembler</id>
+
     <name>OPAL Integration</name>
+
     <vendor email="marcel.dieter@stud.tu-darmstadt.de">Gruppe23</vendor>
 
     <description><![CDATA[
     OPAL Framework integration for IntelliJ IDEA.<br>
     ]]></description>
 
-    <version>0.1.1</version>
+    <change-notes>Minor changes for publishing this plugin. This is only an ALPHA version for testing purposes. </change-notes>
+
+    <version>0.1.5</version>
     <!-- until-build version is looking into the future might be wrong!! -->
-    <idea-version since-build="183.4588.61"/>
+    <idea-version since-build="181" until-build="183.*"/>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->

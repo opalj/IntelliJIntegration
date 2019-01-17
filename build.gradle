@@ -6,10 +6,17 @@ plugins {
     id 'pmd'
     id "com.github.spotbugs" version "1.6.6"
     id 'com.github.sherter.google-java-format' version '0.8'
+    id 'com.github.johnrengelman.shadow' version '4.0.3'
+}
+
+shadowJar {
+    transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
+        resource = 'reference.conf'
+    }
 }
 
 group '23'
-version '0.1'
+version '0.1.5'
 
 sourceCompatibility = 1.8
 
@@ -31,7 +38,7 @@ dependencies {
 }
 
 intellij {
-    version '2018.3.2'
+    version 'LATEST-EAP-SNAPSHOT'
     intellij.updateSinceUntilBuild false //Disables updating since-build attribute in plugin.xml
 }
 patchPluginXml {

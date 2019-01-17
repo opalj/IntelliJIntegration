@@ -6,9 +6,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class TAC_fileTypeFactory extends FileTypeFactory {
 
-    @Override
-    public void createFileTypes(@NotNull FileTypeConsumer fileTypeConsumer) {
-        fileTypeConsumer.consume(TAC_filetype.INSTANCE);
-    }
-
+  @Override
+  public void createFileTypes(@NotNull FileTypeConsumer fileTypeConsumer) {
+    fileTypeConsumer.consume(TAC_filetype.INSTANCE);
+  }
 }
