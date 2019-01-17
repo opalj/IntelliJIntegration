@@ -5,7 +5,11 @@ import com.intellij.ide.structureView.StructureViewBuilder;
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
+import com.intellij.openapi.fileEditor.FileEditorProvider;
 import com.intellij.openapi.fileEditor.FileEditorState;
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
+import com.intellij.openapi.fileEditor.impl.EditorWindow;
+import com.intellij.openapi.fileEditor.impl.EditorWithProviderComposite;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
@@ -26,14 +30,19 @@ import org.jetbrains.annotations.Nullable;
 public class MyHtmlEditor implements FileEditor {
 
   private final MyHtmlEditorUI editorUI;
-  private final VirtualFile virtualFile; // HTMLVF
+  private final VirtualFile virtualFile;
+  private VirtualFile htmlFile;
   private final Project project;
   private boolean disposed;
 
   public MyHtmlEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
     this.project = project;
-    this.virtualFile = Opal.prepareHtml(project, virtualFile);  // TODO: this.virtualFile should be .class (param) or .html (Opal.prepareHtml())?
-    editorUI = new MyHtmlEditorUI(this.virtualFile);
+    this.virtualFile = virtualFile;
+    htmlFile =
+        Opal.prepareHtml(
+            project,
+            virtualFile); // TODO: doesn't update after .class file changes (similar for TAC)
+    editorUI = new MyHtmlEditorUI(htmlFile);
 
     Disposer.register(this, editorUI);
   }
@@ -46,6 +55,25 @@ public class MyHtmlEditor implements FileEditor {
     return editorUI.getWebEngine();
   }
 
+  // TODO: find appropriate place to call this from (currently @ MyHtmlEditor#getName())
+  private void setTacEditorName() {
+    FileEditorManagerEx fileEditorManagerEx = FileEditorManagerEx.getInstanceEx(project);
+    EditorWithProviderComposite ewpc;
+
+    for (EditorWindow ew : fileEditorManagerEx.getWindows()) {
+      ewpc = ew.findFileComposite(virtualFile);
+
+      if (ewpc == null) {
+        continue;
+      }
+
+      FileEditor fe = ewpc.getSelectedEditorWithProvider().first;
+      FileEditorProvider fep = ewpc.getSelectedEditorWithProvider().second;
+
+      ewpc.setDisplayName(fe, fep.getEditorTypeId());
+    }
+  }
+
   @NotNull
   @Override
   public JComponent getComponent() {
@@ -55,24 +83,21 @@ public class MyHtmlEditor implements FileEditor {
   @Nullable
   @Override
   public JComponent getPreferredFocusedComponent() {
-    return editorUI.getPreferdComponent();
+    return editorUI.getPreferredComponent();
   }
 
   @NotNull
   @Override
   public String getName() {
+    // setTacEditorName();
     return "OPAL HTML";
   }
 
   @Override
-  public void setState(@NotNull FileEditorState state) {
-    // TODO
-    //        fileEditorState = state;
-  }
+  public void setState(@NotNull FileEditorState state) {}
 
   @Override
   public boolean isModified() {
-    // TODO
     return false;
   }
 
@@ -135,13 +160,8 @@ public class MyHtmlEditor implements FileEditor {
   @Nullable
   @Override
   public StructureViewBuilder getStructureViewBuilder() {
-    StructureViewBuilder structureViewBuilder;
-
-    PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
+    PsiFile psiFile = PsiManager.getInstance(project).findFile(htmlFile);
     StructureViewTreeElement root = new MyStructureViewTreeElement(false, (XmlFile) psiFile, this);
-    //        Messages.showInfoMessage("root = " + root, "HtmlEditor#StructViewBuilder");
-    structureViewBuilder = new MyStructureViewBuilder(psiFile, root);
-
-    return structureViewBuilder;
+    return new MyStructureViewBuilder(psiFile, root);
   }
 }

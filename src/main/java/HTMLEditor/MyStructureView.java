@@ -2,7 +2,6 @@ package HTMLEditor;
 
 import com.intellij.ide.structureView.StructureView;
 import com.intellij.ide.structureView.StructureViewFactory;
-import com.intellij.ide.structureView.StructureViewModel;
 import com.intellij.openapi.project.Project;
 import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 public class MyStructureView implements StructureView {
 
   private MyHtmlEditor htmlEditor;
-  private StructureViewModel model;
   private OpalEditorBasedStructureViewModel opalModel;
   private Project project;
   private boolean isRootNodeShown;
@@ -38,9 +36,11 @@ public class MyStructureView implements StructureView {
 
   @Override
   public JComponent getComponent() {
+    // just delegate to the default view
     StructureView view =
         StructureViewFactory.getInstance(project)
             .createStructureView(htmlEditor, opalModel, project, isRootNodeShown);
+
     return view.getComponent();
   }
 

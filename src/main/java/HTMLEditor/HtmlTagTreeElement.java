@@ -6,10 +6,11 @@ import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import com.intellij.navigation.LocationPresentation;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.xml.XmlTag;
-import com.intellij.util.containers.ContainerUtil;
 import com.intellij.xml.util.HtmlUtil;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import javafx.application.Platform;
 import javafx.scene.web.WebEngine;
 import org.jetbrains.annotations.NotNull;
@@ -17,13 +18,9 @@ import org.jetbrains.annotations.Nullable;
 
 public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements LocationPresentation {
   static final int MAX_TEXT_LENGTH = 50;
-  MyHtmlEditor htmlEditor;
 
-  HtmlTagTreeElement(final XmlTag tag) {
-    super(tag);
-  }
+  private MyHtmlEditor htmlEditor;
 
-  // TODO
   HtmlTagTreeElement(final XmlTag tag, MyHtmlEditor htmlEditor) {
     super(tag);
     this.htmlEditor = htmlEditor;
@@ -34,14 +31,14 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     WebEngine webEngine = htmlEditor.getWebEngine();
 
     // this.getPresentableText() contains the desired id: "details#[my-id].method"
-    String presentableText = this.getPresentableText();
+    String presentableText = this.getDefaultPresentableText();
     if (presentableText.startsWith("details#") && presentableText.endsWith(".method")) {
       int begin = presentableText.indexOf("#");
       int end = presentableText.lastIndexOf(".");
 
+      // TODO: init() should be <init>() ... problem: what if there is an actual init() method
       String id = presentableText.substring(begin + 1, end);
 
-      //            Messages.showInfoMessage("id = " + id, "Tag");
       Runnable run = () -> webEngine.executeScript("scrollTo(\"" + id + "\")");
       Platform.runLater(run);
     }
@@ -52,14 +49,34 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     }
   }
 
+  // the default text representation is needed for retrieving the tag-ID of the method
+  private String getDefaultPresentableText() {
+    final XmlTag tag = getElement();
+    if (tag == null) {
+      return IdeBundle.message("node.structureview.invalid");
+    }
+
+    return HtmlUtil.getTagPresentation(tag);
+  }
+
   @Override
   @NotNull
   public Collection<StructureViewTreeElement> getChildrenBase() {
     final XmlTag tag = getElement();
     if (tag == null || !tag.isValid()) return Collections.emptyList();
-    //        return ContainerUtil.map2List(tag.getSubTags(), HtmlTagTreeElement::new);
-    return ContainerUtil.map2List(
-        tag.getSubTags(), xmlTag -> new HtmlTagTreeElement(xmlTag, htmlEditor));
+
+    List<StructureViewTreeElement> result = new ArrayList<>();
+    for (XmlTag xmlTag : tag.getSubTags()) {
+      // don't show <summary>
+      if (xmlTag.getSubTags().length == 0) continue;
+
+      // TODO: how to get rid of sub-tags of methods?
+      // MyXmlTag newTag = new MyXmlTag(xmlTag);
+
+      result.add(new HtmlTagTreeElement(xmlTag, htmlEditor));
+    }
+
+    return result;
   }
 
   @Override
@@ -68,6 +85,16 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     if (tag == null) {
       return IdeBundle.message("node.structureview.invalid");
     }
+
+    // TODO: consider a method to extract ID of method
+    String original = HtmlUtil.getTagPresentation(tag);
+    if (original.startsWith("details#") && original.endsWith(".method")) {
+      int begin = original.indexOf("#");
+      int end = original.lastIndexOf(".");
+
+      return original.substring(begin + 1, end - 1); // end-1 to get rid of the trailing 'V'
+    }
+
     return HtmlUtil.getTagPresentation(tag);
   }
 

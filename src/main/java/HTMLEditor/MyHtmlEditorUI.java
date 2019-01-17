@@ -21,11 +21,6 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-// import com.teamdev.jxbrowser.chromium.Browser;
-// import com.teamdev.jxbrowser.chromium.BrowserContext;
-// import com.teamdev.jxbrowser.chromium.BrowserContextParams;
-// import com.teamdev.jxbrowser.chromium.swing.BrowserView;
-
 // DataProvider: Allows a component hosting actions to provide context information to the actions.
 // CopyProvider: performs copy, enables/disables copy, shows/hide copy
 public class MyHtmlEditorUI extends JPanel implements Disposable, DocumentListener, KeyListener {
@@ -47,35 +42,6 @@ public class MyHtmlEditorUI extends JPanel implements Disposable, DocumentListen
     return webEngine;
   }
 
-  public MyHtmlEditorUI(String html) {
-    // init the JavaFX-File
-    fxPanel = new JFXPanel();
-    Platform.setImplicitExit(false);
-    Platform.runLater(
-        () -> {
-          root = new Group();
-          scene = new Scene(root);
-          webView = new WebView();
-          webEngine = webView.getEngine();
-          webEngine.load(html);
-          root.getChildren().add(webView);
-          fxPanel.setScene(scene);
-        });
-    this.setLayout(new BorderLayout());
-    this.setBackground(JBColor.background());
-
-    fxPanel.addKeyListener(this);
-    this.add(fxPanel);
-    fxPanel.addComponentListener(
-        new ComponentAdapter() {
-          @Override
-          public void componentResized(ComponentEvent e) {
-            setWebViewSize();
-          }
-        });
-    this.addKeyListener(this);
-  }
-
   public MyHtmlEditorUI(VirtualFile html) {
     // init the JavaFX-File
     fxPanel = new JFXPanel();
@@ -83,6 +49,7 @@ public class MyHtmlEditorUI extends JPanel implements Disposable, DocumentListen
     Platform.runLater(
         () -> {
           root = new Group();
+//          scene = new Scene(root, javafx.scene.paint.Color.web("#020202"));
           scene = new Scene(root);
           webView = new WebView();
           webEngine = webView.getEngine();
@@ -107,30 +74,17 @@ public class MyHtmlEditorUI extends JPanel implements Disposable, DocumentListen
 
   private void setWebViewSize() {
     Platform.setImplicitExit(false);
-    Platform.runLater(
-        () -> {
-          webView.setPrefSize(this.getSize().width, this.getSize().height);
-        });
+    Platform.runLater(() -> webView.setPrefSize(this.getSize().width, this.getSize().height));
   }
 
-  public void setWebSite(String filepath) {
-    Platform.setImplicitExit(false);
-    Platform.runLater(
-        () -> {
-          webEngine.load(filepath);
-        });
-  }
-
-  public JComponent getPreferdComponent() {
-    // TODO maybe webEngine or webView
+  public JComponent getPreferredComponent() {
     return fxPanel;
   }
 
   @Override
   public void dispose() {
-    // remove fxlisener;
     fxPanel.removeAll();
-    // remove all Component of UI;
+    // remove all Components of UI;
     removeAll();
   }
 

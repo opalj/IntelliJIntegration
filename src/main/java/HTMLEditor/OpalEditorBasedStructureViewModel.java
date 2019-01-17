@@ -11,6 +11,7 @@ import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+// TODO: currently many methods unimplemented, how much of them is needed ?
 public class OpalEditorBasedStructureViewModel implements StructureViewModel {
   private final MyHtmlEditor myEditor;
   private final PsiFile myPsiFile;

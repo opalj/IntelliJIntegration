@@ -14,10 +14,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class MyStructureViewBuilder extends TreeBasedStructureViewBuilder {
 
-  OpalEditorBasedStructureViewModel model;
   PsiFile psiFile;
   StructureViewTreeElement root;
-  StructureView view;
   FileEditor fileEditor;
 
   public MyStructureViewBuilder(PsiFile psiFile, StructureViewTreeElement root) {
@@ -28,24 +26,19 @@ public class MyStructureViewBuilder extends TreeBasedStructureViewBuilder {
   @NotNull
   @Override
   public StructureViewModel createStructureViewModel(@Nullable Editor editor) {
-    //        model = new OpalEditorBasedStructureViewModel(editor, psiFile, root);
+    // ignore, as MyHtmlEditor is not a TextEditor and hence needs special treatment
     return new OpalEditorBasedStructureViewModel(((MyHtmlEditor) fileEditor), psiFile, root);
   }
 
   @Override
   @NotNull
   public StructureView createStructureView(FileEditor fileEditor, @NotNull Project project) {
-    //        final StructureViewModel model = createStructureViewModel(fileEditor instanceof
-    // MyHtmlEditor ? ((MyHtmlEditor)fileEditor).getEditor() : null);
-    //        StructureView view =
-    // StructureViewFactory.getInstance(project).createStructureView(fileEditor, model, project,
-    // isRootNodeShown());
     this.fileEditor = fileEditor;
-    OpalEditorBasedStructureViewModel newModel =
+    OpalEditorBasedStructureViewModel opalModel =
         new OpalEditorBasedStructureViewModel(((MyHtmlEditor) fileEditor), psiFile, root);
-    view = new MyStructureView((MyHtmlEditor) fileEditor, newModel, project, isRootNodeShown());
-    //        Disposer.register(view, () -> model.dispose());
-    Disposer.register(view, () -> newModel.dispose());
+    MyStructureView view =
+        new MyStructureView((MyHtmlEditor) fileEditor, opalModel, project, isRootNodeShown());
+    Disposer.register(view, () -> opalModel.dispose());
     return view;
   }
 }

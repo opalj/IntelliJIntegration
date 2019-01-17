@@ -16,6 +16,8 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
+
+        <!--
         <toolWindow id="Outline"
                     factoryClass="toolWindows.OutlineToolWindowFactory"
                     anchor="left"
@@ -25,6 +27,7 @@
                     factoryClass="toolWindows.DisassemblerToolWindowFactory"
                     anchor="right"
                     secondary="true"/>
+         -->
         <fileEditorProvider implementation="HTMLEditor.MyFileEditorProvider"
                             id="OpalHTMLEditorProvider"/>
         <fileEditorProvider implementation="FileEditor.TacFileEditor"

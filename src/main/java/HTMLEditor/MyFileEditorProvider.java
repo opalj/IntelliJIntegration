@@ -20,15 +20,13 @@ public class MyFileEditorProvider implements FileEditorProvider {
   public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
     // for now restrict to .class files only
     String fileExtension = file.getExtension();
-    return (fileExtension != null)
-        && fileExtension.equals("class"); // || fileExtension.equals("html"));
+    return (fileExtension != null) && fileExtension.equals("class");
   }
 
   @NotNull
   @Override
   public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
-    // this method here is only called if MyFileEditorProvider.accept() returns true
-    // this method should NEVER return null
+    // only called if MyFileEditorProvider#accept() returns true
     return new MyHtmlEditor(project, file);
   }
 
@@ -42,6 +40,6 @@ public class MyFileEditorProvider implements FileEditorProvider {
   @Override
   public FileEditorPolicy getPolicy() {
     // This keeps the default editor so that one can switch between the two
-    return FileEditorPolicy.NONE;
+    return FileEditorPolicy.PLACE_BEFORE_DEFAULT_EDITOR;
   }
 }

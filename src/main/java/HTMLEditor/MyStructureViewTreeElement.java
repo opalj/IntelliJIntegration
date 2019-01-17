@@ -1,11 +1,7 @@
 package HTMLEditor;
 
-import com.intellij.ide.structureView.StructureViewFactoryEx;
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
-import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.ide.util.treeView.smartTree.TreeStructureUtil;
-import com.intellij.lang.html.structureView.Html5SectionsNodeProvider;
 import com.intellij.psi.filters.XmlTagFilter;
 import com.intellij.psi.scope.processor.FilterElementProcessor;
 import com.intellij.psi.xml.XmlDocument;
@@ -16,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import javafx.application.Platform;
+import javafx.scene.web.WebEngine;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,12 +21,6 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
   private final boolean myInStructureViewPopup;
   private MyHtmlEditor htmlEditor;
 
-  MyStructureViewTreeElement(final boolean inStructureViewPopup, final XmlFile xmlFile) {
-    super(xmlFile);
-    myInStructureViewPopup = inStructureViewPopup;
-  }
-
-  // TODO: also need to call HtmlTagTreeElement constructors with MyHtmlEditor
   MyStructureViewTreeElement(
       final boolean inStructureViewPopup, final XmlFile xmlFile, MyHtmlEditor htmlEditor) {
     super(xmlFile);
@@ -38,20 +30,17 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
 
   @Override
   public void navigate(boolean requestFocus) {
-    // super.navigate(requestFocus);
-    // Messages.showInfoMessage("I'm here", "TreeElement.navigate()");
+    WebEngine webEngine = htmlEditor.getWebEngine();
 
-    // this is the root only !!
+    // this is the root (i.e. class-file itself) only !!
+    String classID = "class_file_header";
+    Runnable run = () -> webEngine.executeScript("scrollTo(\"" + classID + "\")");
+    Platform.runLater(run);
   }
 
   @Override
   @NotNull
   public Collection<StructureViewTreeElement> getChildrenBase() {
-    //        if (isHtml5SectionsMode()) {
-    //            return Collections.emptyList(); // Html5SectionsNodeProvider will return its
-    // structure
-    //        }
-
     final XmlFile xmlFile = getElement();
     final XmlDocument document = xmlFile == null ? null : xmlFile.getDocument();
     if (document == null) {
@@ -60,6 +49,37 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
 
     final List<XmlTag> rootTags = new SmartList<>();
     document.processElements(new FilterElementProcessor(XmlTagFilter.INSTANCE, rootTags), document);
+
+    // TODO: right direction, but currently hard-coded ... make it more robust !
+    if (rootTags.size() == 1) {
+      int length;
+
+      XmlTag rootTag = rootTags.get(0);
+
+      length = rootTag.getSubTags().length;
+      XmlTag body = rootTag.getSubTags()[length - 1];
+
+      length = body.getSubTags().length;
+      XmlTag divClassFile = body.getSubTags()[length - 1];
+
+      length = divClassFile.getSubTags().length;
+      XmlTag divMembers = divClassFile.getSubTags()[length - 1];
+
+      length = divMembers.getSubTags().length;
+      XmlTag divMethods = divMembers.getSubTags()[length - 1];
+
+      length = divMethods.getSubTags().length;
+      XmlTag details = divMethods.getSubTags()[0];
+
+      return new HtmlTagTreeElement(details, htmlEditor).getChildrenBase();
+
+      //      length = details.getSubTags().length;
+      //      if(length > 1) {
+      //        XmlTag method1 = details.getSubTags()[1];
+      //        // ...
+      //        XmlTag methodN = details.getSubTags()[length-1];
+      //      }
+    }
 
     if (rootTags.isEmpty()) {
       return Collections.emptyList();
@@ -75,6 +95,8 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
         return new HtmlTagTreeElement(rootTag, htmlEditor).getChildrenBase();
       }
 
+      // final anchor (i.e. leaves of tree, e.g. "details#init()V.method") <- is it ?? NO it's not
+      // !!
       return Collections.singletonList(new HtmlTagTreeElement(rootTag, htmlEditor));
     } else {
       final Collection<StructureViewTreeElement> result = new ArrayList<>(rootTags.size());
@@ -85,28 +107,12 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
     }
   }
 
-  private boolean isHtml5SectionsMode() {
-    final XmlFile xmlFile = getElement();
-    if (xmlFile == null) return false;
-
-    if (myInStructureViewPopup) {
-      final String propertyName =
-          TreeStructureUtil.getPropertyName(
-              Html5SectionsNodeProvider.HTML5_OUTLINE_PROVIDER_PROPERTY);
-      if (PropertiesComponent.getInstance().getBoolean(propertyName)) {
-        return true;
-      }
-    } else if (StructureViewFactoryEx.getInstanceEx(xmlFile.getProject())
-        .isActionActive(Html5SectionsNodeProvider.ACTION_ID)) {
-      return true;
-    }
-
-    return false;
-  }
-
   @Override
   @Nullable
   public String getPresentableText() {
-    return toString();
+    String defaultText = toString();
+    String className =
+        defaultText.substring(defaultText.indexOf(":") + 1, defaultText.lastIndexOf("."));
+    return className;
   }
 }

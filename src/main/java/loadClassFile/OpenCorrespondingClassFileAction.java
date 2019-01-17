@@ -1,18 +1,15 @@
 package loadClassFile;
 
-import Compile.Compiler;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.ProjectFileIndex;
-import com.intellij.openapi.vfs.VfsUtilCore;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.openapi.vfs.VirtualFileVisitor;
+import com.intellij.openapi.vfs.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -39,12 +36,18 @@ public class OpenCorrespondingClassFileAction extends AnAction {
   public void actionPerformed(AnActionEvent event) {
     final Project project = event.getProject();
 
-    if (project != null && Compiler.make(project)) {
+    if (project != null) {
       // currently selected file in the project view
       VirtualFile javaFile = event.getData(CommonDataKeys.VIRTUAL_FILE);
 
-      // TODO: refresh needed ? (A snchronous refresh will block until the refresh is done)
-      VirtualFileManager.getInstance().syncRefresh();
+      // TODO: compile entire module (think about dependencies) or just the current file?
+      CompilerManager.getInstance(project).compile(new VirtualFile[] {javaFile}, null);
+
+      String protocol = javaFile.getUrl().split(":")[0]; // <protocol>://<path>
+      VirtualFileManager.getInstance().getFileSystem(protocol).refresh(false);
+
+      // TODO: refresh needed ? (A synchronous refresh will block until the refresh is done)
+      // VirtualFileManager.getInstance().syncRefresh();
       VirtualFile classFile = getCorrespondingClassFile(project, javaFile);
       FileEditorManager.getInstance(project).openFile(classFile, true);
       FileEditorManager.getInstance(project).setSelectedEditor(classFile, "OPAL-HTML");

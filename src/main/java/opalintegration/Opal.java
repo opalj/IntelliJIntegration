@@ -121,25 +121,12 @@ public class Opal {
       // get the class file and construct the HTML string
       org.opalj.da.ClassFile cf = (org.opalj.da.ClassFile) ClassFileReader.ClassFile(dis).head();
 
-      // TODO: make constant or so
-
       // ordentliches HTML Code
       toHtmlAsString =
           "<html>\n<head>\n<style>"
-              + cf.TheCSS()
+              + myCSS(cf.TheCSS()) // cf.TheCSS()
               + "</style>\n</head>\n<body>\n"
-              + "<script>\n"
-              + "function scrollTo(elementId) {\n"
-              + "    var element = document.getElementById(elementId);\n"
-              + "    element.scrollIntoView(); \n"
-              + "    element.open  = true;\n"
-              + "    var orig = element.style.backgroundColor;\n"
-              + "    element.style.backgroundColor = \"#FDFF47\";\n"
-              + "    window.setTimeout(function(){\n"
-              + "       element.style.backgroundColor = orig;\n"
-              + "    }, 2000);\n"
-              + "}\n"
-              + "</script>"
+              + jsScrollTo()
               + cf.classFileToXHTML(new Some(classPath)).toString()
               + "\n</body>\n</html>";
 
@@ -152,6 +139,66 @@ public class Opal {
     }
     return toHtmlAsString;
   }
+
+  private static String jsScrollTo() {
+    // differentiate between light and dark IDE theme
+    String lightThemeHighlight = "\"#FDFF47\"";
+    String darkThemeHighlight = "\"#ABCDEF\"";
+
+    //    String highlightColor = JBColor.isBright() ? lightThemeHighlight : darkThemeHighlight;
+    String highlightColor = lightThemeHighlight;
+
+    // TODO: to fix the highlight-bug, store the default color somewhere and use that instead of orig (e.g. get it from CSS)?
+    String script =
+        "<script>\n"
+            + "function scrollTo(elementId) {\n"
+            + "    var element = document.getElementById(elementId);\n"
+            + "    element.scrollIntoView(); \n"
+            + "    element.open  = true;\n"
+            + "    var orig = element.style.backgroundColor;\n"
+            + "    element.style.backgroundColor = "
+            + highlightColor
+            + ";\n"
+            + "    window.setTimeout(function(){\n"
+            + "       element.style.backgroundColor = orig;\n"
+            + "    }, 2000);\n"
+            + "}\n"
+            + "</script>\n";
+
+    return script;
+  }
+
+  private static String myCSS(String theirCSS) {
+    // if(JBColor.isBright())
+    //    return theirCSS;
+    if(true)
+      return theirCSS;
+
+    int firstColorIndex = theirCSS.indexOf("#");
+    theirCSS = theirCSS.replaceFirst("background-color: #F6F6F6", "background-color: #abcdef");
+
+    String[] colorSplit = theirCSS.split("color:  ");
+    String[] backgroundColorSplit = theirCSS.split("background-color:  ");
+
+    // 0:  body (no visible change)
+    // 1:  div#source ... background: rgb(...)
+    // 2:  !! background-color: rgb(...)
+    // 3:  .nested-details ... background-color: #...
+    // 4:  summary ... background-color: #...
+    // 5:  div.method, details.method ... background-color: #...
+    // 6:  .annotation
+    // 7:  .index, .pc
+    // 8:  .line
+    // 9:  .reservedwords,.verification
+    // 10: .constant_value
+    // 11: .attribute_name
+    // 12: .close
+
+    return theirCSS;
+  }
+
+  // ====================================================================================
+  // ====================================================================================
 
   public static void setProject(com.intellij.openapi.project.Project inteliProject) {
     project = inteliProject;
