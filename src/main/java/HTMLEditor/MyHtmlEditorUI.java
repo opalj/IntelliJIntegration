@@ -49,7 +49,7 @@ public class MyHtmlEditorUI extends JPanel implements Disposable, DocumentListen
     Platform.runLater(
         () -> {
           root = new Group();
-//          scene = new Scene(root, javafx.scene.paint.Color.web("#020202"));
+          //          scene = new Scene(root, javafx.scene.paint.Color.web("#020202"));
           scene = new Scene(root);
           webView = new WebView();
           webEngine = webView.getEngine();

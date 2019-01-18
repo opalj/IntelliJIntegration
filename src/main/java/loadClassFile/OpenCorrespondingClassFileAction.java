@@ -81,12 +81,10 @@ public class OpenCorrespondingClassFileAction extends AnAction {
           @NotNull
           @Override
           public Result visitFileEx(@NotNull VirtualFile file) {
-            if (!file.isDirectory()) {
-              if (file.getName().equals(classFileName)) {
-                classFiles.add(file);
-                VirtualFileVisitor.limit(-1);
-                return VirtualFileVisitor.SKIP_CHILDREN;
-              }
+            if (!file.isDirectory() && file.getName().equals(classFileName)) {
+              classFiles.add(file);
+              VirtualFileVisitor.limit(-1);
+              return VirtualFileVisitor.SKIP_CHILDREN;
             }
             return CONTINUE;
           }

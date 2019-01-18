@@ -8,20 +8,17 @@ import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.xml.util.HtmlUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
 import javafx.application.Platform;
 import javafx.scene.web.WebEngine;
+import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
 
 public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements LocationPresentation {
   static final int MAX_TEXT_LENGTH = 50;
@@ -46,7 +43,11 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
       // TODO: init() should be <init>() ... problem: what if there is an actual init() method
       String id = presentableText.substring(begin + 1, end);
 
-      Runnable run = () -> webEngine.executeScript("scrollTo(\"" + id + "\")");
+      Runnable run =
+          () -> {
+            webEngine.executeScript("openMethods()");
+            webEngine.executeScript("scrollTo(\"" + id + "\")");
+          };
       Platform.runLater(run);
     }
     // check if it's field ...
@@ -107,19 +108,74 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
 
   @Override
   public Icon getIcon(boolean open) {
-    if(true) {
-      return OutlineIcons.METHOD;
+    final XmlTag xmlTag = getElement();
+
+    if (xmlTag != null && xmlTag.getAttribute("data-access-flags") != null) {
+      String modifier = xmlTag.getAttribute("data-access-flags").getValue();
+      System.out.println(modifier);
+      //      Messages.showInfoMessage(modifier, "Modifiers?");
+
+      return foobar(modifier);
     }
 
     final PsiElement element = getElement();
     if (element != null) {
       int flags = Iconable.ICON_FLAG_READ_STATUS;
-      if (!(element instanceof PsiFile) || !element.isWritable()) flags |= Iconable.ICON_FLAG_VISIBILITY;
+      if (!(element instanceof PsiFile) || !element.isWritable())
+        flags |= Iconable.ICON_FLAG_VISIBILITY;
       return element.getIcon(flags);
-    }
-    else {
+    } else {
       return null;
     }
+  }
+
+  Icon foobar(String modifier) {
+    Icon iconRet;
+
+    if (modifier.contains("static") && modifier.contains("final")) {
+      if (modifier.contains("public")) {
+        iconRet = OutlineIcons.METHOD_STATIC_FINAL_PUBLIC;
+      } else if (modifier.contains("private")) {
+        iconRet = OutlineIcons.METHOD_STATIC_FINAL_PRIVATE;
+      } else if (modifier.contains("protected")) {
+        iconRet = OutlineIcons.METHOD_STATIC_FINAL_PROTECTED;
+      } else {
+        iconRet = OutlineIcons.METHOD_STATIC_FINAL_PACKAGE;
+      }
+    } else if (modifier.contains("static")) {
+      if (modifier.contains("public")) {
+        iconRet = OutlineIcons.METHOD_STATIC_PUBLIC;
+      } else if (modifier.contains("private")) {
+        iconRet = OutlineIcons.METHOD_STATIC_PRIVATE;
+      } else if (modifier.contains("protected")) {
+        iconRet = OutlineIcons.METHOD_STATIC_PROTECTED;
+      } else {
+        iconRet = OutlineIcons.METHOD_STATIC_PACKAGE;
+      }
+    } else if (modifier.contains("final")) {
+      if (modifier.contains("public")) {
+        iconRet = OutlineIcons.METHOD_FINAL_PUBLIC;
+      } else if (modifier.contains("private")) {
+        iconRet = OutlineIcons.METHOD_FINAL_PRIVATE;
+
+      } else if (modifier.contains("protected")) {
+        iconRet = OutlineIcons.METHOD_FINAL_PROTECTED;
+      } else {
+        iconRet = OutlineIcons.METHOD_FINAL_PACKAGE;
+      }
+    } else {
+      if (modifier.contains("public")) {
+        iconRet = OutlineIcons.METHOD_PUBLIC;
+      } else if (modifier.contains("private")) {
+        iconRet = OutlineIcons.METHOD_PRIVATE;
+      } else if (modifier.contains("protected")) {
+        iconRet = OutlineIcons.METHOD_PROTECTED;
+      } else {
+        iconRet = OutlineIcons.METHOD_PACKAGE;
+      }
+    }
+
+    return iconRet;
   }
 
   @Nullable

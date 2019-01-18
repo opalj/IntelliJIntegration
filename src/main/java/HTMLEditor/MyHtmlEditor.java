@@ -90,7 +90,7 @@ public class MyHtmlEditor implements FileEditor {
   @NotNull
   @Override
   public String getName() {
-//     setTacEditorName();
+    //     setTacEditorName();
     return "OPAL HTML";
   }
 

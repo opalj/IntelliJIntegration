@@ -17,10 +17,9 @@ import java.util.Collections;
 import java.util.List;
 import javafx.application.Platform;
 import javafx.scene.web.WebEngine;
+import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
 
 public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
   private final boolean myInStructureViewPopup;
@@ -45,17 +44,17 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
 
   @Override
   public Icon getIcon(boolean open) {
-    if(true) {
+    if (open) {
       return OutlineIcons.CLASS_TYPE_MAIN;
     }
 
     final PsiElement element = getElement();
     if (element != null) {
       int flags = Iconable.ICON_FLAG_READ_STATUS;
-      if (!(element instanceof PsiFile) || !element.isWritable()) flags |= Iconable.ICON_FLAG_VISIBILITY;
+      if (!(element instanceof PsiFile) || !element.isWritable())
+        flags |= Iconable.ICON_FLAG_VISIBILITY;
       return element.getIcon(flags);
-    }
-    else {
+    } else {
       return null;
     }
   }

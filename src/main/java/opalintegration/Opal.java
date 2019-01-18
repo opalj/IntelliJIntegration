@@ -124,8 +124,9 @@ public class Opal {
       // ordentliches HTML Code
       toHtmlAsString =
           "<html>\n<head>\n<style>"
-              + myCSS(cf.TheCSS()) // cf.TheCSS()
+              + cf.TheCSS() // cf.TheCSS()
               + "</style>\n</head>\n<body>\n"
+              + jsOpenMethod()
               + jsScrollTo()
               + cf.classFileToXHTML(new Some(classPath)).toString()
               + "\n</body>\n</html>";
@@ -140,6 +141,17 @@ public class Opal {
     return toHtmlAsString;
   }
 
+  private static String jsOpenMethod() {
+    String script =
+        "<script>\n"
+            + "function openMethods() {\n"
+            + "   document.getElementsByClassName(\"methods\")[0].getElementsByTagName(\"details\")[0].open = true;"
+            + "}\n"
+            + "</script>\n";
+
+    return script;
+  }
+
   private static String jsScrollTo() {
     // differentiate between light and dark IDE theme
     String lightThemeHighlight = "\"#FDFF47\"";
@@ -148,7 +160,8 @@ public class Opal {
     //    String highlightColor = JBColor.isBright() ? lightThemeHighlight : darkThemeHighlight;
     String highlightColor = lightThemeHighlight;
 
-    // TODO: to fix the highlight-bug, store the default color somewhere and use that instead of orig (e.g. get it from CSS)?
+    // TODO: to fix the highlight-bug, store the default color somewhere and use that instead of
+    // orig (e.g. get it from CSS)?
     String script =
         "<script>\n"
             + "function scrollTo(elementId) {\n"
@@ -171,8 +184,6 @@ public class Opal {
   private static String myCSS(String theirCSS) {
     // if(JBColor.isBright())
     //    return theirCSS;
-    if(true)
-      return theirCSS;
 
     int firstColorIndex = theirCSS.indexOf("#");
     theirCSS = theirCSS.replaceFirst("background-color: #F6F6F6", "background-color: #abcdef");
