@@ -2,6 +2,9 @@ package HTMLEditor;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
+import com.intellij.openapi.util.Iconable;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.filters.XmlTagFilter;
 import com.intellij.psi.scope.processor.FilterElementProcessor;
 import com.intellij.psi.xml.XmlDocument;
@@ -16,6 +19,8 @@ import javafx.application.Platform;
 import javafx.scene.web.WebEngine;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
 
 public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
   private final boolean myInStructureViewPopup;
@@ -36,6 +41,23 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
     String classID = "class_file_header";
     Runnable run = () -> webEngine.executeScript("scrollTo(\"" + classID + "\")");
     Platform.runLater(run);
+  }
+
+  @Override
+  public Icon getIcon(boolean open) {
+    if(true) {
+      return OutlineIcons.CLASS_TYPE_MAIN;
+    }
+
+    final PsiElement element = getElement();
+    if (element != null) {
+      int flags = Iconable.ICON_FLAG_READ_STATUS;
+      if (!(element instanceof PsiFile) || !element.isWritable()) flags |= Iconable.ICON_FLAG_VISIBILITY;
+      return element.getIcon(flags);
+    }
+    else {
+      return null;
+    }
   }
 
   @Override

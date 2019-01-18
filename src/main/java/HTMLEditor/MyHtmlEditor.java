@@ -71,6 +71,7 @@ public class MyHtmlEditor implements FileEditor {
       FileEditorProvider fep = ewpc.getSelectedEditorWithProvider().second;
 
       ewpc.setDisplayName(fe, fep.getEditorTypeId());
+      ewpc.setDisplayName(fe, "TAC");
     }
   }
 
@@ -89,7 +90,7 @@ public class MyHtmlEditor implements FileEditor {
   @NotNull
   @Override
   public String getName() {
-    // setTacEditorName();
+//     setTacEditorName();
     return "OPAL HTML";
   }
 

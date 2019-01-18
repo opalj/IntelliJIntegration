@@ -4,17 +4,24 @@ import com.intellij.ide.IdeBundle;
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import com.intellij.navigation.LocationPresentation;
+import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.xml.util.HtmlUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
 import javafx.application.Platform;
 import javafx.scene.web.WebEngine;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
 
 public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements LocationPresentation {
   static final int MAX_TEXT_LENGTH = 50;
@@ -96,6 +103,23 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     }
 
     return HtmlUtil.getTagPresentation(tag);
+  }
+
+  @Override
+  public Icon getIcon(boolean open) {
+    if(true) {
+      return OutlineIcons.METHOD;
+    }
+
+    final PsiElement element = getElement();
+    if (element != null) {
+      int flags = Iconable.ICON_FLAG_READ_STATUS;
+      if (!(element instanceof PsiFile) || !element.isWritable()) flags |= Iconable.ICON_FLAG_VISIBILITY;
+      return element.getIcon(flags);
+    }
+    else {
+      return null;
+    }
   }
 
   @Nullable
