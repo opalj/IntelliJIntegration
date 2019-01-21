@@ -2,10 +2,17 @@ package HTMLEditor;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
+import com.intellij.openapi.fileTypes.FileTypeManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Iconable;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.*;
 import com.intellij.psi.filters.XmlTagFilter;
+import com.intellij.psi.impl.source.PsiJavaFileBaseImpl;
+import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.psi.scope.processor.FilterElementProcessor;
 import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlFile;
@@ -44,19 +51,15 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
 
   @Override
   public Icon getIcon(boolean open) {
-    if (open) {
-      return OutlineIcons.CLASS_TYPE_MAIN;
-    }
+      // get the PsiFile of the corresponding .class file
+      VirtualFile classFile = htmlEditor.getFile();
+      Document document = FileDocumentManager.getInstance().getDocument(classFile);
+      PsiFile psiFile = PsiDocumentManager.getInstance(htmlEditor.getProject()).getPsiFile(document);
 
-    final PsiElement element = getElement();
-    if (element != null) {
-      int flags = Iconable.ICON_FLAG_READ_STATUS;
-      if (!(element instanceof PsiFile) || !element.isWritable())
-        flags |= Iconable.ICON_FLAG_VISIBILITY;
-      return element.getIcon(flags);
-    } else {
-      return null;
-    }
+      int flags = Iconable.ICON_FLAG_READ_STATUS | Iconable.ICON_FLAG_VISIBILITY;
+
+      // the psiFile is at the same time the root element
+      return psiFile.getIcon(flags);
   }
 
   @Override
@@ -71,8 +74,11 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
     final List<XmlTag> rootTags = new SmartList<>();
     document.processElements(new FilterElementProcessor(XmlTagFilter.INSTANCE, rootTags), document);
 
+    if (rootTags.isEmpty()) {
+        return Collections.emptyList();
+    }
     // TODO: right direction, but currently hard-coded ... make it more robust !
-    if (rootTags.size() == 1) {
+    else if (rootTags.size() == 1) {
       int length;
 
       XmlTag rootTag = rootTags.get(0);
@@ -89,37 +95,12 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
       length = divMembers.getSubTags().length;
       XmlTag divMethods = divMembers.getSubTags()[length - 1];
 
-      length = divMethods.getSubTags().length;
       XmlTag details = divMethods.getSubTags()[0];
 
       return new HtmlTagTreeElement(details, htmlEditor).getChildrenBase();
-
-      //      length = details.getSubTags().length;
-      //      if(length > 1) {
-      //        XmlTag method1 = details.getSubTags()[1];
-      //        // ...
-      //        XmlTag methodN = details.getSubTags()[length-1];
-      //      }
     }
-
-    if (rootTags.isEmpty()) {
-      return Collections.emptyList();
-    } else if (rootTags.size() == 1) {
-      final XmlTag rootTag = rootTags.get(0);
-      if ("html".equalsIgnoreCase(rootTag.getLocalName())) {
-        final XmlTag[] subTags = rootTag.getSubTags();
-        if (subTags.length == 1
-            && ("head".equalsIgnoreCase(subTags[0].getLocalName())
-                || "body".equalsIgnoreCase(subTags[0].getLocalName()))) {
-          return new HtmlTagTreeElement(subTags[0], htmlEditor).getChildrenBase();
-        }
-        return new HtmlTagTreeElement(rootTag, htmlEditor).getChildrenBase();
-      }
-
-      // final anchor (i.e. leaves of tree, e.g. "details#init()V.method") <- is it ?? NO it's not
-      // !!
-      return Collections.singletonList(new HtmlTagTreeElement(rootTag, htmlEditor));
-    } else {
+    // TODO: this case covers multiple roots and is most likely not needed
+    else {
       final Collection<StructureViewTreeElement> result = new ArrayList<>(rootTags.size());
       for (XmlTag tag : rootTags) {
         result.add(new HtmlTagTreeElement(tag, htmlEditor));

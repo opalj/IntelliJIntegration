@@ -4,16 +4,17 @@ import com.intellij.ide.IdeBundle;
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import com.intellij.navigation.LocationPresentation;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.xml.util.HtmlUtil;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+
+import java.util.*;
+
 import javafx.application.Platform;
 import javafx.scene.web.WebEngine;
 import javax.swing.*;
@@ -75,11 +76,18 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
 
     List<StructureViewTreeElement> result = new ArrayList<>();
     for (XmlTag xmlTag : tag.getSubTags()) {
-      // don't show <summary>
+      // don't show children of <summary>
       if (xmlTag.getSubTags().length == 0) continue;
 
-      // TODO: how to get rid of sub-tags of methods?
-      // MyXmlTag newTag = new MyXmlTag(xmlTag);
+      // this basically gets rid of the children
+      // just keep it in mind in case you make changes to MyStructureViewTreeElement#getChildrenBase()
+      // because currently it assumes that we start at the proper method level
+      XmlAttribute classAttribute = xmlTag.getAttribute("class");
+      String classAttributeValue = classAttribute != null ? classAttribute.getValue() : "";
+      // careful: abstract methods also have a div tag
+      if(xmlTag.getName().equals("div") && !classAttributeValue.equals("details method native_or_abstract")) {
+        continue;
+      }
 
       result.add(new HtmlTagTreeElement(xmlTag, htmlEditor));
     }
@@ -94,12 +102,27 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
       return IdeBundle.message("node.structureview.invalid");
     }
 
+    // TODO: verify that this regex is correct in all cases
+    // explanation:
+    // \\w+: one or more word characters (details, or div)
+    // #: a single #
+    // .+: the method name TODO: is .+ ok? maybe replace the .+ with actual legal characters for Java identifiers
+    // [(].*[)]: ( param-list ) TODO: is .* ok?
+    // [A-Z]: a single capital letter (mostly V or I, but maybe there are others?)
+    // \\.: a single dot
+    // \\w+(\\.\\w+)*: one more word (then 0-inf many words, all separated by a dot)
+    String regex = "\\w+#.+[(].*[)][A-Z]\\.\\w+(\\.\\w+)*";
+
     // TODO: consider a method to extract ID of method
     String original = HtmlUtil.getTagPresentation(tag);
-    if (original.startsWith("details#") && original.endsWith(".method")) {
-      int begin = original.indexOf("#");
-      int end = original.lastIndexOf(".");
+//    System.out.println(original);
 
+    if (original.startsWith("details#") && original.endsWith(".method")
+          || original.matches(regex)) {
+      int begin = original.indexOf("#");
+      int end = original.indexOf(".");
+
+      // TODO: properly format parameter list, and try to append the <summary> stuff?
       return original.substring(begin + 1, end - 1); // end-1 to get rid of the trailing 'V'
     }
 
@@ -111,11 +134,10 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     final XmlTag xmlTag = getElement();
 
     if (xmlTag != null && xmlTag.getAttribute("data-access-flags") != null) {
-      String modifier = xmlTag.getAttribute("data-access-flags").getValue();
-      System.out.println(modifier);
-      //      Messages.showInfoMessage(modifier, "Modifiers?");
+      String modifiers = xmlTag.getAttribute("data-access-flags").getValue();
+//      System.out.println(modifiers);
 
-      return foobar(modifier);
+      return findIconBasedOnModifiers(modifiers);
     }
 
     final PsiElement element = getElement();
@@ -129,53 +151,31 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     }
   }
 
-  Icon foobar(String modifier) {
-    Icon iconRet;
+  // TODO: sort modifiers so that it won't break when order is changed in HTML file
+  Icon findIconBasedOnModifiers(String modifiers) {
+    // considering only methods:
+    // [public|private|protected] static final
+    // abstract is incompatible with private, static, and final
+    // default always comes last, e.g. static final default
+    // get rid of /*SYNTHETIC*/
 
-    if (modifier.contains("static") && modifier.contains("final")) {
-      if (modifier.contains("public")) {
-        iconRet = OutlineIcons.METHOD_STATIC_FINAL_PUBLIC;
-      } else if (modifier.contains("private")) {
-        iconRet = OutlineIcons.METHOD_STATIC_FINAL_PRIVATE;
-      } else if (modifier.contains("protected")) {
-        iconRet = OutlineIcons.METHOD_STATIC_FINAL_PROTECTED;
-      } else {
-        iconRet = OutlineIcons.METHOD_STATIC_FINAL_PACKAGE;
-      }
-    } else if (modifier.contains("static")) {
-      if (modifier.contains("public")) {
-        iconRet = OutlineIcons.METHOD_STATIC_PUBLIC;
-      } else if (modifier.contains("private")) {
-        iconRet = OutlineIcons.METHOD_STATIC_PRIVATE;
-      } else if (modifier.contains("protected")) {
-        iconRet = OutlineIcons.METHOD_STATIC_PROTECTED;
-      } else {
-        iconRet = OutlineIcons.METHOD_STATIC_PACKAGE;
-      }
-    } else if (modifier.contains("final")) {
-      if (modifier.contains("public")) {
-        iconRet = OutlineIcons.METHOD_FINAL_PUBLIC;
-      } else if (modifier.contains("private")) {
-        iconRet = OutlineIcons.METHOD_FINAL_PRIVATE;
+    final String legalMods = "public private protected default static final abstract";
 
-      } else if (modifier.contains("protected")) {
-        iconRet = OutlineIcons.METHOD_FINAL_PROTECTED;
-      } else {
-        iconRet = OutlineIcons.METHOD_FINAL_PACKAGE;
-      }
-    } else {
-      if (modifier.contains("public")) {
-        iconRet = OutlineIcons.METHOD_PUBLIC;
-      } else if (modifier.contains("private")) {
-        iconRet = OutlineIcons.METHOD_PRIVATE;
-      } else if (modifier.contains("protected")) {
-        iconRet = OutlineIcons.METHOD_PROTECTED;
-      } else {
-        iconRet = OutlineIcons.METHOD_PACKAGE;
-      }
+    String[] mods = modifiers.split(" ");
+    mods = Arrays.stream(mods).filter(s -> legalMods.contains(s)).toArray(String[]::new);
+
+    StringBuilder fileNameOfIcon = new StringBuilder("method_");
+    for(String mod : mods) {
+      fileNameOfIcon.append(mod);
+      fileNameOfIcon.append("_");
     }
 
-    return iconRet;
+    // append the file extension (.png)
+    int lastIdx = fileNameOfIcon.lastIndexOf("_");
+    fileNameOfIcon.replace(lastIdx, lastIdx+1, ".png");
+
+
+    return IconLoader.getIcon("icons/methods/" + fileNameOfIcon.toString());
   }
 
   @Nullable
