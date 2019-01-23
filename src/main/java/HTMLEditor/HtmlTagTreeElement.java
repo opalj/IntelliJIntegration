@@ -35,11 +35,16 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
   public void navigate(boolean requestFocus) {
     WebEngine webEngine = htmlEditor.getWebEngine();
 
-    // this.getPresentableText() contains the desired id: "details#[my-id].method"
+    // this.getPresentableText() contains the desired id, e.g.: "details#[my-id].method"
     String presentableText = this.getDefaultPresentableText();
-    if (presentableText.startsWith("details#") && presentableText.endsWith(".method")) {
+
+    // presentableText may have different forms (e.g. for abstract methods), but in general looks like this:
+    // xxx#someMethodName(maybeSomeParams)[*some capital letter*].yyy[...]
+    String simpleRegex = "(.*)#(.+[(].*[)][A-Z])\\.(.*)";
+
+    if(presentableText.matches(simpleRegex)) {
       int begin = presentableText.indexOf("#");
-      int end = presentableText.lastIndexOf(".");
+      int end = presentableText.indexOf(".");
 
       // TODO: init() should be <init>() ... problem: what if there is an actual init() method
       String id = presentableText.substring(begin + 1, end);
@@ -84,10 +89,16 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
       // because currently it assumes that we start at the proper method level
       XmlAttribute classAttribute = xmlTag.getAttribute("class");
       String classAttributeValue = classAttribute != null ? classAttribute.getValue() : "";
-      // careful: abstract methods also have a div tag
+
+      // careful: abstract methods also have a div tag with class="details method native_or_abstract"
       if(xmlTag.getName().equals("div") && !classAttributeValue.equals("details method native_or_abstract")) {
         continue;
       }
+      // child of abstract: <span class="method_declaration">
+      else if(xmlTag.getName().equals("span") && classAttributeValue.equals("method_declaration")) {
+        continue;
+      }
+
 
       result.add(new HtmlTagTreeElement(xmlTag, htmlEditor));
     }
@@ -122,11 +133,111 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
       int begin = original.indexOf("#");
       int end = original.indexOf(".");
 
+      String preParamFormat = original.substring(begin + 1, end - 1);
+      String postParamFormat = formatParameters(preParamFormat);
+
       // TODO: properly format parameter list, and try to append the <summary> stuff?
-      return original.substring(begin + 1, end - 1); // end-1 to get rid of the trailing 'V'
+//      return original.substring(begin + 1, end - 1); // end-1 to get rid of the trailing 'V'
+      return postParamFormat;
     }
 
     return HtmlUtil.getTagPresentation(tag);
+  }
+
+  private String formatParameters(String preParamFormat) {
+    String postParamFormat = "";
+
+    int begin = preParamFormat.indexOf('(');
+    int end = preParamFormat.lastIndexOf(')');
+
+    String parameters = preParamFormat.substring(begin + 1, end);
+
+    int commaCount = 0;
+    StringBuilder sb = new StringBuilder();
+    for(int i=0; i < parameters.length(); ++i) {
+      char c = parameters.charAt(i);
+
+      if(commaCount >= 7) {
+        sb.append("..., ");
+        break;
+      }
+
+      if("ZBCSIJFD[L".contains(c + "")) {
+        ++commaCount;
+      }
+
+      switch(c) {
+        case 'Z':
+          sb.append("boolean, ");
+          break;
+        case 'B':
+          sb.append("byte, ");
+          break;
+        case 'C':
+          sb.append("char, ");
+          break;
+        case 'S':
+          sb.append("short, ");
+          break;
+        case 'I':
+          sb.append("int, ");
+          break;
+        case 'J':
+          sb.append("long, ");
+          break;
+        case 'F':
+          sb.append("float, ");
+          break;
+        case 'D':
+          sb.append("double, ");
+          break;
+        case 'L':
+        case '[':
+          int semicol = parameters.indexOf(';', i);
+          String temp = parameters.substring(0, semicol);
+          int lastSlash = temp.lastIndexOf('/');
+          sb.append(temp.substring(lastSlash + 1));
+          if(c == '[') sb.append("[], ");
+          else sb.append(", ");
+          i = semicol;
+          break;
+      }
+    }
+
+    // primitives
+//    parameters = parameters.replaceAll("Z && ?!(L.*/Z.*;).*?", "boolean, ");
+//    parameters = parameters.replaceAll("B && ?!(L.*/B.*;).*?", "byte, ");
+//    parameters = parameters.replaceAll("C && ?!(L.*/C.*;).*?", "char, ");
+//    parameters = parameters.replaceAll("S && ?!(L.*/S.*;).*?", "short, ");
+//    parameters = parameters.replaceAll("I && ?!(L.*/I.*;).*?", "int, ");
+//    parameters = parameters.replaceAll("L && ?!(L.*/L.*;).*?", "long, ");
+//    parameters = parameters.replaceAll("F && ?!(L.*/F.*;).*?", "float, ");
+//    parameters = parameters.replaceAll("D && ?!(L.*/D.*;).*?", "double, ");
+//
+//    // Objects begin with L, arrays begin with [
+//    String objectRegex = "[\\[]?L.*/\\w+;";
+//    while(parameters.matches("(.*)" + objectRegex + "(.*)")) {
+//      int next = parameters.indexOf(";");
+//      String temp = parameters.substring(0, next);
+//
+//      int lastSlashIdx = temp.lastIndexOf("/");
+//      temp = temp.substring(lastSlashIdx + 1);
+//
+//      if(parameters.contains("[L") && parameters.indexOf("[L") < next) {
+//        parameters = parameters.replaceFirst("[\\[]?L.*/\\w+;", temp + "[], "
+//                + parameters.substring(next + 1));
+//      }
+//      else {
+//        parameters = parameters.replaceFirst("[\\[]?L.*/\\w+;", temp + ", "
+//                + parameters.substring(next + 1));
+//      }
+//
+//      System.out.println(parameters);
+//    }
+
+//    postParamFormat = preParamFormat.substring(0, begin + 1) + parameters + ")";
+    postParamFormat = preParamFormat.substring(0, begin + 1) + sb.toString() + ")";
+    return postParamFormat.replace(", )", ")"); // get rid of the last comma
   }
 
   @Override
