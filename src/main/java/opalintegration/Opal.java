@@ -159,8 +159,8 @@ public class Opal {
 
     //    String highlightColor = JBColor.isBright() ? lightThemeHighlight : darkThemeHighlight;
     String highlightColor = lightThemeHighlight;
+    String originalColor = "\"#F7F7F7\"";         // TODO: need one for dark theme as well
 
-    // TODO: to fix the highlight-bug, store the default color somewhere and use that instead of
     // orig (e.g. get it from CSS)?
     String script =
         "<script>\n"
@@ -168,15 +168,23 @@ public class Opal {
             + "    var element = document.getElementById(elementId);\n"
             + "    element.scrollIntoView(); \n"
             + "    element.open  = true;\n"
-            + "    var orig = element.style.backgroundColor;\n"
+//            + "    var orig = element.style.backgroundColor;\n"
             + "    element.style.backgroundColor = "
             + highlightColor
             + ";\n"
             + "    window.setTimeout(function(){\n"
-            + "       element.style.backgroundColor = orig;\n"
+//            + "       element.style.backgroundColor = orig;\n"
+            + "    element.style.backgroundColor = " + originalColor + ";\n"
             + "    }, 2000);\n"
             + "}\n"
             + "</script>\n";
+
+//    script =
+//            "<script>\n"
+//            + "function scrollTo(hash) {\n"
+//                    + "location.hash = \"#\" + hash;\n"
+//                    + "}\n"
+//            + "</script>\n";
 
     return script;
   }

@@ -56,6 +56,7 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
 
     // this.getPresentableText() contains the desired id, e.g.: "details#[my-id].method"
     String presentableText = this.getDefaultPresentableText();
+//      System.out.println(presentableText);
 
     if(presentableText.matches(simpleDefaultPresentableTextRegex)) {
       int begin = presentableText.indexOf("#");
@@ -73,8 +74,10 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     }
     // check if it's field ...
     else if (presentableText.equals("div.field.details")) {
-      // TODO: probably have to adjust the HTML file to contain field names in tag-attributes
-      // (currently ambiguous)
+        String dataName = getElement().getAttribute("data-name").getValue();
+        System.out.println(dataName);   // correct, but how to jump to this?
+//      Runnable run = () -> webEngine.executeScript("scrollTo(\"" + dataName + "\")");
+//      Platform.runLater(run);
     }
   }
 
@@ -88,44 +91,11 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     return HtmlUtil.getTagPresentation(tag);
   }
 
-  public Collection<StructureViewTreeElement> myGetChildrenBase() {
-      final XmlTag tag = getElement();
-      if (tag == null || !tag.isValid()) return Collections.emptyList();
-
-      XmlTag[] fieldTags;
-      XmlTag[] methodTags;
-
-      List<StructureViewTreeElement> result = new ArrayList<>();
-      for(XmlTag sub : tag.getSubTags()) {
-          XmlAttribute classAttrib = sub.getAttribute("class");
-          if(classAttrib == null) {
-              continue;
-          }
-          else if(classAttrib.getValue().equals("fields")) {
-              XmlTag details = sub.findSubTags("details")[0];
-              result.addAll(new HtmlTagTreeElement(details, htmlEditor).getChildrenBase());
-          }
-          else if(classAttrib.getValue().equals("methods")) {
-              XmlTag details = sub.findSubTags("details")[0];
-              result.addAll(new HtmlTagTreeElement(details, htmlEditor).getChildrenBase());
-          }
-      }
-
-      return result;
-  }
-
   @Override
   @NotNull
   public Collection<StructureViewTreeElement> getChildrenBase() {
     final XmlTag tag = getElement();
     if (tag == null || !tag.isValid()) return Collections.emptyList();
-
-    try {
-        System.out.println(tag.findSubTags("summary")[0].getValue().getText());
-    } catch(Exception e) {
-        System.out.println("Exception !!!");
-    }
-
 
     List<StructureViewTreeElement> result = new ArrayList<>();
     for (XmlTag xmlTag : tag.getSubTags()) {
@@ -151,7 +121,6 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
         continue;
       }
 
-        System.out.println("here !!!");
       result.add(new HtmlTagTreeElement(xmlTag, htmlEditor));
     }
 
@@ -165,6 +134,9 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
       return IdeBundle.message("node.structureview.invalid");
     }
 
+    String defaultPresentation = HtmlUtil.getTagPresentation(tag);
+
+    // fields (maybe add initialized value as well?)
     XmlAttribute classAttrib = tag.getAttribute("class");
     if(classAttrib != null && classAttrib.getValue().equals("field details")) {
         XmlTag field = tag.findFirstSubTag("span");
@@ -189,23 +161,23 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
         return name + ": " + type;
     }
 
-    String original = HtmlUtil.getTagPresentation(tag);
-    if (original.matches(simpleDefaultPresentableTextRegex)) {
-      int begin = original.indexOf("#");
-      int end = original.indexOf(".");
+    // methods
+    if (defaultPresentation.matches(simpleDefaultPresentableTextRegex)) {
+      int begin = defaultPresentation.indexOf("#");
+      int end = defaultPresentation.indexOf(".");
 
-      String preParamFormat = original.substring(begin + 1, end - 1);
+      String preParamFormat = defaultPresentation.substring(begin + 1, end - 1);
       String postParamFormat = formatParameters(preParamFormat);
 
       // the return type begins after the closing ')'
-      int retTypeIdxBegin = original.indexOf(')') + 1;
-      String returnType = formatReturnType(original.substring(retTypeIdxBegin));
+      int retTypeIdxBegin = defaultPresentation.indexOf(')') + 1;
+      String returnType = formatReturnType(defaultPresentation.substring(retTypeIdxBegin));
 
       return postParamFormat + ": " + returnType;
     }
 
     // return the default in case something went wrong (e.g. unanticipated text format)
-    return HtmlUtil.getTagPresentation(tag);
+    return defaultPresentation;
   }
 
   @NotNull
@@ -298,7 +270,6 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
 
     if (xmlTag != null && xmlTag.getAttribute("data-access-flags") != null) {
       String modifiers = xmlTag.getAttribute("data-access-flags").getValue();
-//      System.out.println(modifiers);
 
       return findIconBasedOnModifiers(modifiers);
     }
@@ -314,20 +285,15 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     }
   }
 
-  // TODO: sort modifiers so that it won't break when order is changed in HTML file
+  // TODO: sort modifiers so that it won't break when order is changed in HTML file ?
   Icon findIconBasedOnModifiers(String modifiers) {
-    // considering only methods:
-    // [public|private|protected] static final
-    // abstract is incompatible with private, static, and final
-    // default always comes last, e.g. static final default
-    // get rid of /*SYNTHETIC*/
-
     final String legalMods = "public private protected default static final abstract";
 
     String[] mods = modifiers.split(" ");
     mods = Arrays.stream(mods).filter(s -> legalMods.contains(s)).toArray(String[]::new);
 
-    StringBuilder fileNameOfIcon = new StringBuilder("method_");
+    String filePrefix = getElement().getName().equals("details") ? "methods/method_" : "fields/field_";
+    StringBuilder fileNameOfIcon = new StringBuilder(filePrefix);
     for(String mod : mods) {
       fileNameOfIcon.append(mod);
       fileNameOfIcon.append("_");
@@ -337,8 +303,7 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     int lastIdx = fileNameOfIcon.lastIndexOf("_");
     fileNameOfIcon.replace(lastIdx, lastIdx+1, ".png");
 
-
-    return IconLoader.getIcon("icons/methods/" + fileNameOfIcon.toString());
+    return IconLoader.getIcon("icons/" + fileNameOfIcon.toString());
   }
 
   @Nullable
