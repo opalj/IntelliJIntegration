@@ -14,6 +14,9 @@ import com.intellij.psi.xml.XmlTag;
 import com.intellij.xml.util.HtmlUtil;
 
 import java.util.*;
+import java.util.AbstractMap.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.application.Platform;
 import javafx.scene.web.WebEngine;
@@ -25,6 +28,22 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
   static final int MAX_TEXT_LENGTH = 50;
 
   private MyHtmlEditor htmlEditor;
+
+  // xxx#someMethod(possiblySomeParams)retType.xxx
+  private final String simpleDefaultPresentableTextRegex = "(.*)#.+[(].*[)](.*)\\.(.*)";
+
+  // TODO: move this to some utility class (maybe Opal)?
+    private static final Map<String, String> primitiveTypesMap = Stream.of(
+            new SimpleEntry<>("Z", "boolean"),
+            new SimpleEntry<>("B", "byte"),
+            new SimpleEntry<>("C", "char"),
+            new SimpleEntry<>("S", "short"),
+            new SimpleEntry<>("I", "int"),
+            new SimpleEntry<>("J", "long"),
+            new SimpleEntry<>("F", "float"),
+            new SimpleEntry<>("D", "double"),
+            new SimpleEntry<>("V", "void")
+    ).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
 
   HtmlTagTreeElement(final XmlTag tag, MyHtmlEditor htmlEditor) {
     super(tag);
@@ -38,11 +57,7 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     // this.getPresentableText() contains the desired id, e.g.: "details#[my-id].method"
     String presentableText = this.getDefaultPresentableText();
 
-    // presentableText may have different forms (e.g. for abstract methods), but in general looks like this:
-    // xxx#someMethodName(maybeSomeParams)[*some capital letter*].yyy[...]
-    String simpleRegex = "(.*)#(.+[(].*[)][A-Z])\\.(.*)";
-
-    if(presentableText.matches(simpleRegex)) {
+    if(presentableText.matches(simpleDefaultPresentableTextRegex)) {
       int begin = presentableText.indexOf("#");
       int end = presentableText.indexOf(".");
 
@@ -99,7 +114,6 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
         continue;
       }
 
-
       result.add(new HtmlTagTreeElement(xmlTag, htmlEditor));
     }
 
@@ -113,131 +127,107 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
       return IdeBundle.message("node.structureview.invalid");
     }
 
-    // TODO: verify that this regex is correct in all cases
-    // explanation:
-    // \\w+: one or more word characters (details, or div)
-    // #: a single #
-    // .+: the method name TODO: is .+ ok? maybe replace the .+ with actual legal characters for Java identifiers
-    // [(].*[)]: ( param-list ) TODO: is .* ok?
-    // [A-Z]: a single capital letter (mostly V or I, but maybe there are others?)
-    // \\.: a single dot
-    // \\w+(\\.\\w+)*: one more word (then 0-inf many words, all separated by a dot)
-    String regex = "\\w+#.+[(].*[)][A-Z]\\.\\w+(\\.\\w+)*";
-
-    // TODO: consider a method to extract ID of method
     String original = HtmlUtil.getTagPresentation(tag);
-//    System.out.println(original);
-
-    if (original.startsWith("details#") && original.endsWith(".method")
-          || original.matches(regex)) {
+    if (original.matches(simpleDefaultPresentableTextRegex)) {
       int begin = original.indexOf("#");
       int end = original.indexOf(".");
 
       String preParamFormat = original.substring(begin + 1, end - 1);
       String postParamFormat = formatParameters(preParamFormat);
 
-      // TODO: properly format parameter list, and try to append the <summary> stuff?
-//      return original.substring(begin + 1, end - 1); // end-1 to get rid of the trailing 'V'
-      return postParamFormat;
+      // the return type begins after the closing ')'
+      int retTypeIdxBegin = original.indexOf(')') + 1;
+      String returnType = formatReturnType(original.substring(retTypeIdxBegin));
+
+      return postParamFormat + ": " + returnType;
     }
 
+    // return the default in case something went wrong (e.g. unanticipated text format)
     return HtmlUtil.getTagPresentation(tag);
   }
 
-  private String formatParameters(String preParamFormat) {
-    String postParamFormat = "";
-
+  @NotNull
+  private String formatParameters(@NotNull String preParamFormat) {
     int begin = preParamFormat.indexOf('(');
     int end = preParamFormat.lastIndexOf(')');
 
-    String parameters = preParamFormat.substring(begin + 1, end);
+    String opalParameters = preParamFormat.substring(begin + 1, end);
+    String javaParameters = replaceOpalParamsWithJavaParams(opalParameters);
 
-    int commaCount = 0;
-    StringBuilder sb = new StringBuilder();
-    for(int i=0; i < parameters.length(); ++i) {
-      char c = parameters.charAt(i);
-
-      if(commaCount >= 7) {
-        sb.append("..., ");
-        break;
-      }
-
-      if("ZBCSIJFD[L".contains(c + "")) {
-        ++commaCount;
-      }
-
-      switch(c) {
-        case 'Z':
-          sb.append("boolean, ");
-          break;
-        case 'B':
-          sb.append("byte, ");
-          break;
-        case 'C':
-          sb.append("char, ");
-          break;
-        case 'S':
-          sb.append("short, ");
-          break;
-        case 'I':
-          sb.append("int, ");
-          break;
-        case 'J':
-          sb.append("long, ");
-          break;
-        case 'F':
-          sb.append("float, ");
-          break;
-        case 'D':
-          sb.append("double, ");
-          break;
-        case 'L':
-        case '[':
-          int semicol = parameters.indexOf(';', i);
-          String temp = parameters.substring(0, semicol);
-          int lastSlash = temp.lastIndexOf('/');
-          sb.append(temp.substring(lastSlash + 1));
-          if(c == '[') sb.append("[], ");
-          else sb.append(", ");
-          i = semicol;
-          break;
-      }
-    }
-
-    // primitives
-//    parameters = parameters.replaceAll("Z && ?!(L.*/Z.*;).*?", "boolean, ");
-//    parameters = parameters.replaceAll("B && ?!(L.*/B.*;).*?", "byte, ");
-//    parameters = parameters.replaceAll("C && ?!(L.*/C.*;).*?", "char, ");
-//    parameters = parameters.replaceAll("S && ?!(L.*/S.*;).*?", "short, ");
-//    parameters = parameters.replaceAll("I && ?!(L.*/I.*;).*?", "int, ");
-//    parameters = parameters.replaceAll("L && ?!(L.*/L.*;).*?", "long, ");
-//    parameters = parameters.replaceAll("F && ?!(L.*/F.*;).*?", "float, ");
-//    parameters = parameters.replaceAll("D && ?!(L.*/D.*;).*?", "double, ");
-//
-//    // Objects begin with L, arrays begin with [
-//    String objectRegex = "[\\[]?L.*/\\w+;";
-//    while(parameters.matches("(.*)" + objectRegex + "(.*)")) {
-//      int next = parameters.indexOf(";");
-//      String temp = parameters.substring(0, next);
-//
-//      int lastSlashIdx = temp.lastIndexOf("/");
-//      temp = temp.substring(lastSlashIdx + 1);
-//
-//      if(parameters.contains("[L") && parameters.indexOf("[L") < next) {
-//        parameters = parameters.replaceFirst("[\\[]?L.*/\\w+;", temp + "[], "
-//                + parameters.substring(next + 1));
-//      }
-//      else {
-//        parameters = parameters.replaceFirst("[\\[]?L.*/\\w+;", temp + ", "
-//                + parameters.substring(next + 1));
-//      }
-//
-//      System.out.println(parameters);
-//    }
-
-//    postParamFormat = preParamFormat.substring(0, begin + 1) + parameters + ")";
-    postParamFormat = preParamFormat.substring(0, begin + 1) + sb.toString() + ")";
+    String postParamFormat = preParamFormat.substring(0, begin + 1) + javaParameters + ")";
     return postParamFormat.replace(", )", ")"); // get rid of the last comma
+  }
+
+  @NotNull
+  private String replaceOpalParamsWithJavaParams(@NotNull String opalParams) {
+      int commaCount = 0;
+      int arrayDim = 0;
+
+      StringBuilder sb = new StringBuilder();
+      for(int i=0; i < opalParams.length(); ++i) {
+          char c = opalParams.charAt(i);
+
+          if(c == '[') {
+              ++arrayDim;
+              continue;
+          }
+
+          if(commaCount >= 7) {
+              sb.append("..., ");
+              break;
+          }
+
+          String primitiveType = primitiveTypesMap.get(c + "");
+          if(primitiveType != null) {
+              sb.append(primitiveType);
+              ++commaCount;
+          }
+          else if(c == 'L') {
+              int semicol = opalParams.indexOf(';', i);
+              String temp = opalParams.substring(0, semicol);
+              int lastSlash = temp.lastIndexOf('/');
+              sb.append(temp.substring(lastSlash + 1));
+              ++commaCount;
+              i = semicol;
+          }
+
+          if((primitiveType != null || c == 'L') && arrayDim > 0) {
+              for(int j=0; j < arrayDim; ++j) {
+                  sb.append("[]");
+              }
+              arrayDim = 0;
+          }
+
+          sb.append(", ");
+      }
+
+      return sb.toString();
+  }
+
+  private String formatReturnType(@NotNull String preFormatRetType) {
+      int arrayDim = 0;
+
+      char c;
+      for(int i=0; i < preFormatRetType.length(); ++i) {
+          c = preFormatRetType.charAt(i);
+          if(c == '[') {
+              ++arrayDim;
+          }
+      }
+      c = preFormatRetType.charAt(arrayDim);
+
+      String retType = primitiveTypesMap.get(c + "");
+      if(retType == null) {
+          int begin = preFormatRetType.lastIndexOf('/');
+          int end = preFormatRetType.indexOf(';');
+          retType = preFormatRetType.substring(begin + 1, end);
+      }
+
+      for(int i=0; i < arrayDim; ++i) {
+          retType += "[]";
+      }
+
+      return retType;
   }
 
   @Override
