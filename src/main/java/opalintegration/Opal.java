@@ -126,7 +126,9 @@ public class Opal {
           "<html>\n<head>\n<style>"
               + cf.TheCSS() // cf.TheCSS()
               + "</style>\n</head>\n<body>\n"
+              + jsOpenField()
               + jsOpenMethod()
+              + jsScrollToField()
               + jsScrollTo()
               + cf.classFileToXHTML(new Some(classPath)).toString()
               + "\n</body>\n</html>";
@@ -141,6 +143,17 @@ public class Opal {
     return toHtmlAsString;
   }
 
+  private static String jsOpenField() {
+    String script =
+            "<script>\n"
+                    + "function openFields() {\n"
+                    + "   document.getElementsByClassName(\"fields\")[0].getElementsByTagName(\"details\")[0].open = true;"
+                    + "}\n"
+                    + "</script>\n";
+
+    return script;
+  }
+
   private static String jsOpenMethod() {
     String script =
         "<script>\n"
@@ -148,6 +161,38 @@ public class Opal {
             + "   document.getElementsByClassName(\"methods\")[0].getElementsByTagName(\"details\")[0].open = true;"
             + "}\n"
             + "</script>\n";
+
+    return script;
+  }
+
+  private static String jsScrollToField() {
+    // differentiate between light and dark IDE theme
+    String lightThemeHighlight = "\"#FDFF47\"";
+    String darkThemeHighlight = "\"#ABCDEF\"";
+
+    //    String highlightColor = JBColor.isBright() ? lightThemeHighlight : darkThemeHighlight;
+    String highlightColor = lightThemeHighlight;
+    String originalColor = "\"#FFFFFF\"";         // TODO: need one for dark theme as well
+
+    // orig (e.g. get it from CSS)?
+    String script =
+            "<script>\n"
+                    + "function scrollToField(dataName) {\n"
+                    + "    var elements = document.getElementsByClassName(\"field details\");\n"
+                    + "    for(var i=0; i < elements.length; i++) {\n"
+                    + "       var element = elements[i];\n"
+                    + "       if(element.getAttribute(\"data-name\") == dataName) {\n"
+                    + "         element.scrollIntoView();\n"
+//                    + "         elements[i].open = true;\n"
+                    + "         element.style.backgroundColor = " + highlightColor + ";\n"
+                    + "         window.setTimeout(function(){\n"
+                    + "           element.style.backgroundColor = " + originalColor + ";\n"
+                    + "         }, 2000);\n"
+                    + "         return;\n"
+                    + "       }\n"
+                    + "    }\n"
+                    + "}\n"
+                    + "</script>\n";
 
     return script;
   }

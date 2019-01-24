@@ -56,7 +56,6 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
 
     // this.getPresentableText() contains the desired id, e.g.: "details#[my-id].method"
     String presentableText = this.getDefaultPresentableText();
-//      System.out.println(presentableText);
 
     if(presentableText.matches(simpleDefaultPresentableTextRegex)) {
       int begin = presentableText.indexOf("#");
@@ -74,10 +73,12 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     }
     // check if it's field ...
     else if (presentableText.equals("div.field.details")) {
-        String dataName = getElement().getAttribute("data-name").getValue();
-        System.out.println(dataName);   // correct, but how to jump to this?
-//      Runnable run = () -> webEngine.executeScript("scrollTo(\"" + dataName + "\")");
-//      Platform.runLater(run);
+      String dataName = getElement().getAttribute("data-name").getValue();
+      Runnable run = () -> {
+          webEngine.executeScript("openFields()");
+          webEngine.executeScript("scrollToField(\"" + dataName + "\")");
+      };
+      Platform.runLater(run);
     }
   }
 
@@ -99,8 +100,6 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
 
     List<StructureViewTreeElement> result = new ArrayList<>();
     for (XmlTag xmlTag : tag.getSubTags()) {
-        System.out.println(xmlTag);
-
       // don't show children of <summary>
       if (xmlTag.getSubTags().length == 0) continue;
 
@@ -270,8 +269,8 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
 
     if (xmlTag != null && xmlTag.getAttribute("data-access-flags") != null) {
       String modifiers = xmlTag.getAttribute("data-access-flags").getValue();
-
-      return findIconBasedOnModifiers(modifiers);
+      boolean isField = xmlTag.getAttribute("class").getText().contains("field");
+      return findIconBasedOnModifiers(modifiers, isField);
     }
 
     final PsiElement element = getElement();
@@ -286,13 +285,13 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
   }
 
   // TODO: sort modifiers so that it won't break when order is changed in HTML file ?
-  Icon findIconBasedOnModifiers(String modifiers) {
+  Icon findIconBasedOnModifiers(String modifiers, boolean isField) {
     final String legalMods = "public private protected default static final abstract";
 
     String[] mods = modifiers.split(" ");
     mods = Arrays.stream(mods).filter(s -> legalMods.contains(s)).toArray(String[]::new);
 
-    String filePrefix = getElement().getName().equals("details") ? "methods/method_" : "fields/field_";
+    String filePrefix = isField ? "fields/field_" : "methods/method_";
     StringBuilder fileNameOfIcon = new StringBuilder(filePrefix);
     for(String mod : mods) {
       fileNameOfIcon.append(mod);

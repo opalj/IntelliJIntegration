@@ -111,8 +111,11 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
   private List<StructureViewTreeElement> createMemberTree(@NotNull XmlTag members) {
     List<StructureViewTreeElement> result = new ArrayList<>();
 
-    for(XmlTag sub : members.getSubTags()) {
+    // go in reverse-order, so that methods are displayed before fields!
+    for(int i=members.getSubTags().length-1; i >= 0; --i) {
+      XmlTag sub = members.getSubTags()[i];
       XmlAttribute classAttribute = sub.getAttribute("class");
+
       if(classAttribute == null) {
         continue;
       }
