@@ -88,14 +88,49 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     return HtmlUtil.getTagPresentation(tag);
   }
 
+  public Collection<StructureViewTreeElement> myGetChildrenBase() {
+      final XmlTag tag = getElement();
+      if (tag == null || !tag.isValid()) return Collections.emptyList();
+
+      XmlTag[] fieldTags;
+      XmlTag[] methodTags;
+
+      List<StructureViewTreeElement> result = new ArrayList<>();
+      for(XmlTag sub : tag.getSubTags()) {
+          XmlAttribute classAttrib = sub.getAttribute("class");
+          if(classAttrib == null) {
+              continue;
+          }
+          else if(classAttrib.getValue().equals("fields")) {
+              XmlTag details = sub.findSubTags("details")[0];
+              result.addAll(new HtmlTagTreeElement(details, htmlEditor).getChildrenBase());
+          }
+          else if(classAttrib.getValue().equals("methods")) {
+              XmlTag details = sub.findSubTags("details")[0];
+              result.addAll(new HtmlTagTreeElement(details, htmlEditor).getChildrenBase());
+          }
+      }
+
+      return result;
+  }
+
   @Override
   @NotNull
   public Collection<StructureViewTreeElement> getChildrenBase() {
     final XmlTag tag = getElement();
     if (tag == null || !tag.isValid()) return Collections.emptyList();
 
+    try {
+        System.out.println(tag.findSubTags("summary")[0].getValue().getText());
+    } catch(Exception e) {
+        System.out.println("Exception !!!");
+    }
+
+
     List<StructureViewTreeElement> result = new ArrayList<>();
     for (XmlTag xmlTag : tag.getSubTags()) {
+        System.out.println(xmlTag);
+
       // don't show children of <summary>
       if (xmlTag.getSubTags().length == 0) continue;
 
@@ -106,14 +141,17 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
       String classAttributeValue = classAttribute != null ? classAttribute.getValue() : "";
 
       // careful: abstract methods also have a div tag with class="details method native_or_abstract"
-      if(xmlTag.getName().equals("div") && !classAttributeValue.equals("details method native_or_abstract")) {
+      if(xmlTag.getName().equals("div") && !classAttributeValue.equals("details method native_or_abstract")
+            && !classAttributeValue.equals("field details")) {
         continue;
       }
       // child of abstract: <span class="method_declaration">
-      else if(xmlTag.getName().equals("span") && classAttributeValue.equals("method_declaration")) {
+      else if(xmlTag.getName().equals("span") &&
+              (classAttributeValue.equals("method_declaration") || classAttributeValue.equals("field_declaration"))) {
         continue;
       }
 
+        System.out.println("here !!!");
       result.add(new HtmlTagTreeElement(xmlTag, htmlEditor));
     }
 
@@ -125,6 +163,30 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     final XmlTag tag = getElement();
     if (tag == null) {
       return IdeBundle.message("node.structureview.invalid");
+    }
+
+    XmlAttribute classAttrib = tag.getAttribute("class");
+    if(classAttrib != null && classAttrib.getValue().equals("field details")) {
+        XmlTag field = tag.findFirstSubTag("span");
+        String type = "";
+        String name = "";
+        for(XmlTag fieldSub : field.getSubTags()) {
+            classAttrib = fieldSub.getAttribute("class");
+            if(classAttrib == null) {
+                continue;
+            }
+            else if(classAttrib.getValue().contains("type")) {
+                type = fieldSub.getValue().getText();
+            }
+            else if(classAttrib.getValue().equals("name")) {
+                name = fieldSub.getValue().getText();
+            }
+        }
+
+        if(type.contains(".")) {
+            type = type.substring(type.lastIndexOf(".") + 1);
+        }
+        return name + ": " + type;
     }
 
     String original = HtmlUtil.getTagPresentation(tag);

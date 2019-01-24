@@ -14,6 +14,7 @@ import com.intellij.psi.filters.XmlTagFilter;
 import com.intellij.psi.impl.source.PsiJavaFileBaseImpl;
 import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.psi.scope.processor.FilterElementProcessor;
+import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
@@ -79,25 +80,28 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
     }
     // TODO: right direction, but currently hard-coded ... make it more robust !
     else if (rootTags.size() == 1) {
-      int length;
-
       XmlTag rootTag = rootTags.get(0);
+      List<StructureViewTreeElement> result = new ArrayList<>();
 
-      length = rootTag.getSubTags().length;
-      XmlTag body = rootTag.getSubTags()[length - 1];
+      XmlTag members = getChildrenBaseForMembers(rootTag);
 
-      length = body.getSubTags().length;
-      XmlTag divClassFile = body.getSubTags()[length - 1];
+      for(XmlTag sub : members.getSubTags()) {
+        XmlAttribute classAttrib = sub.getAttribute("class");
+        if(classAttrib == null) {
+          continue;
+        }
+        else if(classAttrib.getValue().equals("fields")) {
+          XmlTag details = sub.findSubTags("details")[0];
+          result.addAll(new HtmlTagTreeElement(details, htmlEditor).getChildrenBase());
+        }
+        else if(classAttrib.getValue().equals("methods")) {
+          XmlTag details = sub.findSubTags("details")[0];
+          result.addAll(new HtmlTagTreeElement(details, htmlEditor).getChildrenBase());
+        }
+      }
 
-      length = divClassFile.getSubTags().length;
-      XmlTag divMembers = divClassFile.getSubTags()[length - 1];
-
-      length = divMembers.getSubTags().length;
-      XmlTag divMethods = divMembers.getSubTags()[length - 1];
-
-      XmlTag details = divMethods.getSubTags()[0];
-
-      return new HtmlTagTreeElement(details, htmlEditor).getChildrenBase();
+//      return new HtmlTagTreeElement(members, htmlEditor).myGetChildrenBase();
+      return result;
     }
     // TODO: this case covers multiple roots and is most likely not needed
     else {
@@ -107,6 +111,51 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
       }
       return result;
     }
+  }
+
+  private XmlTag getChildrenBaseForMembers(XmlTag rootTag) {
+    int length = rootTag.getSubTags().length;
+    XmlTag body = rootTag.getSubTags()[length - 1];
+
+    length = body.getSubTags().length;
+    XmlTag divClassFile = body.getSubTags()[length - 1];
+
+    length = divClassFile.getSubTags().length;
+    XmlTag divMembers = divClassFile.getSubTags()[length - 1];
+
+    return divMembers;
+  }
+
+  private XmlTag getChildrenBaseForMethods(XmlTag rootTag) {
+    int length = rootTag.getSubTags().length;
+    XmlTag body = rootTag.getSubTags()[length - 1];
+
+    length = body.getSubTags().length;
+    XmlTag divClassFile = body.getSubTags()[length - 1];
+
+    length = divClassFile.getSubTags().length;
+    XmlTag divMembers = divClassFile.getSubTags()[length - 1];
+
+//    for(XmlTag tag : divMembers.getSubTags()) {
+//      try {
+//        System.out.println(tag);
+//        System.out.println(tag.getAttribute("class").getValue());
+//        System.out.println("Subsub");
+//        for(XmlTag subsubTag : tag.getSubTags()) {
+//          System.out.println(subsubTag);
+//          System.out.println(subsubTag.getSubTags()[0].getValue());
+//          System.out.println(subsubTag.getSubTags()[1].getValue());
+//        }
+//        System.out.println();
+//      } catch(Exception e) {}
+//    }
+//    System.out.println("====");
+
+    length = divMembers.getSubTags().length;
+    XmlTag divMethods = divMembers.getSubTags()[length - 1];
+
+    XmlTag details = divMethods.getSubTags()[0];
+    return details;
   }
 
   @Override
