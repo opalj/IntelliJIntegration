@@ -91,7 +91,7 @@ public class MyHtmlEditor implements FileEditor {
   @Override
   public String getName() {
     //     setTacEditorName();
-    return "OPAL HTML";
+    return "Bytecode";
   }
 
   @Override

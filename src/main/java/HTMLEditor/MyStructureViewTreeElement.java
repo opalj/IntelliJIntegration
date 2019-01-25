@@ -44,7 +44,7 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
   public void navigate(boolean requestFocus) {
     WebEngine webEngine = htmlEditor.getWebEngine();
 
-    // this is the root (i.e. class-file itself) only !!
+    // this is the root (i.e. class-file-name itself) only !!
     String classID = "class_file_header";
     Runnable run = () -> webEngine.executeScript("scrollTo(\"" + classID + "\")");
     Platform.runLater(run);
@@ -78,14 +78,13 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
     if (rootTags.isEmpty()) {
         return Collections.emptyList();
     }
-    // TODO: right direction, but currently hard-coded ... make it more robust !
     else if (rootTags.size() == 1) {
       XmlTag rootTag = rootTags.get(0);
       XmlTag members = getChildrenBaseForMembers(rootTag);
       List<StructureViewTreeElement> result = createMemberTree(members);
       return result;
     }
-    // TODO: this case covers multiple roots and is most likely not needed
+    // TODO: this case covers multiple roots and is probably not needed
     else {
       final Collection<StructureViewTreeElement> result = new ArrayList<>(rootTags.size());
       for (XmlTag tag : rootTags) {
@@ -95,6 +94,7 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
     }
   }
 
+  // TODO: Hardcoded at the moment, can improve this somehow?
   private XmlTag getChildrenBaseForMembers(@NotNull XmlTag rootTag) {
     int length = rootTag.getSubTags().length;
     XmlTag body = rootTag.getSubTags()[length - 1];
@@ -135,9 +135,10 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
   @Override
   @Nullable
   public String getPresentableText() {
+    // default: HtmlFile:[filename].html
     String defaultText = toString();
     String className =
-        defaultText.substring(defaultText.indexOf(":") + 1, defaultText.lastIndexOf("."));
+        defaultText.substring(defaultText.indexOf(":") + 1, defaultText.indexOf("."));
     return className;
   }
 }

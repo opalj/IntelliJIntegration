@@ -12,6 +12,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.jetbrains.annotations.NotNull;
 import org.opalj.ai.ValuesDomain;
 import org.opalj.br.Method;
@@ -105,13 +108,13 @@ public class Opal {
     //        return tacCodeString;
   }
 
-  public static String JavaClasstoHtmlForm(VirtualFile virtualClassFile) {
+  public static String JavaClassToHtmlForm(VirtualFile virtualClassFile) {
     classPath = virtualClassFile.getPath();
-    String JavaHTMLClass = JavaClasstoHTMLForm(classPath);
+    String JavaHTMLClass = JavaClassToHTMLForm(classPath);
     return JavaHTMLClass;
   }
 
-  public static String JavaClasstoHTMLForm(String classPath) {
+  public static String JavaClassToHTMLForm(String classPath) {
     Path path = Paths.get(classPath);
     File file = path.toFile();
     // TODO scala.collection.immutable.List<Object> classFileList;
@@ -129,18 +132,34 @@ public class Opal {
               + jsOpenField()
               + jsOpenMethod()
               + jsScrollToField()
-              + jsScrollTo()
+              + jsScrollToID()
               + cf.classFileToXHTML(new Some(classPath)).toString()
               + "\n</body>\n</html>";
 
-      toHtmlAsString = toHtmlAsString.replace("id=\"&lt;init&gt;()V\"", "id=\"init()V\"");
+      // TODO: is this ok? (talk to M. Eichberg?)
+      toHtmlAsString = fixInitSymbols(toHtmlAsString);
     } catch (IOException e) {
-      e.printStackTrace();
-      // fehlerausgabe im HTMLFormat für den Editor
       toHtmlAsString =
           "<html><body><h1>Something went wrong in Opal.toHTMLForm()</h1></body></html>";
     }
     return toHtmlAsString;
+  }
+
+  private static String fixInitSymbols(String htmlString) {
+    // e.g. id="&lt;clinit&gt;()V" should become id="<clinit>()V"
+    final String regex = "(id=\"|data-name=\")(&lt;)(\\w+)(&gt;)([^\"]*\")";
+    final Pattern p = Pattern.compile(regex);
+    final Matcher m = p.matcher(htmlString);
+
+    StringBuffer sb = new StringBuffer();
+    while(m.find()) {
+      String replacement = m.group(1) + "<" + m.group(3) + ">" + m.group(5);
+      m.appendReplacement(sb, replacement);
+    }
+    m.appendTail(sb);
+    htmlString = sb.toString();
+
+    return htmlString;
   }
 
   private static String jsOpenField() {
@@ -183,7 +202,6 @@ public class Opal {
                     + "       var element = elements[i];\n"
                     + "       if(element.getAttribute(\"data-name\") == dataName) {\n"
                     + "         element.scrollIntoView();\n"
-//                    + "         elements[i].open = true;\n"
                     + "         element.style.backgroundColor = " + highlightColor + ";\n"
                     + "         window.setTimeout(function(){\n"
                     + "           element.style.backgroundColor = " + originalColor + ";\n"
@@ -197,7 +215,7 @@ public class Opal {
     return script;
   }
 
-  private static String jsScrollTo() {
+  private static String jsScrollToID() {
     // differentiate between light and dark IDE theme
     String lightThemeHighlight = "\"#FDFF47\"";
     String darkThemeHighlight = "\"#ABCDEF\"";
@@ -213,23 +231,14 @@ public class Opal {
             + "    var element = document.getElementById(elementId);\n"
             + "    element.scrollIntoView(); \n"
             + "    element.open  = true;\n"
-//            + "    var orig = element.style.backgroundColor;\n"
             + "    element.style.backgroundColor = "
             + highlightColor
             + ";\n"
             + "    window.setTimeout(function(){\n"
-//            + "       element.style.backgroundColor = orig;\n"
             + "    element.style.backgroundColor = " + originalColor + ";\n"
             + "    }, 2000);\n"
             + "}\n"
             + "</script>\n";
-
-//    script =
-//            "<script>\n"
-//            + "function scrollTo(hash) {\n"
-//                    + "location.hash = \"#\" + hash;\n"
-//                    + "}\n"
-//            + "</script>\n";
 
     return script;
   }
@@ -356,7 +365,7 @@ public class Opal {
     }
     String represetableForm = null;
     if (prepareID.equals(GlobalData.DISASSEMBLED_FILE_ENDING_HTML)) {
-      represetableForm = Opal.JavaClasstoHtmlForm(virtualFile);
+      represetableForm = Opal.JavaClassToHtmlForm(virtualFile);
     } else if (prepareID.equals(GlobalData.DISASSEMBLED_FILE_ENDING_TAC)) {
       represetableForm = Opal.JavaClasstoTACForm(virtualFile);
     }
