@@ -1,7 +1,11 @@
 package HTMLEditor;
 
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.DataProvider;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileEvent;
+import com.intellij.openapi.vfs.VirtualFileListener;
 import com.intellij.ui.JBColor;
 import com.sun.webkit.WebPage;
 import java.awt.*;
@@ -20,30 +24,36 @@ import javafx.scene.web.WebView;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.jetbrains.annotations.NotNull;
 
 // DataProvider: Allows a component hosting actions to provide context information to the actions.
 // CopyProvider: performs copy, enables/disables copy, shows/hide copy
-public class MyHtmlEditorUI extends JPanel implements Disposable, DocumentListener, KeyListener {
+public class HTMLEditorComponent extends JPanel
+    implements DataProvider, Disposable, DocumentListener, KeyListener {
 
   private static final Color SEARCH_GOOD_BACKGROUND = new Color(255, 255, 255);
   private static final Color SEARCH_GOOD_TEXT = new Color(0, 0, 0);
   private static final Color SEARCH_BAD_BACKGROUND = new Color(255, 0, 0);
   private static final Color SEARCH_BAD_TEXT = new Color(255, 255, 255);
   private static final Font SEARCH_FONT = new Font("Arial", Font.PLAIN, 19);
+  private boolean controlKeyDown = false;
+
   private JFXPanel fxPanel;
   private Group root;
   private Scene scene;
   private WebView webView;
   private WebEngine webEngine;
   private JTextField searchText;
-  private boolean controlKeyDown = false;
+
+  private HTMLEditor myEditor;
 
   public WebEngine getWebEngine() {
     return webEngine;
   }
 
-  public MyHtmlEditorUI(VirtualFile html) {
+  public HTMLEditorComponent(VirtualFile html, HTMLEditor e) {
     // init the JavaFX-File
+    myEditor = e;
     fxPanel = new JFXPanel();
     Platform.setImplicitExit(false);
     Platform.runLater(
@@ -69,6 +79,18 @@ public class MyHtmlEditorUI extends JPanel implements Disposable, DocumentListen
             setWebViewSize();
           }
         });
+    html.getFileSystem()
+        .addVirtualFileListener(
+            new VirtualFileListener() {
+              @Override
+              public void contentsChanged(@NotNull VirtualFileEvent event) {
+                Platform.setImplicitExit(false);
+                Platform.runLater(
+                    () -> {
+                      webEngine.reload();
+                    });
+              }
+            });
     this.addKeyListener(this);
   }
 
@@ -183,5 +205,17 @@ public class MyHtmlEditorUI extends JPanel implements Disposable, DocumentListen
     if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
       controlKeyDown = true;
     }
+  }
+  // MY SHIT
+  public boolean isModified() {
+    return true;
+  }
+
+  @Override
+  public Object getData(final String dataId) {
+    if (CommonDataKeys.EDITOR.is(dataId)) {
+      return myEditor;
+    }
+    return null;
   }
 }

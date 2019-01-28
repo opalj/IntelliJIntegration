@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 /*
  * @example: https://github.com/JetBrains/intellij-community/blob/master/images/src/org/intellij/images/editor/impl/ImageFileEditorProvider.java
  */
-public class MyFileEditorProvider implements FileEditorProvider {
+public class HTMLEditorProvider implements FileEditorProvider {
   // TODO: should this class implement "DumbAware" ?
 
   @NonNls private static final String EDITOR_TYPE_ID = "OPAL-HTML";
@@ -26,8 +26,8 @@ public class MyFileEditorProvider implements FileEditorProvider {
   @NotNull
   @Override
   public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
-    // only called if MyFileEditorProvider#accept() returns true
-    return new MyHtmlEditor(project, file);
+    // only called if HTMLEditorProvider#accept() returns true
+    return new HTMLEditor(project, file);
   }
 
   @NotNull

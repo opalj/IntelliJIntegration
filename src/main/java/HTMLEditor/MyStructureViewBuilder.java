@@ -26,8 +26,8 @@ public class MyStructureViewBuilder extends TreeBasedStructureViewBuilder {
   @NotNull
   @Override
   public StructureViewModel createStructureViewModel(@Nullable Editor editor) {
-    // ignore, as MyHtmlEditor is not a TextEditor and hence needs special treatment
-    return new OpalEditorBasedStructureViewModel(((MyHtmlEditor) fileEditor), psiFile, root);
+    // ignore, as HTMLEditor is not a TextEditor and hence needs special treatment
+    return new OpalEditorBasedStructureViewModel(((HTMLEditor) fileEditor), psiFile, root);
   }
 
   @Override
@@ -35,9 +35,9 @@ public class MyStructureViewBuilder extends TreeBasedStructureViewBuilder {
   public StructureView createStructureView(FileEditor fileEditor, @NotNull Project project) {
     this.fileEditor = fileEditor;
     OpalEditorBasedStructureViewModel opalModel =
-        new OpalEditorBasedStructureViewModel(((MyHtmlEditor) fileEditor), psiFile, root);
+        new OpalEditorBasedStructureViewModel(((HTMLEditor) fileEditor), psiFile, root);
     MyStructureView view =
-        new MyStructureView((MyHtmlEditor) fileEditor, opalModel, project, isRootNodeShown());
+        new MyStructureView((HTMLEditor) fileEditor, opalModel, project, isRootNodeShown());
     Disposer.register(view, () -> opalModel.dispose());
     return view;
   }

@@ -8,13 +8,13 @@ import org.jetbrains.annotations.NotNull;
 
 public class MyStructureView implements StructureView {
 
-  private MyHtmlEditor htmlEditor;
+  private HTMLEditor htmlEditor;
   private OpalEditorBasedStructureViewModel opalModel;
   private Project project;
   private boolean isRootNodeShown;
 
   public MyStructureView(
-      MyHtmlEditor htmlEditor,
+      HTMLEditor htmlEditor,
       OpalEditorBasedStructureViewModel model,
       Project project,
       boolean isRootNodeShown) {
@@ -25,7 +25,7 @@ public class MyStructureView implements StructureView {
   }
 
   @Override
-  public MyHtmlEditor getFileEditor() {
+  public HTMLEditor getFileEditor() {
     return htmlEditor;
   }
 

@@ -28,9 +28,9 @@
                     anchor="right"
                     secondary="true"/>
          -->
-        <fileEditorProvider implementation="HTMLEditor.MyFileEditorProvider"
+        <fileEditorProvider implementation="HTMLEditor.HTMLEditorProvider"
                             id="OpalHTMLEditorProvider"/>
-        <fileEditorProvider implementation="FileEditor.TacFileEditor"
+        <fileEditorProvider implementation="FileEditor.TacTextEditorProvider"
                             id="OpalTACEditorProvider"/>
         <fileTypeFactory implementation="syntaxHighlighting.TAC_fileTypeFactory"/>
         <lang.parserDefinition language="TAC" implementationClass="syntaxHighlighting.TAC_parserDefinition"/>

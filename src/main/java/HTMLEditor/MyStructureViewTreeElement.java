@@ -23,10 +23,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
   private final boolean myInStructureViewPopup;
-  private MyHtmlEditor htmlEditor;
+  private HTMLEditor htmlEditor;
 
   MyStructureViewTreeElement(
-      final boolean inStructureViewPopup, final XmlFile xmlFile, MyHtmlEditor htmlEditor) {
+      final boolean inStructureViewPopup, final XmlFile xmlFile, HTMLEditor htmlEditor) {
     super(xmlFile);
     myInStructureViewPopup = inStructureViewPopup;
     this.htmlEditor = htmlEditor;

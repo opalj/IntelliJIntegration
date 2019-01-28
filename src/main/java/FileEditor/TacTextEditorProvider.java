@@ -2,7 +2,7 @@ package FileEditor;
 
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;
-import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider;
+import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
@@ -10,7 +10,7 @@ import opalintegration.Opal;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
-public class TacFileEditor extends TextEditorProvider {
+public class TacTextEditorProvider extends PsiAwareTextEditorProvider {
   @NonNls private static final String EDITOR_TYPE_ID = "OPAL-TAC";
 
   @Override
@@ -49,7 +49,8 @@ public class TacFileEditor extends TextEditorProvider {
       //                }
       //                }
     }
-    return super.createEditor(project, file);
+    // return super.createEditor(project, file);
+    return new TacTextEditor(project, file, this);
   }
 
   @NotNull

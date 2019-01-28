@@ -13,13 +13,13 @@ import org.jetbrains.annotations.Nullable;
 
 // TODO: currently many methods unimplemented, how much of them is needed ?
 public class OpalEditorBasedStructureViewModel implements StructureViewModel {
-  private final MyHtmlEditor myEditor;
+  private final HTMLEditor myEditor;
   private final PsiFile myPsiFile;
   private final StructureViewTreeElement myRoot;
 
-  // Editor should be MyHtmlEditor !!
+  // Editor should be HTMLEditor !!
   public OpalEditorBasedStructureViewModel(
-      final MyHtmlEditor editor, PsiFile psiFile, StructureViewTreeElement root) {
+      final HTMLEditor editor, PsiFile psiFile, StructureViewTreeElement root) {
     myEditor = editor;
     myPsiFile = psiFile;
     myRoot = root;

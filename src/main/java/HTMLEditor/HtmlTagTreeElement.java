@@ -23,9 +23,9 @@ import org.jetbrains.annotations.Nullable;
 public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements LocationPresentation {
   static final int MAX_TEXT_LENGTH = 50;
 
-  private MyHtmlEditor htmlEditor;
+  private HTMLEditor htmlEditor;
 
-  HtmlTagTreeElement(final XmlTag tag, MyHtmlEditor htmlEditor) {
+  HtmlTagTreeElement(final XmlTag tag, HTMLEditor htmlEditor) {
     super(tag);
     this.htmlEditor = htmlEditor;
   }
