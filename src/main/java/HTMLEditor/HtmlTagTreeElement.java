@@ -4,16 +4,20 @@ import com.intellij.ide.IdeBundle;
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import com.intellij.navigation.LocationPresentation;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.xml.util.HtmlUtil;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+
+import java.util.*;
+import java.util.AbstractMap.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import javafx.application.Platform;
 import javafx.scene.web.WebEngine;
 import javax.swing.*;
@@ -23,9 +27,36 @@ import org.jetbrains.annotations.Nullable;
 public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements LocationPresentation {
   static final int MAX_TEXT_LENGTH = 50;
 
-  private HTMLEditor htmlEditor;
+  private MyHtmlEditor htmlEditor;
 
-  HtmlTagTreeElement(final XmlTag tag, HTMLEditor htmlEditor) {
+  // xxx#someMethod(possiblySomeParams)retType.xxx
+  private final String simpleDefaultPresentableTextRegex = "(.*)#.+[(].*[)](.*)\\.(.*)";
+
+  // TODO: move this to some utility class (maybe Opal)?
+    private static final Map<String, String> primitiveTypesMap = Stream.of(
+            new SimpleEntry<>("Z", "boolean"),
+            new SimpleEntry<>("B", "byte"),
+            new SimpleEntry<>("C", "char"),
+            new SimpleEntry<>("S", "short"),
+            new SimpleEntry<>("I", "int"),
+            new SimpleEntry<>("J", "long"),
+            new SimpleEntry<>("F", "float"),
+            new SimpleEntry<>("D", "double"),
+            new SimpleEntry<>("V", "void")
+    ).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
+
+    private static final Map<String, Integer> modifierSortOrder = Stream.of(
+            new SimpleEntry<>("public", 0),
+            new SimpleEntry<>("private", 0),
+            new SimpleEntry<>("protected", 0),
+            new SimpleEntry<>("static", 1),
+            new SimpleEntry<>("final", 2),
+            new SimpleEntry<>("abstract", 2),
+            new SimpleEntry<>("default", 3)
+    ).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
+
+
+  HtmlTagTreeElement(final XmlTag tag, MyHtmlEditor htmlEditor) {
     super(tag);
     this.htmlEditor = htmlEditor;
   }
@@ -34,13 +65,13 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
   public void navigate(boolean requestFocus) {
     WebEngine webEngine = htmlEditor.getWebEngine();
 
-    // this.getPresentableText() contains the desired id: "details#[my-id].method"
+    // this.getPresentableText() contains the desired id, e.g.: "details#[my-id].method"
     String presentableText = this.getDefaultPresentableText();
-    if (presentableText.startsWith("details#") && presentableText.endsWith(".method")) {
-      int begin = presentableText.indexOf("#");
-      int end = presentableText.lastIndexOf(".");
 
-      // TODO: init() should be <init>() ... problem: what if there is an actual init() method
+    if(presentableText.matches(simpleDefaultPresentableTextRegex)) {
+      int begin = presentableText.indexOf("#");
+      int end = presentableText.indexOf(".");
+
       String id = presentableText.substring(begin + 1, end);
 
       Runnable run =
@@ -52,8 +83,12 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     }
     // check if it's field ...
     else if (presentableText.equals("div.field.details")) {
-      // TODO: probably have to adjust the HTML file to contain field names in tag-attributes
-      // (currently ambiguous)
+      String dataName = getElement().getAttribute("data-name").getValue();
+      Runnable run = () -> {
+          webEngine.executeScript("openFields()");
+          webEngine.executeScript("scrollToField(\"" + dataName + "\")");
+      };
+      Platform.runLater(run);
     }
   }
 
@@ -75,11 +110,22 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
 
     List<StructureViewTreeElement> result = new ArrayList<>();
     for (XmlTag xmlTag : tag.getSubTags()) {
-      // don't show <summary>
+      // don't show children of <summary>
       if (xmlTag.getSubTags().length == 0) continue;
 
-      // TODO: how to get rid of sub-tags of methods?
-      // MyXmlTag newTag = new MyXmlTag(xmlTag);
+      XmlAttribute classAttribute = xmlTag.getAttribute("class");
+      String classAttributeValue = classAttribute != null ? classAttribute.getValue() : "";
+
+      // careful: abstract methods also have a div tag with class="details method native_or_abstract"
+      if(xmlTag.getName().equals("div") && !classAttributeValue.equals("details method native_or_abstract")
+            && !classAttributeValue.equals("field details")) {
+        continue;
+      }
+      // child of abstract: <span class="method_declaration">
+      else if(xmlTag.getName().equals("span") &&
+              (classAttributeValue.equals("method_declaration") || classAttributeValue.equals("field_declaration"))) {
+        continue;
+      }
 
       result.add(new HtmlTagTreeElement(xmlTag, htmlEditor));
     }
@@ -94,88 +140,199 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
       return IdeBundle.message("node.structureview.invalid");
     }
 
-    // TODO: consider a method to extract ID of method
-    String original = HtmlUtil.getTagPresentation(tag);
-    if (original.startsWith("details#") && original.endsWith(".method")) {
-      int begin = original.indexOf("#");
-      int end = original.lastIndexOf(".");
+    String defaultPresentation = HtmlUtil.getTagPresentation(tag);
 
-      return original.substring(begin + 1, end - 1); // end-1 to get rid of the trailing 'V'
+    // fields (maybe add initialized value as well? e.g. "myField: double = 2")
+    XmlAttribute classAttribute = tag.getAttribute("class");
+    if(classAttribute != null && classAttribute.getValue().equals("field details")) {
+        return getPresentableTextForField(tag);
     }
 
-    return HtmlUtil.getTagPresentation(tag);
+    // methods
+    if (defaultPresentation.matches(simpleDefaultPresentableTextRegex)) {
+      return getPresentableTextForMethod(defaultPresentation);
+    }
+
+    // return the default in case something went wrong (e.g. unanticipated text format)
+    return defaultPresentation;
+  }
+
+  @NotNull
+  private String getPresentableTextForField(@NotNull XmlTag tag) {
+      XmlTag field = tag.findFirstSubTag("span");
+      String type = "";
+      String name = "";
+
+      for(XmlTag fieldSub : field.getSubTags()) {
+          XmlAttribute classAttribute = fieldSub.getAttribute("class");
+          if(classAttribute == null) {
+              continue;
+          }
+          else if(classAttribute.getValue().contains("type")) {
+              type = fieldSub.getValue().getText();
+          }
+          else if(classAttribute.getValue().equals("name")) {
+              name = fieldSub.getValue().getText();
+          }
+      }
+
+      if(type.contains(".")) {
+          type = type.substring(type.lastIndexOf(".") + 1);
+      }
+      return name + ": " + type;
+  }
+
+  @NotNull
+  private String getPresentableTextForMethod(@NotNull String defaultPresentation) {
+      int begin = defaultPresentation.indexOf("#");
+      int end = defaultPresentation.indexOf(".");
+
+      String preParamFormat = defaultPresentation.substring(begin + 1, end - 1);
+      String postParamFormat = formatParameters(preParamFormat);
+
+      // the return type begins after the closing ')'
+      int retTypeIdxBegin = defaultPresentation.indexOf(')') + 1;
+      String returnType = formatReturnType(defaultPresentation.substring(retTypeIdxBegin));
+
+      return postParamFormat + ": " + returnType;
+  }
+
+  @NotNull
+  private String formatParameters(@NotNull String preParamFormat) {
+    int begin = preParamFormat.indexOf('(');
+    int end = preParamFormat.lastIndexOf(')');
+
+    String opalParameters = preParamFormat.substring(begin + 1, end);
+    String javaParameters = replaceOpalParamsWithJavaParams(opalParameters);
+
+    String postParamFormat = preParamFormat.substring(0, begin + 1) + javaParameters + ")";
+    return postParamFormat.replace(", )", ")"); // get rid of the last comma
+  }
+
+  @NotNull
+  private String replaceOpalParamsWithJavaParams(@NotNull String opalParams) {
+      int commaCount = 0;
+      int arrayDim = 0;
+
+      StringBuilder sb = new StringBuilder();
+      for(int i=0; i < opalParams.length(); ++i) {
+          char c = opalParams.charAt(i);
+
+          if(c == '[') {
+              ++arrayDim;
+              continue;
+          }
+
+          if(commaCount >= 7) {
+              sb.append("..., ");
+              break;
+          }
+
+          String primitiveType = primitiveTypesMap.get(c + "");
+          if(primitiveType != null) {
+              sb.append(primitiveType);
+              ++commaCount;
+          }
+          else if(c == 'L') {
+              int semicol = opalParams.indexOf(';', i);
+              String temp = opalParams.substring(0, semicol);
+              int lastSlash = temp.lastIndexOf('/');
+              sb.append(temp.substring(lastSlash + 1));
+              ++commaCount;
+              i = semicol;
+          }
+
+          if((primitiveType != null || c == 'L') && arrayDim > 0) {
+              for(int j=0; j < arrayDim; ++j) {
+                  sb.append("[]");
+              }
+              arrayDim = 0;
+          }
+
+          sb.append(", ");
+      }
+
+      return sb.toString();
+  }
+
+  private String formatReturnType(@NotNull String preFormatRetType) {
+      int arrayDim = 0;
+
+      char c;
+      for(int i=0; i < preFormatRetType.length(); ++i) {
+          c = preFormatRetType.charAt(i);
+          if(c == '[') {
+              ++arrayDim;
+          }
+      }
+      c = preFormatRetType.charAt(arrayDim);
+
+      String retType = primitiveTypesMap.get(c + "");
+      if(retType == null) {
+          int begin = preFormatRetType.lastIndexOf('/');
+          int end = preFormatRetType.indexOf(';');
+          retType = preFormatRetType.substring(begin + 1, end);
+      }
+
+      for(int i=0; i < arrayDim; ++i) {
+          retType += "[]";
+      }
+
+      return retType;
   }
 
   @Override
   public Icon getIcon(boolean open) {
     final XmlTag xmlTag = getElement();
 
+    // methods and fields
     if (xmlTag != null && xmlTag.getAttribute("data-access-flags") != null) {
-      String modifier = xmlTag.getAttribute("data-access-flags").getValue();
-      System.out.println(modifier);
-      //      Messages.showInfoMessage(modifier, "Modifiers?");
-
-      return foobar(modifier);
+      String modifiers = xmlTag.getAttribute("data-access-flags").getValue();
+      boolean isField = xmlTag.getAttribute("class").getText().contains("field");
+      return findIconBasedOnModifiers(modifiers, isField);
     }
 
-    final PsiElement element = getElement();
-    if (element != null) {
-      int flags = Iconable.ICON_FLAG_READ_STATUS;
-      if (!(element instanceof PsiFile) || !element.isWritable())
-        flags |= Iconable.ICON_FLAG_VISIBILITY;
-      return element.getIcon(flags);
-    } else {
-      return null;
-    }
+    // rely on the "default" implementation for everything else (creates XML-tag symbol)
+    // e.g. gets called for <summary>
+    return getIconFallback();
   }
 
-  Icon foobar(String modifier) {
-    Icon iconRet;
+  @NotNull
+  private Icon findIconBasedOnModifiers(@NotNull String modifiers, boolean isField) {
+    final String legalMods = "public private protected default static final abstract";
 
-    if (modifier.contains("static") && modifier.contains("final")) {
-      if (modifier.contains("public")) {
-        iconRet = OutlineIcons.METHOD_STATIC_FINAL_PUBLIC;
-      } else if (modifier.contains("private")) {
-        iconRet = OutlineIcons.METHOD_STATIC_FINAL_PRIVATE;
-      } else if (modifier.contains("protected")) {
-        iconRet = OutlineIcons.METHOD_STATIC_FINAL_PROTECTED;
-      } else {
-        iconRet = OutlineIcons.METHOD_STATIC_FINAL_PACKAGE;
-      }
-    } else if (modifier.contains("static")) {
-      if (modifier.contains("public")) {
-        iconRet = OutlineIcons.METHOD_STATIC_PUBLIC;
-      } else if (modifier.contains("private")) {
-        iconRet = OutlineIcons.METHOD_STATIC_PRIVATE;
-      } else if (modifier.contains("protected")) {
-        iconRet = OutlineIcons.METHOD_STATIC_PROTECTED;
-      } else {
-        iconRet = OutlineIcons.METHOD_STATIC_PACKAGE;
-      }
-    } else if (modifier.contains("final")) {
-      if (modifier.contains("public")) {
-        iconRet = OutlineIcons.METHOD_FINAL_PUBLIC;
-      } else if (modifier.contains("private")) {
-        iconRet = OutlineIcons.METHOD_FINAL_PRIVATE;
+    String[] mods = modifiers.split(" ");
+    mods = Arrays.stream(mods)
+            .filter(s -> legalMods.contains(s))
+            // sort in case the order in OPAL ever gets changed
+            .sorted(Comparator.comparing(modifierSortOrder::get))
+            .toArray(String[]::new);
 
-      } else if (modifier.contains("protected")) {
-        iconRet = OutlineIcons.METHOD_FINAL_PROTECTED;
-      } else {
-        iconRet = OutlineIcons.METHOD_FINAL_PACKAGE;
-      }
-    } else {
-      if (modifier.contains("public")) {
-        iconRet = OutlineIcons.METHOD_PUBLIC;
-      } else if (modifier.contains("private")) {
-        iconRet = OutlineIcons.METHOD_PRIVATE;
-      } else if (modifier.contains("protected")) {
-        iconRet = OutlineIcons.METHOD_PROTECTED;
-      } else {
-        iconRet = OutlineIcons.METHOD_PACKAGE;
-      }
+    String filePrefix = isField ? "fields/field_" : "methods/method_";
+    StringBuilder fileNameOfIcon = new StringBuilder(filePrefix);
+    for(String mod : mods) {
+      fileNameOfIcon.append(mod);
+      fileNameOfIcon.append("_");
     }
 
-    return iconRet;
+    // append the file extension (.png)
+    int lastIdx = fileNameOfIcon.lastIndexOf("_");
+    fileNameOfIcon.replace(lastIdx, lastIdx+1, ".png");
+
+    return IconLoader.getIcon("icons/" + fileNameOfIcon.toString());
+  }
+
+  @Nullable
+  private Icon getIconFallback() {
+      final PsiElement element = getElement();
+      if (element != null) {
+          int flags = Iconable.ICON_FLAG_READ_STATUS;
+          if (!(element instanceof PsiFile) || !element.isWritable())
+              flags |= Iconable.ICON_FLAG_VISIBILITY;
+          return element.getIcon(flags);
+      } else {
+          return null;
+      }
   }
 
   @Nullable

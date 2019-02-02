@@ -2,11 +2,19 @@ package HTMLEditor;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
+import com.intellij.openapi.fileTypes.FileTypeManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Iconable;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.*;
 import com.intellij.psi.filters.XmlTagFilter;
+import com.intellij.psi.impl.source.PsiJavaFileBaseImpl;
+import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.psi.scope.processor.FilterElementProcessor;
+import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
@@ -36,7 +44,7 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
   public void navigate(boolean requestFocus) {
     WebEngine webEngine = htmlEditor.getWebEngine();
 
-    // this is the root (i.e. class-file itself) only !!
+    // this is the root (i.e. class-file-name itself) only !!
     String classID = "class_file_header";
     Runnable run = () -> webEngine.executeScript("scrollTo(\"" + classID + "\")");
     Platform.runLater(run);
@@ -44,19 +52,15 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
 
   @Override
   public Icon getIcon(boolean open) {
-    if (open) {
-      return OutlineIcons.CLASS_TYPE_MAIN;
-    }
+      // get the PsiFile of the corresponding .class file
+      VirtualFile classFile = htmlEditor.getFile();
+      Document document = FileDocumentManager.getInstance().getDocument(classFile);
+      PsiFile psiFile = PsiDocumentManager.getInstance(htmlEditor.getProject()).getPsiFile(document);
 
-    final PsiElement element = getElement();
-    if (element != null) {
-      int flags = Iconable.ICON_FLAG_READ_STATUS;
-      if (!(element instanceof PsiFile) || !element.isWritable())
-        flags |= Iconable.ICON_FLAG_VISIBILITY;
-      return element.getIcon(flags);
-    } else {
-      return null;
-    }
+      int flags = Iconable.ICON_FLAG_READ_STATUS | Iconable.ICON_FLAG_VISIBILITY;
+
+      // the psiFile is at the same time the root element
+      return psiFile.getIcon(flags);
   }
 
   @Override
@@ -71,55 +75,17 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
     final List<XmlTag> rootTags = new SmartList<>();
     document.processElements(new FilterElementProcessor(XmlTagFilter.INSTANCE, rootTags), document);
 
-    // TODO: right direction, but currently hard-coded ... make it more robust !
-    if (rootTags.size() == 1) {
-      int length;
-
-      XmlTag rootTag = rootTags.get(0);
-
-      length = rootTag.getSubTags().length;
-      XmlTag body = rootTag.getSubTags()[length - 1];
-
-      length = body.getSubTags().length;
-      XmlTag divClassFile = body.getSubTags()[length - 1];
-
-      length = divClassFile.getSubTags().length;
-      XmlTag divMembers = divClassFile.getSubTags()[length - 1];
-
-      length = divMembers.getSubTags().length;
-      XmlTag divMethods = divMembers.getSubTags()[length - 1];
-
-      length = divMethods.getSubTags().length;
-      XmlTag details = divMethods.getSubTags()[0];
-
-      return new HtmlTagTreeElement(details, htmlEditor).getChildrenBase();
-
-      //      length = details.getSubTags().length;
-      //      if(length > 1) {
-      //        XmlTag method1 = details.getSubTags()[1];
-      //        // ...
-      //        XmlTag methodN = details.getSubTags()[length-1];
-      //      }
-    }
-
     if (rootTags.isEmpty()) {
-      return Collections.emptyList();
-    } else if (rootTags.size() == 1) {
-      final XmlTag rootTag = rootTags.get(0);
-      if ("html".equalsIgnoreCase(rootTag.getLocalName())) {
-        final XmlTag[] subTags = rootTag.getSubTags();
-        if (subTags.length == 1
-            && ("head".equalsIgnoreCase(subTags[0].getLocalName())
-                || "body".equalsIgnoreCase(subTags[0].getLocalName()))) {
-          return new HtmlTagTreeElement(subTags[0], htmlEditor).getChildrenBase();
-        }
-        return new HtmlTagTreeElement(rootTag, htmlEditor).getChildrenBase();
-      }
-
-      // final anchor (i.e. leaves of tree, e.g. "details#init()V.method") <- is it ?? NO it's not
-      // !!
-      return Collections.singletonList(new HtmlTagTreeElement(rootTag, htmlEditor));
-    } else {
+        return Collections.emptyList();
+    }
+    else if (rootTags.size() == 1) {
+      XmlTag rootTag = rootTags.get(0);
+      XmlTag members = getChildrenBaseForMembers(rootTag);
+      List<StructureViewTreeElement> result = createMemberTree(members);
+      return result;
+    }
+    // TODO: this case covers multiple roots and is probably not needed
+    else {
       final Collection<StructureViewTreeElement> result = new ArrayList<>(rootTags.size());
       for (XmlTag tag : rootTags) {
         result.add(new HtmlTagTreeElement(tag, htmlEditor));
@@ -128,12 +94,51 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
     }
   }
 
+  // TODO: Hardcoded at the moment, can improve this somehow?
+  private XmlTag getChildrenBaseForMembers(@NotNull XmlTag rootTag) {
+    int length = rootTag.getSubTags().length;
+    XmlTag body = rootTag.getSubTags()[length - 1];
+
+    length = body.getSubTags().length;
+    XmlTag divClassFile = body.getSubTags()[length - 1];
+
+    length = divClassFile.getSubTags().length;
+    XmlTag divMembers = divClassFile.getSubTags()[length - 1];
+
+    return divMembers;
+  }
+
+  private List<StructureViewTreeElement> createMemberTree(@NotNull XmlTag members) {
+    List<StructureViewTreeElement> result = new ArrayList<>();
+
+    // go in reverse-order, so that methods are displayed before fields!
+    for(int i=members.getSubTags().length-1; i >= 0; --i) {
+      XmlTag sub = members.getSubTags()[i];
+      XmlAttribute classAttribute = sub.getAttribute("class");
+
+      if(classAttribute == null) {
+        continue;
+      }
+      else if(classAttribute.getValue().equals("fields")) {
+        XmlTag details = sub.findSubTags("details")[0];
+        result.addAll(new HtmlTagTreeElement(details, htmlEditor).getChildrenBase());
+      }
+      else if(classAttribute.getValue().equals("methods")) {
+        XmlTag details = sub.findSubTags("details")[0];
+        result.addAll(new HtmlTagTreeElement(details, htmlEditor).getChildrenBase());
+      }
+    }
+
+    return result;
+  }
+
   @Override
   @Nullable
   public String getPresentableText() {
+    // default: HtmlFile:[filename].html
     String defaultText = toString();
     String className =
-        defaultText.substring(defaultText.indexOf(":") + 1, defaultText.lastIndexOf("."));
+        defaultText.substring(defaultText.indexOf(":") + 1, defaultText.indexOf("."));
     return className;
   }
 }

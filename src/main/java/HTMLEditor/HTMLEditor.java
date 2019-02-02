@@ -73,7 +73,7 @@ public class HTMLEditor extends UserDataHolderBase implements NavigatableFileEdi
   @Override
   public String getName() {
     //     setTacEditorName();
-    return "OPAL HTML";
+    return "Bytecode";
   }
 
   @Override
