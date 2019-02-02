@@ -1,20 +1,12 @@
 package opalintegration;
 
 import Compile.Compiler;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import globalData.GlobalData;
-import java.io.*;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.jetbrains.annotations.NotNull;
 import org.opalj.ai.ValuesDomain;
 import org.opalj.br.Method;
@@ -25,13 +17,16 @@ import org.opalj.collection.immutable.RefArray;
 import org.opalj.da.ClassFileReader;
 import org.opalj.tac.*;
 import org.opalj.value.KnownTypedValue;
-import saveFile.SaveFile;
-import saveFile.exceptions.ErrorWritingFileException;
-import saveFile.exceptions.InputNullException;
-import saveFile.exceptions.IsNotAFileException;
-import saveFile.exceptions.NotEnoughRightsException;
 import scala.Function1;
 import scala.Some;
+
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Opal {
   // uriProject wird benötigt um die OpalFrameworks mit dem Project zu verbinden.
@@ -325,60 +320,25 @@ public class Opal {
   }
 
   // todo SaveFile Class erweitern?
-  private static File prepare(@NotNull String prepareID, VirtualFile virtualFile) {
+  private static File prepare(@NotNull String prepareID, VirtualFile virtualFile)  {
     String basePath = project.getBasePath();
-    classPath = virtualFile.getPath();
-    File baseDir = new File(basePath);
-    File temp = (new File(classPath)).getParentFile();
-    ArrayList<String> dirNames = new ArrayList<String>();
-    while (!temp.getAbsolutePath().equals(baseDir.getAbsolutePath())) {
-      dirNames.add(temp.getName());
-      temp = temp.getParentFile();
-    }
-    File disassembledDir = new File(basePath + File.separator + GlobalData.DISASSEMBLED_FILES_DIR);
-    if (!disassembledDir.exists()) {
-      disassembledDir.mkdir();
-    }
-    temp = new File(disassembledDir.getAbsolutePath());
-    for (int i = 0; i < dirNames.size(); i++) {
-      temp =
-          new File(
-              temp.getAbsolutePath() + File.separator + dirNames.get(dirNames.size() - (i + 1)));
-      if (!temp.exists()) {
-        temp.mkdir();
-      }
-    }
-    String fileName = virtualFile.getNameWithoutExtension();
-    if (prepareID.equals(GlobalData.DISASSEMBLED_FILE_ENDING_HTML)) {
-      fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_HTML);
-    } else if (prepareID.equals(GlobalData.DISASSEMBLED_FILE_ENDING_TAC)) {
-      fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_TAC);
-    }
-    File disassembledFile = new File(temp.getAbsolutePath() + File.separator + fileName);
+    classPath = virtualFile.getParent().getPath();
+    String absPath = basePath + File.separator + GlobalData.DISASSEMBLED_FILES_DIR + classPath.substring(basePath.length());
 
-    if (!disassembledFile.exists()) {
-      try {
-        disassembledFile.createNewFile();
-      } catch (IOException e) {
-        // empty
-      }
-    }
+    String fileName = virtualFile.getNameWithoutExtension();
     String represetableForm = null;
     if (prepareID.equals(GlobalData.DISASSEMBLED_FILE_ENDING_HTML)) {
+      fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_HTML);
       represetableForm = Opal.JavaClassToHtmlForm(virtualFile);
     } else if (prepareID.equals(GlobalData.DISASSEMBLED_FILE_ENDING_TAC)) {
+      fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_TAC);
       represetableForm = Opal.JavaClasstoTACForm(virtualFile);
     }
+    File disassembledFile = new File(absPath + File.separator + fileName);
     try {
-      SaveFile.saveFile(represetableForm, disassembledFile.getAbsolutePath());
-    } catch (InputNullException e0) {
-      // empty
-    } catch (NotEnoughRightsException e1) {
-      // empty
-    } catch (IsNotAFileException e2) {
-      // empty
-    } catch (ErrorWritingFileException e3) {
-      // empty
+      FileUtil.writeToFile(disassembledFile,represetableForm,false);
+    } catch (IOException e) {
+      e.printStackTrace();
     }
     return disassembledFile;
   }

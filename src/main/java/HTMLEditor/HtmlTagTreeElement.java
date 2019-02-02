@@ -12,22 +12,21 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.xml.util.HtmlUtil;
-
-import java.util.*;
-import java.util.AbstractMap.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import javafx.application.Platform;
 import javafx.scene.web.WebEngine;
-import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements LocationPresentation {
   static final int MAX_TEXT_LENGTH = 50;
 
-  private MyHtmlEditor htmlEditor;
+  private HTMLEditor htmlEditor;
 
   // xxx#someMethod(possiblySomeParams)retType.xxx
   private final String simpleDefaultPresentableTextRegex = "(.*)#.+[(].*[)](.*)\\.(.*)";
@@ -56,7 +55,7 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     ).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
 
 
-  HtmlTagTreeElement(final XmlTag tag, MyHtmlEditor htmlEditor) {
+  HtmlTagTreeElement(final XmlTag tag, HTMLEditor htmlEditor) {
     super(tag);
     this.htmlEditor = htmlEditor;
   }

@@ -36,7 +36,6 @@ public class HTMLEditor extends UserDataHolderBase implements NavigatableFileEdi
   private final Project project;
   private boolean disposed;
   private final PropertyChangeSupport myChangeSupport = new PropertyChangeSupport(this);
-  String
   public HTMLEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
     this.project = project;
     this.virtualFile = virtualFile;
