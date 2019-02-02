@@ -1,4 +1,4 @@
-package HTMLEditor;
+package Editors.HTMLEditor;
 
 import com.intellij.ide.IdeBundle;
 import com.intellij.ide.structureView.StructureViewTreeElement;
@@ -12,16 +12,15 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlTag;
 import com.intellij.xml.util.HtmlUtil;
-import javafx.application.Platform;
-import javafx.scene.web.WebEngine;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.*;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javafx.application.Platform;
+import javafx.scene.web.WebEngine;
+import javax.swing.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements LocationPresentation {
   static final int MAX_TEXT_LENGTH = 50;
@@ -32,28 +31,29 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
   private final String simpleDefaultPresentableTextRegex = "(.*)#.+[(].*[)](.*)\\.(.*)";
 
   // TODO: move this to some utility class (maybe Opal)?
-    private static final Map<String, String> primitiveTypesMap = Stream.of(
-            new SimpleEntry<>("Z", "boolean"),
-            new SimpleEntry<>("B", "byte"),
-            new SimpleEntry<>("C", "char"),
-            new SimpleEntry<>("S", "short"),
-            new SimpleEntry<>("I", "int"),
-            new SimpleEntry<>("J", "long"),
-            new SimpleEntry<>("F", "float"),
-            new SimpleEntry<>("D", "double"),
-            new SimpleEntry<>("V", "void")
-    ).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
+  private static final Map<String, String> primitiveTypesMap =
+      Stream.of(
+              new SimpleEntry<>("Z", "boolean"),
+              new SimpleEntry<>("B", "byte"),
+              new SimpleEntry<>("C", "char"),
+              new SimpleEntry<>("S", "short"),
+              new SimpleEntry<>("I", "int"),
+              new SimpleEntry<>("J", "long"),
+              new SimpleEntry<>("F", "float"),
+              new SimpleEntry<>("D", "double"),
+              new SimpleEntry<>("V", "void"))
+          .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
 
-    private static final Map<String, Integer> modifierSortOrder = Stream.of(
-            new SimpleEntry<>("public", 0),
-            new SimpleEntry<>("private", 0),
-            new SimpleEntry<>("protected", 0),
-            new SimpleEntry<>("static", 1),
-            new SimpleEntry<>("final", 2),
-            new SimpleEntry<>("abstract", 2),
-            new SimpleEntry<>("default", 3)
-    ).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
-
+  private static final Map<String, Integer> modifierSortOrder =
+      Stream.of(
+              new SimpleEntry<>("public", 0),
+              new SimpleEntry<>("private", 0),
+              new SimpleEntry<>("protected", 0),
+              new SimpleEntry<>("static", 1),
+              new SimpleEntry<>("final", 2),
+              new SimpleEntry<>("abstract", 2),
+              new SimpleEntry<>("default", 3))
+          .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
 
   HtmlTagTreeElement(final XmlTag tag, HTMLEditor htmlEditor) {
     super(tag);
@@ -67,7 +67,7 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     // this.getPresentableText() contains the desired id, e.g.: "details#[my-id].method"
     String presentableText = this.getDefaultPresentableText();
 
-    if(presentableText.matches(simpleDefaultPresentableTextRegex)) {
+    if (presentableText.matches(simpleDefaultPresentableTextRegex)) {
       int begin = presentableText.indexOf("#");
       int end = presentableText.indexOf(".");
 
@@ -83,10 +83,11 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     // check if it's field ...
     else if (presentableText.equals("div.field.details")) {
       String dataName = getElement().getAttribute("data-name").getValue();
-      Runnable run = () -> {
-          webEngine.executeScript("openFields()");
-          webEngine.executeScript("scrollToField(\"" + dataName + "\")");
-      };
+      Runnable run =
+          () -> {
+            webEngine.executeScript("openFields()");
+            webEngine.executeScript("scrollToField(\"" + dataName + "\")");
+          };
       Platform.runLater(run);
     }
   }
@@ -115,14 +116,17 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
       XmlAttribute classAttribute = xmlTag.getAttribute("class");
       String classAttributeValue = classAttribute != null ? classAttribute.getValue() : "";
 
-      // careful: abstract methods also have a div tag with class="details method native_or_abstract"
-      if(xmlTag.getName().equals("div") && !classAttributeValue.equals("details method native_or_abstract")
-            && !classAttributeValue.equals("field details")) {
+      // careful: abstract methods also have a div tag with class="details method
+      // native_or_abstract"
+      if (xmlTag.getName().equals("div")
+          && !classAttributeValue.equals("details method native_or_abstract")
+          && !classAttributeValue.equals("field details")) {
         continue;
       }
       // child of abstract: <span class="method_declaration">
-      else if(xmlTag.getName().equals("span") &&
-              (classAttributeValue.equals("method_declaration") || classAttributeValue.equals("field_declaration"))) {
+      else if (xmlTag.getName().equals("span")
+          && (classAttributeValue.equals("method_declaration")
+              || classAttributeValue.equals("field_declaration"))) {
         continue;
       }
 
@@ -143,8 +147,8 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
 
     // fields (maybe add initialized value as well? e.g. "myField: double = 2")
     XmlAttribute classAttribute = tag.getAttribute("class");
-    if(classAttribute != null && classAttribute.getValue().equals("field details")) {
-        return getPresentableTextForField(tag);
+    if (classAttribute != null && classAttribute.getValue().equals("field details")) {
+      return getPresentableTextForField(tag);
     }
 
     // methods
@@ -158,42 +162,40 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
 
   @NotNull
   private String getPresentableTextForField(@NotNull XmlTag tag) {
-      XmlTag field = tag.findFirstSubTag("span");
-      String type = "";
-      String name = "";
+    XmlTag field = tag.findFirstSubTag("span");
+    String type = "";
+    String name = "";
 
-      for(XmlTag fieldSub : field.getSubTags()) {
-          XmlAttribute classAttribute = fieldSub.getAttribute("class");
-          if(classAttribute == null) {
-              continue;
-          }
-          else if(classAttribute.getValue().contains("type")) {
-              type = fieldSub.getValue().getText();
-          }
-          else if(classAttribute.getValue().equals("name")) {
-              name = fieldSub.getValue().getText();
-          }
+    for (XmlTag fieldSub : field.getSubTags()) {
+      XmlAttribute classAttribute = fieldSub.getAttribute("class");
+      if (classAttribute == null) {
+        continue;
+      } else if (classAttribute.getValue().contains("type")) {
+        type = fieldSub.getValue().getText();
+      } else if (classAttribute.getValue().equals("name")) {
+        name = fieldSub.getValue().getText();
       }
+    }
 
-      if(type.contains(".")) {
-          type = type.substring(type.lastIndexOf(".") + 1);
-      }
-      return name + ": " + type;
+    if (type.contains(".")) {
+      type = type.substring(type.lastIndexOf(".") + 1);
+    }
+    return name + ": " + type;
   }
 
   @NotNull
   private String getPresentableTextForMethod(@NotNull String defaultPresentation) {
-      int begin = defaultPresentation.indexOf("#");
-      int end = defaultPresentation.indexOf(".");
+    int begin = defaultPresentation.indexOf("#");
+    int end = defaultPresentation.indexOf(".");
 
-      String preParamFormat = defaultPresentation.substring(begin + 1, end - 1);
-      String postParamFormat = formatParameters(preParamFormat);
+    String preParamFormat = defaultPresentation.substring(begin + 1, end - 1);
+    String postParamFormat = formatParameters(preParamFormat);
 
-      // the return type begins after the closing ')'
-      int retTypeIdxBegin = defaultPresentation.indexOf(')') + 1;
-      String returnType = formatReturnType(defaultPresentation.substring(retTypeIdxBegin));
+    // the return type begins after the closing ')'
+    int retTypeIdxBegin = defaultPresentation.indexOf(')') + 1;
+    String returnType = formatReturnType(defaultPresentation.substring(retTypeIdxBegin));
 
-      return postParamFormat + ": " + returnType;
+    return postParamFormat + ": " + returnType;
   }
 
   @NotNull
@@ -210,74 +212,73 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
 
   @NotNull
   private String replaceOpalParamsWithJavaParams(@NotNull String opalParams) {
-      int commaCount = 0;
-      int arrayDim = 0;
+    int commaCount = 0;
+    int arrayDim = 0;
 
-      StringBuilder sb = new StringBuilder();
-      for(int i=0; i < opalParams.length(); ++i) {
-          char c = opalParams.charAt(i);
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < opalParams.length(); ++i) {
+      char c = opalParams.charAt(i);
 
-          if(c == '[') {
-              ++arrayDim;
-              continue;
-          }
-
-          if(commaCount >= 7) {
-              sb.append("..., ");
-              break;
-          }
-
-          String primitiveType = primitiveTypesMap.get(c + "");
-          if(primitiveType != null) {
-              sb.append(primitiveType);
-              ++commaCount;
-          }
-          else if(c == 'L') {
-              int semicol = opalParams.indexOf(';', i);
-              String temp = opalParams.substring(0, semicol);
-              int lastSlash = temp.lastIndexOf('/');
-              sb.append(temp.substring(lastSlash + 1));
-              ++commaCount;
-              i = semicol;
-          }
-
-          if((primitiveType != null || c == 'L') && arrayDim > 0) {
-              for(int j=0; j < arrayDim; ++j) {
-                  sb.append("[]");
-              }
-              arrayDim = 0;
-          }
-
-          sb.append(", ");
+      if (c == '[') {
+        ++arrayDim;
+        continue;
       }
 
-      return sb.toString();
+      if (commaCount >= 7) {
+        sb.append("..., ");
+        break;
+      }
+
+      String primitiveType = primitiveTypesMap.get(c + "");
+      if (primitiveType != null) {
+        sb.append(primitiveType);
+        ++commaCount;
+      } else if (c == 'L') {
+        int semicol = opalParams.indexOf(';', i);
+        String temp = opalParams.substring(0, semicol);
+        int lastSlash = temp.lastIndexOf('/');
+        sb.append(temp.substring(lastSlash + 1));
+        ++commaCount;
+        i = semicol;
+      }
+
+      if ((primitiveType != null || c == 'L') && arrayDim > 0) {
+        for (int j = 0; j < arrayDim; ++j) {
+          sb.append("[]");
+        }
+        arrayDim = 0;
+      }
+
+      sb.append(", ");
+    }
+
+    return sb.toString();
   }
 
   private String formatReturnType(@NotNull String preFormatRetType) {
-      int arrayDim = 0;
+    int arrayDim = 0;
 
-      char c;
-      for(int i=0; i < preFormatRetType.length(); ++i) {
-          c = preFormatRetType.charAt(i);
-          if(c == '[') {
-              ++arrayDim;
-          }
+    char c;
+    for (int i = 0; i < preFormatRetType.length(); ++i) {
+      c = preFormatRetType.charAt(i);
+      if (c == '[') {
+        ++arrayDim;
       }
-      c = preFormatRetType.charAt(arrayDim);
+    }
+    c = preFormatRetType.charAt(arrayDim);
 
-      String retType = primitiveTypesMap.get(c + "");
-      if(retType == null) {
-          int begin = preFormatRetType.lastIndexOf('/');
-          int end = preFormatRetType.indexOf(';');
-          retType = preFormatRetType.substring(begin + 1, end);
-      }
+    String retType = primitiveTypesMap.get(c + "");
+    if (retType == null) {
+      int begin = preFormatRetType.lastIndexOf('/');
+      int end = preFormatRetType.indexOf(';');
+      retType = preFormatRetType.substring(begin + 1, end);
+    }
 
-      for(int i=0; i < arrayDim; ++i) {
-          retType += "[]";
-      }
+    for (int i = 0; i < arrayDim; ++i) {
+      retType += "[]";
+    }
 
-      return retType;
+    return retType;
   }
 
   @Override
@@ -301,7 +302,8 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
     final String legalMods = "public private protected default static final abstract";
 
     String[] mods = modifiers.split(" ");
-    mods = Arrays.stream(mods)
+    mods =
+        Arrays.stream(mods)
             .filter(s -> legalMods.contains(s))
             // sort in case the order in OPAL ever gets changed
             .sorted(Comparator.comparing(modifierSortOrder::get))
@@ -309,29 +311,29 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
 
     String filePrefix = isField ? "fields/field_" : "methods/method_";
     StringBuilder fileNameOfIcon = new StringBuilder(filePrefix);
-    for(String mod : mods) {
+    for (String mod : mods) {
       fileNameOfIcon.append(mod);
       fileNameOfIcon.append("_");
     }
 
     // append the file extension (.png)
     int lastIdx = fileNameOfIcon.lastIndexOf("_");
-    fileNameOfIcon.replace(lastIdx, lastIdx+1, ".png");
+    fileNameOfIcon.replace(lastIdx, lastIdx + 1, ".png");
 
     return IconLoader.getIcon("icons/" + fileNameOfIcon.toString());
   }
 
   @Nullable
   private Icon getIconFallback() {
-      final PsiElement element = getElement();
-      if (element != null) {
-          int flags = Iconable.ICON_FLAG_READ_STATUS;
-          if (!(element instanceof PsiFile) || !element.isWritable())
-              flags |= Iconable.ICON_FLAG_VISIBILITY;
-          return element.getIcon(flags);
-      } else {
-          return null;
-      }
+    final PsiElement element = getElement();
+    if (element != null) {
+      int flags = Iconable.ICON_FLAG_READ_STATUS;
+      if (!(element instanceof PsiFile) || !element.isWritable())
+        flags |= Iconable.ICON_FLAG_VISIBILITY;
+      return element.getIcon(flags);
+    } else {
+      return null;
+    }
   }
 
   @Nullable

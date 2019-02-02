@@ -1,4 +1,4 @@
-package FileEditor;
+package Editors.FileEditor;
 
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;
@@ -32,8 +32,9 @@ public class TacTextEditorProvider extends PsiAwareTextEditorProvider {
   public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
     // TODO Tac soll auf die Classfile gelinked werden.
     // not best impl
-    //        FileEditor[] allEditors = FileEditorManager.getInstance(project).getAllEditors();
-    //        for(FileEditor editor : allEditors){
+    //        Editors.disEditor.FileEditor[] allEditors =
+    // FileEditorManager.getInstance(project).getAllEditors();
+    //        for(Editors.disEditor.FileEditor editor : allEditors){
     //            if(editor.getFile().equals(file))
     //                return  editor;
     //        }

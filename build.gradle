@@ -1,13 +1,11 @@
 plugins {
     id 'java'
     id 'org.jetbrains.intellij' version '0.3.12'
-
     id 'checkstyle'
     id 'pmd'
     id "com.github.spotbugs" version "1.6.6"
     id 'com.github.sherter.google-java-format' version '0.8'
 }
-
 group '23'
 version '1.0-SNAPSHOT'
 
@@ -23,11 +21,6 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'de.opal-project:abstract-interpretation-framework_2.12:2.0.1'
     compile 'de.opal-project:bytecode-disassembler_2.12:2.0.1:'
-    // Cross-platform
-    compile "com.teamdev.jxbrowser:jxbrowser:6.9"
-    // JxBrowser license
-    compile files("$rootDir/license.jar")
-    //compile files('Q:/Documents/IntelliJ/intellijintegration/build/libs/jxbrowser-6.22.1.jar')
 }
 
 intellij {
@@ -59,13 +52,30 @@ tasks.withType(com.github.spotbugs.SpotBugsTask) {
         xml.enabled = false
         html.enabled = true
     }
-
     // TODO: remove later
     ignoreFailures = true
+}
+tasks.withType(Pmd){
+    reports{
+        xml.enabled=false
+        html.enabled=true
+    }
 }
 
 checkstyle {
     toolVersion "8.10.1"
     config = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml')
 //    maxErrors 20
+}
+pmd{
+    toolVersion = "6.11.0"
+    ignoreFailures = true
+    //ConsoleOutput = true
+    ruleSetFiles = files("config/pmd/myRuleSets.xml")
+    //ruleSets = ['category/java/errorprone.xml'
+            //'java-basic',
+            //'java-CyclomaticComplexityRule'
+            // schaut noch ob Javadoc geschrieben sind
+            //'java-comments',
+            //]
 }

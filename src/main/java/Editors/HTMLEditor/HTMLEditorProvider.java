@@ -1,4 +1,4 @@
-package HTMLEditor;
+package Editors.HTMLEditor;
 
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;

@@ -1,4 +1,4 @@
-package HTMLEditor;
+package Editors.HTMLEditor;
 
 import com.intellij.codeHighlighting.BackgroundEditorHighlighter;
 import com.intellij.ide.structureView.StructureViewBuilder;
@@ -16,14 +16,13 @@ import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import javafx.scene.web.WebEngine;
+import javax.swing.*;
 import opalintegration.Opal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 
 /*
  * @example: https://github.com/JetBrains/intellij-community/blob/master/images/src/org/intellij/images/editor/impl/ImageEditorImpl.java
@@ -36,6 +35,7 @@ public class HTMLEditor extends UserDataHolderBase implements NavigatableFileEdi
   private final Project project;
   private boolean disposed;
   private final PropertyChangeSupport myChangeSupport = new PropertyChangeSupport(this);
+
   public HTMLEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
     this.project = project;
     this.virtualFile = virtualFile;
@@ -43,7 +43,7 @@ public class HTMLEditor extends UserDataHolderBase implements NavigatableFileEdi
         Opal.prepareHtml(
             project,
             virtualFile); // TODO: doesn't update after .class file changes (similar for TAC)
-    editorUI = new HTMLEditorComponent(htmlFile, this);
+    editorUI = new HTMLEditorComponent(htmlFile, this, project);
 
     Disposer.register(this, editorUI);
   }
@@ -92,13 +92,15 @@ public class HTMLEditor extends UserDataHolderBase implements NavigatableFileEdi
   @Override
   public void selectNotify() {
     // for now can remain empty (called when editor is selected)
-    //    Messages.showInfoMessage("selectNotify(): " + virtualFile.getName(), "HTMLEditor");
+    //    Messages.showInfoMessage("selectNotify(): " + virtualFile.getName(),
+    // "Editors.disEditor.HTMLEditor");
   }
 
   @Override
   public void deselectNotify() {
     // for now can remain empty (called when editor is deselected)
-    //    Messages.showInfoMessage("deselectNotify() " + virtualFile.getName(), "HTMLEditor");
+    //    Messages.showInfoMessage("deselectNotify() " + virtualFile.getName(),
+    // "Editors.disEditor.HTMLEditor");
   }
 
   @Override
@@ -132,7 +134,7 @@ public class HTMLEditor extends UserDataHolderBase implements NavigatableFileEdi
   @Nullable
   @Override
   public <T> T getUserData(@NotNull Key<T> key) {
-    // Messages.showInfoMessage("getUserData(): " + key.toString(), "HTMLEditor");
+    // Messages.showInfoMessage("getUserData(): " + key.toString(), "Editors.disEditor.HTMLEditor");
     return null;
   }
 
@@ -154,12 +156,12 @@ public class HTMLEditor extends UserDataHolderBase implements NavigatableFileEdi
 
   @Override
   public boolean canNavigateTo(@NotNull Navigatable navigatable) {
-    Messages.showInfoMessage("canNavigateTo(): " + virtualFile.getName(), "HTMLEditor");
+    Messages.showInfoMessage("canNavigateTo(): " + virtualFile.getName(), "Editors/HTMLEditor");
     return false;
   }
 
   @Override
   public void navigateTo(@NotNull Navigatable navigatable) {
-    Messages.showInfoMessage("navigateTo(): " + virtualFile.getName(), "HTMLEditor");
+    Messages.showInfoMessage("navigateTo(): " + virtualFile.getName(), "Editors/HTMLEditor");
   }
 }

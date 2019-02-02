@@ -1,4 +1,4 @@
-package HTMLEditor;
+package Editors.HTMLEditor;
 
 import com.intellij.ide.structureView.FileEditorPositionListener;
 import com.intellij.ide.structureView.ModelListener;
@@ -17,7 +17,7 @@ public class OpalEditorBasedStructureViewModel implements StructureViewModel {
   private final PsiFile myPsiFile;
   private final StructureViewTreeElement myRoot;
 
-  // Editor should be HTMLEditor !!
+  // Editor should be Editors.disEditor.HTMLEditor !!
   public OpalEditorBasedStructureViewModel(
       final HTMLEditor editor, PsiFile psiFile, StructureViewTreeElement root) {
     myEditor = editor;

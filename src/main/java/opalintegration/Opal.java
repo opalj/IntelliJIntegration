@@ -7,6 +7,14 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import globalData.GlobalData;
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.opalj.ai.ValuesDomain;
 import org.opalj.br.Method;
@@ -19,14 +27,6 @@ import org.opalj.tac.*;
 import org.opalj.value.KnownTypedValue;
 import scala.Function1;
 import scala.Some;
-
-import java.io.*;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Opal {
   // uriProject wird benötigt um die OpalFrameworks mit dem Project zu verbinden.
@@ -62,6 +62,27 @@ public class Opal {
               System.out.println();
               return 1;
             });
+  }
+
+  public static VirtualFile SomeTest(VirtualFile virtualClassFile) {
+    File myFile = null;
+    try {
+      Process exec = Runtime.getRuntime().exec("javap -c " + virtualClassFile.getPath());
+      Scanner scanner = new Scanner(exec.getInputStream()).useDelimiter("\\A");
+      String myString = "";
+      while (scanner.hasNextLine()) myString = myString.concat(scanner.nextLine()).concat("\n");
+      FileUtil.writeToFile(
+          myFile =
+              new File(
+                  virtualClassFile.getParent().getPath()
+                      + File.separator
+                      + virtualClassFile.getNameWithoutExtension()
+                      + ".dis"),
+          myString);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(myFile);
   }
 
   public static String JavaClasstoTACForm(VirtualFile virtualClassFile) {
@@ -147,7 +168,7 @@ public class Opal {
     final Matcher m = p.matcher(htmlString);
 
     StringBuffer sb = new StringBuffer();
-    while(m.find()) {
+    while (m.find()) {
       String replacement = m.group(1) + "<" + m.group(3) + ">" + m.group(5);
       m.appendReplacement(sb, replacement);
     }
@@ -159,11 +180,11 @@ public class Opal {
 
   private static String jsOpenField() {
     String script =
-            "<script>\n"
-                    + "function openFields() {\n"
-                    + "   document.getElementsByClassName(\"fields\")[0].getElementsByTagName(\"details\")[0].open = true;"
-                    + "}\n"
-                    + "</script>\n";
+        "<script>\n"
+            + "function openFields() {\n"
+            + "   document.getElementsByClassName(\"fields\")[0].getElementsByTagName(\"details\")[0].open = true;"
+            + "}\n"
+            + "</script>\n";
 
     return script;
   }
@@ -186,26 +207,30 @@ public class Opal {
 
     //    String highlightColor = JBColor.isBright() ? lightThemeHighlight : darkThemeHighlight;
     String highlightColor = lightThemeHighlight;
-    String originalColor = "\"#FFFFFF\"";         // TODO: need one for dark theme as well
+    String originalColor = "\"#FFFFFF\""; // TODO: need one for dark theme as well
 
     // orig (e.g. get it from CSS)?
     String script =
-            "<script>\n"
-                    + "function scrollToField(dataName) {\n"
-                    + "    var elements = document.getElementsByClassName(\"field details\");\n"
-                    + "    for(var i=0; i < elements.length; i++) {\n"
-                    + "       var element = elements[i];\n"
-                    + "       if(element.getAttribute(\"data-name\") == dataName) {\n"
-                    + "         element.scrollIntoView();\n"
-                    + "         element.style.backgroundColor = " + highlightColor + ";\n"
-                    + "         window.setTimeout(function(){\n"
-                    + "           element.style.backgroundColor = " + originalColor + ";\n"
-                    + "         }, 2000);\n"
-                    + "         return;\n"
-                    + "       }\n"
-                    + "    }\n"
-                    + "}\n"
-                    + "</script>\n";
+        "<script>\n"
+            + "function scrollToField(dataName) {\n"
+            + "    var elements = document.getElementsByClassName(\"field details\");\n"
+            + "    for(var i=0; i < elements.length; i++) {\n"
+            + "       var element = elements[i];\n"
+            + "       if(element.getAttribute(\"data-name\") == dataName) {\n"
+            + "         element.scrollIntoView();\n"
+            + "         element.style.backgroundColor = "
+            + highlightColor
+            + ";\n"
+            + "         window.setTimeout(function(){\n"
+            + "           element.style.backgroundColor = "
+            + originalColor
+            + ";\n"
+            + "         }, 2000);\n"
+            + "         return;\n"
+            + "       }\n"
+            + "    }\n"
+            + "}\n"
+            + "</script>\n";
 
     return script;
   }
@@ -217,7 +242,7 @@ public class Opal {
 
     //    String highlightColor = JBColor.isBright() ? lightThemeHighlight : darkThemeHighlight;
     String highlightColor = lightThemeHighlight;
-    String originalColor = "\"#F7F7F7\"";         // TODO: need one for dark theme as well
+    String originalColor = "\"#F7F7F7\""; // TODO: need one for dark theme as well
 
     // orig (e.g. get it from CSS)?
     String script =
@@ -230,7 +255,9 @@ public class Opal {
             + highlightColor
             + ";\n"
             + "    window.setTimeout(function(){\n"
-            + "    element.style.backgroundColor = " + originalColor + ";\n"
+            + "    element.style.backgroundColor = "
+            + originalColor
+            + ";\n"
             + "    }, 2000);\n"
             + "}\n"
             + "</script>\n";
@@ -320,10 +347,14 @@ public class Opal {
   }
 
   // todo SaveFile Class erweitern?
-  private static File prepare(@NotNull String prepareID, VirtualFile virtualFile)  {
+  private static File prepare(@NotNull String prepareID, VirtualFile virtualFile) {
     String basePath = project.getBasePath();
     classPath = virtualFile.getParent().getPath();
-    String absPath = basePath + File.separator + GlobalData.DISASSEMBLED_FILES_DIR + classPath.substring(basePath.length());
+    String absPath =
+        basePath
+            + File.separator
+            + GlobalData.DISASSEMBLED_FILES_DIR
+            + classPath.substring(basePath.length());
 
     String fileName = virtualFile.getNameWithoutExtension();
     String represetableForm = null;
@@ -336,7 +367,7 @@ public class Opal {
     }
     File disassembledFile = new File(absPath + File.separator + fileName);
     try {
-      FileUtil.writeToFile(disassembledFile,represetableForm,false);
+      FileUtil.writeToFile(disassembledFile, represetableForm, false);
     } catch (IOException e) {
       e.printStackTrace();
     }

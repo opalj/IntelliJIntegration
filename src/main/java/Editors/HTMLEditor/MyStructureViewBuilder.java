@@ -1,4 +1,4 @@
-package HTMLEditor;
+package Editors.HTMLEditor;
 
 import com.intellij.ide.structureView.StructureView;
 import com.intellij.ide.structureView.StructureViewModel;
@@ -26,7 +26,7 @@ public class MyStructureViewBuilder extends TreeBasedStructureViewBuilder {
   @NotNull
   @Override
   public StructureViewModel createStructureViewModel(@Nullable Editor editor) {
-    // ignore, as HTMLEditor is not a TextEditor and hence needs special treatment
+    // ignore, as Editors.disEditor.HTMLEditor is not a TextEditor and hence needs special treatment
     return new OpalEditorBasedStructureViewModel(((HTMLEditor) fileEditor), psiFile, root);
   }
 

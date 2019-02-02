@@ -28,10 +28,12 @@
                     anchor="right"
                     secondary="true"/>
          -->
-        <fileEditorProvider implementation="HTMLEditor.HTMLEditorProvider"
+        <fileEditorProvider implementation="Editors.HTMLEditor.HTMLEditorProvider"
                             id="OpalHTMLEditorProvider"/>
-        <fileEditorProvider implementation="FileEditor.TacTextEditorProvider"
+        <fileEditorProvider implementation="Editors.FileEditor.TacTextEditorProvider"
                             id="OpalTACEditorProvider"/>
+        <fileEditorProvider implementation="Editors.disEditor.DisTextEditorProvider"
+                            id="DisTextEditorProvider"/>
         <fileTypeFactory implementation="syntaxHighlighting.TAC_fileTypeFactory"/>
         <lang.parserDefinition language="TAC" implementationClass="syntaxHighlighting.TAC_parserDefinition"/>
         <lang.syntaxHighlighterFactory language="TAC"

@@ -1,18 +1,13 @@
-package HTMLEditor;
+package Editors.HTMLEditor;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.impl.common.PsiTreeElementBase;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
-import com.intellij.openapi.fileTypes.FileTypeManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.filters.XmlTagFilter;
-import com.intellij.psi.impl.source.PsiJavaFileBaseImpl;
-import com.intellij.psi.impl.source.PsiJavaFileImpl;
 import com.intellij.psi.scope.processor.FilterElementProcessor;
 import com.intellij.psi.xml.XmlAttribute;
 import com.intellij.psi.xml.XmlDocument;
@@ -52,15 +47,15 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
 
   @Override
   public Icon getIcon(boolean open) {
-      // get the PsiFile of the corresponding .class file
-      VirtualFile classFile = htmlEditor.getFile();
-      Document document = FileDocumentManager.getInstance().getDocument(classFile);
-      PsiFile psiFile = PsiDocumentManager.getInstance(htmlEditor.getProject()).getPsiFile(document);
+    // get the PsiFile of the corresponding .class file
+    VirtualFile classFile = htmlEditor.getFile();
+    Document document = FileDocumentManager.getInstance().getDocument(classFile);
+    PsiFile psiFile = PsiDocumentManager.getInstance(htmlEditor.getProject()).getPsiFile(document);
 
-      int flags = Iconable.ICON_FLAG_READ_STATUS | Iconable.ICON_FLAG_VISIBILITY;
+    int flags = Iconable.ICON_FLAG_READ_STATUS | Iconable.ICON_FLAG_VISIBILITY;
 
-      // the psiFile is at the same time the root element
-      return psiFile.getIcon(flags);
+    // the psiFile is at the same time the root element
+    return psiFile.getIcon(flags);
   }
 
   @Override
@@ -76,9 +71,8 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
     document.processElements(new FilterElementProcessor(XmlTagFilter.INSTANCE, rootTags), document);
 
     if (rootTags.isEmpty()) {
-        return Collections.emptyList();
-    }
-    else if (rootTags.size() == 1) {
+      return Collections.emptyList();
+    } else if (rootTags.size() == 1) {
       XmlTag rootTag = rootTags.get(0);
       XmlTag members = getChildrenBaseForMembers(rootTag);
       List<StructureViewTreeElement> result = createMemberTree(members);
@@ -112,18 +106,16 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
     List<StructureViewTreeElement> result = new ArrayList<>();
 
     // go in reverse-order, so that methods are displayed before fields!
-    for(int i=members.getSubTags().length-1; i >= 0; --i) {
+    for (int i = members.getSubTags().length - 1; i >= 0; --i) {
       XmlTag sub = members.getSubTags()[i];
       XmlAttribute classAttribute = sub.getAttribute("class");
 
-      if(classAttribute == null) {
+      if (classAttribute == null) {
         continue;
-      }
-      else if(classAttribute.getValue().equals("fields")) {
+      } else if (classAttribute.getValue().equals("fields")) {
         XmlTag details = sub.findSubTags("details")[0];
         result.addAll(new HtmlTagTreeElement(details, htmlEditor).getChildrenBase());
-      }
-      else if(classAttribute.getValue().equals("methods")) {
+      } else if (classAttribute.getValue().equals("methods")) {
         XmlTag details = sub.findSubTags("details")[0];
         result.addAll(new HtmlTagTreeElement(details, htmlEditor).getChildrenBase());
       }

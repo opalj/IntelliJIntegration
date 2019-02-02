@@ -1,4 +1,4 @@
-package HTMLEditor;
+package Editors.HTMLEditor;
 
 import com.intellij.ide.structureView.StructureView;
 import com.intellij.ide.structureView.StructureViewFactory;

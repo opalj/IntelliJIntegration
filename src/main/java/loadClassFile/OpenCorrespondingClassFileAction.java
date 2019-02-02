@@ -13,11 +13,10 @@ import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.jetbrains.annotations.NotNull;
 
 public class OpenCorrespondingClassFileAction extends AnAction {
 
@@ -44,19 +43,18 @@ public class OpenCorrespondingClassFileAction extends AnAction {
       // currently selected file in the project view
       VirtualFile javaFile = event.getData(CommonDataKeys.VIRTUAL_FILE);
       VirtualFile classFile = getCorrespondingClassFile(project, javaFile);
-      if(classFile == null){
+      if (classFile == null) {
         // TODO: compile entire module (think about dependencies) or just the current file?
-        //CompilerManager.getInstance(project).compile(new VirtualFile[] {javaFile}, );
-       CompilerManager.getInstance(project).rebuild(null);
-       do
-         {
-         try {
-         TimeUnit.SECONDS.sleep(2);
+        // CompilerManager.getInstance(project).compile(new VirtualFile[] {javaFile}, );
+        CompilerManager.getInstance(project).rebuild(null);
+        do {
+          try {
+            TimeUnit.SECONDS.sleep(2);
           } catch (InterruptedException e) {
-         e.printStackTrace();
-       }
-       }while(CompilerManager.getInstance(project).isCompilationActive());
-       classFile = getCorrespondingClassFile(project, javaFile);
+            e.printStackTrace();
+          }
+        } while (CompilerManager.getInstance(project).isCompilationActive());
+        classFile = getCorrespondingClassFile(project, javaFile);
       }
       FileEditorManager.getInstance(project).openFile(classFile, true);
       FileEditorManager.getInstance(project).setSelectedEditor(classFile, "OPAL-HTML");
@@ -77,7 +75,7 @@ public class OpenCorrespondingClassFileAction extends AnAction {
     Module module = projectFileIndex.getModuleForFile(javaFile);
     // get the output directory
     VirtualFile outputPath = CompilerModuleExtension.getInstance(module).getCompilerOutputPath();
-    outputPath.refresh(false,true);
+    outputPath.refresh(false, true);
     // the name of the class file we are looking for
     String classFileName = javaFile.getNameWithoutExtension() + ".class";
 

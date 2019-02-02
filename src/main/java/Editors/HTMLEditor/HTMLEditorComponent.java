@@ -1,8 +1,12 @@
-package HTMLEditor;
+package Editors.HTMLEditor;
 
+import com.intellij.codeInsight.lookup.LookupManager;
+import com.intellij.codeInsight.lookup.impl.LookupImpl;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataProvider;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileEvent;
 import com.intellij.openapi.vfs.VirtualFileListener;
@@ -46,13 +50,15 @@ public class HTMLEditorComponent extends JPanel
   private JTextField searchText;
 
   private HTMLEditor myEditor;
+  private Project project;
 
   public WebEngine getWebEngine() {
     return webEngine;
   }
 
-  public HTMLEditorComponent(VirtualFile html, HTMLEditor e) {
+  public HTMLEditorComponent(VirtualFile html, HTMLEditor e, Project project) {
     // init the JavaFX-File
+    this.project = project;
     myEditor = e;
     fxPanel = new JFXPanel();
     Platform.setImplicitExit(false);
@@ -215,6 +221,12 @@ public class HTMLEditorComponent extends JPanel
   public Object getData(final String dataId) {
     if (CommonDataKeys.EDITOR.is(dataId)) {
       return myEditor;
+    }
+    if (PlatformDataKeys.DOMINANT_HINT_AREA_RECTANGLE.is(dataId)) {
+      final LookupImpl lookup = (LookupImpl) LookupManager.getInstance(project).getActiveLookup();
+      if (lookup != null && lookup.isVisible()) {
+        return lookup.getBounds();
+      }
     }
     return null;
   }

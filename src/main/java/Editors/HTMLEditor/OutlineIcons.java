@@ -1,4 +1,4 @@
-package HTMLEditor;
+package Editors.HTMLEditor;
 
 import com.intellij.openapi.util.IconLoader;
 import javax.swing.*;
@@ -10,7 +10,6 @@ public interface OutlineIcons {
 
   Icon METHOD = IconLoader.getIcon("/icons/common/method.png");
   Icon CLASS_TYPE_MAIN = IconLoader.getIcon("/icons/common/classTypeMain.png");
-
 
   // =======================
   // =======Methods=========
@@ -39,7 +38,6 @@ public interface OutlineIcons {
   Icon METHOD_FINAL_PROTECTED = IconLoader.getIcon("icons/abc/method_final_protected.png");
   Icon METHOD_FINAL_PACKAGE = IconLoader.getIcon("icons/abc/method_final_package.png");
 
-
   // =======================
   // ===Abstract Methods====
   // =======================
@@ -49,18 +47,30 @@ public interface OutlineIcons {
   Icon ABSTRACT_METHOD_PROTECTED = IconLoader.getIcon("icons/abc2/abstract_method_protected.png");
   Icon ABSTRACT_METHOD_PACKAGE = IconLoader.getIcon("icons/abc2/abstract_method_package.png");
 
-  Icon ABSTRACT_METHOD_STATIC_PUBLIC = IconLoader.getIcon("icons/abc2/abstract_method_static_public.png");
-  Icon ABSTRACT_METHOD_STATIC_PRIVATE = IconLoader.getIcon("icons/abc2/abstract_method_static_private.png");
-  Icon ABSTRACT_METHOD_STATIC_PROTECTED = IconLoader.getIcon("icons/abc2/abstract_method_static_protected.png");
-  Icon ABSTRACT_METHOD_STATIC_PACKAGE = IconLoader.getIcon("icons/abc2/abstract_method_static_package.png");
+  Icon ABSTRACT_METHOD_STATIC_PUBLIC =
+      IconLoader.getIcon("icons/abc2/abstract_method_static_public.png");
+  Icon ABSTRACT_METHOD_STATIC_PRIVATE =
+      IconLoader.getIcon("icons/abc2/abstract_method_static_private.png");
+  Icon ABSTRACT_METHOD_STATIC_PROTECTED =
+      IconLoader.getIcon("icons/abc2/abstract_method_static_protected.png");
+  Icon ABSTRACT_METHOD_STATIC_PACKAGE =
+      IconLoader.getIcon("icons/abc2/abstract_method_static_package.png");
 
-  Icon ABSTRACT_METHOD_STATIC_FINAL_PUBLIC = IconLoader.getIcon("icons/abc2/abstract_method_static_final_public.png");
-  Icon ABSTRACT_METHOD_STATIC_FINAL_PRIVATE = IconLoader.getIcon("icons/abc2/abstract_method_static_final_private.png");
-  Icon ABSTRACT_METHOD_STATIC_FINAL_PROTECTED = IconLoader.getIcon("icons/abc2/abstract_method_static_final_protected.png");
-  Icon ABSTRACT_METHOD_STATIC_FINAL_PACKAGE = IconLoader.getIcon("icons/abc2/abstract_method_static_final_package.png");
+  Icon ABSTRACT_METHOD_STATIC_FINAL_PUBLIC =
+      IconLoader.getIcon("icons/abc2/abstract_method_static_final_public.png");
+  Icon ABSTRACT_METHOD_STATIC_FINAL_PRIVATE =
+      IconLoader.getIcon("icons/abc2/abstract_method_static_final_private.png");
+  Icon ABSTRACT_METHOD_STATIC_FINAL_PROTECTED =
+      IconLoader.getIcon("icons/abc2/abstract_method_static_final_protected.png");
+  Icon ABSTRACT_METHOD_STATIC_FINAL_PACKAGE =
+      IconLoader.getIcon("icons/abc2/abstract_method_static_final_package.png");
 
-  Icon ABSTRACT_METHOD_FINAL_PUBLIC = IconLoader.getIcon("icons/abc2/abstract_method_final_public.png");
-  Icon ABSTRACT_METHOD_FINAL_PRIVATE = IconLoader.getIcon("icons/abc2/abstract_method_final_private.png");
-  Icon ABSTRACT_METHOD_FINAL_PROTECTED = IconLoader.getIcon("icons/abc2/abstract_method_final_protected.png");
-  Icon ABSTRACT_METHOD_FINAL_PACKAGE = IconLoader.getIcon("icons/abc2/abstract_method_final_package.png");
+  Icon ABSTRACT_METHOD_FINAL_PUBLIC =
+      IconLoader.getIcon("icons/abc2/abstract_method_final_public.png");
+  Icon ABSTRACT_METHOD_FINAL_PRIVATE =
+      IconLoader.getIcon("icons/abc2/abstract_method_final_private.png");
+  Icon ABSTRACT_METHOD_FINAL_PROTECTED =
+      IconLoader.getIcon("icons/abc2/abstract_method_final_protected.png");
+  Icon ABSTRACT_METHOD_FINAL_PACKAGE =
+      IconLoader.getIcon("icons/abc2/abstract_method_final_package.png");
 }
