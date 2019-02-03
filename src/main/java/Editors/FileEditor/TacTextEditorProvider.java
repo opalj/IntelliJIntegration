@@ -18,7 +18,7 @@ public class TacTextEditorProvider extends PsiAwareTextEditorProvider {
     // for now restrict to .class files only
     String fileExtension = file.getExtension();
     return (fileExtension != null)
-        && (fileExtension.equals("class") || fileExtension.equals("tac"));
+        && (fileExtension.equals("class") || fileExtension.equals(GlobalData.DISASSEMBLED_FILE_ENDING_TAC));
   }
 
   // FileEditorManager.getInstance(project).setSelectedEditor(file,"class");

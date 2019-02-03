@@ -18,13 +18,13 @@ public class DisTextEditorProvider extends PsiAwareTextEditorProvider {
     // for now restrict to .class files only
     String fileExtension = file.getExtension();
     return (fileExtension != null)
-        && (fileExtension.equals("class") || fileExtension.equals("dis"));
+        && (fileExtension.equals("class") || fileExtension.equals(GlobalData.DISASSEMBLED_FILE_ENDING_JBC));
   }
 
   @NotNull
   @Override
   public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
-    if (!file.getExtension().equals(GlobalData.DISASSEMBLED_FILE_ENDING_TAC)) {
+    if (!file.getExtension().equals(GlobalData.DISASSEMBLED_FILE_ENDING_JBC)) {
       file = Opal.SomeTest(file);
     }
     return new DisTextEditor(project, file, this);

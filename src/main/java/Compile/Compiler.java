@@ -4,14 +4,11 @@ import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public final class Compiler {
 
@@ -38,47 +35,12 @@ public final class Compiler {
   }
 
   /*
-     Finds filebased or dirbased Projectpaths
-  */
-  private String find(String filePath) {
-    Path path = Paths.get(filePath);
-    String s;
-    while (path != null) {
-      s = find(path.toFile());
-      if (s != null) {
-        return s;
-      }
-      path = path.getParent();
-    }
-    return "";
-  }
-
-  /*
-   * recursive helpfunction for the find method
-   */
-  @Nullable
-  private String find(@NotNull File fl) {
-    for (File f : fl.listFiles()) {
-      if (f.isDirectory() && f.getName().equals(".idea")) {
-        return f.getParentFile().getAbsolutePath();
-      } else if (f.isFile() && f.getName().endsWith(".ipr")) {
-        return f.getAbsolutePath(); // nocht nicht getestet
-      } else if (f.isDirectory()) {
-        return find(f);
-      }
-    }
-    return null;
-  }
-
-  /*
    * Compile a project with a given filePath-String,
    * searches naively the first .idea-Dir or *.ipr-file
    */
   public boolean make(@NotNull String filePath) {
-    filePath = find(filePath);
-    if (filePath == null) {
-      return false;
-    }
+    //filePath = find(filePath);
+
     ProjectManager projectManager = ProjectManager.getInstance();
     Project project;
     // Look for OpenProjects

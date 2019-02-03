@@ -7,14 +7,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import globalData.GlobalData;
-import java.io.*;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.opalj.ai.ValuesDomain;
 import org.opalj.br.Method;
@@ -27,6 +19,15 @@ import org.opalj.tac.*;
 import org.opalj.value.KnownTypedValue;
 import scala.Function1;
 import scala.Some;
+
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Opal {
   // uriProject wird benötigt um die OpalFrameworks mit dem Project zu verbinden.
@@ -77,7 +78,8 @@ public class Opal {
                   virtualClassFile.getParent().getPath()
                       + File.separator
                       + virtualClassFile.getNameWithoutExtension()
-                      + ".dis"),
+                          + "."
+                      + GlobalData.DISASSEMBLED_FILE_ENDING_JBC),
           myString);
     } catch (IOException e) {
       e.printStackTrace();

@@ -1,0 +1,19 @@
+{
+  parserClass="JavaByteCodeLanguage.parser.JavaByteCodeParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="JavaByteCode"
+  psiImplClassSuffix="Impl"
+  psiPackage="JavaByteCodeLanguage.psi"
+  psiImplPackage="JavaByteCodeLanguage.psi.impl"
+
+  elementTypeHolderClass="JavaByteCodeLanguage.psi.JavaByteCodeTypes"
+  elementTypeClass="JavaByteCodeLanguage.psi.JavaByteCodeElementType"
+  tokenTypeClass="JavaByteCodeLanguage.psi.JavaByteCodeTokenType"
+}
+jbcFile ::= item_*
+
+private item_ ::= (property|COMMENT|CRLF)
+
+property ::= (KEY? SEPARATOR VALUE?) | KEY

@@ -34,8 +34,13 @@
                             id="OpalTACEditorProvider"/>
         <fileEditorProvider implementation="Editors.disEditor.DisTextEditorProvider"
                             id="DisTextEditorProvider"/>
+
         <fileTypeFactory implementation="syntaxHighlighting.TAC_fileTypeFactory"/>
+        <fileTypeFactory implementation="JavaByteCodeLanguage.LanguageAndFileType.JavaByteCodeFileTypeFactory"/>
+
         <lang.parserDefinition language="TAC" implementationClass="syntaxHighlighting.TAC_parserDefinition"/>
+        <lang.parserDefinition language="jbc" implementationClass="JavaByteCodeLanguage.parser.JavaByteCodeParserDefinition"/>
+
         <lang.syntaxHighlighterFactory language="TAC"
                                        implementationClass="syntaxHighlighting.TAC_syntaxHighlighterFactory"/>
         <colorSettingsPage implementation="syntaxHighlighting.TAC_colorSettingsPage"/>
