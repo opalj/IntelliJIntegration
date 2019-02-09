@@ -5,6 +5,9 @@ plugins {
     id 'pmd'
     id "com.github.spotbugs" version "1.6.6"
     id 'com.github.sherter.google-java-format' version '0.8'
+    //https://openjfx.io/openjfx-docs/#gradle
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.7'
 }
 group '23'
 version '1.0-SNAPSHOT'
@@ -78,4 +81,9 @@ pmd{
             // schaut noch ob Javadoc geschrieben sind
             //'java-comments',
             //]
+}
+
+javafx {
+    modules = [ 'javafx.controls', 'javafx.fxml','javafx.web', 'javafx.swing' ]
+    version = "11.0.1"
 }
