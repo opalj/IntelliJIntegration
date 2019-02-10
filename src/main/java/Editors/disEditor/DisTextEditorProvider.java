@@ -25,7 +25,7 @@ public class DisTextEditorProvider extends PsiAwareTextEditorProvider {
   @Override
   public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
     if (!file.getExtension().equals(GlobalData.DISASSEMBLED_FILE_ENDING_JBC)) {
-      file = Opal.SomeTest(file);
+      file = Opal.DisassemblertoVF(file);
     }
     return new DisTextEditor(project, file, this);
   }

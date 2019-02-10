@@ -29,7 +29,7 @@ public final class Compiler {
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
-      } while (CompilerManager.getInstance(project).isCompilationActive());
+      } while (compManager.isCompilationActive());
     }
     return uptoDate;
   }

@@ -12,9 +12,9 @@ public interface JavaByteCodeTypes {
 
   IElementType COMMENT = new JavaByteCodeTokenType("COMMENT");
   IElementType CRLF = new JavaByteCodeTokenType("CRLF");
-  IElementType KEY = new JavaByteCodeTokenType("KEY");
-  IElementType SEPARATOR = new JavaByteCodeTokenType("SEPARATOR");
-  IElementType VALUE = new JavaByteCodeTokenType("VALUE");
+  IElementType INST = new JavaByteCodeTokenType("INST");
+  IElementType LINE = new JavaByteCodeTokenType("LINE");
+  IElementType PC = new JavaByteCodeTokenType("PC");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {

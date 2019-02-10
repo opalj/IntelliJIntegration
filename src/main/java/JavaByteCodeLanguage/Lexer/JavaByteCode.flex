@@ -15,23 +15,37 @@ import com.intellij.psi.TokenType;
 %eof{  return;
 %eof}
 
+
 CRLF=\R
 WHITE_SPACE=[\ \n\t\f]
 FIRST_VALUE_CHARACTER=[^ \n\f\\] | "\\"{CRLF} | "\\".
 VALUE_CHARACTER=[^\n\f\\] | "\\"{CRLF} | "\\".
-END_OF_LINE_COMMENT=("#"|"!")[^\r\n]*
-SEPARATOR=[:=]
-KEY_CHARACTER=[^:=\ \n\t\f\\] | "\\ "
+
+    LineTerminator = \r|\n|\r\n
+    InputCharacter = [^\r\n]
+    WhiteSpace     = {LineTerminator} | [ \t\f]
+ /* comments */
+    Comment = {TraditionalComment} | {EndOfLineComment} | {DocumentationComment}
+
+    TraditionalComment   = "/*" [^*] ~"*/" | "/*" "*"+ "/"
+    // Comment can be the last line of the file, without line terminator.
+    EndOfLineComment     = "//" {InputCharacter}* {LineTerminator}?
+    DocumentationComment = "/**" {CommentContent} "*"+ "/"
+    CommentContent       = ( [^*] | \*+ [^/*] )*
+    /*DecimalInteger*/
+    DecIntegerLiteral = 0 | [1-9][0-9]*
+//SEPARATOR=[:]
+//KEY_CHARACTER=[^:=\ \n\t\f\\] | "\\ "
 
 %state WAITING_VALUE
 
 %%
 
-<YYINITIAL> {END_OF_LINE_COMMENT}                           { yybegin(YYINITIAL); return JavaByteCodeTypes.COMMENT; }
+<YYINITIAL> {Comment}                                              { yybegin(YYINITIAL); return JavaByteCodeTypes.COMMENT; }
 
-<YYINITIAL> {KEY_CHARACTER}+                                { yybegin(YYINITIAL); return JavaByteCodeTypes.KEY; }
+//<YYINITIAL> {KEY_CHARACTER}+                                { yybegin(YYINITIAL); return JavaByteCodeTypes.KEY; }
 
-<YYINITIAL> {SEPARATOR}                                     { yybegin(WAITING_VALUE); return JavaByteCodeTypes.SEPARATOR; }
+//<YYINITIAL> {SEPARATOR}                                     { yybegin(WAITING_VALUE); return JavaByteCodeTypes.SEPARATOR; }
 
 <WAITING_VALUE> {CRLF}({CRLF}|{WHITE_SPACE})+               { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
 

@@ -13,6 +13,7 @@ group '23'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -23,7 +24,7 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'de.opal-project:abstract-interpretation-framework_2.12:2.0.1'
-    compile 'de.opal-project:bytecode-disassembler_2.12:2.0.1:'
+    compile 'de.opal-project:bytecode-disassembler_2.12:2.0.1'
 }
 
 intellij {
@@ -82,8 +83,7 @@ pmd{
             //'java-comments',
             //]
 }
-
+// need to be java 11?
 javafx {
     modules = [ 'javafx.controls', 'javafx.fxml','javafx.web', 'javafx.swing' ]
-    version = "11.0.1"
 }
