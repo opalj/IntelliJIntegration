@@ -1,6 +1,5 @@
 {
   parserClass="JavaByteCodeLanguage.parser.JavaByteCodeParser"
-
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
   psiClassPrefix="JavaByteCode"
@@ -11,9 +10,34 @@
   elementTypeHolderClass="JavaByteCodeLanguage.psi.JavaByteCodeTypes"
   elementTypeClass="JavaByteCodeLanguage.psi.JavaByteCodeElementType"
   tokenTypeClass="JavaByteCodeLanguage.psi.JavaByteCodeTokenType"
+  //implements("") = "org.intellij.lang."
+  tokens=[
+  SPACE='regexp:\s+'
+  COMMENT='regexp://.*'
+  NUMBER ='regexp:\d+'
+  STRING="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\")"
+  //JAVA="regexp:(([A-Za-z])*\.)+([A-Za-z])*(\{(.)*\})?"
+  INST="regexp:A(A)?(CONST_NULL|LOAD|STORE)(_\d)?|(I)(CONST|LOAD|STORE)(_M?\d)?|(I|L|F|D|A)?RETURN|INVOKE(SPECIAL|STATIC|VIRTUAL)|DUP|NOP|IF(EQ|NE|LT|GE|GT|LE|_ICMP(EQ|NE|LT|GE|GT|LE)|_ACMP(EQ|NE))|IINC|ARRAYLENGTH|GOTO|LoadString|NEW|CHECKCAST"
+  // TYPES
+  JAVATYPE="regexp:(([A-Za-z])*\.)+[A-Z-a-z]*"
+  PRIMITIVETYPE="regexp:void|boolean|byte|char|short|int|long|float|double"
+  MODIFIER="regexp:public|private|static|protected|final|abstract|default"
+  EOF = "\n"
+  METHODNAME = "regexp:[A-Za-z0-9]+"
+  ]
 }
 jbcFile ::= item_*
 
-private item_ ::= (property|COMMENT|CRLF)
+private item_ ::= (MethodDeclaration)
+Type ::= (JAVATYPE | PRIMITIVETYPE)('[]')?
 
-property ::= (PC LINE INST)
+MethodDeclaration ::= MethodHead InstructionHead InstructionBody* LocVarTableDeleration?
+MethodHead ::= MODIFIER? Type MethodName// JAVA
+MethodName ::= '<init>()'|'<clinit>()'|METHODNAME
+private InstructionHead ::= PC Line Instruction
+private InstructionBody::= NUMBER NUMBER Instr
+Instr ::= INST ("("(JavaOP|NUMBER|STRING)")")?
+JavaOP ::= (Type('{'Type MethodName'}')(',')?)+
+LocVarTableDeleration ::= LocVarTableHead LocVarTableBody*
+LocVarTableHead ::= LocalVariableTable
+LocVarTableBody ::= "["NUMBER ">" NUMBER ")" "=>"  // NOT RIGHT

@@ -79,6 +79,8 @@ public class Opal {
                 uriProject.allProjectClassFiles();
         for (int i = 0; i < classFileConstArray.length(); i++) {
             org.opalj.br.ClassFile classFile = classFileConstArray.apply(i);
+            // AccessFlags(int) => public class | static class
+
             myString = myString + AccessFlags.classFlagsToJava(classFile.accessFlags()) +" "+ classFile.fqn() ;
             if(classFile.superclassType().isDefined())
                 myString = myString + " extends " + classFile.superclassType().get().toJava();
@@ -88,7 +90,7 @@ public class Opal {
                     myString = myString + classFile.interfaceTypes().apply(j).toJava()+ " ";
                 }
             }
-            myString = myString +"\nSource File: "+classFile.sourceFile()+" Version: "+classFile.jdkVersion()+" Size: \n";
+            myString = myString +"\n// Source File: "+classFile.sourceFile()+" Version: "+classFile.jdkVersion()+" Size: \n";
 
             //TODO Constant Pool Maybe working with DA.
             RefArray<Method> methods = classFile.methods();
@@ -97,7 +99,7 @@ public class Opal {
                 if (method.body().isDefined()) {
                     Code body = method.body().get();
                     Instruction[] instructions = body.instructions();
-                    myString = myString + method.toString()+ "[size :"+body.codeSize()+" bytes, max Stack: "+body.maxStack()+", max Locals: "+body.maxLocals()+"] \n";
+                    myString = myString + method.toString()+ "// [size :"+body.codeSize()+" bytes, max Stack: "+body.maxStack()+", max Locals: "+body.maxLocals()+"] \n";
                     myString = myString + "\tPC\tLine\tInstruction\n";
                     for(int k = 0; k < instructions.length; k++) {
                         if(instructions[k] != null) {
@@ -107,7 +109,7 @@ public class Opal {
                     }
                     if(body.localVariableTable().isDefined()){
                         RefArray<LocalVariable> refArrayOption = body.localVariableTable().get();
-                        myString = myString + "\n\nLocalVariableTable [size: "+refArrayOption.length()+" item(s)]\n";
+                        myString = myString + "\n\nLocalVariableTable // [size: "+refArrayOption.length()+" item(s)]\n";
                         for(int k = 0 ; k < refArrayOption.length() ; k++){
                             LocalVariable localVariable  = refArrayOption.apply(k);
                             myString = myString + "["+localVariable.startPC() +" > "+ localVariable.length() +") => "+localVariable.fieldType().toJava()+ " " + localVariable.name() +"\n";
