@@ -75,7 +75,7 @@ pmd{
     toolVersion = "6.11.0"
     ignoreFailures = true
     //ConsoleOutput = true
-    ruleSetFiles = files("config/pmd/myRuleSets.xml")
+//    ruleSetFiles = files("config/pmd/myRuleSets.xml")
     //ruleSets = ['category/java/errorprone.xml'
     //'java-basic',
     //'java-CyclomaticComplexityRule'
