@@ -1,30 +1,21 @@
 plugins {
     id 'java'
     id 'org.jetbrains.intellij' version '0.3.12'
-    id 'checkstyle'
-    id 'pmd'
-    id "com.github.spotbugs" version "1.6.6"
-    id 'com.github.sherter.google-java-format' version '0.8'
-    //https://openjfx.io/openjfx-docs/#gradle
-//    id 'application'
-//    id 'org.openjfx.javafxplugin' version '0.0.7'
 }
+
 group '23'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
-targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
-    maven { url = 'http://maven.teamdev.com/repository/products' }
 }
-
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'de.opal-project:abstract-interpretation-framework_2.12:2.0.1'
-    compile 'de.opal-project:bytecode-disassembler_2.12:2.0.1'
+    compile 'de.opal-project:bytecode-disassembler_2.12:2.0.1:'
 }
 
 intellij {
@@ -35,56 +26,3 @@ patchPluginXml {
       Add change notes here.<br>
       <em>most HTML tags may be used</em>"""
 }
-
-// ================
-// Overriding tasks
-// ================
-
-// build.dependsOn(check), which means that 'check' will be executed whenever 'build' will be executed
-check {
-    // googleJavaFormat will report "NO-SOURCE" if everything is properly formatted (-> not harmful in any way, can ignore)
-    dependsOn 'googleJavaFormat'
-    // dependsOn [checkstyle, pmd and spotbugsMain] per default
-
-    tasks.findByName('checkstyleMain').mustRunAfter('googleJavaFormat')
-    tasks.findByName('pmdMain').mustRunAfter('checkstyleMain')
-    tasks.findByName('spotbugsMain').mustRunAfter('pmdMain')
-}
-
-tasks.withType(com.github.spotbugs.SpotBugsTask) {
-    reports {
-        xml.enabled = false
-        html.enabled = true
-    }
-    // TODO: remove later
-    ignoreFailures = true
-}
-tasks.withType(Pmd){
-    reports{
-        xml.enabled=false
-        html.enabled=true
-    }
-}
-
-checkstyle {
-    toolVersion "8.10.1"
-    config = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml')
-//    maxErrors 20
-}
-pmd{
-    toolVersion = "6.11.0"
-    ignoreFailures = true
-    //ConsoleOutput = true
-//    ruleSetFiles = files("config/pmd/myRuleSets.xml")
-    //ruleSets = ['category/java/errorprone.xml'
-    //'java-basic',
-    //'java-CyclomaticComplexityRule'
-    // schaut noch ob Javadoc geschrieben sind
-    //'java-comments',
-    //]
-}
-
-// need to be java 11?
-//javafx {
-//    modules = [ 'javafx.controls', 'javafx.fxml','javafx.web', 'javafx.swing' ]
-//}
