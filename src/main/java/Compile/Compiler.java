@@ -4,11 +4,10 @@ import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
-import org.jdom.JDOMException;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import org.jdom.JDOMException;
+import org.jetbrains.annotations.NotNull;
 
 public final class Compiler {
 
@@ -39,7 +38,7 @@ public final class Compiler {
    * searches naively the first .idea-Dir or *.ipr-file
    */
   public boolean make(@NotNull String filePath) {
-    //filePath = find(filePath);
+    // filePath = find(filePath);
 
     ProjectManager projectManager = ProjectManager.getInstance();
     Project project;

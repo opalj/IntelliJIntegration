@@ -50,6 +50,9 @@ check {
     tasks.findByName('pmdMain').mustRunAfter('checkstyleMain')
     tasks.findByName('spotbugsMain').mustRunAfter('pmdMain')
 }
+runIde{
+    dependsOn 'check'
+}
 
 tasks.withType(com.github.spotbugs.SpotBugsTask) {
     reports {

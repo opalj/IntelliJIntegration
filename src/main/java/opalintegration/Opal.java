@@ -7,8 +7,15 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import globalData.GlobalData;
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
-
 import org.opalj.ai.ValuesDomain;
 import org.opalj.bi.AccessFlags;
 import org.opalj.br.ClassFile;
@@ -24,17 +31,7 @@ import org.opalj.da.ClassFileReader;
 import org.opalj.tac.*;
 import org.opalj.value.KnownTypedValue;
 import scala.Function1;
-import scala.Option;
 import scala.Some;
-
-import java.io.*;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Opal {
   // uriProject wird benötigt um die OpalFrameworks mit dem Project zu verbinden.
@@ -71,74 +68,112 @@ public class Opal {
               return 1;
             });
   }
-    public static VirtualFile DisassemblertoVF(VirtualFile virtualClassFile){
-        String filepath = virtualClassFile.getPath();
-        String myString = "";
-        Project<URL> uriProject = Project.apply(new File(filepath));
-        ConstArray<ClassFile> classFileConstArray =
-                uriProject.allProjectClassFiles();
-        for (int i = 0; i < classFileConstArray.length(); i++) {
-            org.opalj.br.ClassFile classFile = classFileConstArray.apply(i);
-            // AccessFlags(int) => public class | static class
 
-            myString = myString + AccessFlags.classFlagsToJava(classFile.accessFlags()) +" "+ classFile.fqn() ;
-            if(classFile.superclassType().isDefined())
-                myString = myString + " extends " + classFile.superclassType().get().toJava();
-            if(classFile.interfaceTypes().length() > 0){
-                myString = myString + " implements " ;
-                for( int j = 0; j < classFile.interfaceTypes().length();j++){
-                    myString = myString + classFile.interfaceTypes().apply(j).toJava()+ " ";
-                }
-            }
-            myString = myString +"\n// Source File: "+classFile.sourceFile()+" Version: "+classFile.jdkVersion()+" Size: \n";
+  public static VirtualFile DisassemblertoVF(VirtualFile virtualClassFile) {
+    String filepath = virtualClassFile.getPath();
+    String myString = "";
+    Project<URL> uriProject = Project.apply(new File(filepath));
+    ConstArray<ClassFile> classFileConstArray = uriProject.allProjectClassFiles();
+    for (int i = 0; i < classFileConstArray.length(); i++) {
+      org.opalj.br.ClassFile classFile = classFileConstArray.apply(i);
+      // AccessFlags(int) => public class | static class
 
-            //TODO Constant Pool Maybe working with DA.
-            RefArray<Method> methods = classFile.methods();
-            for (int j = 0; j < methods.length(); j++) {
-                Method method = methods.apply(j);
-                if (method.body().isDefined()) {
-                    Code body = method.body().get();
-                    Instruction[] instructions = body.instructions();
-                    myString = myString + method.toString()+ "// [size :"+body.codeSize()+" bytes, max Stack: "+body.maxStack()+", max Locals: "+body.maxLocals()+"] \n";
-                    myString = myString + "\tPC\tLine\tInstruction\n";
-                    for(int k = 0; k < instructions.length; k++) {
-                        if(instructions[k] != null) {
-                            myString = myString +
-                                    "\t"+k+"\t"+body.lineNumber(k).get().toString()+"\t\t"+instructions[k]+"\n";
-                        }
-                    }
-                    if(body.localVariableTable().isDefined()){
-                        RefArray<LocalVariable> refArrayOption = body.localVariableTable().get();
-                        myString = myString + "\n\nLocalVariableTable // [size: "+refArrayOption.length()+" item(s)]\n";
-                        for(int k = 0 ; k < refArrayOption.length() ; k++){
-                            LocalVariable localVariable  = refArrayOption.apply(k);
-                            myString = myString + "["+localVariable.startPC() +" > "+ localVariable.length() +") => "+localVariable.fieldType().toJava()+ " " + localVariable.name() +"\n";
-                        }
-                    }
-                    myString = myString + "\n\n\n";
-                }
-            } // for(j)
+      myString =
+          myString + AccessFlags.classFlagsToJava(classFile.accessFlags()) + " " + classFile.fqn();
+      if (classFile.superclassType().isDefined())
+        myString = myString + " extends " + classFile.superclassType().get().toJava();
+      if (classFile.interfaceTypes().length() > 0) {
+        myString = myString + " implements ";
+        for (int j = 0; j < classFile.interfaceTypes().length(); j++) {
+          myString = myString + classFile.interfaceTypes().apply(j).toJava() + " ";
         }
-        File myFile = null;
-        try{
-        FileUtil.writeToFile(
-                myFile =
-                        new File(
-                                virtualClassFile.getParent().getPath()
-                                        + File.separator
-                                        + virtualClassFile.getNameWithoutExtension()
-                                        + "."
-                                        + GlobalData.DISASSEMBLED_FILE_ENDING_JBC),
-                myString);
+      }
+      myString =
+          myString
+              + "\n// Source File: "
+              + classFile.sourceFile()
+              + " Version: "
+              + classFile.jdkVersion()
+              + " Size: \n";
+
+      // TODO Constant Pool Maybe working with DA.
+      RefArray<Method> methods = classFile.methods();
+      for (int j = 0; j < methods.length(); j++) {
+        Method method = methods.apply(j);
+        if (method.body().isDefined()) {
+          Code body = method.body().get();
+          Instruction[] instructions = body.instructions();
+          myString =
+              myString
+                  + method.toString()
+                  + "// [size :"
+                  + body.codeSize()
+                  + " bytes, max Stack: "
+                  + body.maxStack()
+                  + ", max Locals: "
+                  + body.maxLocals()
+                  + "] \n";
+          myString = myString + "\tPC\tLine\tInstruction\n";
+          for (int k = 0; k < instructions.length; k++) {
+            if (instructions[k] != null) {
+              myString =
+                  myString
+                      + "\t"
+                      + k
+                      + "\t"
+                      + body.lineNumber(k).get().toString()
+                      + "\t\t"
+                      + instructions[k]
+                      + "\n";
+            }
+          }
+          if (body.localVariableTable().isDefined()) {
+            RefArray<LocalVariable> refArrayOption = body.localVariableTable().get();
+            myString =
+                myString
+                    + "\n\nLocalVariableTable // [size: "
+                    + refArrayOption.length()
+                    + " item(s)]\n";
+            for (int k = 0; k < refArrayOption.length(); k++) {
+              LocalVariable localVariable = refArrayOption.apply(k);
+              myString =
+                  myString
+                      + "["
+                      + localVariable.startPC()
+                      + " > "
+                      + localVariable.length()
+                      + ") => "
+                      + localVariable.fieldType().toJava()
+                      + " "
+                      + localVariable.name()
+                      + "\n";
+            }
+          }
+          myString = myString + "\n\n\n";
+        }
+      } // for(j)
+    }
+    File myFile = null;
+    try {
+      FileUtil.writeToFile(
+          myFile =
+              new File(
+                  virtualClassFile.getParent().getPath()
+                      + File.separator
+                      + virtualClassFile.getNameWithoutExtension()
+                      + "."
+                      + GlobalData.DISASSEMBLED_FILE_ENDING_JBC),
+          myString);
     } catch (IOException e) {
-        e.printStackTrace();
+      e.printStackTrace();
     }
     return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(myFile);
-    }
+  }
+
   public static VirtualFile SomeTest(VirtualFile virtualClassFile) {
     File myFile = null;
     try {
-      Process exec = Runtime.getRuntime().exec("javap -c \"" + virtualClassFile.getPath()+"\"");
+      Process exec = Runtime.getRuntime().exec("javap -c \"" + virtualClassFile.getPath() + "\"");
       Scanner scanner = new Scanner(exec.getInputStream()).useDelimiter("\\A");
       String myString = "";
       while (scanner.hasNextLine()) myString = myString.concat(scanner.nextLine()).concat("\n");
@@ -148,7 +183,7 @@ public class Opal {
                   virtualClassFile.getParent().getPath()
                       + File.separator
                       + virtualClassFile.getNameWithoutExtension()
-                          + "."
+                      + "."
                       + GlobalData.DISASSEMBLED_FILE_ENDING_JBC),
           myString);
     } catch (IOException e) {
@@ -162,7 +197,6 @@ public class Opal {
     String JavaTACClassString = threeWayDisassemblerString(classPath);
     return JavaTACClassString;
   }
-
 
   public static String threeWayDisassemblerString(String filepath) {
     StringBuilder tacCodeString = new StringBuilder();

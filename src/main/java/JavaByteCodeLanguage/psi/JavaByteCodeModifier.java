@@ -4,4 +4,11 @@ package JavaByteCodeLanguage.psi;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.*;
 
-public interface JavaByteCodeProperty extends PsiElement {}
+public interface JavaByteCodeModifier extends PsiElement {
+
+  @Nullable
+  PsiElement getModifier();
+
+  @Nullable
+  PsiElement getPremodifier();
+}

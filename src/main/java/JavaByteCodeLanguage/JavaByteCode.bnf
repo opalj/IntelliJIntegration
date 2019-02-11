@@ -1,5 +1,6 @@
 {
   parserClass="JavaByteCodeLanguage.parser.JavaByteCodeParser"
+  parserUtilClass="JavaByteCodeLanguage.parser.JavaByteCodeParserUtil"
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
   psiClassPrefix="JavaByteCode"
@@ -14,16 +15,17 @@
   tokens=[
   SPACE='regexp:\s+'
   COMMENT='regexp://.*'
-  NUMBER ='regexp:\d+'
+  NUMBER ='regexp:(-)?\d+'
   STRING="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\")"
   //JAVA="regexp:(([A-Za-z])*\.)+([A-Za-z])*(\{(.)*\})?"
   INST="regexp:A(A)?(CONST_NULL|LOAD|STORE)(_\d)?|(I)(CONST|LOAD|STORE)(_M?\d)?|(I|L|F|D|A)?RETURN|INVOKE(SPECIAL|STATIC|VIRTUAL)|DUP|NOP|IF(EQ|NE|LT|GE|GT|LE|_ICMP(EQ|NE|LT|GE|GT|LE)|_ACMP(EQ|NE))|IINC|ARRAYLENGTH|GOTO|LoadString|NEW|CHECKCAST"
   // TYPES
   JAVATYPE="regexp:(([A-Za-z])*\.)+[A-Z-a-z]*"
   PRIMITIVETYPE="regexp:void|boolean|byte|char|short|int|long|float|double"
-  MODIFIER="regexp:public|private|static|protected|final|abstract|default"
+  MODIFIER="regexp:static|protected|final|abstract|default"
+  PREMODIFIER="regexp:public|private|default"
   EOF = "\n"
-  METHODNAME = "regexp:[A-Za-z0-9]+"
+  STRINGVAR = "regexp:[A-Za-z0-9]+"
   ]
 }
 jbcFile ::= item_*
@@ -32,12 +34,14 @@ private item_ ::= (MethodDeclaration)
 Type ::= (JAVATYPE | PRIMITIVETYPE)('[]')?
 
 MethodDeclaration ::= MethodHead InstructionHead InstructionBody* LocVarTableDeleration?
-MethodHead ::= MODIFIER? Type MethodName// JAVA
-MethodName ::= '<init>()'|'<clinit>()'|METHODNAME
+MethodHead ::= Modifier? Type MethodName// JAVA
+Modifier ::= PREMODIFIER? MODIFIER?
+MethodName ::= ('<init>'|'<clinit>'|STRINGVAR)('('(Type ','?)*')')?
 private InstructionHead ::= PC Line Instruction
 private InstructionBody::= NUMBER NUMBER Instr
-Instr ::= INST ("("(JavaOP|NUMBER|STRING)")")?
-JavaOP ::= (Type('{'Type MethodName'}')(',')?)+
+Instr ::= INST ("("((JavaOP|NUMBER|STRING)','?)*")"|JavaOP)?
+JavaOP ::= ((Type|STRINGVAR)('{'Type MethodName'}')?)+| 'lvIndex=' NUMBER
+
 LocVarTableDeleration ::= LocVarTableHead LocVarTableBody*
-LocVarTableHead ::= LocalVariableTable
-LocVarTableBody ::= "["NUMBER ">" NUMBER ")" "=>"  // NOT RIGHT
+private LocVarTableHead ::= LocalVariableTable
+private LocVarTableBody ::= "["NUMBER ">" NUMBER ")" "=>"  // NOT RIGHT

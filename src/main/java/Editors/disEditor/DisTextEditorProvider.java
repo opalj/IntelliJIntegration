@@ -18,7 +18,8 @@ public class DisTextEditorProvider extends PsiAwareTextEditorProvider {
     // for now restrict to .class files only
     String fileExtension = file.getExtension();
     return (fileExtension != null)
-        && (fileExtension.equals("class") || fileExtension.equals(GlobalData.DISASSEMBLED_FILE_ENDING_JBC));
+        && (fileExtension.equals("class")
+            || fileExtension.equals(GlobalData.DISASSEMBLED_FILE_ENDING_JBC));
   }
 
   @NotNull
