@@ -14,27 +14,6 @@ import com.intellij.psi.tree.IElementType;
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class TAC_parser implements PsiParser, LightPsiParser {
 
-  public ASTNode parse(IElementType t, PsiBuilder b) {
-    parseLight(t, b);
-    return b.getTreeBuilt();
-  }
-
-  public void parseLight(IElementType t, PsiBuilder b) {
-    boolean r;
-    b = adapt_builder_(t, b, this, null);
-    Marker m = enter_section_(b, 0, _COLLAPSE_, null);
-    if (t == PROPERTY) {
-      r = property(b, 0);
-    } else {
-      r = parse_root_(t, b, 0);
-    }
-    exit_section_(b, 0, m, t, r, true, TRUE_CONDITION);
-  }
-
-  protected boolean parse_root_(IElementType t, PsiBuilder b, int l) {
-    return tacFile(b, l + 1);
-  }
-
   /* ********************************************************** */
   // property|COMMENT|CRLF
   static boolean item_(PsiBuilder b, int l) {
@@ -95,5 +74,26 @@ public class TAC_parser implements PsiParser, LightPsiParser {
       if (!empty_element_parsed_guard_(b, "tacFile", c)) break;
     }
     return true;
+  }
+
+  public ASTNode parse(IElementType t, PsiBuilder b) {
+    parseLight(t, b);
+    return b.getTreeBuilt();
+  }
+
+  public void parseLight(IElementType t, PsiBuilder b) {
+    boolean r;
+    b = adapt_builder_(t, b, this, null);
+    Marker m = enter_section_(b, 0, _COLLAPSE_, null);
+    if (t == PROPERTY) {
+      r = property(b, 0);
+    } else {
+      r = parse_root_(t, b, 0);
+    }
+    exit_section_(b, 0, m, t, r, true, TRUE_CONDITION);
+  }
+
+  protected boolean parse_root_(IElementType t, PsiBuilder b, int l) {
+    return tacFile(b, l + 1);
   }
 }

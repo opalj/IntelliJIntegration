@@ -18,8 +18,8 @@ import org.jetbrains.annotations.NotNull;
 public class OutlineToolWindowFactory implements ToolWindowFactory {
 
   private final JEditorPane toolWindowContent;
-  private ToolWindow toolWindow;
   private final JFXPanel fxPanel;
+  private ToolWindow toolWindow;
 
   public OutlineToolWindowFactory() {
     toolWindowContent = new JEditorPane();

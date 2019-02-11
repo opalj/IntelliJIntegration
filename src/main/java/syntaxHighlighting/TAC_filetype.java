@@ -30,7 +30,7 @@ public class TAC_filetype extends LanguageFileType {
   @NotNull
   @Override
   public String getDefaultExtension() {
-    return GlobalData.DISASSEMBLED_FILE_ENDING;
+    return GlobalData.DISASSEMBLED_FILE_ENDING_TAC;
   }
 
   @Nullable

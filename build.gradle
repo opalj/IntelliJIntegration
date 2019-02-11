@@ -25,15 +25,15 @@ repositories {
     maven { url = 'http://maven.teamdev.com/repository/products' }
 }
 
-ext {
-    jxBrowserVersion = '7.0'
-}
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'de.opal-project:abstract-interpretation-framework_2.12:2.0.1'
     compile 'de.opal-project:bytecode-disassembler_2.12:2.0.1:'
-    //compile "com.teamdev.jxbrowser:jxbrowser-cross-platform:${jxBrowserVersion}"
+    // Cross-platform
+    compile "com.teamdev.jxbrowser:jxbrowser:6.9"
+    // JxBrowser license
+    compile files("$rootDir/license.jar")
     //compile files('Q:/Documents/IntelliJ/intellijintegration/build/libs/jxbrowser-6.22.1.jar')
 }
 
@@ -55,7 +55,6 @@ patchPluginXml {
 check {
     // googleJavaFormat will report "NO-SOURCE" if everything is properly formatted (-> not harmful in any way, can ignore)
     dependsOn 'googleJavaFormat'
-
     // dependsOn [checkstyle, pmd and spotbugsMain] per default
 
     tasks.findByName('checkstyleMain').mustRunAfter('googleJavaFormat')

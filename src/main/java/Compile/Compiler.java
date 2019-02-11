@@ -4,16 +4,40 @@ import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import org.jdom.JDOMException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
-import org.jdom.JDOMException;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public final class Compiler {
+
+  /*
+   * Compile a project with a given (open) Project-Object
+   */
+  public static boolean make(@NotNull final Project project) {
+    CompilerManager compManager = CompilerManager.getInstance(project);
+    CompileScope projectCompileScope = compManager.createProjectCompileScope(project);
+    boolean uptoDate = compManager.isUpToDate(projectCompileScope);
+    if (!uptoDate) {
+      // ApplicationManager.getApplication().invokeAndWait( () -
+      //compManager.make(null);
+      compManager.makeWithModalProgress(projectCompileScope,null);
+      do
+      {
+        try {
+          TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }while(CompilerManager.getInstance(project).isCompilationActive());
+    }
+    return uptoDate;
+  }
 
   /*
      Finds filebased or dirbased Projectpaths
@@ -46,30 +70,6 @@ public final class Compiler {
       }
     }
     return null;
-  }
-
-  /*
-   * Compile a project with a given (open) Project-Object
-   */
-  public static boolean make(@NotNull final Project project) {
-    CompilerManager compManager = CompilerManager.getInstance(project);
-    CompileScope projectCompileScope = compManager.createProjectCompileScope(project);
-    if (!compManager.isUpToDate(projectCompileScope)) {
-      // ApplicationManager.getApplication().invokeAndWait( () -
-      compManager.make(null);
-      try {
-        TimeUnit.SECONDS.sleep(1);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-
-      while (compManager.isCompilationActive()) {
-        // compManager.isCompilationActive())
-        // empty
-      }
-    }
-
-    return true;
   }
 
   /*
