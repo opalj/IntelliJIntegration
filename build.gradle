@@ -1,24 +1,19 @@
 plugins {
     id 'java'
     id 'org.jetbrains.intellij' version '0.3.12'
-
     id 'checkstyle'
     id 'pmd'
     id "com.github.spotbugs" version "1.6.6"
     id 'com.github.sherter.google-java-format' version '0.8'
-    id 'com.github.johnrengelman.shadow' version '4.0.3'
+    //https://openjfx.io/openjfx-docs/#gradle
+//    id 'application'
+//    id 'org.openjfx.javafxplugin' version '0.0.7'
 }
-
-shadowJar {
-    transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
-        resource = 'reference.conf'
-    }
-}
-
 group '23'
-version '0.1.5'
+version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -29,17 +24,11 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'de.opal-project:abstract-interpretation-framework_2.12:2.0.1'
-    compile 'de.opal-project:bytecode-disassembler_2.12:2.0.1:'
-    // Cross-platform
-    compile "com.teamdev.jxbrowser:jxbrowser:6.9"
-    // JxBrowser license
-    compile files("$rootDir/license.jar")
-    //compile files('Q:/Documents/IntelliJ/intellijintegration/build/libs/jxbrowser-6.22.1.jar')
+    compile 'de.opal-project:bytecode-disassembler_2.12:2.0.1'
 }
 
 intellij {
-    version 'LATEST-EAP-SNAPSHOT'
-    intellij.updateSinceUntilBuild false //Disables updating since-build attribute in plugin.xml
+    version '2018.2.2'
 }
 patchPluginXml {
     changeNotes """
@@ -67,9 +56,14 @@ tasks.withType(com.github.spotbugs.SpotBugsTask) {
         xml.enabled = false
         html.enabled = true
     }
-
     // TODO: remove later
     ignoreFailures = true
+}
+tasks.withType(Pmd){
+    reports{
+        xml.enabled=false
+        html.enabled=true
+    }
 }
 
 checkstyle {
@@ -77,3 +71,20 @@ checkstyle {
     config = rootProject.resources.text.fromFile('config/checkstyle/checkstyle.xml')
 //    maxErrors 20
 }
+pmd{
+    toolVersion = "6.11.0"
+    ignoreFailures = true
+    //ConsoleOutput = true
+    ruleSetFiles = files("config/pmd/myRuleSets.xml")
+    //ruleSets = ['category/java/errorprone.xml'
+    //'java-basic',
+    //'java-CyclomaticComplexityRule'
+    // schaut noch ob Javadoc geschrieben sind
+    //'java-comments',
+    //]
+}
+
+// need to be java 11?
+//javafx {
+//    modules = [ 'javafx.controls', 'javafx.fxml','javafx.web', 'javafx.swing' ]
+//}
