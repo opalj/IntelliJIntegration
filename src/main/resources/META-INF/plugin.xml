@@ -1,19 +1,12 @@
 <idea-plugin>
     <id>23.bytecode-disassembler</id>
-
-    <name>OPAL Integration</name>
-
-    <vendor email="marcel.dieter@stud.tu-darmstadt.de">Gruppe23</vendor>
+    <name>Plugin display name here</name>
+    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
 
     <description><![CDATA[
-    OPAL Framework integration for IntelliJ IDEA.<br>
+    Enter short description for your plugin here.<br>
+    <em>most HTML tags may be used</em>
     ]]></description>
-
-    <change-notes>Minor changes for publishing this plugin. This is only an ALPHA version for testing purposes. </change-notes>
-
-    <version>0.1.5</version>
-    <!-- until-build version is looking into the future might be wrong!! -->
-    <idea-version since-build="181" until-build="183.*"/>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
@@ -23,8 +16,6 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-
-        <!--
         <toolWindow id="Outline"
                     factoryClass="toolWindows.OutlineToolWindowFactory"
                     anchor="left"
@@ -34,16 +25,8 @@
                     factoryClass="toolWindows.DisassemblerToolWindowFactory"
                     anchor="right"
                     secondary="true"/>
-         -->
-        <fileEditorProvider implementation="HTMLEditor.HTMLEditorProvider"
-                            id="OpalHTMLEditorProvider"/>
-        <fileEditorProvider implementation="FileEditor.TacTextEditorProvider"
-                            id="OpalTACEditorProvider"/>
-        <fileTypeFactory implementation="syntaxHighlighting.TAC_fileTypeFactory"/>
-        <lang.parserDefinition language="TAC" implementationClass="syntaxHighlighting.TAC_parserDefinition"/>
-        <lang.syntaxHighlighterFactory language="TAC"
-                                       implementationClass="syntaxHighlighting.TAC_syntaxHighlighterFactory"/>
-        <colorSettingsPage implementation="syntaxHighlighting.TAC_colorSettingsPage"/>
+        <fileEditorProvider implementation="HTMLEditor.MyFileEditorProvider"
+                            id="My File Editor Provider"/>
     </extensions>
 
     <actions>
