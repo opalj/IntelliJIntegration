@@ -6,8 +6,8 @@ plugins {
     id "com.github.spotbugs" version "1.6.6"
     id 'com.github.sherter.google-java-format' version '0.8'
     //https://openjfx.io/openjfx-docs/#gradle
-    id 'application'
-    id 'org.openjfx.javafxplugin' version '0.0.7'
+//    id 'application'
+//    id 'org.openjfx.javafxplugin' version '0.0.7'
 }
 group '23'
 version '1.0-SNAPSHOT'
@@ -50,9 +50,10 @@ check {
     tasks.findByName('pmdMain').mustRunAfter('checkstyleMain')
     tasks.findByName('spotbugsMain').mustRunAfter('pmdMain')
 }
-runIde{
-    dependsOn 'check'
-}
+
+//runIde{
+//    dependsOn 'check'
+//}
 
 tasks.withType(com.github.spotbugs.SpotBugsTask) {
     reports {
@@ -86,7 +87,8 @@ pmd{
             //'java-comments',
             //]
 }
-// need to be java 11?
-javafx {
-    modules = [ 'javafx.controls', 'javafx.fxml','javafx.web', 'javafx.swing' ]
-}
+
+// needed if you use java 11
+//javafx {
+//    modules = [ 'javafx.controls', 'javafx.fxml','javafx.web', 'javafx.swing' ]
+//}

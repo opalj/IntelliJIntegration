@@ -1,9 +1,9 @@
 // This is a generated file. Not intended for manual editing.
 package JavaByteCodeLanguage.psi;
 
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementVisitor;
 import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiElement;
 
 public class JavaByteCodeVisitor extends PsiElementVisitor {
 
@@ -28,7 +28,7 @@ public class JavaByteCodeVisitor extends PsiElementVisitor {
   }
 
   public void visitMethodName(@NotNull JavaByteCodeMethodName o) {
-    visitPsiElement(o);
+    visitNamedElement(o);
   }
 
   public void visitModifier(@NotNull JavaByteCodeModifier o) {
@@ -36,10 +36,15 @@ public class JavaByteCodeVisitor extends PsiElementVisitor {
   }
 
   public void visitType(@NotNull JavaByteCodeType o) {
+    visitNamedElement(o);
+  }
+
+  public void visitNamedElement(@NotNull JavaByteCodeNamedElement o) {
     visitPsiElement(o);
   }
 
   public void visitPsiElement(@NotNull PsiElement o) {
     visitElement(o);
   }
+
 }

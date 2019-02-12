@@ -27,16 +27,21 @@
   EOF = "\n"
   STRINGVAR = "regexp:[A-Za-z0-9]+"
   ]
+
+  psiImplUtilClass="JavaByteCodeLanguage.psi.impl.JavaByteCodePsiImplUtil"
 }
 jbcFile ::= item_*
 
 private item_ ::= (MethodDeclaration)
-Type ::= (JAVATYPE | PRIMITIVETYPE)('[]')?
+Type ::= (JAVATYPE | PRIMITIVETYPE)('[]')? | JAVATYPE {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
+                                                        implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement" methods=[getKey getValue getName setName getNameIdentifier]}
 
 MethodDeclaration ::= MethodHead InstructionHead InstructionBody* LocVarTableDeleration?
 MethodHead ::= Modifier? Type MethodName// JAVA
 Modifier ::= PREMODIFIER? MODIFIER?
 MethodName ::= ('<init>'|'<clinit>'|STRINGVAR)('('(Type ','?)*')')?
+    | STRINGVAR {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
+                implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement" methods=[getKey getValue getName setName getNameIdentifier]}
 private InstructionHead ::= PC Line Instruction
 private InstructionBody::= NUMBER NUMBER Instr
 Instr ::= INST ("("((JavaOP|NUMBER|STRING)','?)*")"|JavaOP)?
