@@ -1,15 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package JavaByteCodeLanguage.parser;
 
+import static JavaByteCodeLanguage.parser.JavaByteCodeParserUtil.*;
+import static JavaByteCodeLanguage.psi.JavaByteCodeTypes.*;
+
+import com.intellij.lang.ASTNode;
+import com.intellij.lang.LightPsiParser;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import static JavaByteCodeLanguage.psi.JavaByteCodeTypes.*;
-import static JavaByteCodeLanguage.parser.JavaByteCodeParserUtil.*;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
-import com.intellij.lang.LightPsiParser;
+import com.intellij.psi.tree.IElementType;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class JavaByteCodeParser implements PsiParser, LightPsiParser {
@@ -25,38 +25,27 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
     if (t == DEF_METHOD_NAME) {
       r = DefMethodName(b, 0);
-    }
-    else if (t == INSTR) {
+    } else if (t == INSTR) {
       r = Instr(b, 0);
-    }
-    else if (t == J_TYPE) {
+    } else if (t == J_TYPE) {
       r = JType(b, 0);
-    }
-    else if (t == JAVA_OP) {
+    } else if (t == JAVA_OP) {
       r = JavaOP(b, 0);
-    }
-    else if (t == LOC_VAR_TABLE_DELERATION) {
+    } else if (t == LOC_VAR_TABLE_DELERATION) {
       r = LocVarTableDeleration(b, 0);
-    }
-    else if (t == METHOD_DECLARATION) {
+    } else if (t == METHOD_DECLARATION) {
       r = MethodDeclaration(b, 0);
-    }
-    else if (t == METHOD_HEAD) {
+    } else if (t == METHOD_HEAD) {
       r = MethodHead(b, 0);
-    }
-    else if (t == METHOD_NAME) {
+    } else if (t == METHOD_NAME) {
       r = MethodName(b, 0);
-    }
-    else if (t == MODIFIER) {
+    } else if (t == MODIFIER) {
       r = Modifier(b, 0);
-    }
-    else if (t == TYPE) {
+    } else if (t == TYPE) {
       r = Type(b, 0);
-    }
-    else if (t == PARAMS) {
+    } else if (t == PARAMS) {
       r = params(b, 0);
-    }
-    else {
+    } else {
       r = parse_root_(t, b, 0);
     }
     exit_section_(b, 0, m, t, r, true, TRUE_CONDITION);
@@ -535,5 +524,4 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     consumeToken(b, ",");
     return true;
   }
-
 }

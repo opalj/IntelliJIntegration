@@ -1,10 +1,10 @@
 // This is a generated file. Not intended for manual editing.
 package JavaByteCodeLanguage.psi;
 
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.PsiElement;
-import com.intellij.lang.ASTNode;
 import JavaByteCodeLanguage.psi.impl.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.tree.IElementType;
 
 public interface JavaByteCodeTypes {
 
@@ -27,7 +27,7 @@ public interface JavaByteCodeTypes {
   IElementType JAVATYPE = new JavaByteCodeTokenType("JAVATYPE");
   IElementType LINE = new JavaByteCodeTokenType("Line");
   IElementType LOCALVARIABLETABLE = new JavaByteCodeTokenType("LocalVariableTable");
-//  IElementType MODIFIER = new JavaByteCodeTokenType("MODIFIER");
+  //  IElementType MODIFIER = new JavaByteCodeTokenType("MODIFIER");
   IElementType NUMBER = new JavaByteCodeTokenType("NUMBER");
   IElementType PC = new JavaByteCodeTokenType("PC");
   IElementType PREMODIFIER = new JavaByteCodeTokenType("PREMODIFIER");
@@ -40,35 +40,25 @@ public interface JavaByteCodeTypes {
       IElementType type = node.getElementType();
       if (type == DEF_METHOD_NAME) {
         return new JavaByteCodeDefMethodNameImpl(node);
-      }
-      else if (type == INSTR) {
+      } else if (type == INSTR) {
         return new JavaByteCodeInstrImpl(node);
-      }
-      else if (type == JAVA_OP) {
+      } else if (type == JAVA_OP) {
         return new JavaByteCodeJavaOPImpl(node);
-      }
-      else if (type == J_TYPE) {
+      } else if (type == J_TYPE) {
         return new JavaByteCodeJTypeImpl(node);
-      }
-      else if (type == LOC_VAR_TABLE_DELERATION) {
+      } else if (type == LOC_VAR_TABLE_DELERATION) {
         return new JavaByteCodeLocVarTableDelerationImpl(node);
-      }
-      else if (type == METHOD_DECLARATION) {
+      } else if (type == METHOD_DECLARATION) {
         return new JavaByteCodeMethodDeclarationImpl(node);
-      }
-      else if (type == METHOD_HEAD) {
+      } else if (type == METHOD_HEAD) {
         return new JavaByteCodeMethodHeadImpl(node);
-      }
-      else if (type == METHOD_NAME) {
+      } else if (type == METHOD_NAME) {
         return new JavaByteCodeMethodNameImpl(node);
-      }
-      else if (type == MODIFIER) {
+      } else if (type == MODIFIER) {
         return new JavaByteCodeModifierImpl(node);
-      }
-      else if (type == PARAMS) {
+      } else if (type == PARAMS) {
         return new JavaByteCodeParamsImpl(node);
-      }
-      else if (type == TYPE) {
+      } else if (type == TYPE) {
         return new JavaByteCodeTypeImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);

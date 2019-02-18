@@ -7,89 +7,90 @@ import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * a class that resolves references for methods in the JavaByteCode-Editor
+ * (e.g. for println(java.lang.String) it finds the println(String) method in PrintStream.java)
+ */
 public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
 
-    private Project project;
-    private String fqn; // the FQN of the class the method belongs to
+  // the FQN of the class the method belongs to
+  private String fqn;
 
-    private String methodName;
-    private String returnType;
-    private String parameterList;
+  public JbcMethodReference(@NotNull PsiElement element, TextRange textRange, String fqn) {
+    super(element, textRange);
+    this.fqn = fqn;
 
-    public JbcMethodReference(@NotNull PsiElement element, TextRange textRange, String fqn) {
-        super(element, textRange);
+  }
 
-        this.project = element.getProject();
-        this.fqn = fqn;
-
-        this.methodName = element.getText();
-        this.returnType = element.getParent().getParent().getChildren()[1].getText();
-        this.parameterList = element.getParent().getLastChild().getText();
+  @Nullable
+  @Override
+  public PsiElement resolve() {
+    if (myElement instanceof JavaByteCodeDefMethodName) {
+      final Project project = myElement.getProject();
+      PsiClass psiClass =
+          JavaPsiFacade.getInstance(project).findClass(fqn, GlobalSearchScope.allScope(project));
+      PsiMethod psiMethod = (psiClass != null) ? findAppropriateOverload(psiClass) : null;
+      return psiMethod;
     }
 
-    @Nullable
-    @Override
-    public PsiElement resolve() {
-        if(myElement instanceof JavaByteCodeDefMethodName) {
-            PsiClass psiClass = JavaPsiFacade.getInstance(project)
-                    .findClass(fqn, GlobalSearchScope.allScope(project));
-            PsiMethod psiMethod = findAppropriateOverload(psiClass);
-            return psiMethod;
-        }
+    return null;
+  }
 
-        return null;
+  @NotNull
+  @Override
+  public Object[] getVariants() {
+    return new Object[0];
+  }
+
+  /**
+   * finds the appropriate overload of the method for a given class,
+   * e.g. when pressing on println(java.lang.String) it will find java.io.PrintStream.println(String),
+   * and not println() or println(char)
+   *
+   * @param psiClass the class to which the method belongs to (e.g. java.io.PrintStream in the case of println)
+   * @return the correct overload of the method that fits the signature (method name and parameter list)
+   */
+  private PsiMethod findAppropriateOverload(@NotNull PsiClass psiClass) {
+    // relies on underlying grammar
+    String methodName = myElement.getText();
+    String parameterList = myElement.getParent().getLastChild().getText();
+
+    // this guarantees that the name matches, if the method exists in the class
+    PsiMethod[] psiMethods = psiClass.findMethodsByName(methodName, true);
+
+    // get rid of the parentheses and split at comma,
+    // e.g. "(java.lang.String, void)" -> [java.lang.String, void]
+    String[] params = parameterList.substring(1, parameterList.length() - 1).split(",");
+
+    for (PsiMethod psiMethod : psiMethods) {
+      PsiParameter[] psiParameters = psiMethod.getParameterList().getParameters();
+
+      if(isSameParameterList(params, psiParameters)) {
+        return psiMethod;
+      }
     }
 
-    @NotNull
-    @Override
-    public Object[] getVariants() {
-        return new Object[0];
+    return psiMethods[0];
+  }
+
+  /**
+   * TODO: what about varargs and generics ?
+   *
+   * @param ourParams   the parameter list that is found in our JavaByteCode-Editor
+   * @param theirParams the parameter list of an overload of the reference we're looking for
+   * @return true, if the parameter lists match
+   */
+  private boolean isSameParameterList(@NotNull String[] ourParams, @NotNull PsiParameter[] theirParams) {
+    if(ourParams.length != theirParams.length) {
+      return false;
     }
 
-    @NotNull
-    @Override
-    public PsiElement getElement() {
-        return myElement;
+    for(int i=0; i < theirParams.length; ++i) {
+      if(!ourParams[i].equals(theirParams[i].getType().getCanonicalText())) {
+        return false;
+      }
     }
 
-    private PsiMethod findAppropriateOverload(PsiClass psiClass) {
-        PsiMethod[] psiMethods = psiClass.findMethodsByName(methodName, true);
-        System.out.println("I'm here !! " + psiMethods.length);
-
-        if(psiMethods.length == 1) {
-            return psiMethods[0];
-        }
-
-        // get rid of the parentheses and split at comma, e.g. "(java.lang.String, void)" -> [java.lang.String, void]
-        String[] params = parameterList.substring(1, parameterList.length()-1).split(",");
-
-        for(PsiMethod psiMethod : psiMethods) {
-            boolean isSameName = methodName.equals(psiMethod.getName());
-            boolean isSameRetType = returnType.equals(psiMethod.getReturnType().getCanonicalText());
-            boolean isSameParameterList = true;
-
-            // TODO
-            boolean isEarlyExit = true;
-            PsiParameter[] psiParameters = psiMethod.getParameterList().getParameters();
-            for(int i=0; i < psiParameters.length; ++i) {
-                System.out.println("Param-compare: " + params[i] + " -- " + psiParameters[i].getType().getCanonicalText()
-                    + " ... " + params[i].equals(psiParameters[i].getType().getCanonicalText()));
-
-                if(!params[i].equals(psiParameters[i].getType().getCanonicalText())) {
-                    isSameParameterList = false;
-                    break;
-                }
-
-                if(i == psiParameters.length-1) {
-                    isEarlyExit = false;
-                }
-            }
-
-            if(isSameName && isSameRetType && isSameParameterList && !isEarlyExit) {
-                return psiMethod;
-            }
-        }
-
-        return psiMethods[0];
-    }
+    return true;
+  }
 }
