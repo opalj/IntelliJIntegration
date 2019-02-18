@@ -7,8 +7,16 @@ import com.intellij.psi.PsiElement;
 
 public class JavaByteCodeVisitor extends PsiElementVisitor {
 
+  public void visitDefMethodName(@NotNull JavaByteCodeDefMethodName o) {
+    visitNamedElement(o);
+  }
+
   public void visitInstr(@NotNull JavaByteCodeInstr o) {
     visitPsiElement(o);
+  }
+
+  public void visitJType(@NotNull JavaByteCodeJType o) {
+    visitNamedElement(o);
   }
 
   public void visitJavaOP(@NotNull JavaByteCodeJavaOP o) {
@@ -28,7 +36,7 @@ public class JavaByteCodeVisitor extends PsiElementVisitor {
   }
 
   public void visitMethodName(@NotNull JavaByteCodeMethodName o) {
-    visitNamedElement(o);
+    visitPsiElement(o);
   }
 
   public void visitModifier(@NotNull JavaByteCodeModifier o) {
@@ -36,7 +44,11 @@ public class JavaByteCodeVisitor extends PsiElementVisitor {
   }
 
   public void visitType(@NotNull JavaByteCodeType o) {
-    visitNamedElement(o);
+    visitPsiElement(o);
+  }
+
+  public void visitParams(@NotNull JavaByteCodeParams o) {
+    visitPsiElement(o);
   }
 
   public void visitNamedElement(@NotNull JavaByteCodeNamedElement o) {

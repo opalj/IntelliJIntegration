@@ -8,13 +8,16 @@ import JavaByteCodeLanguage.psi.impl.*;
 
 public interface JavaByteCodeTypes {
 
+  IElementType DEF_METHOD_NAME = new JavaByteCodeElementType("DEF_METHOD_NAME");
   IElementType INSTR = new JavaByteCodeElementType("INSTR");
   IElementType JAVA_OP = new JavaByteCodeElementType("JAVA_OP");
+  IElementType J_TYPE = new JavaByteCodeElementType("J_TYPE");
   IElementType LOC_VAR_TABLE_DELERATION = new JavaByteCodeElementType("LOC_VAR_TABLE_DELERATION");
   IElementType METHOD_DECLARATION = new JavaByteCodeElementType("METHOD_DECLARATION");
   IElementType METHOD_HEAD = new JavaByteCodeElementType("METHOD_HEAD");
   IElementType METHOD_NAME = new JavaByteCodeElementType("METHOD_NAME");
   IElementType MODIFIER = new JavaByteCodeElementType("MODIFIER");
+  IElementType PARAMS = new JavaByteCodeElementType("PARAMS");
   IElementType TYPE = new JavaByteCodeElementType("TYPE");
 
   IElementType COMMENT = new JavaByteCodeTokenType("COMMENT");
@@ -35,11 +38,17 @@ public interface JavaByteCodeTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-      if (type == INSTR) {
+      if (type == DEF_METHOD_NAME) {
+        return new JavaByteCodeDefMethodNameImpl(node);
+      }
+      else if (type == INSTR) {
         return new JavaByteCodeInstrImpl(node);
       }
       else if (type == JAVA_OP) {
         return new JavaByteCodeJavaOPImpl(node);
+      }
+      else if (type == J_TYPE) {
+        return new JavaByteCodeJTypeImpl(node);
       }
       else if (type == LOC_VAR_TABLE_DELERATION) {
         return new JavaByteCodeLocVarTableDelerationImpl(node);
@@ -55,6 +64,9 @@ public interface JavaByteCodeTypes {
       }
       else if (type == MODIFIER) {
         return new JavaByteCodeModifierImpl(node);
+      }
+      else if (type == PARAMS) {
+        return new JavaByteCodeParamsImpl(node);
       }
       else if (type == TYPE) {
         return new JavaByteCodeTypeImpl(node);

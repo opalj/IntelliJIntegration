@@ -44,6 +44,8 @@
         <lang.syntaxHighlighterFactory language="TAC"
                                        implementationClass="syntaxHighlighting.TAC_syntaxHighlighterFactory"/>
         <colorSettingsPage implementation="syntaxHighlighting.TAC_colorSettingsPage"/>
+
+        <psi.referenceContributor implementation="JavaByteCodeLanguage.psi.JbcReferenceContributor"/>
     </extensions>
 
     <actions>

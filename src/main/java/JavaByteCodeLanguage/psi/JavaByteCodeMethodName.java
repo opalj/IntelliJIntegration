@@ -5,24 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface JavaByteCodeMethodName extends JavaByteCodeNamedElement {
-
-  @NotNull
-  List<JavaByteCodeType> getTypeList();
+public interface JavaByteCodeMethodName extends PsiElement {
 
   @Nullable
-  PsiElement getStringvar();
+  JavaByteCodeDefMethodName getDefMethodName();
 
-  String getKey();
-
-  //WARNING: getValue(...) is skipped
-  //matching getValue(JavaByteCodeMethodName, ...)
-  //methods are not found in JavaByteCodePsiImplUtil
-
-  String getName();
-
-  PsiElement setName(String newName);
-
-  PsiElement getNameIdentifier();
+  @NotNull
+  JavaByteCodeParams getParams();
 
 }

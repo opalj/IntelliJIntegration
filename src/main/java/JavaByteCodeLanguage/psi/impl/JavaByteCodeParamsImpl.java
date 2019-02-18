@@ -11,14 +11,14 @@ import static JavaByteCodeLanguage.psi.JavaByteCodeTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import JavaByteCodeLanguage.psi.*;
 
-public class JavaByteCodeMethodNameImpl extends ASTWrapperPsiElement implements JavaByteCodeMethodName {
+public class JavaByteCodeParamsImpl extends ASTWrapperPsiElement implements JavaByteCodeParams {
 
-  public JavaByteCodeMethodNameImpl(@NotNull ASTNode node) {
+  public JavaByteCodeParamsImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull JavaByteCodeVisitor visitor) {
-    visitor.visitMethodName(this);
+    visitor.visitParams(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -27,15 +27,9 @@ public class JavaByteCodeMethodNameImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
-  @Nullable
-  public JavaByteCodeDefMethodName getDefMethodName() {
-    return findChildByClass(JavaByteCodeDefMethodName.class);
-  }
-
-  @Override
   @NotNull
-  public JavaByteCodeParams getParams() {
-    return findNotNullChildByClass(JavaByteCodeParams.class);
+  public List<JavaByteCodeType> getTypeList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeType.class);
   }
 
 }

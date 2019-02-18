@@ -5,12 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface JavaByteCodeType extends PsiElement {
+public interface JavaByteCodeParams extends PsiElement {
 
-  @Nullable
-  JavaByteCodeJType getJType();
-
-  @Nullable
-  PsiElement getPrimitivetype();
+  @NotNull
+  List<JavaByteCodeType> getTypeList();
 
 }

@@ -29,19 +29,33 @@
   ]
 
   psiImplUtilClass="JavaByteCodeLanguage.psi.impl.JavaByteCodePsiImplUtil"
+
+//  mixin("JAVATYPE")="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
+//        implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
+//        methods=[getKey getValue getName setName getNameIdentifier getReferences]
 }
 jbcFile ::= item_*
 
 private item_ ::= (MethodDeclaration)
-Type ::= (JAVATYPE | PRIMITIVETYPE)('[]')? | JAVATYPE {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
-                                                        implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement" methods=[getKey getValue getName setName getNameIdentifier]}
+Type ::= (JType | PRIMITIVETYPE)('[]')?
+
+JType ::= JAVATYPE {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
+                    implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
+                    methods=[getJavaType getName setName getNameIdentifier getReferences]}
 
 MethodDeclaration ::= MethodHead InstructionHead InstructionBody* LocVarTableDeleration?
 MethodHead ::= Modifier? Type MethodName// JAVA
 Modifier ::= PREMODIFIER? MODIFIER?
-MethodName ::= ('<init>'|'<clinit>'|STRINGVAR)('('(Type ','?)*')')?
-    | STRINGVAR {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
-                implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement" methods=[getKey getValue getName setName getNameIdentifier]}
+//MethodName ::= ('<init>'|'<clinit>'|STRINGVAR)('('(Type ','?)*')')?
+//    | STRINGVAR {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
+//                implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement" methods=[getKey getValue getName setName getNameIdentifier]}
+MethodName ::=  ('<init>'|'<clinit>'|DefMethodName) params
+
+DefMethodName ::= STRINGVAR {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
+                             implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
+                             methods=[getStringVar getName setName getNameIdentifier getReferences]}
+params ::= ('('(Type ','?)*')')?
+
 private InstructionHead ::= PC Line Instruction
 private InstructionBody::= NUMBER NUMBER Instr
 Instr ::= INST ("("((JavaOP|NUMBER|STRING)','?)*")"|JavaOP)?
