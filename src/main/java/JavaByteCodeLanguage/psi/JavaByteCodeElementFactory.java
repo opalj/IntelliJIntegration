@@ -3,16 +3,25 @@ package JavaByteCodeLanguage.psi;
 import JavaByteCodeLanguage.LanguageAndFileType.JavaByteCodeFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFileFactory;
+import org.jetbrains.annotations.NotNull;
 
 public class JavaByteCodeElementFactory {
-    public static JavaByteCodeProperty createProperty(Project project, String name) {
-        final JavaByteCodeFile file = createFile(project, name);
-        return (JavaByteCodeProperty) file.getFirstChild();
-    }
+  public static JavaByteCodeType createType(Project project, String name) {
+    final JavaByteCodeFile file = createFile(project, name);
+    return (JavaByteCodeType) file.getFirstChild();
+  }
 
-    public static JavaByteCodeFile createFile(Project project, String text) {
-        String name = "dummy.simple";
-        return (JavaByteCodeFile) PsiFileFactory.getInstance(project).
-                createFileFromText(name, JavaByteCodeFileType.INSTANCE, text);
-    }
+  public static JavaByteCodeMethodName createMethodName(Project project, String name) {
+    final JavaByteCodeFile file = createFile(project, name);
+    return (JavaByteCodeMethodName) file.getFirstChild();
+  }
+
+
+  @NotNull
+  private static JavaByteCodeFile createFile(Project project, String text) {
+    String name = "dummy.jbc";
+    return (JavaByteCodeFile)
+        PsiFileFactory.getInstance(project)
+            .createFileFromText(name, JavaByteCodeFileType.INSTANCE, text);
+  }
 }

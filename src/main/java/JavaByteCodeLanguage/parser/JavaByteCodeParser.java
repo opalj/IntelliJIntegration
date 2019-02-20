@@ -1,15 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package JavaByteCodeLanguage.parser;
 
+import static JavaByteCodeLanguage.parser.JavaByteCodeParserUtil.*;
+import static JavaByteCodeLanguage.psi.JavaByteCodeTypes.*;
+
+import com.intellij.lang.ASTNode;
+import com.intellij.lang.LightPsiParser;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import static JavaByteCodeLanguage.psi.JavaByteCodeTypes.*;
-import static JavaByteCodeLanguage.parser.JavaByteCodeParserUtil.*;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
-import com.intellij.lang.LightPsiParser;
+import com.intellij.psi.tree.IElementType;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class JavaByteCodeParser implements PsiParser, LightPsiParser {
@@ -23,31 +23,29 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     boolean r;
     b = adapt_builder_(t, b, this, null);
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
-    if (t == INSTR) {
+    if (t == DEF_METHOD_NAME) {
+      r = DefMethodName(b, 0);
+    } else if (t == INSTR) {
       r = Instr(b, 0);
-    }
-    else if (t == JAVA_OP) {
+    } else if (t == J_TYPE) {
+      r = JType(b, 0);
+    } else if (t == JAVA_OP) {
       r = JavaOP(b, 0);
-    }
-    else if (t == LOC_VAR_TABLE_DELERATION) {
+    } else if (t == LOC_VAR_TABLE_DELERATION) {
       r = LocVarTableDeleration(b, 0);
-    }
-    else if (t == METHOD_DECLARATION) {
+    } else if (t == METHOD_DECLARATION) {
       r = MethodDeclaration(b, 0);
-    }
-    else if (t == METHOD_HEAD) {
+    } else if (t == METHOD_HEAD) {
       r = MethodHead(b, 0);
-    }
-    else if (t == METHOD_NAME) {
+    } else if (t == METHOD_NAME) {
       r = MethodName(b, 0);
-    }
-    else if (t == MODIFIER) {
+    } else if (t == MODIFIER) {
       r = Modifier(b, 0);
-    }
-    else if (t == TYPE) {
+    } else if (t == TYPE) {
       r = Type(b, 0);
-    }
-    else {
+    } else if (t == PARAMS) {
+      r = params(b, 0);
+    } else {
       r = parse_root_(t, b, 0);
     }
     exit_section_(b, 0, m, t, r, true, TRUE_CONDITION);
@@ -55,6 +53,18 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
 
   protected boolean parse_root_(IElementType t, PsiBuilder b, int l) {
     return jbcFile(b, l + 1);
+  }
+
+  /* ********************************************************** */
+  // STRINGVAR
+  public static boolean DefMethodName(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "DefMethodName")) return false;
+    if (!nextTokenIs(b, STRINGVAR)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, STRINGVAR);
+    exit_section_(b, m, DEF_METHOD_NAME, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -161,6 +171,18 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeTokens(b, 0, PC, LINE, INSTRUCTION);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // JAVATYPE
+  public static boolean JType(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JType")) return false;
+    if (!nextTokenIs(b, JAVATYPE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, JAVATYPE);
+    exit_section_(b, m, J_TYPE, r);
     return r;
   }
 
@@ -341,87 +363,27 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ('<init>'|'<clinit>'|STRINGVAR)('('(Type ','?)*')')?
-  //     | STRINGVAR
+  // ('<init>'|'<clinit>'|DefMethodName) params
   public static boolean MethodName(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "MethodName")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, METHOD_NAME, "<method name>");
     r = MethodName_0(b, l + 1);
-    if (!r) r = consumeToken(b, STRINGVAR);
+    r = r && params(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // ('<init>'|'<clinit>'|STRINGVAR)('('(Type ','?)*')')?
+  // '<init>'|'<clinit>'|DefMethodName
   private static boolean MethodName_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "MethodName_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = MethodName_0_0(b, l + 1);
-    r = r && MethodName_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // '<init>'|'<clinit>'|STRINGVAR
-  private static boolean MethodName_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "MethodName_0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
     r = consumeToken(b, "<init>");
     if (!r) r = consumeToken(b, "<clinit>");
-    if (!r) r = consumeToken(b, STRINGVAR);
+    if (!r) r = DefMethodName(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
-  }
-
-  // ('('(Type ','?)*')')?
-  private static boolean MethodName_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "MethodName_0_1")) return false;
-    MethodName_0_1_0(b, l + 1);
-    return true;
-  }
-
-  // '('(Type ','?)*')'
-  private static boolean MethodName_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "MethodName_0_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, "(");
-    r = r && MethodName_0_1_0_1(b, l + 1);
-    r = r && consumeToken(b, ")");
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // (Type ','?)*
-  private static boolean MethodName_0_1_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "MethodName_0_1_0_1")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!MethodName_0_1_0_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "MethodName_0_1_0_1", c)) break;
-    }
-    return true;
-  }
-
-  // Type ','?
-  private static boolean MethodName_0_1_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "MethodName_0_1_0_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = Type(b, l + 1);
-    r = r && MethodName_0_1_0_1_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // ','?
-  private static boolean MethodName_0_1_0_1_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "MethodName_0_1_0_1_0_1")) return false;
-    consumeToken(b, ",");
-    return true;
   }
 
   /* ********************************************************** */
@@ -451,48 +413,37 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (JAVATYPE | PRIMITIVETYPE)('[]')? | JAVATYPE
+  // (JType | PRIMITIVETYPE)('[]')?
   public static boolean Type(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "Type")) return false;
     if (!nextTokenIs(b, "<type>", JAVATYPE, PRIMITIVETYPE)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, TYPE, "<type>");
     r = Type_0(b, l + 1);
-    if (!r) r = consumeToken(b, JAVATYPE);
+    r = r && Type_1(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // (JAVATYPE | PRIMITIVETYPE)('[]')?
+  // JType | PRIMITIVETYPE
   private static boolean Type_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "Type_0")) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = Type_0_0(b, l + 1);
-    r = r && Type_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // JAVATYPE | PRIMITIVETYPE
-  private static boolean Type_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Type_0_0")) return false;
-    boolean r;
-    r = consumeToken(b, JAVATYPE);
+    r = JType(b, l + 1);
     if (!r) r = consumeToken(b, PRIMITIVETYPE);
     return r;
   }
 
   // ('[]')?
-  private static boolean Type_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Type_0_1")) return false;
-    Type_0_1_0(b, l + 1);
+  private static boolean Type_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "Type_1")) return false;
+    Type_1_0(b, l + 1);
     return true;
   }
 
   // ('[]')
-  private static boolean Type_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Type_0_1_0")) return false;
+  private static boolean Type_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "Type_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, "[]");
@@ -523,4 +474,54 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return true;
   }
 
+  /* ********************************************************** */
+  // ('('(Type ','?)*')')?
+  public static boolean params(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "params")) return false;
+    Marker m = enter_section_(b, l, _NONE_, PARAMS, "<params>");
+    params_0(b, l + 1);
+    exit_section_(b, l, m, true, false, null);
+    return true;
+  }
+
+  // '('(Type ','?)*')'
+  private static boolean params_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "params_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, "(");
+    r = r && params_0_1(b, l + 1);
+    r = r && consumeToken(b, ")");
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (Type ','?)*
+  private static boolean params_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "params_0_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!params_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "params_0_1", c)) break;
+    }
+    return true;
+  }
+
+  // Type ','?
+  private static boolean params_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "params_0_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = Type(b, l + 1);
+    r = r && params_0_1_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // ','?
+  private static boolean params_0_1_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "params_0_1_0_1")) return false;
+    consumeToken(b, ",");
+    return true;
+  }
 }

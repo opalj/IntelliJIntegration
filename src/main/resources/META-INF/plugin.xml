@@ -43,9 +43,10 @@
 
         <lang.syntaxHighlighterFactory language="TAC"
                                        implementationClass="syntaxHighlighting.TAC_syntaxHighlighterFactory"/>
-        <lang.syntaxHighlighterFactory language="jbc" implementationClass="JavaByteCodeLanguage.syntaxhighlighter.JavaByteCodeHighlighterFactory"/>
         <colorSettingsPage implementation="syntaxHighlighting.TAC_colorSettingsPage"/>
         <colorSettingsPage implementation="JavaByteCodeLanguage.syntaxhighlighter.JavaByteCodeColorSettingPage"/>
+        <psi.referenceContributor implementation="JavaByteCodeLanguage.psi.JbcReferenceContributor"/>
+
         <lang.psiStructureViewFactory language="jbc" implementationClass="JavaByteCodeLanguage.StructureView.JavaByteCodeStructureViewFactory"/>
     </extensions>
 

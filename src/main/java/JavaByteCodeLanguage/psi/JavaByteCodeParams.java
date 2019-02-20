@@ -2,13 +2,11 @@
 package JavaByteCodeLanguage.psi;
 
 import com.intellij.psi.PsiElement;
+import java.util.List;
 import org.jetbrains.annotations.*;
 
-public interface JavaByteCodeType extends PsiElement {
+public interface JavaByteCodeParams extends PsiElement {
 
-  @Nullable
-  JavaByteCodeJType getJType();
-
-  @Nullable
-  PsiElement getPrimitivetype();
+  @NotNull
+  List<JavaByteCodeType> getTypeList();
 }
