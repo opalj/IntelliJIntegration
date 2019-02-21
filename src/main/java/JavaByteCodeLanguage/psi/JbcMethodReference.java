@@ -8,8 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * a class that resolves references for methods in the JavaByteCode-Editor
- * (e.g. for println(java.lang.String) it finds the println(String) method in PrintStream.java)
+ * a class that resolves references for methods in the JavaByteCode-Editor (e.g. for
+ * println(java.lang.String) it finds the println(String) method in PrintStream.java)
  */
 public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
 
@@ -19,7 +19,6 @@ public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
   public JbcMethodReference(@NotNull PsiElement element, TextRange textRange, String fqn) {
     super(element, textRange);
     this.fqn = fqn;
-
   }
 
   @Nullable
@@ -43,12 +42,14 @@ public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
   }
 
   /**
-   * finds the appropriate overload of the method for a given class,
-   * e.g. when pressing on println(java.lang.String) it will find java.io.PrintStream.println(String),
-   * and not println() or println(char)
+   * finds the appropriate overload of the method for a given class, e.g. when pressing on
+   * println(java.lang.String) it will find java.io.PrintStream.println(String), and not println()
+   * or println(char)
    *
-   * @param psiClass the class to which the method belongs to (e.g. java.io.PrintStream in the case of println)
-   * @return the correct overload of the method that fits the signature (method name and parameter list)
+   * @param psiClass the class to which the method belongs to (e.g. java.io.PrintStream in the case
+   *     of println)
+   * @return the correct overload of the method that fits the signature (method name and parameter
+   *     list)
    */
   private PsiMethod findAppropriateOverload(@NotNull PsiClass psiClass) {
     // relies on underlying grammar
@@ -65,7 +66,7 @@ public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
     for (PsiMethod psiMethod : psiMethods) {
       PsiParameter[] psiParameters = psiMethod.getParameterList().getParameters();
 
-      if(isSameParameterList(params, psiParameters)) {
+      if (isSameParameterList(params, psiParameters)) {
         return psiMethod;
       }
     }
@@ -76,17 +77,18 @@ public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
   /**
    * TODO: what about varargs and generics ?
    *
-   * @param ourParams   the parameter list that is found in our JavaByteCode-Editor
+   * @param ourParams the parameter list that is found in our JavaByteCode-Editor
    * @param theirParams the parameter list of an overload of the reference we're looking for
    * @return true, if the parameter lists match
    */
-  private boolean isSameParameterList(@NotNull String[] ourParams, @NotNull PsiParameter[] theirParams) {
-    if(ourParams.length != theirParams.length) {
+  private boolean isSameParameterList(
+      @NotNull String[] ourParams, @NotNull PsiParameter[] theirParams) {
+    if (ourParams.length != theirParams.length) {
       return false;
     }
 
-    for(int i=0; i < theirParams.length; ++i) {
-      if(!ourParams[i].equals(theirParams[i].getType().getCanonicalText())) {
+    for (int i = 0; i < theirParams.length; ++i) {
+      if (!ourParams[i].equals(theirParams[i].getType().getCanonicalText())) {
         return false;
       }
     }

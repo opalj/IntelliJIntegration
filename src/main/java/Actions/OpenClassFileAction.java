@@ -1,4 +1,4 @@
-package loadClassFile;
+package Actions;
 
 import Compile.Compiler;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -18,11 +18,13 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.jetbrains.annotations.NotNull;
 
-public class OpenCorrespondingClassFileAction extends AnAction {
+public class OpenClassFileAction extends AnAction {
+  public OpenClassFileAction(String Text) {
+    super(Text);
+  }
 
-  public OpenCorrespondingClassFileAction() {
-    // Set the menu item name.
-    super("Compile And Open .class-File");
+  public OpenClassFileAction() {
+    super();
   }
 
   @Override
@@ -57,7 +59,7 @@ public class OpenCorrespondingClassFileAction extends AnAction {
         classFile = getCorrespondingClassFile(project, javaFile);
       }
       FileEditorManager.getInstance(project).openFile(classFile, true);
-      FileEditorManager.getInstance(project).setSelectedEditor(classFile, "OPAL-HTML");
+      FileEditorManager.getInstance(project).setSelectedEditor(classFile, "OPAL-DIS");
     } // if
   } // actionPerformed
 

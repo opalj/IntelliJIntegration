@@ -40,11 +40,13 @@
 
         <lang.parserDefinition language="TAC" implementationClass="syntaxHighlighting.TAC_parserDefinition"/>
         <lang.parserDefinition language="jbc" implementationClass="JavaByteCodeLanguage.parser.JavaByteCodeParserDefinition"/>
-
         <lang.syntaxHighlighterFactory language="TAC"
                                        implementationClass="syntaxHighlighting.TAC_syntaxHighlighterFactory"/>
+        <lang.syntaxHighlighterFactory language="jbc"
+                                       implementationClass="JavaByteCodeLanguage.syntaxhighlighter.JavaByteCodeHighlighterFactory"/>
         <colorSettingsPage implementation="syntaxHighlighting.TAC_colorSettingsPage"/>
         <colorSettingsPage implementation="JavaByteCodeLanguage.syntaxhighlighter.JavaByteCodeColorSettingPage"/>
+
         <psi.referenceContributor implementation="JavaByteCodeLanguage.psi.JbcReferenceContributor"/>
 
         <lang.psiStructureViewFactory language="jbc" implementationClass="JavaByteCodeLanguage.StructureView.JavaByteCodeStructureViewFactory"/>
@@ -52,12 +54,15 @@
 
     <actions>
         <!-- Add your actions here -->
+        <action id="JumpToJBCEID" class="Actions.OpenClassFileAction" text="Open Bytecodeanalyse">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
     </actions>
 
     <application-components>
         <!-- Add your application components here -->
         <component>
-            <implementation-class>loadClassFile.LoadClassFileComponent</implementation-class>
+            <implementation-class>Actions.LoadClassFileComponent</implementation-class>
         </component>
     </application-components>
 </idea-plugin>

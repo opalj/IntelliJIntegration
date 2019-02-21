@@ -4,14 +4,15 @@ package JavaByteCodeLanguage.psi.impl;
 import static JavaByteCodeLanguage.psi.JavaByteCodeTypes.*;
 
 import JavaByteCodeLanguage.psi.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import java.util.List;
 import org.jetbrains.annotations.*;
 
-public class JavaByteCodeMethodDeclarationImpl extends ASTWrapperPsiElement
+public class JavaByteCodeMethodDeclarationImpl extends JavaByteCodeNamedElementImpl
     implements JavaByteCodeMethodDeclaration {
 
   public JavaByteCodeMethodDeclarationImpl(@NotNull ASTNode node) {
@@ -35,13 +36,29 @@ public class JavaByteCodeMethodDeclarationImpl extends ASTWrapperPsiElement
 
   @Override
   @Nullable
-  public JavaByteCodeLocVarTableDeleration getLocVarTableDeleration() {
-    return findChildByClass(JavaByteCodeLocVarTableDeleration.class);
+  public JavaByteCodeLocVarTableDeclaration getLocVarTableDeclaration() {
+    return findChildByClass(JavaByteCodeLocVarTableDeclaration.class);
   }
 
   @Override
   @NotNull
   public JavaByteCodeMethodHead getMethodHead() {
     return findNotNullChildByClass(JavaByteCodeMethodHead.class);
+  }
+
+  public String getName() {
+    return JavaByteCodePsiImplUtil.getName(this);
+  }
+
+  public PsiElement setName(String newName) {
+    return JavaByteCodePsiImplUtil.setName(this, newName);
+  }
+
+  public PsiElement getNameIdentifier() {
+    return JavaByteCodePsiImplUtil.getNameIdentifier(this);
+  }
+
+  public ItemPresentation getPresentation() {
+    return JavaByteCodePsiImplUtil.getPresentation(this);
   }
 }

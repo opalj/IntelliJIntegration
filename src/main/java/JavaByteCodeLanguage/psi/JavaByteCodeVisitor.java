@@ -7,6 +7,10 @@ import org.jetbrains.annotations.*;
 
 public class JavaByteCodeVisitor extends PsiElementVisitor {
 
+  public void visitClassHead(@NotNull JavaByteCodeClassHead o) {
+    visitPsiElement(o);
+  }
+
   public void visitDefMethodName(@NotNull JavaByteCodeDefMethodName o) {
     visitNamedElement(o);
   }
@@ -23,12 +27,16 @@ public class JavaByteCodeVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitLocVarTableDeleration(@NotNull JavaByteCodeLocVarTableDeleration o) {
+  public void visitLocVarTableDeclaration(@NotNull JavaByteCodeLocVarTableDeclaration o) {
+    visitNamedElement(o);
+  }
+
+  public void visitLocVarTableHead(@NotNull JavaByteCodeLocVarTableHead o) {
     visitPsiElement(o);
   }
 
   public void visitMethodDeclaration(@NotNull JavaByteCodeMethodDeclaration o) {
-    visitPsiElement(o);
+    visitNamedElement(o);
   }
 
   public void visitMethodHead(@NotNull JavaByteCodeMethodHead o) {
@@ -39,7 +47,7 @@ public class JavaByteCodeVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitModifier(@NotNull JavaByteCodeModifier o) {
+  public void visitModifierV(@NotNull JavaByteCodeModifierV o) {
     visitPsiElement(o);
   }
 

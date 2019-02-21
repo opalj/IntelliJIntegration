@@ -16,7 +16,6 @@ public class JavaByteCodeElementFactory {
     return (JavaByteCodeMethodName) file.getFirstChild();
   }
 
-
   @NotNull
   private static JavaByteCodeFile createFile(Project project, String text) {
     String name = "dummy.jbc";

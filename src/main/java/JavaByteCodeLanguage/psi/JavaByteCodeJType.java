@@ -7,15 +7,14 @@ import org.jetbrains.annotations.*;
 
 public interface JavaByteCodeJType extends JavaByteCodeNamedElement {
 
-  @NotNull
-  PsiElement getJavatype();
-
+  @Nullable
   String getJavaType();
 
   String getName();
 
   PsiElement setName(String newName);
 
+  @Nullable
   PsiElement getNameIdentifier();
 
   PsiReference[] getReferences();

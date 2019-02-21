@@ -10,13 +10,16 @@ public interface JavaByteCodeDefMethodName extends JavaByteCodeNamedElement {
   @NotNull
   PsiElement getStringvar();
 
+  @Nullable
   String getStringVar();
 
   String getName();
 
   PsiElement setName(String newName);
 
+  @Nullable
   PsiElement getNameIdentifier();
 
+  @NotNull
   PsiReference[] getReferences();
 }

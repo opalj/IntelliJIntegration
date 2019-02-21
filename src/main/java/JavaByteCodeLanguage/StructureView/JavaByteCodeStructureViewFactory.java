@@ -10,15 +10,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class JavaByteCodeStructureViewFactory implements PsiStructureViewFactory {
-    @Nullable
-    @Override
-    public StructureViewBuilder getStructureViewBuilder(@NotNull PsiFile psiFile) {
-        return new TreeBasedStructureViewBuilder() {
-            @NotNull
-            @Override
-            public StructureViewModel createStructureViewModel(@Nullable Editor editor) {
-                return new JavaByteCodeStructureViewModel(psiFile);
-            }
-        };
-    }
+  @Nullable
+  @Override
+  public StructureViewBuilder getStructureViewBuilder(@NotNull PsiFile psiFile) {
+    return new TreeBasedStructureViewBuilder() {
+      @NotNull
+      @Override
+      public StructureViewModel createStructureViewModel(@Nullable Editor editor) {
+        return new JavaByteCodeStructureViewModel(psiFile);
+      }
+    };
+  }
 }

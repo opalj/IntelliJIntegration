@@ -7,17 +7,19 @@ import JavaByteCodeLanguage.psi.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import java.util.List;
 import org.jetbrains.annotations.*;
 
-public class JavaByteCodeMethodHeadImpl extends ASTWrapperPsiElement
-    implements JavaByteCodeMethodHead {
+public class JavaByteCodeClassHeadImpl extends ASTWrapperPsiElement
+    implements JavaByteCodeClassHead {
 
-  public JavaByteCodeMethodHeadImpl(@NotNull ASTNode node) {
+  public JavaByteCodeClassHeadImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull JavaByteCodeVisitor visitor) {
-    visitor.visitMethodHead(this);
+    visitor.visitClassHead(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -27,19 +29,19 @@ public class JavaByteCodeMethodHeadImpl extends ASTWrapperPsiElement
 
   @Override
   @NotNull
-  public JavaByteCodeMethodName getMethodName() {
-    return findNotNullChildByClass(JavaByteCodeMethodName.class);
+  public JavaByteCodeDefMethodName getDefMethodName() {
+    return findNotNullChildByClass(JavaByteCodeDefMethodName.class);
+  }
+
+  @Override
+  @NotNull
+  public List<JavaByteCodeJType> getJTypeList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeJType.class);
   }
 
   @Override
   @Nullable
   public JavaByteCodeModifierV getModifierV() {
     return findChildByClass(JavaByteCodeModifierV.class);
-  }
-
-  @Override
-  @NotNull
-  public JavaByteCodeType getType() {
-    return findNotNullChildByClass(JavaByteCodeType.class);
   }
 }

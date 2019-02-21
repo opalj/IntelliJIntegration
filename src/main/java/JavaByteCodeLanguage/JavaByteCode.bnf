@@ -13,19 +13,31 @@
   tokenTypeClass="JavaByteCodeLanguage.psi.JavaByteCodeTokenType"
   //implements("") = "org.intellij.lang."
   tokens=[
-  SPACE='regexp:\s+'
   COMMENT='regexp://.*'
   NUMBER ='regexp:(-)?\d+'
   STRING="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\")"
-  //JAVA="regexp:(([A-Za-z])*\.)+([A-Za-z])*(\{(.)*\})?"
-  INST="regexp:A(A)?(CONST_NULL|LOAD|STORE)(_\d)?|(I)(CONST|LOAD|STORE)(_M?\d)?|(I|L|F|D|A)?RETURN|INVOKE(SPECIAL|STATIC|VIRTUAL)|DUP|NOP|IF(EQ|NE|LT|GE|GT|LE|_ICMP(EQ|NE|LT|GE|GT|LE)|_ACMP(EQ|NE))|IINC|ARRAYLENGTH|GOTO|LoadString|NEW|CHECKCAST"
+
+  INST="regexp:A(A)?(CONST_NULL|LOAD|STORE)(_\d)?|(I)(CONST|LOAD|STORE)(_M?\d)?|(I|L|F|D|A)?RETURN|INVOKE(SPECIAL|STATIC|VIRTUAL)|DUP|NOP|IF(EQ|NE|LT|GE|GT|LE|_ICMP(EQ|NE|LT|GE|GT|LE)|_ACMP(EQ|NE))|IINC|ARRAYLENGTH|GOTO|NEW|CHECKCAST"
+  // CONST
+  SPACE='regexp:\s+'
+  COMMA=","
+  DOT="."
+  LBRACKET="regexp:\(|\{|\[|«"
+  RBRACKET="regexp:\)|\}|\]|»"
+  CONSTMETHODNAMES = "regexp:<(cl)?init>"
+  PUT_GET_INSTR="regexp:(put|get) .* :"
+  LOAD_INSTR="regexp:Load([A-Za-z]+)"
+  //JAVACONST
+  CLASS='class'
+  EXTENDS='extends'
+  IMPLEMENTS='implements'
   // TYPES
-  JAVATYPE="regexp:(([A-Za-z])*\.)+[A-Z-a-z]*"
   PRIMITIVETYPE="regexp:void|boolean|byte|char|short|int|long|float|double"
-  MODIFIER="regexp:static|protected|final|abstract|default"
-  PREMODIFIER="regexp:public|private|default"
+  MODIFIER="regexp:static|final|abstract|default"
+  PREMODIFIER="regexp:public|private|protected|default"
   EOF = "\n"
-  STRINGVAR = "regexp:[A-Za-z0-9]+"
+  STRINGVAR = "regexp:[a-zA-Z$_][a-zA-Z0-9$_]*"
+
   ]
 
   psiImplUtilClass="JavaByteCodeLanguage.psi.impl.JavaByteCodePsiImplUtil"
@@ -34,23 +46,21 @@
 //        implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
 //        methods=[getKey getValue getName setName getNameIdentifier getReferences]
 }
-jbcFile ::= item_*
+jbcFile ::= ClassHead item_*
 
-private item_ ::= (MethodDeclaration)
-Type ::= (JType | PRIMITIVETYPE)('[]')?
-
-JType ::= JAVATYPE {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
+private item_ ::= MethodDeclaration
+Type ::= (JType | PRIMITIVETYPE)('[]')*
+JType ::= (STRINGVAR'.')*STRINGVAR  {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
                     implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
                     methods=[getJavaType getName setName getNameIdentifier getReferences]}
 
-MethodDeclaration ::= MethodHead InstructionHead InstructionBody* LocVarTableDeleration?
-MethodHead ::= Modifier? Type MethodName// JAVA
-Modifier ::= PREMODIFIER? MODIFIER?
-//MethodName ::= ('<init>'|'<clinit>'|STRINGVAR)('('(Type ','?)*')')?
-//    | STRINGVAR {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
-//                implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement" methods=[getKey getValue getName setName getNameIdentifier]}
+MethodDeclaration ::= MethodHead InstructionHead InstructionBody* LocVarTableDeclaration? {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
+                                                                                            implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
+                                                                                            methods=[getName setName getNameIdentifier getPresentation]}
+ClassHead ::= ModifierV? class DefMethodName (extends JType)? (implements (JType(",")?)+)?
+Private MethodHead ::= ModifierV? Type MethodName ("«" (STRINGVAR ","?)* "»")? // JAVA
+ModifierV ::= (PREMODIFIER)?(MODIFIER)*
 MethodName ::=  ('<init>'|'<clinit>'|DefMethodName) params
-
 DefMethodName ::= STRINGVAR {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
                              implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
                              methods=[getStringVar getName setName getNameIdentifier getReferences]}
@@ -58,9 +68,14 @@ params ::= ('('(Type ','?)*')')?
 
 private InstructionHead ::= PC Line Instruction
 private InstructionBody::= NUMBER NUMBER Instr
-Instr ::= INST ("("((JavaOP|NUMBER|STRING)','?)*")"|JavaOP)?
+Instr ::= ((INST|LOAD_INSTR) ("("((JavaOP|NUMBER|STRING)','?)*")"|JavaOP)?) | (PUT_GET_INSTR Type) | // TODO {recoverWhile=recoverTillNextInstr}
 JavaOP ::= ((Type|STRINGVAR)('{'Type MethodName'}')?)+| 'lvIndex=' NUMBER
 
-LocVarTableDeleration ::= LocVarTableHead LocVarTableBody*
-private LocVarTableHead ::= LocalVariableTable
-private LocVarTableBody ::= "["NUMBER ">" NUMBER ")" "=>"  // NOT RIGHT
+    private recoverTillNextInstr ::= !NUMBER
+
+LocVarTableDeclaration ::= LocVarTableHead LocVarTableBody* {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
+                                                                               implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
+                                                                               methods=[getName setName getNameIdentifier getPresentation]}
+
+LocVarTableHead ::= LocalVariableTable
+private LocVarTableBody ::= "["NUMBER ">" NUMBER ")" "=>" Type (this | STRINGVAR) // NOT RIGHT

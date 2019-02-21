@@ -6,16 +6,13 @@ import com.intellij.psi.PsiElement;
 import java.util.List;
 import org.jetbrains.annotations.*;
 
-public interface JavaByteCodeMethodDeclaration extends JavaByteCodeNamedElement {
+public interface JavaByteCodeLocVarTableDeclaration extends JavaByteCodeNamedElement {
 
   @NotNull
-  List<JavaByteCodeInstr> getInstrList();
-
-  @Nullable
-  JavaByteCodeLocVarTableDeclaration getLocVarTableDeclaration();
+  JavaByteCodeLocVarTableHead getLocVarTableHead();
 
   @NotNull
-  JavaByteCodeMethodHead getMethodHead();
+  List<JavaByteCodeType> getTypeList();
 
   String getName();
 

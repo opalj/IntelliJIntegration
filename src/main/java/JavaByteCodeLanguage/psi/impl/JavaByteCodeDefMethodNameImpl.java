@@ -32,6 +32,7 @@ public class JavaByteCodeDefMethodNameImpl extends JavaByteCodeNamedElementImpl
     return findNotNullChildByType(STRINGVAR);
   }
 
+  @Nullable
   public String getStringVar() {
     return JavaByteCodePsiImplUtil.getStringVar(this);
   }
@@ -44,10 +45,12 @@ public class JavaByteCodeDefMethodNameImpl extends JavaByteCodeNamedElementImpl
     return JavaByteCodePsiImplUtil.setName(this, newName);
   }
 
+  @Nullable
   public PsiElement getNameIdentifier() {
     return JavaByteCodePsiImplUtil.getNameIdentifier(this);
   }
 
+  @NotNull
   public PsiReference[] getReferences() {
     return JavaByteCodePsiImplUtil.getReferences(this);
   }

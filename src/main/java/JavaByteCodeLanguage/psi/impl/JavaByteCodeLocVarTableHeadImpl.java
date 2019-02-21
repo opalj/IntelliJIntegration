@@ -6,34 +6,22 @@ import static JavaByteCodeLanguage.psi.JavaByteCodeTypes.*;
 import JavaByteCodeLanguage.psi.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import org.jetbrains.annotations.*;
 
-public class JavaByteCodeModifierImpl extends ASTWrapperPsiElement implements JavaByteCodeModifier {
+public class JavaByteCodeLocVarTableHeadImpl extends ASTWrapperPsiElement
+    implements JavaByteCodeLocVarTableHead {
 
-  public JavaByteCodeModifierImpl(@NotNull ASTNode node) {
+  public JavaByteCodeLocVarTableHeadImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull JavaByteCodeVisitor visitor) {
-    visitor.visitModifier(this);
+    visitor.visitLocVarTableHead(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof JavaByteCodeVisitor) accept((JavaByteCodeVisitor) visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getModifier() {
-    return findChildByType(MODIFIER);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getPremodifier() {
-    return findChildByType(PREMODIFIER);
   }
 }

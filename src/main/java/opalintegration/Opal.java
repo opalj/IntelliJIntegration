@@ -12,11 +12,11 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.Scanner;
+import java.util.NoSuchElementException;
+import java.util.jar.JarInputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
-import org.opalj.ai.ValuesDomain;
 import org.opalj.bi.AccessFlags;
 import org.opalj.br.ClassFile;
 import org.opalj.br.Code;
@@ -30,6 +30,7 @@ import org.opalj.collection.immutable.RefArray;
 import org.opalj.da.ClassFileReader;
 import org.opalj.tac.*;
 import org.opalj.value.KnownTypedValue;
+import scala.Function0;
 import scala.Function1;
 import scala.Some;
 
@@ -43,79 +44,118 @@ public class Opal {
   private static com.intellij.openapi.project.Project project;
   private static String classPath;
 
-  private static void Test(String filepath) {
-    Project<URL> uriProject = Project.apply(new File(filepath));
-    JavaProject javaProject = new JavaProject(uriProject);
-    javaProject
-        .project()
-        .parForeachMethodWithBody(
-            null,
-            16,
-            (mi) -> {
-              TACode<TACMethodParameter, DUVar<ValuesDomain.Value>> taCode =
-                  TACAI.apply(javaProject.project(), mi.method(), null);
-              String taCodeAsString = ToTxt.apply(taCode).mkString("\n");
-              String Name = mi.classFile().thisType().toJava() + mi.method().name();
-              System.out.println("test");
-              try {
-                FileOutputStream outputStream = new FileOutputStream(Name);
-                byte[] strToBytes = taCodeAsString.getBytes();
-                outputStream.write(strToBytes);
-              } catch (IOException e) {
-                e.printStackTrace();
-              }
-              System.out.println();
-              return 1;
-            });
-  }
+  // =====================================================================================
+  // =====================================================================================
+  // =====================================================================================
 
-  public static VirtualFile DisassemblertoVF(VirtualFile virtualClassFile) {
+  private static ClassFile getClassFile(VirtualFile virtualClassFile) {
     String filepath = virtualClassFile.getPath();
-    String myString = "";
     Project<URL> uriProject = Project.apply(new File(filepath));
     ConstArray<ClassFile> classFileConstArray = uriProject.allProjectClassFiles();
-    for (int i = 0; i < classFileConstArray.length(); i++) {
-      org.opalj.br.ClassFile classFile = classFileConstArray.apply(i);
-      // AccessFlags(int) => public class | static class
 
-      myString =
-          myString + AccessFlags.classFlagsToJava(classFile.accessFlags()) + " " + classFile.fqn();
-      if (classFile.superclassType().isDefined())
-        myString = myString + " extends " + classFile.superclassType().get().toJava();
-      if (classFile.interfaceTypes().length() > 0) {
-        myString = myString + " implements ";
-        for (int j = 0; j < classFile.interfaceTypes().length(); j++) {
-          myString = myString + classFile.interfaceTypes().apply(j).toJava() + " ";
-        }
+    if (classFileConstArray.length() > 0) {
+      System.out.println("Apply(0): " + classFileConstArray.apply(0));
+      return classFileConstArray.apply(0);
+    }
+    // else (might be) JAR
+    else {
+      System.out.println("getClassFile() JAR? : " + virtualClassFile.getName());
+      String jarFileRoot = getJarFileRoot(virtualClassFile);
+      return createClassFileFromJar(jarFileRoot);
+    }
+  }
+
+  private static String getJarFileRoot(VirtualFile virtualClassFile) {
+    String jarPathWithoutClassExtension =
+        virtualClassFile.getParent().getPath()
+            + File.separator
+            + virtualClassFile.getNameWithoutExtension();
+    // this\is\the\jarPath -> this/is/the/jarPath
+    jarPathWithoutClassExtension = jarPathWithoutClassExtension.replaceAll("\\\\", "/");
+
+    String jarFileRoot =
+        jarPathWithoutClassExtension.substring(0, jarPathWithoutClassExtension.indexOf("!/"));
+    return jarFileRoot;
+  }
+
+  // TODO: this gets called for classes we haven't clicked on as well?
+  private static ClassFile createClassFileFromJar(String jarFileRoot) {
+    Project<URL> uriProject = Project.apply(new File(jarFileRoot));
+
+    Object classObj =
+        Project.JavaClassFileReader(uriProject.logContext(), uriProject.config())
+            .ClassFiles(
+                new Function0<JarInputStream>() {
+                  @Override
+                  public JarInputStream apply() {
+                    try {
+                      return new JarInputStream(new FileInputStream(new File(jarFileRoot)));
+                    } catch (IOException e) {
+                      // ....
+                    }
+
+                    System.out.println("ABOUT TO RETURN NULL (1)");
+                    return null;
+                  }
+                })
+            .head()
+            ._1();
+
+    ClassFile classFileFromJar = null;
+    if (classObj instanceof ClassFile) {
+      classFileFromJar = (ClassFile) classObj;
+    }
+
+    return classFileFromJar;
+  }
+
+  /**
+   * create the bytecode representation (of OPAL) for a given class file
+   *
+   * @param classFile ...
+   * @return the bytecode representation as a String
+   */
+  private static String createBytecodeString(ClassFile classFile) {
+    String myString = "// ";
+    myString =
+        myString + AccessFlags.classFlagsToJava(classFile.accessFlags()) + " " + classFile.fqn();
+    if (classFile.superclassType().isDefined())
+      myString = myString + " extends " + classFile.superclassType().get().toJava();
+    if (classFile.interfaceTypes().length() > 0) {
+      myString = myString + " implements ";
+      for (int j = 0; j < classFile.interfaceTypes().length(); j++) {
+        myString = myString + classFile.interfaceTypes().apply(j).toJava() + " ";
       }
-      myString =
-          myString
-              + "\n// Source File: "
-              + classFile.sourceFile()
-              + " Version: "
-              + classFile.jdkVersion()
-              + " Size: \n";
+    }
+    myString =
+        myString
+            + "\n// Source File: "
+            + classFile.sourceFile()
+            + " Version: "
+            + classFile.jdkVersion()
+            + " Size: \n";
 
-      // TODO Constant Pool Maybe working with DA.
-      RefArray<Method> methods = classFile.methods();
-      for (int j = 0; j < methods.length(); j++) {
-        Method method = methods.apply(j);
-        if (method.body().isDefined()) {
-          Code body = method.body().get();
-          Instruction[] instructions = body.instructions();
-          myString =
-              myString
-                  + method.toString()
-                  + "// [size :"
-                  + body.codeSize()
-                  + " bytes, max Stack: "
-                  + body.maxStack()
-                  + ", max Locals: "
-                  + body.maxLocals()
-                  + "] \n";
-          myString = myString + "\tPC\tLine\tInstruction\n";
-          for (int k = 0; k < instructions.length; k++) {
-            if (instructions[k] != null) {
+    // TODO Constant Pool Maybe working with DA.
+    RefArray<Method> methods = classFile.methods();
+    for (int j = 0; j < methods.length(); j++) {
+      Method method = methods.apply(j);
+      if (method.body().isDefined()) {
+        Code body = method.body().get();
+        Instruction[] instructions = body.instructions();
+        myString =
+            myString
+                + method.toString()
+                + "// [size :"
+                + body.codeSize()
+                + " bytes, max Stack: "
+                + body.maxStack()
+                + ", max Locals: "
+                + body.maxLocals()
+                + "] \n";
+        myString = myString + "\tPC\tLine\tInstruction\n";
+        for (int k = 0; k < instructions.length; k++) {
+          if (instructions[k] != null) {
+            try {
               myString =
                   myString
                       + "\t"
@@ -125,111 +165,75 @@ public class Opal {
                       + "\t\t"
                       + instructions[k]
                       + "\n";
+            } catch (NoSuchElementException e) {
+              return "Issue with Java 5? \n\n " + e.getMessage();
             }
           }
-          if (body.localVariableTable().isDefined()) {
-            RefArray<LocalVariable> refArrayOption = body.localVariableTable().get();
+        }
+        if (body.localVariableTable().isDefined()) {
+          RefArray<LocalVariable> refArrayOption = body.localVariableTable().get();
+          myString =
+              myString
+                  + "\n\nLocalVariableTable // [size: "
+                  + refArrayOption.length()
+                  + " item(s)]\n";
+          for (int k = 0; k < refArrayOption.length(); k++) {
+            LocalVariable localVariable = refArrayOption.apply(k);
             myString =
                 myString
-                    + "\n\nLocalVariableTable // [size: "
-                    + refArrayOption.length()
-                    + " item(s)]\n";
-            for (int k = 0; k < refArrayOption.length(); k++) {
-              LocalVariable localVariable = refArrayOption.apply(k);
-              myString =
-                  myString
-                      + "["
-                      + localVariable.startPC()
-                      + " > "
-                      + localVariable.length()
-                      + ") => "
-                      + localVariable.fieldType().toJava()
-                      + " "
-                      + localVariable.name()
-                      + "\n";
-            }
+                    + "["
+                    + localVariable.startPC()
+                    + " > "
+                    + localVariable.length()
+                    + ") => "
+                    + localVariable.fieldType().toJava()
+                    + " "
+                    + localVariable.name()
+                    + "\n";
           }
-          myString = myString + "\n\n\n";
         }
-      } // for(j)
+        myString = myString + "\n\n\n";
+      }
     }
-    File myFile = null;
-    try {
-      FileUtil.writeToFile(
-          myFile =
-              new File(
-                  virtualClassFile.getParent().getPath()
-                      + File.separator
-                      + virtualClassFile.getNameWithoutExtension()
-                      + "."
-                      + GlobalData.DISASSEMBLED_FILE_ENDING_JBC),
-          myString);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(myFile);
+
+    return myString;
   }
 
-  public static VirtualFile SomeTest(VirtualFile virtualClassFile) {
-    File myFile = null;
-    try {
-      Process exec = Runtime.getRuntime().exec("javap -c \"" + virtualClassFile.getPath() + "\"");
-      Scanner scanner = new Scanner(exec.getInputStream()).useDelimiter("\\A");
-      String myString = "";
-      while (scanner.hasNextLine()) myString = myString.concat(scanner.nextLine()).concat("\n");
-      FileUtil.writeToFile(
-          myFile =
-              new File(
-                  virtualClassFile.getParent().getPath()
-                      + File.separator
-                      + virtualClassFile.getNameWithoutExtension()
-                      + "."
-                      + GlobalData.DISASSEMBLED_FILE_ENDING_JBC),
-          myString);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(myFile);
-  }
+  // =====================================================================================
+  // =====================================================================================
+  // =====================================================================================
 
-  public static String JavaClasstoTACForm(VirtualFile virtualClassFile) {
-    classPath = virtualClassFile.getPath();
-    String JavaTACClassString = threeWayDisassemblerString(classPath);
+  public static String JavaClassToTACForm(ClassFile classFile, String filepath) {
+    String JavaTACClassString = threeWayDisassemblerString(classFile, filepath);
     return JavaTACClassString;
   }
 
-  public static String threeWayDisassemblerString(String filepath) {
+  public static String threeWayDisassemblerString(ClassFile classFile, String filepath) {
     StringBuilder tacCodeString = new StringBuilder();
     uriProject = Project.apply(new File(filepath));
     javaProject = new JavaProject(uriProject);
-    ConstArray<org.opalj.br.ClassFile> classFileConstArray =
-        javaProject.project().allProjectClassFiles();
     methodTACodeFunction = javaProject.project().get(DefaultTACAIKey$.MODULE$);
-    for (int i = 0; i < classFileConstArray.length(); i++) {
-      org.opalj.br.ClassFile classFile = classFileConstArray.apply(i);
-      RefArray<Method> methods = classFile.methods();
-      //            TODO     classFile.fields(); soll nicht
-      //            TODO     classFile.attributes();
-      for (int j = 0; j < methods.length(); j++) {
-        Method method = methods.apply(j);
-        if (method.body().isDefined()) {
-          System.out.println(method.toJava());
-          TACode<TACMethodParameter, DUVar<KnownTypedValue>> TacCode =
-              methodTACodeFunction.apply(method);
-          tacCodeString.append(ToTxt.apply(TacCode).mkString("\n"));
-        }
-      } // for(j)
-    } // for(i)
 
-    // TODO
-    try {
-      return new String(tacCodeString.toString().getBytes(), "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      return null;
-    }
+    // iterate through the methods and generate the TAC for each
+    RefArray<Method> methods = classFile.methods();
+    for (int j = 0; j < methods.length(); j++) {
+      Method method = methods.apply(j);
+      if (method.body().isDefined()) {
+        System.out.println(method.toJava());
+        tacCodeString.append(method.toJava()).append("\n");
+        TACode<TACMethodParameter, DUVar<KnownTypedValue>> TacCode =
+            methodTACodeFunction.apply(method);
+        tacCodeString.append(ToTxt.apply(TacCode).mkString("\n"));
+        tacCodeString.append("\n\n\n");
+      }
+    } // for(j)
 
-    //        return tacCodeString;
+    System.out.println("TAC CODE TO STRING: " + tacCodeString);
+    return tacCodeString.toString();
   }
+
+  // ====================================================================================
+  // ====================================================================================
 
   public static String JavaClassToHtmlForm(VirtualFile virtualClassFile) {
     classPath = virtualClassFile.getPath();
@@ -372,33 +376,6 @@ public class Opal {
     return script;
   }
 
-  private static String myCSS(String theirCSS) {
-    // if(JBColor.isBright())
-    //    return theirCSS;
-
-    int firstColorIndex = theirCSS.indexOf("#");
-    theirCSS = theirCSS.replaceFirst("background-color: #F6F6F6", "background-color: #abcdef");
-
-    String[] colorSplit = theirCSS.split("color:  ");
-    String[] backgroundColorSplit = theirCSS.split("background-color:  ");
-
-    // 0:  body (no visible change)
-    // 1:  div#source ... background: rgb(...)
-    // 2:  !! background-color: rgb(...)
-    // 3:  .nested-details ... background-color: #...
-    // 4:  summary ... background-color: #...
-    // 5:  div.method, details.method ... background-color: #...
-    // 6:  .annotation
-    // 7:  .index, .pc
-    // 8:  .line
-    // 9:  .reservedwords,.verification
-    // 10: .constant_value
-    // 11: .attribute_name
-    // 12: .close
-
-    return theirCSS;
-  }
-
   // ====================================================================================
   // ====================================================================================
 
@@ -424,6 +401,9 @@ public class Opal {
       LocalFileSystem.getInstance()
           .refreshAndFindFileByIoFile(
               prepare(GlobalData.DISASSEMBLED_FILE_ENDING_TAC, virtualFile));
+      LocalFileSystem.getInstance()
+          .refreshAndFindFileByIoFile(
+              prepare(GlobalData.DISASSEMBLED_FILE_ENDING_JBC, virtualFile));
       return LocalFileSystem.getInstance()
           .refreshAndFindFileByIoFile(
               prepare(GlobalData.DISASSEMBLED_FILE_ENDING_HTML, virtualFile));
@@ -446,10 +426,40 @@ public class Opal {
       LocalFileSystem.getInstance()
           .refreshAndFindFileByIoFile(
               prepare(GlobalData.DISASSEMBLED_FILE_ENDING_HTML, virtualFile));
+      LocalFileSystem.getInstance()
+          .refreshAndFindFileByIoFile(
+              prepare(GlobalData.DISASSEMBLED_FILE_ENDING_JBC, virtualFile));
       return LocalFileSystem.getInstance()
           .refreshAndFindFileByIoFile(
               prepare(GlobalData.DISASSEMBLED_FILE_ENDING_TAC, virtualFile));
     }
+    return virtualFilesByName.stream().findFirst().get();
+  }
+
+  // this should be called by constructor
+  public static VirtualFile prepareJBC(
+      @NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
+    setProject(project);
+    Collection<VirtualFile> virtualFilesByName =
+        FilenameIndex.getVirtualFilesByName(
+            project,
+            virtualFile
+                .getNameWithoutExtension()
+                .concat(".")
+                .concat(GlobalData.DISASSEMBLED_FILE_ENDING_JBC),
+            GlobalSearchScope.projectScope(project));
+    if (!Compiler.make(project) || virtualFilesByName.isEmpty()) {
+      LocalFileSystem.getInstance()
+          .refreshAndFindFileByIoFile(
+              prepare(GlobalData.DISASSEMBLED_FILE_ENDING_HTML, virtualFile));
+      LocalFileSystem.getInstance()
+          .refreshAndFindFileByIoFile(
+              prepare(GlobalData.DISASSEMBLED_FILE_ENDING_TAC, virtualFile));
+      return LocalFileSystem.getInstance()
+          .refreshAndFindFileByIoFile(
+              prepare(GlobalData.DISASSEMBLED_FILE_ENDING_JBC, virtualFile));
+    }
+
     return virtualFilesByName.stream().findFirst().get();
   }
 
@@ -464,20 +474,42 @@ public class Opal {
             + classPath.substring(basePath.length());
 
     String fileName = virtualFile.getNameWithoutExtension();
-    String represetableForm = null;
-    if (prepareID.equals(GlobalData.DISASSEMBLED_FILE_ENDING_HTML)) {
-      fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_HTML);
-      represetableForm = Opal.JavaClassToHtmlForm(virtualFile);
-    } else if (prepareID.equals(GlobalData.DISASSEMBLED_FILE_ENDING_TAC)) {
-      fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_TAC);
-      represetableForm = Opal.JavaClasstoTACForm(virtualFile);
+    String representableForm = null;
+    ClassFile classFile;
+    switch (prepareID) {
+      case GlobalData.DISASSEMBLED_FILE_ENDING_HTML:
+        fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_HTML);
+        representableForm = Opal.JavaClassToHtmlForm(virtualFile);
+        break;
+      case GlobalData.DISASSEMBLED_FILE_ENDING_TAC:
+        fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_TAC);
+        classFile = getClassFile(virtualFile);
+        representableForm = Opal.JavaClassToTACForm(classFile, virtualFile.getPath());
+        break;
+      case GlobalData.DISASSEMBLED_FILE_ENDING_JBC:
+        fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_JBC);
+        classFile = getClassFile(virtualFile);
+        representableForm = Opal.createBytecodeString(classFile);
+        break;
     }
+
     File disassembledFile = new File(absPath + File.separator + fileName);
+    writeContentToFile(disassembledFile, representableForm, false);
+    return disassembledFile;
+  }
+
+  /**
+   * an auxiliary method that writes 'content' to a 'file' (main purpose of this method is to
+   * encapsulate the try/catch block)
+   *
+   * @param file file to write to
+   * @param content content to write into the file
+   */
+  private static void writeContentToFile(File file, String content, boolean append) {
     try {
-      FileUtil.writeToFile(disassembledFile, represetableForm, false);
+      FileUtil.writeToFile(file, content, append);
     } catch (IOException e) {
       e.printStackTrace();
     }
-    return disassembledFile;
   }
 }

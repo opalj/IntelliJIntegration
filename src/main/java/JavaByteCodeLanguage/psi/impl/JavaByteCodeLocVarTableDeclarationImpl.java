@@ -5,20 +5,22 @@ import static JavaByteCodeLanguage.psi.JavaByteCodeTypes.*;
 
 import JavaByteCodeLanguage.psi.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.PsiReference;
+import com.intellij.psi.util.PsiTreeUtil;
+import java.util.List;
 import org.jetbrains.annotations.*;
 
-public class JavaByteCodeJTypeImpl extends JavaByteCodeNamedElementImpl
-    implements JavaByteCodeJType {
+public class JavaByteCodeLocVarTableDeclarationImpl extends JavaByteCodeNamedElementImpl
+    implements JavaByteCodeLocVarTableDeclaration {
 
-  public JavaByteCodeJTypeImpl(@NotNull ASTNode node) {
+  public JavaByteCodeLocVarTableDeclarationImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull JavaByteCodeVisitor visitor) {
-    visitor.visitJType(this);
+    visitor.visitLocVarTableDeclaration(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -26,9 +28,16 @@ public class JavaByteCodeJTypeImpl extends JavaByteCodeNamedElementImpl
     else super.accept(visitor);
   }
 
-  @Nullable
-  public String getJavaType() {
-    return JavaByteCodePsiImplUtil.getJavaType(this);
+  @Override
+  @NotNull
+  public JavaByteCodeLocVarTableHead getLocVarTableHead() {
+    return findNotNullChildByClass(JavaByteCodeLocVarTableHead.class);
+  }
+
+  @Override
+  @NotNull
+  public List<JavaByteCodeType> getTypeList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeType.class);
   }
 
   public String getName() {
@@ -39,12 +48,11 @@ public class JavaByteCodeJTypeImpl extends JavaByteCodeNamedElementImpl
     return JavaByteCodePsiImplUtil.setName(this, newName);
   }
 
-  @Nullable
   public PsiElement getNameIdentifier() {
     return JavaByteCodePsiImplUtil.getNameIdentifier(this);
   }
 
-  public PsiReference[] getReferences() {
-    return JavaByteCodePsiImplUtil.getReferences(this);
+  public ItemPresentation getPresentation() {
+    return JavaByteCodePsiImplUtil.getPresentation(this);
   }
 }

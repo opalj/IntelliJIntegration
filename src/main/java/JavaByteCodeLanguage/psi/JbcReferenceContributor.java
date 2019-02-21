@@ -6,11 +6,8 @@ import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * for elaborate JavaDoc, see {@link PsiReferenceContributor}
- */
+/** for elaborate JavaDoc, see {@link PsiReferenceContributor} */
 public class JbcReferenceContributor extends PsiReferenceContributor {
-
 
   @Override
   public void registerReferenceProviders(@NotNull PsiReferenceRegistrar registrar) {
@@ -31,8 +28,9 @@ public class JbcReferenceContributor extends PsiReferenceContributor {
         };
 
     /**
-     * the Pattern guarantees that psiReferenceProvider#getReferencesByElement(...)
-     * is only executed for JavaByteCodeDefMethodName elements
+     * the Pattern guarantees that psiReferenceProvider#getReferencesByElement(...) is only executed
+     * for JavaByteCodeDefMethodName elements
+     *
      * @see com.intellij.psi.PsiReferenceRegistrar
      */
     registrar.registerReferenceProvider(

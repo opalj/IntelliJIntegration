@@ -10,6 +10,15 @@ public interface JavaByteCodeInstr extends PsiElement {
   @NotNull
   List<JavaByteCodeJavaOP> getJavaOPList();
 
-  @NotNull
+  @Nullable
+  JavaByteCodeType getType();
+
+  @Nullable
   PsiElement getInst();
+
+  @Nullable
+  PsiElement getLoadInstr();
+
+  @Nullable
+  PsiElement getPutGetInstr();
 }

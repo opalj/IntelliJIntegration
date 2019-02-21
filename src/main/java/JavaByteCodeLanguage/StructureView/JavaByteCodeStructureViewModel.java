@@ -8,22 +8,25 @@ import com.intellij.ide.util.treeView.smartTree.Sorter;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 
-public class JavaByteCodeStructureViewModel extends StructureViewModelBase implements StructureViewModel.ElementInfoProvider{
+public class JavaByteCodeStructureViewModel extends StructureViewModelBase
+    implements StructureViewModel.ElementInfoProvider {
 
-    public JavaByteCodeStructureViewModel(@NotNull PsiFile psiFile) {
-        super(psiFile, new JavaByteCodeStructureViewElement(psiFile));
-    }
-    @NotNull
-    public Sorter[] getSorters() {
-        return new Sorter[]{Sorter.ALPHA_SORTER};
-    }
-    @Override
-    public boolean isAlwaysShowsPlus(StructureViewTreeElement element) {
-        return false;
-    }
+  public JavaByteCodeStructureViewModel(@NotNull PsiFile psiFile) {
+    super(psiFile, new JavaByteCodeStructureViewElement(psiFile));
+  }
 
-    @Override
-    public boolean isAlwaysLeaf(StructureViewTreeElement element) {
-        return element instanceof JavaByteCode;
-    }
+  @NotNull
+  public Sorter[] getSorters() {
+    return new Sorter[] {Sorter.ALPHA_SORTER};
+  }
+
+  @Override
+  public boolean isAlwaysShowsPlus(StructureViewTreeElement element) {
+    return false;
+  }
+
+  @Override
+  public boolean isAlwaysLeaf(StructureViewTreeElement element) {
+    return element instanceof JavaByteCode;
+  }
 }
