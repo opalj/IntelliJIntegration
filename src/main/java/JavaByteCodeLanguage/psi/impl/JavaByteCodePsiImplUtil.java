@@ -1,11 +1,17 @@
 package JavaByteCodeLanguage.psi.impl;
 
+import Editors.disEditor.DisTextEditor;
 import JavaByteCodeLanguage.psi.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.ide.util.PsiNavigationSupport;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ColoredItemPresentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.util.Iconable;
+import com.intellij.pom.Navigatable;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.impl.source.resolve.reference.impl.providers.JavaClassReferenceProvider;
@@ -261,4 +267,19 @@ public class JavaByteCodePsiImplUtil {
     // PsiElementFactory.SERVICE.getInstance(element.getProject()).createMethodFromText(element.getText(), null).getPresentation();
     return coloredItemPresentation;
   }
+  public static void navigate(JavaByteCodeMethodDeclaration element, boolean requestFocus){
+      navigate((JavaByteCodeNamedElement)element,requestFocus);
+  }
+  public static void navigate(JavaByteCodeLocVarTableDeclaration element, boolean requestFocus){
+        navigate((JavaByteCodeNamedElement)element,requestFocus);
+  }
+    public static void navigate(JavaByteCodeNamedElement element,boolean requestFocus) {
+        Navigatable descriptor = PsiNavigationSupport.getInstance().getDescriptor(element);
+        FileEditor editor = FileEditorManager.getInstance(element.getProject()).getSelectedEditor();
+        if(editor instanceof DisTextEditor) {
+            ((DisTextEditor)editor).navigateTo(descriptor);
+        }else{
+            ((Navigatable)element).navigate(requestFocus);
+        }
+    }
 }

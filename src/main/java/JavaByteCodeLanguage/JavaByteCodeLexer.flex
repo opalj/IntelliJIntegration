@@ -1,7 +1,7 @@
 package JavaByteCodeLanguage;
 
 import com.intellij.lexer.FlexLexer;
-import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.JavaTokenType;import com.intellij.psi.tree.IElementType;
 
 import static com.intellij.psi.TokenType.BAD_CHARACTER;
 import static com.intellij.psi.TokenType.WHITE_SPACE;
@@ -30,6 +30,7 @@ NUMBER=(-)?[0-9]+
 STRING=('([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\")
 INST=A(A)?(CONST_NULL|LOAD|STORE)(_[0-9])?|(I)(CONST|LOAD|STORE)(_M?[0-9])?|(I|L|F|D|A)?RETURN|INVOKE(SPECIAL|STATIC|VIRTUAL)|DUP|NOP|IF(EQ|NE|LT|GE|GT|LE|_ICMP(EQ|NE|LT|GE|GT|LE)|_ACMP(EQ|NE))|IINC|ARRAYLENGTH|GOTO|NEW|CHECKCAST
 SPACE=[ \t\n\x0B\f\r]+
+TO=>|=>
 LBRACKET=\(|\{|\[|«
 RBRACKET=\)|\}|\]|»
 CONSTMETHODNAMES=<(cl)?init>
@@ -49,6 +50,7 @@ STRINGVAR=[a-zA-Z$_][a-zA-Z0-9$_]*
   "class"                 { return CLASS; }
   "extends"               { return EXTENDS; }
   "implements"            { return IMPLEMENTS; }
+  "Fields"                { return FIELDS; }
   "\\n"                   { return EOF; }
   "PC"                    { return PC; }
   "Line"                  { return LINE; }
@@ -61,6 +63,7 @@ STRINGVAR=[a-zA-Z$_][a-zA-Z0-9$_]*
   {STRING}                { return STRING; }
   {INST}                  { return INST; }
   {SPACE}                 { return SPACE; }
+  {TO}                    { return TO; }
   {LBRACKET}              { return LBRACKET; }
   {RBRACKET}              { return RBRACKET; }
   {CONSTMETHODNAMES}      { return CONSTMETHODNAMES; }

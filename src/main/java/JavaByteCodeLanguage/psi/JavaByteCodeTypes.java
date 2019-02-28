@@ -1,15 +1,16 @@
 // This is a generated file. Not intended for manual editing.
 package JavaByteCodeLanguage.psi;
 
-import JavaByteCodeLanguage.psi.impl.*;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.PsiElement;
+import com.intellij.lang.ASTNode;
+import JavaByteCodeLanguage.psi.impl.*;
 
 public interface JavaByteCodeTypes {
 
   IElementType CLASS_HEAD = new JavaByteCodeElementType("CLASS_HEAD");
   IElementType DEF_METHOD_NAME = new JavaByteCodeElementType("DEF_METHOD_NAME");
+  IElementType FIELDS_DECLARATION = new JavaByteCodeElementType("FIELDS_DECLARATION");
   IElementType INSTR = new JavaByteCodeElementType("INSTR");
   IElementType JAVA_OP = new JavaByteCodeElementType("JAVA_OP");
   IElementType J_TYPE = new JavaByteCodeElementType("J_TYPE");
@@ -29,6 +30,7 @@ public interface JavaByteCodeTypes {
   IElementType DOT = new JavaByteCodeTokenType(".");
   IElementType EOF = new JavaByteCodeTokenType("\\n");
   IElementType EXTENDS = new JavaByteCodeTokenType("extends");
+  IElementType FIELDS = new JavaByteCodeTokenType("Fields");
   IElementType IMPLEMENTS = new JavaByteCodeTokenType("implements");
   IElementType INST = new JavaByteCodeTokenType("INST");
   IElementType INSTRUCTION = new JavaByteCodeTokenType("Instruction");
@@ -47,35 +49,51 @@ public interface JavaByteCodeTypes {
   IElementType STRING = new JavaByteCodeTokenType("STRING");
   IElementType STRINGVAR = new JavaByteCodeTokenType("STRINGVAR");
   IElementType THIS = new JavaByteCodeTokenType("this");
+  IElementType TO = new JavaByteCodeTokenType("TO");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
       if (type == CLASS_HEAD) {
         return new JavaByteCodeClassHeadImpl(node);
-      } else if (type == DEF_METHOD_NAME) {
+      }
+      else if (type == DEF_METHOD_NAME) {
         return new JavaByteCodeDefMethodNameImpl(node);
-      } else if (type == INSTR) {
+      }
+      else if (type == FIELDS_DECLARATION) {
+        return new JavaByteCodeFieldsDeclarationImpl(node);
+      }
+      else if (type == INSTR) {
         return new JavaByteCodeInstrImpl(node);
-      } else if (type == JAVA_OP) {
+      }
+      else if (type == JAVA_OP) {
         return new JavaByteCodeJavaOPImpl(node);
-      } else if (type == J_TYPE) {
+      }
+      else if (type == J_TYPE) {
         return new JavaByteCodeJTypeImpl(node);
-      } else if (type == LOC_VAR_TABLE_DECLARATION) {
+      }
+      else if (type == LOC_VAR_TABLE_DECLARATION) {
         return new JavaByteCodeLocVarTableDeclarationImpl(node);
-      } else if (type == LOC_VAR_TABLE_HEAD) {
+      }
+      else if (type == LOC_VAR_TABLE_HEAD) {
         return new JavaByteCodeLocVarTableHeadImpl(node);
-      } else if (type == METHOD_DECLARATION) {
+      }
+      else if (type == METHOD_DECLARATION) {
         return new JavaByteCodeMethodDeclarationImpl(node);
-      } else if (type == METHOD_HEAD) {
+      }
+      else if (type == METHOD_HEAD) {
         return new JavaByteCodeMethodHeadImpl(node);
-      } else if (type == METHOD_NAME) {
+      }
+      else if (type == METHOD_NAME) {
         return new JavaByteCodeMethodNameImpl(node);
-      } else if (type == MODIFIER_V) {
+      }
+      else if (type == MODIFIER_V) {
         return new JavaByteCodeModifierVImpl(node);
-      } else if (type == PARAMS) {
+      }
+      else if (type == PARAMS) {
         return new JavaByteCodeParamsImpl(node);
-      } else if (type == TYPE) {
+      }
+      else if (type == TYPE) {
         return new JavaByteCodeTypeImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);

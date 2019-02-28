@@ -17,21 +17,24 @@ import java.util.jar.JarInputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
+import org.mozilla.classfile.ByteCode;
 import org.opalj.bi.AccessFlags;
-import org.opalj.br.ClassFile;
-import org.opalj.br.Code;
-import org.opalj.br.LocalVariable;
-import org.opalj.br.Method;
+import org.opalj.bi.AccessFlagsContexts;
+import org.opalj.bi.VisibilityModifier;
+import org.opalj.br.*;
 import org.opalj.br.analyses.JavaProject;
 import org.opalj.br.analyses.Project;
 import org.opalj.br.instructions.Instruction;
+import org.opalj.collection.IntIterator;
 import org.opalj.collection.immutable.ConstArray;
+import org.opalj.collection.immutable.IntArraySet;
 import org.opalj.collection.immutable.RefArray;
 import org.opalj.da.ClassFileReader;
 import org.opalj.tac.*;
 import org.opalj.value.KnownTypedValue;
 import scala.Function0;
 import scala.Function1;
+import scala.Option;
 import scala.Some;
 
 public class Opal {
@@ -116,55 +119,46 @@ public class Opal {
    * @return the bytecode representation as a String
    */
   private static String createBytecodeString(ClassFile classFile) {
-    String myString = "// ";
-    myString =
-        myString + AccessFlags.classFlagsToJava(classFile.accessFlags()) + " " + classFile.fqn();
-    if (classFile.superclassType().isDefined())
-      myString = myString + " extends " + classFile.superclassType().get().toJava();
+    StringBuilder ByteCodeString = new StringBuilder();
+    String threeTimeNL = "\n\n\n";
+    ByteCodeString.append(AccessFlags.classFlagsToJava(classFile.accessFlags())).append( " ").append(classFile.fqn());
+    if (classFile.superclassType().isDefined()) {
+      ByteCodeString.append(" extends ").append(classFile.superclassType().get().toJava());
+    }
     if (classFile.interfaceTypes().length() > 0) {
-      myString = myString + " implements ";
+      ByteCodeString.append(" implements ");
       for (int j = 0; j < classFile.interfaceTypes().length(); j++) {
-        myString = myString + classFile.interfaceTypes().apply(j).toJava() + " ";
+        ByteCodeString.append(classFile.interfaceTypes().apply(j).toJava()).append(" ");
       }
     }
-    myString =
-        myString
-            + "\n// Source File: "
-            + classFile.sourceFile()
-            + " Version: "
-            + classFile.jdkVersion()
-            + " Size: \n";
-
+    ByteCodeString.append("\n// Source File: ").append(classFile.sourceFile()).append(" Version: ").append(classFile.jdkVersion()).append("Size : \n");
     // TODO Constant Pool Maybe working with DA.
+    RefArray<Field> fields = classFile.fields();
+    ByteCodeString.append("Fields\n");
+    for(int j = 0; j < fields.length(); j++){
+      Field field = fields.apply(j);
+      ByteCodeString.append(AccessFlags.toString(field.accessFlags(), AccessFlagsContexts.FIELD()))
+              .append(" ").append(field.fieldType().toJava())
+              .append(" ").append(field.name()).append("\n");
+    }
+    ByteCodeString.append(threeTimeNL);
+    RefArray<Annotation> annotations = classFile.annotations();
+    for (int i = 0; i < annotations.length() ; i++) {
+      Annotation annotation = annotations.apply(i);
+      ByteCodeString.append("//").append(annotation.toJava()).append("\n");
+    }
     RefArray<Method> methods = classFile.methods();
     for (int j = 0; j < methods.length(); j++) {
       Method method = methods.apply(j);
       if (method.body().isDefined()) {
         Code body = method.body().get();
         Instruction[] instructions = body.instructions();
-        myString =
-            myString
-                + method.toString()
-                + "// [size :"
-                + body.codeSize()
-                + " bytes, max Stack: "
-                + body.maxStack()
-                + ", max Locals: "
-                + body.maxLocals()
-                + "] \n";
-        myString = myString + "\tPC\tLine\tInstruction\n";
+        ByteCodeString.append(method.toJava()).append("// [size :").append(body.codeSize()).append(" bytes, max Stack: ").append(body.maxStack()).append("] \n");
+        ByteCodeString.append("\tPC\tLine\tInstruction\n");
         for (int k = 0; k < instructions.length; k++) {
           if (instructions[k] != null) {
             try {
-              myString =
-                  myString
-                      + "\t"
-                      + k
-                      + "\t"
-                      + body.lineNumber(k).get().toString()
-                      + "\t\t"
-                      + instructions[k]
-                      + "\n";
+              ByteCodeString.append("\t").append(k).append("\t").append(body.lineNumber(k).get().toString()).append("\t\t").append(instructions[k]).append("\n");
             } catch (NoSuchElementException e) {
               return "Issue with Java 5? \n\n " + e.getMessage();
             }
@@ -172,31 +166,40 @@ public class Opal {
         }
         if (body.localVariableTable().isDefined()) {
           RefArray<LocalVariable> refArrayOption = body.localVariableTable().get();
-          myString =
-              myString
-                  + "\n\nLocalVariableTable // [size: "
-                  + refArrayOption.length()
-                  + " item(s)]\n";
+          ByteCodeString.append("\n\nLocalVariableTable // [size: ").append(refArrayOption.length()).append(" item(s)]\n");
           for (int k = 0; k < refArrayOption.length(); k++) {
             LocalVariable localVariable = refArrayOption.apply(k);
-            myString =
-                myString
-                    + "["
-                    + localVariable.startPC()
-                    + " > "
-                    + localVariable.length()
-                    + ") => "
-                    + localVariable.fieldType().toJava()
-                    + " "
-                    + localVariable.name()
-                    + "\n";
+            ByteCodeString.append("[")
+                    .append(localVariable.startPC())
+                    .append(" > ").append(localVariable.length()).append(") => ").append(localVariable.fieldType().toJava())
+                    .append(" ").append(localVariable.name()).append("\n");
           }
         }
-        myString = myString + "\n\n\n";
+        RefArray<Attribute> attributes = method.attributes();
+        for(int i = 0 ; i <  attributes.length();i++) {
+          Attribute attribute = attributes.apply(i);
+          ByteCodeString.append(attribute.toString()+" "+ attribute.getClass().getAnnotations().length +"\n");
+        }
+        //if(body.runtimeInvisibleTypeAnnotations().length() > 0 || body.runtimeVisibleTypeAnnotations().length()> 0 )
+          System.out.println("RTIV:"+body.runtimeInvisibleTypeAnnotations().mkString("\n"));
+          System.out.println("RTV"+body.runtimeVisibleTypeAnnotations().mkString("\n"));
+        if(body.stackMapTable().isDefined()){
+          StackMapTable stackMapTable = body.stackMapTable().get();
+          RefArray<StackMapFrame> stackMapFrameRefArray = stackMapTable.stackMapFrames();
+          IntIterator pcIterator = stackMapTable.pcs().iterator();
+          for(int i = 0; i < stackMapFrameRefArray.length(); i++) {
+            StackMapFrame stackMapFrame = stackMapFrameRefArray.apply(i);
+            Class<? extends StackMapFrame> frameClass = stackMapFrame.getClass();
+            int pc = pcIterator.next();
+            ByteCodeString.append(pc+" ").append(frameClass.getName()+" ").append(stackMapFrame.frameType()+" ").append(stackMapFrame.offset(0)-1+"\n");
+          }
+
+        }
+        ByteCodeString.append(threeTimeNL);
       }
     }
 
-    return myString;
+    return ByteCodeString.toString();
   }
 
   // =====================================================================================
@@ -228,7 +231,6 @@ public class Opal {
       }
     } // for(j)
 
-    System.out.println("TAC CODE TO STRING: " + tacCodeString);
     return tacCodeString.toString();
   }
 
@@ -250,7 +252,7 @@ public class Opal {
         DataInputStream dis = new DataInputStream(fis)) {
       // get the class file and construct the HTML string
       org.opalj.da.ClassFile cf = (org.opalj.da.ClassFile) ClassFileReader.ClassFile(dis).head();
-
+      cf.cpToXHTML();
       // ordentliches HTML Code
       toHtmlAsString =
           "<html>\n<head>\n<style>"

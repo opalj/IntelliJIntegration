@@ -22,6 +22,7 @@
   SPACE='regexp:\s+'
   COMMA=","
   DOT="."
+  TO="regexp:>|=>"
   LBRACKET="regexp:\(|\{|\[|«"
   RBRACKET="regexp:\)|\}|\]|»"
   CONSTMETHODNAMES = "regexp:<(cl)?init>"
@@ -31,6 +32,7 @@
   CLASS='class'
   EXTENDS='extends'
   IMPLEMENTS='implements'
+  FIELDS='Fields'
   // TYPES
   PRIMITIVETYPE="regexp:void|boolean|byte|char|short|int|long|float|double"
   MODIFIER="regexp:static|final|abstract|default"
@@ -46,9 +48,9 @@
 //        implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
 //        methods=[getKey getValue getName setName getNameIdentifier getReferences]
 }
-jbcFile ::= ClassHead item_*
+jbcFile ::=  item_
 
-private item_ ::= MethodDeclaration
+private item_ ::= ClassHead FieldsDeclaration MethodDeclaration*
 Type ::= (JType | PRIMITIVETYPE)('[]')*
 JType ::= (STRINGVAR'.')*STRINGVAR  {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
                     implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
@@ -56,7 +58,8 @@ JType ::= (STRINGVAR'.')*STRINGVAR  {mixin="JavaByteCodeLanguage.psi.impl.JavaBy
 
 MethodDeclaration ::= MethodHead InstructionHead InstructionBody* LocVarTableDeclaration? {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
                                                                                             implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
-                                                                                            methods=[getName setName getNameIdentifier getPresentation]}
+                                                                                            methods=[getName setName getNameIdentifier getPresentation navigate]}
+FieldsDeclaration ::= Fields (Type DefMethodName)*
 ClassHead ::= ModifierV? class DefMethodName (extends JType)? (implements (JType(",")?)+)?
 Private MethodHead ::= ModifierV? Type MethodName ("«" (STRINGVAR ","?)* "»")? // JAVA
 ModifierV ::= (PREMODIFIER)?(MODIFIER)*
@@ -75,7 +78,7 @@ JavaOP ::= ((Type|STRINGVAR)('{'Type MethodName'}')?)+| 'lvIndex=' NUMBER
 
 LocVarTableDeclaration ::= LocVarTableHead LocVarTableBody* {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
                                                                                implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
-                                                                               methods=[getName setName getNameIdentifier getPresentation]}
+                                                                               methods=[getName setName getNameIdentifier getPresentation navigate]}
 
 LocVarTableHead ::= LocalVariableTable
 private LocVarTableBody ::= "["NUMBER ">" NUMBER ")" "=>" Type (this | STRINGVAR) // NOT RIGHT
