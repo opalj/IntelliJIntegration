@@ -1,15 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package JavaByteCodeLanguage.parser;
 
-import static JavaByteCodeLanguage.parser.JavaByteCodeParserUtil.*;
-import static JavaByteCodeLanguage.psi.JavaByteCodeTypes.*;
-
-import com.intellij.lang.ASTNode;
-import com.intellij.lang.LightPsiParser;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import com.intellij.lang.PsiParser;
+import static JavaByteCodeLanguage.psi.JavaByteCodeTypes.*;
+import static JavaByteCodeLanguage.parser.JavaByteCodeParserUtil.*;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.tree.TokenSet;
+import com.intellij.lang.PsiParser;
+import com.intellij.lang.LightPsiParser;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class JavaByteCodeParser implements PsiParser, LightPsiParser {
@@ -25,37 +25,53 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
     if (t == CLASS_HEAD) {
       r = ClassHead(b, 0);
-    } else if (t == DEF_METHOD_NAME) {
+    }
+    else if (t == DEF_METHOD_NAME) {
       r = DefMethodName(b, 0);
-    } else if (t == FIELDS_DECLARATION) {
+    }
+    else if (t == FIELDS_DECLARATION) {
       r = FieldsDeclaration(b, 0);
-    } else if (t == INSTR) {
+    }
+    else if (t == INSTR) {
       r = Instr(b, 0);
-    } else if (t == J_TYPE) {
+    }
+    else if (t == J_TYPE) {
       r = JType(b, 0);
-    } else if (t == JAVA_OP) {
+    }
+    else if (t == JAVA_OP) {
       r = JavaOP(b, 0);
-    } else if (t == LAMBDA_TYPE) {
+    }
+    else if (t == LAMBDA_TYPE) {
       r = LambdaType(b, 0);
-    } else if (t == LOC_VAR_TABLE_DECLARATION) {
+    }
+    else if (t == LOC_VAR_TABLE_DECLARATION) {
       r = LocVarTableDeclaration(b, 0);
-    } else if (t == LOC_VAR_TABLE_HEAD) {
+    }
+    else if (t == LOC_VAR_TABLE_HEAD) {
       r = LocVarTableHead(b, 0);
-    } else if (t == METHOD_DECLARATION) {
+    }
+    else if (t == METHOD_DECLARATION) {
       r = MethodDeclaration(b, 0);
-    } else if (t == METHOD_HEAD) {
+    }
+    else if (t == METHOD_HEAD) {
       r = MethodHead(b, 0);
-    } else if (t == METHOD_NAME) {
+    }
+    else if (t == METHOD_NAME) {
       r = MethodName(b, 0);
-    } else if (t == MODIFIER_V) {
+    }
+    else if (t == MODIFIER_V) {
       r = ModifierV(b, 0);
-    } else if (t == TYPE) {
+    }
+    else if (t == TYPE) {
       r = Type(b, 0);
-    } else if (t == LAMBDA_PARAMS) {
+    }
+    else if (t == LAMBDA_PARAMS) {
       r = lambdaParams(b, 0);
-    } else if (t == PARAMS) {
+    }
+    else if (t == PARAMS) {
       r = params(b, 0);
-    } else {
+    }
+    else {
       r = parse_root_(t, b, 0);
     }
     exit_section_(b, 0, m, t, r, true, TRUE_CONDITION);
@@ -66,8 +82,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ModifierV? ("@"?)(class|enum|interface) BLOCK_COMMENT* JType (extends JType)? (implements
-  // (JType(",")?)+)?
+  // ModifierV? ("@"?)(class|enum|interface) BLOCK_COMMENT* JType (extends JType)? (implements (JType(",")?)+)?
   public static boolean ClassHead(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ClassHead")) return false;
     boolean r;
@@ -200,7 +215,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // Fields (Type DefMethodName)*
+  // Fields (ModifierV? Type DefMethodName)*
   public static boolean FieldsDeclaration(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "FieldsDeclaration")) return false;
     if (!nextTokenIs(b, FIELDS)) return false;
@@ -212,7 +227,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // (Type DefMethodName)*
+  // (ModifierV? Type DefMethodName)*
   private static boolean FieldsDeclaration_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "FieldsDeclaration_1")) return false;
     while (true) {
@@ -223,15 +238,23 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // Type DefMethodName
+  // ModifierV? Type DefMethodName
   private static boolean FieldsDeclaration_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "FieldsDeclaration_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = Type(b, l + 1);
+    r = FieldsDeclaration_1_0_0(b, l + 1);
+    r = r && Type(b, l + 1);
     r = r && DefMethodName(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  // ModifierV?
+  private static boolean FieldsDeclaration_1_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "FieldsDeclaration_1_0_0")) return false;
+    ModifierV(b, l + 1);
+    return true;
   }
 
   /* ********************************************************** */
@@ -615,7 +638,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ModifierV? BLOCK_COMMENT* Type MethodName ("ï¿½" (STRINGVAR ","?)* "ï¿½")?
+  // ModifierV? BLOCK_COMMENT* Type MethodName ("«" (STRINGVAR ","?)* "»")?
   public static boolean MethodHead(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "MethodHead")) return false;
     boolean r;
@@ -647,21 +670,21 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // ("ï¿½" (STRINGVAR ","?)* "ï¿½")?
+  // ("«" (STRINGVAR ","?)* "»")?
   private static boolean MethodHead_4(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "MethodHead_4")) return false;
     MethodHead_4_0(b, l + 1);
     return true;
   }
 
-  // "ï¿½" (STRINGVAR ","?)* "ï¿½"
+  // "«" (STRINGVAR ","?)* "»"
   private static boolean MethodHead_4_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "MethodHead_4_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, "ï¿½");
+    r = consumeToken(b, "«");
     r = r && MethodHead_4_0_1(b, l + 1);
-    r = r && consumeToken(b, "ï¿½");
+    r = r && consumeToken(b, "»");
     exit_section_(b, m, null, r);
     return r;
   }
@@ -944,4 +967,5 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     consumeToken(b, COMMA);
     return true;
   }
+
 }

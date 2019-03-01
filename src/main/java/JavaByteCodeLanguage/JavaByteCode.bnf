@@ -54,8 +54,8 @@
   DOT="."
   COLON=":"
   TO="regexp:>|=>"
-  LBRACKET="regexp:\(|\{|\[|«"
-  RBRACKET="regexp:\)|\}|\]|»"
+  LBRACKET="regexp:\(|\{|\[|«|\u00ab"
+  RBRACKET="regexp:\)|\}|\]|»|\u00bb"
   CONSTMETHODNAMES = "regexp:<(cl)?init>"
 
   LOAD_INSTR="regexp:Load([A-Za-z]+)"
@@ -66,7 +66,7 @@
   FIELDS='Fields'
   // TYPES
   PRIMITIVETYPE="regexp:void|boolean|byte|char|short|int|long|float|double"
-  MODIFIER="regexp:static|final|abstract|default|synchronized|native|strictfp"
+  MODIFIER="regexp:static|final|abstract|default|synchronized|native|strictfp|volatile"
   PREMODIFIER="regexp:public|private|protected|default"
   EOF = "\n"
   STRINGVAR = "regexp:[a-zA-Z$_][a-zA-Z0-9$_]*"
@@ -86,6 +86,8 @@ private item_ ::= ClassHead FieldsDeclaration? MethodDeclaration*
 
 ClassHead ::= ModifierV? ("@"?)(class|enum|interface) BLOCK_COMMENT* JType (extends JType)? (implements (JType(",")?)+)?
 
+// generic stuff
+
 ModifierV ::= (PREMODIFIER)?(MODIFIER)*
 
 Type ::= (LambdaType | JType | PRIMITIVETYPE)('[]')*
@@ -96,11 +98,15 @@ JType ::= (STRINGVAR'.')*STRINGVAR  {mixin="JavaByteCodeLanguage.psi.impl.JavaBy
 LambdaType ::= (STRINGVAR'.')*STRINGVAR lambdaParams STRINGVAR ":" NUMBER STRINGVAR
 lambdaParams ::= ('('( ("]")* STRINGVAR ':'?)*')')
 
+// fields
+
+FieldsDeclaration ::= Fields (ModifierV? Type DefMethodName)*
+
+// methods
 
 MethodDeclaration ::= MethodHead InstructionHead InstructionBody* LocVarTableDeclaration? {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
                                                                                             implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
                                                                                             methods=[getName setName getNameIdentifier getPresentation navigate]}
-FieldsDeclaration ::= Fields (Type DefMethodName)*
 
 MethodHead ::= ModifierV? BLOCK_COMMENT* Type MethodName ("«" (STRINGVAR ","?)* "»")? // JAVA
 
@@ -110,11 +116,15 @@ DefMethodName ::= STRINGVAR {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNa
                              methods=[getStringVar getName setName getNameIdentifier getReferences]}
 params ::= ('('(Type ','?)*')')?
 
+// instructions (part of method body)
+
 private InstructionHead ::= PC Line Instruction
 private InstructionBody ::= NUMBER NUMBER Instr
 Instr ::= ((MNEMONIC|LOAD_INSTR) ("("((JavaOP|NUMBER|STRING)','?)*")" | JavaOP)?) | (PUT_GET_INSTR Type)  // TODO (("fields"|"static")? Type ":" Type) ... {recoverWhile=recoverTillNextInstr}
 JavaOP ::= ((Type|STRINGVAR)('{'Type MethodName'}')?)+| 'lvIndex=' NUMBER
 
+
+// tables
 
 LocVarTableDeclaration ::= LocVarTableHead LocVarTableBody* {mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
                                                                                implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"

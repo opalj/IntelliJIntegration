@@ -1,18 +1,17 @@
 // This is a generated file. Not intended for manual editing.
 package JavaByteCodeLanguage.psi.impl;
 
-import static JavaByteCodeLanguage.psi.JavaByteCodeTypes.*;
-
-import JavaByteCodeLanguage.psi.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
 import java.util.List;
 import org.jetbrains.annotations.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static JavaByteCodeLanguage.psi.JavaByteCodeTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import JavaByteCodeLanguage.psi.*;
 
-public class JavaByteCodeClassHeadImpl extends ASTWrapperPsiElement
-    implements JavaByteCodeClassHead {
+public class JavaByteCodeClassHeadImpl extends ASTWrapperPsiElement implements JavaByteCodeClassHead {
 
   public JavaByteCodeClassHeadImpl(@NotNull ASTNode node) {
     super(node);
@@ -23,7 +22,7 @@ public class JavaByteCodeClassHeadImpl extends ASTWrapperPsiElement
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof JavaByteCodeVisitor) accept((JavaByteCodeVisitor) visitor);
+    if (visitor instanceof JavaByteCodeVisitor) accept((JavaByteCodeVisitor)visitor);
     else super.accept(visitor);
   }
 
@@ -38,4 +37,5 @@ public class JavaByteCodeClassHeadImpl extends ASTWrapperPsiElement
   public JavaByteCodeModifierV getModifierV() {
     return findChildByClass(JavaByteCodeModifierV.class);
   }
+
 }

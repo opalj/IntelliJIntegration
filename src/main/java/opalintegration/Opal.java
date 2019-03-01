@@ -139,7 +139,7 @@ public class Opal {
         .append(classFile.sourceFile())
         .append(" Version: ")
         .append(classFile.jdkVersion())
-        .append("Size : \n");
+        .append(" Size : \n");
     // TODO Constant Pool Maybe working with DA.
     RefArray<Field> fields = classFile.fields();
     ByteCodeString.append("Fields\n");
