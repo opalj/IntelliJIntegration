@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class JavaByteCodeTokenType extends IElementType {
 
-  protected JavaByteCodeTokenType(@NotNull String debugName) {
+  public JavaByteCodeTokenType(@NotNull String debugName) {
     super(debugName, JavaByteCode.INSTANCE);
   }
 

@@ -119,44 +119,48 @@ public class Opal {
    * @return the bytecode representation as a String
    */
   private static String createBytecodeString(ClassFile classFile) {
-    StringBuilder ByteCodeString = new StringBuilder();
+    StringBuilder byteCodeString = new StringBuilder();
     String threeTimeNL = "\n\n\n";
-    ByteCodeString.append(AccessFlags.classFlagsToJava(classFile.accessFlags()))
+    byteCodeString
+        .append(AccessFlags.classFlagsToJava(classFile.accessFlags()))
         .append(" ")
         .append(classFile.fqn().replace("/", "."));
     //    ByteCodeString.append(AccessFlags.toString(classFile.accessFlags(),
     // AccessFlagsContexts.CLASS())).append( " ").append(classFile.fqn().replace("/", "."));
     if (classFile.superclassType().isDefined()) {
-      ByteCodeString.append(" extends ").append(classFile.superclassType().get().toJava());
+      byteCodeString.append(" extends ").append(classFile.superclassType().get().toJava());
     }
     if (classFile.interfaceTypes().length() > 0) {
-      ByteCodeString.append(" implements ");
+      byteCodeString.append(" implements ");
       for (int j = 0; j < classFile.interfaceTypes().length(); j++) {
-        ByteCodeString.append(classFile.interfaceTypes().apply(j).toJava()).append(" ");
+        byteCodeString.append(classFile.interfaceTypes().apply(j).toJava()).append(" ");
       }
     }
-    ByteCodeString.append("\n// Source File: ")
+    byteCodeString
+        .append("\n// Source File: ")
         .append(classFile.sourceFile())
-        .append(" Version: ")
+        .append(" -- Version: (")
         .append(classFile.jdkVersion())
-        .append(" Size : \n");
+        .append(") -- Size: \n");
     // TODO Constant Pool Maybe working with DA.
     RefArray<Field> fields = classFile.fields();
-    ByteCodeString.append("Fields\n");
+    byteCodeString.append("Fields\n");
     for (int j = 0; j < fields.length(); j++) {
       Field field = fields.apply(j);
-      ByteCodeString.append(AccessFlags.toString(field.accessFlags(), AccessFlagsContexts.FIELD()))
+      // TODO: if access flags empty don't insert empty space before fieldType()
+      byteCodeString
+          .append(AccessFlags.toString(field.accessFlags(), AccessFlagsContexts.FIELD()))
           .append(" ")
           .append(field.fieldType().toJava())
           .append(" ")
           .append(field.name())
           .append("\n");
     }
-    ByteCodeString.append(threeTimeNL);
+    byteCodeString.append(threeTimeNL);
     RefArray<Annotation> annotations = classFile.annotations();
     for (int i = 0; i < annotations.length(); i++) {
       Annotation annotation = annotations.apply(i);
-      ByteCodeString.append("//").append(annotation.toJava()).append("\n");
+      byteCodeString.append("//").append(annotation.toJava()).append("\n");
     }
     RefArray<Method> methods = classFile.methods();
     for (int j = 0; j < methods.length(); j++) {
@@ -164,25 +168,52 @@ public class Opal {
       if (method.body().isDefined()) {
         Code body = method.body().get();
         Instruction[] instructions = body.instructions();
-        ByteCodeString.append(method.toString())
+        byteCodeString
+            .append(method.toString())
             .append("// [size :")
             .append(body.codeSize())
             .append(" bytes, max Stack: ")
             .append(body.maxStack())
             .append("] \n");
-        ByteCodeString.append("\tPC\tLine\tInstruction\n");
+        byteCodeString.append("\tPC\tLine\tInstruction\n");
         for (int k = 0; k < instructions.length; k++) {
           if (instructions[k] != null) {
             try {
               String instruction = instructions[k].toString();
-              // ANEWARRAY(ObjectType(java/lang/String)) -> ANEWARRAY(java.lang.String) TODO: is
+              // ANEWARRAY(ObjectType(java/lang/String)) -> ANEWARRAY(java.lang.String)
               // wanted like this?
               if (instruction.contains("ObjectType")) {
                 instruction = instruction.replaceAll("/", ".");
                 instruction = instruction.replace("ObjectType(", "");
                 instruction = instruction.replaceFirst("\\)", "");
               }
-              ByteCodeString.append("\t")
+              // TODO: ugly, fix this
+              else if (instruction.startsWith("get")) {
+                if (instruction.startsWith("get field")) {
+                  instruction = instruction.replaceFirst("get\\sfield", "GETFIELD");
+                } else if (instruction.startsWith("get static")) {
+                  instruction = instruction.replaceFirst("get\\sstatic", "GETSTATIC");
+                } else {
+                  instruction = instruction.replaceFirst("get", "GET");
+                }
+              }
+              // TODO: ugly, fix this
+              else if (instruction.startsWith("put")) {
+                if (instruction.startsWith("put field")) {
+                  instruction = instruction.replaceFirst("put\\sfield", "PUTFIELD");
+                } else if (instruction.startsWith("put static")) {
+                  instruction = instruction.replaceFirst("put\\sstatic", "PUTSTATIC");
+                } else {
+                  instruction = instruction.replaceFirst("put", "PUT");
+                }
+              }
+
+              // TODO replace \n (and \t...??) and the likes with spaces
+              instruction = instruction.replaceAll("\n", " ");
+              instruction = instruction.replaceAll("\t", " ");
+
+              byteCodeString
+                  .append("\t")
                   .append(k)
                   .append("\t")
                   .append(body.lineNumber(k).get().toString())
@@ -196,12 +227,14 @@ public class Opal {
         }
         if (body.localVariableTable().isDefined()) {
           RefArray<LocalVariable> refArrayOption = body.localVariableTable().get();
-          ByteCodeString.append("\n\nLocalVariableTable // [size: ")
+          byteCodeString
+              .append("\n\nLocalVariableTable // [size: ")
               .append(refArrayOption.length())
               .append(" item(s)]\n");
           for (int k = 0; k < refArrayOption.length(); k++) {
             LocalVariable localVariable = refArrayOption.apply(k);
-            ByteCodeString.append("[")
+            byteCodeString
+                .append("[")
                 .append(localVariable.startPC())
                 .append(" > ")
                 .append(localVariable.length())
@@ -215,7 +248,7 @@ public class Opal {
         RefArray<Attribute> attributes = method.attributes();
         for (int i = 0; i < attributes.length(); i++) {
           Attribute attribute = attributes.apply(i);
-          ByteCodeString.append(
+          byteCodeString.append(
               attribute.toString() + " " + attribute.getClass().getAnnotations().length + "\n");
         }
         // if(body.runtimeInvisibleTypeAnnotations().length() > 0 ||
@@ -230,17 +263,18 @@ public class Opal {
             StackMapFrame stackMapFrame = stackMapFrameRefArray.apply(i);
             Class<? extends StackMapFrame> frameClass = stackMapFrame.getClass();
             int pc = pcIterator.next();
-            ByteCodeString.append(pc + " ")
+            byteCodeString
+                .append(pc + " ")
                 .append(frameClass.getName() + " ")
                 .append(stackMapFrame.frameType() + " ")
                 .append(stackMapFrame.offset(0) - 1 + "\n");
           }
         }
-        ByteCodeString.append(threeTimeNL);
+        byteCodeString.append(threeTimeNL);
       }
     }
 
-    return ByteCodeString.toString();
+    return byteCodeString.toString();
   }
 
   // =====================================================================================
