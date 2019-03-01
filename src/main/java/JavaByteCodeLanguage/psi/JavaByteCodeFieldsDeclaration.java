@@ -2,16 +2,14 @@
 package JavaByteCodeLanguage.psi;
 
 import com.intellij.psi.PsiElement;
+import java.util.List;
 import org.jetbrains.annotations.*;
 
-public interface JavaByteCodeMethodHead extends PsiElement {
+public interface JavaByteCodeFieldsDeclaration extends PsiElement {
 
   @NotNull
-  JavaByteCodeMethodName getMethodName();
-
-  @Nullable
-  JavaByteCodeModifierV getModifierV();
+  List<JavaByteCodeDefMethodName> getDefMethodNameList();
 
   @NotNull
-  JavaByteCodeType getType();
+  List<JavaByteCodeType> getTypeList();
 }

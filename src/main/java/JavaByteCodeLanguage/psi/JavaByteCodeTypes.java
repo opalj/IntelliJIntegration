@@ -1,10 +1,10 @@
 // This is a generated file. Not intended for manual editing.
 package JavaByteCodeLanguage.psi;
 
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.PsiElement;
-import com.intellij.lang.ASTNode;
 import JavaByteCodeLanguage.psi.impl.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.tree.IElementType;
 
 public interface JavaByteCodeTypes {
 
@@ -14,6 +14,8 @@ public interface JavaByteCodeTypes {
   IElementType INSTR = new JavaByteCodeElementType("INSTR");
   IElementType JAVA_OP = new JavaByteCodeElementType("JAVA_OP");
   IElementType J_TYPE = new JavaByteCodeElementType("J_TYPE");
+  IElementType LAMBDA_PARAMS = new JavaByteCodeElementType("LAMBDA_PARAMS");
+  IElementType LAMBDA_TYPE = new JavaByteCodeElementType("LAMBDA_TYPE");
   IElementType LOC_VAR_TABLE_DECLARATION = new JavaByteCodeElementType("LOC_VAR_TABLE_DECLARATION");
   IElementType LOC_VAR_TABLE_HEAD = new JavaByteCodeElementType("LOC_VAR_TABLE_HEAD");
   IElementType METHOD_DECLARATION = new JavaByteCodeElementType("METHOD_DECLARATION");
@@ -23,22 +25,25 @@ public interface JavaByteCodeTypes {
   IElementType PARAMS = new JavaByteCodeElementType("PARAMS");
   IElementType TYPE = new JavaByteCodeElementType("TYPE");
 
+  IElementType BLOCK_COMMENT = new JavaByteCodeTokenType("BLOCK_COMMENT");
   IElementType CLASS = new JavaByteCodeTokenType("class");
+  IElementType COLON = new JavaByteCodeTokenType(":");
   IElementType COMMA = new JavaByteCodeTokenType(",");
   IElementType COMMENT = new JavaByteCodeTokenType("COMMENT");
   IElementType CONSTMETHODNAMES = new JavaByteCodeTokenType("CONSTMETHODNAMES");
   IElementType DOT = new JavaByteCodeTokenType(".");
+  IElementType ENUM = new JavaByteCodeTokenType("enum");
   IElementType EOF = new JavaByteCodeTokenType("\\n");
   IElementType EXTENDS = new JavaByteCodeTokenType("extends");
   IElementType FIELDS = new JavaByteCodeTokenType("Fields");
   IElementType IMPLEMENTS = new JavaByteCodeTokenType("implements");
-  IElementType INST = new JavaByteCodeTokenType("INST");
   IElementType INSTRUCTION = new JavaByteCodeTokenType("Instruction");
-  IElementType INSTR_2_0 = new JavaByteCodeTokenType("Instr_2_0");
+  IElementType INTERFACE = new JavaByteCodeTokenType("interface");
   IElementType LBRACKET = new JavaByteCodeTokenType("LBRACKET");
   IElementType LINE = new JavaByteCodeTokenType("Line");
   IElementType LOAD_INSTR = new JavaByteCodeTokenType("LOAD_INSTR");
   IElementType LOCALVARIABLETABLE = new JavaByteCodeTokenType("LocalVariableTable");
+  IElementType MNEMONIC = new JavaByteCodeTokenType("MNEMONIC");
   IElementType MODIFIER = new JavaByteCodeTokenType("MODIFIER");
   IElementType NUMBER = new JavaByteCodeTokenType("NUMBER");
   IElementType PC = new JavaByteCodeTokenType("PC");
@@ -56,44 +61,35 @@ public interface JavaByteCodeTypes {
       IElementType type = node.getElementType();
       if (type == CLASS_HEAD) {
         return new JavaByteCodeClassHeadImpl(node);
-      }
-      else if (type == DEF_METHOD_NAME) {
+      } else if (type == DEF_METHOD_NAME) {
         return new JavaByteCodeDefMethodNameImpl(node);
-      }
-      else if (type == FIELDS_DECLARATION) {
+      } else if (type == FIELDS_DECLARATION) {
         return new JavaByteCodeFieldsDeclarationImpl(node);
-      }
-      else if (type == INSTR) {
+      } else if (type == INSTR) {
         return new JavaByteCodeInstrImpl(node);
-      }
-      else if (type == JAVA_OP) {
+      } else if (type == JAVA_OP) {
         return new JavaByteCodeJavaOPImpl(node);
-      }
-      else if (type == J_TYPE) {
+      } else if (type == J_TYPE) {
         return new JavaByteCodeJTypeImpl(node);
-      }
-      else if (type == LOC_VAR_TABLE_DECLARATION) {
+      } else if (type == LAMBDA_PARAMS) {
+        return new JavaByteCodeLambdaParamsImpl(node);
+      } else if (type == LAMBDA_TYPE) {
+        return new JavaByteCodeLambdaTypeImpl(node);
+      } else if (type == LOC_VAR_TABLE_DECLARATION) {
         return new JavaByteCodeLocVarTableDeclarationImpl(node);
-      }
-      else if (type == LOC_VAR_TABLE_HEAD) {
+      } else if (type == LOC_VAR_TABLE_HEAD) {
         return new JavaByteCodeLocVarTableHeadImpl(node);
-      }
-      else if (type == METHOD_DECLARATION) {
+      } else if (type == METHOD_DECLARATION) {
         return new JavaByteCodeMethodDeclarationImpl(node);
-      }
-      else if (type == METHOD_HEAD) {
+      } else if (type == METHOD_HEAD) {
         return new JavaByteCodeMethodHeadImpl(node);
-      }
-      else if (type == METHOD_NAME) {
+      } else if (type == METHOD_NAME) {
         return new JavaByteCodeMethodNameImpl(node);
-      }
-      else if (type == MODIFIER_V) {
+      } else if (type == MODIFIER_V) {
         return new JavaByteCodeModifierVImpl(node);
-      }
-      else if (type == PARAMS) {
+      } else if (type == PARAMS) {
         return new JavaByteCodeParamsImpl(node);
-      }
-      else if (type == TYPE) {
+      } else if (type == TYPE) {
         return new JavaByteCodeTypeImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);

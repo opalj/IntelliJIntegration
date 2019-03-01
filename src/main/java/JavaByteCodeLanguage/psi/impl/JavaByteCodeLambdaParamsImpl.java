@@ -9,15 +9,15 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import org.jetbrains.annotations.*;
 
-public class JavaByteCodeLocVarTableHeadImpl extends ASTWrapperPsiElement
-    implements JavaByteCodeLocVarTableHead {
+public class JavaByteCodeLambdaParamsImpl extends ASTWrapperPsiElement
+    implements JavaByteCodeLambdaParams {
 
-  public JavaByteCodeLocVarTableHeadImpl(@NotNull ASTNode node) {
+  public JavaByteCodeLambdaParamsImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull JavaByteCodeVisitor visitor) {
-    visitor.visitLocVarTableHead(this);
+    visitor.visitLambdaParams(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

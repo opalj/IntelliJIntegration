@@ -1,9 +1,9 @@
 // This is a generated file. Not intended for manual editing.
 package JavaByteCodeLanguage.psi;
 
+import com.intellij.psi.PsiElement;
 import java.util.List;
 import org.jetbrains.annotations.*;
-import com.intellij.psi.PsiElement;
 
 public interface JavaByteCodeInstr extends PsiElement {
 
@@ -14,12 +14,11 @@ public interface JavaByteCodeInstr extends PsiElement {
   JavaByteCodeType getType();
 
   @Nullable
-  PsiElement getInst();
-
-  @Nullable
   PsiElement getLoadInstr();
 
   @Nullable
-  PsiElement getPutGetInstr();
+  PsiElement getMnemonic();
 
+  @Nullable
+  PsiElement getPutGetInstr();
 }

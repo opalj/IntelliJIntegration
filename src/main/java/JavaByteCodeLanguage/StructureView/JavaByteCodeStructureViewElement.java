@@ -47,10 +47,8 @@ public class JavaByteCodeStructureViewElement
     if (element instanceof PsiElement) {
       PsiElement[] properties =
           PsiTreeUtil.getChildrenOfType(
-              element,
-              PsiElement
-                  .class); // PsiTreeUtil.getChildrenOfType(element,
-                           // JavaByteCodeMethodDeclaration.class);
+              element, PsiElement.class); // PsiTreeUtil.getChildrenOfType(element,
+      // JavaByteCodeMethodDeclaration.class);
       List<TreeElement> treeElements = new ArrayList<>(properties.length);
       for (PsiElement property : properties) {
         if (property instanceof NavigatablePsiElement) {

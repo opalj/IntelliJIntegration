@@ -51,6 +51,7 @@ public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
    * @return the correct overload of the method that fits the signature (method name and parameter
    *     list)
    */
+  @Nullable
   private PsiMethod findAppropriateOverload(@NotNull PsiClass psiClass) {
     // relies on underlying grammar
     String methodName = myElement.getText();
@@ -71,7 +72,8 @@ public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
       }
     }
 
-    return psiMethods[0];
+    // may come here when (e.g.) parameter list is empty
+    return psiMethods.length > 0 ? psiMethods[0] : null;
   }
 
   /**

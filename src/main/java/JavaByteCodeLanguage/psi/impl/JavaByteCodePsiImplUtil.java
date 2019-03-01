@@ -2,7 +2,6 @@ package JavaByteCodeLanguage.psi.impl;
 
 import Editors.disEditor.DisTextEditor;
 import JavaByteCodeLanguage.psi.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.ide.util.PsiNavigationSupport;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ColoredItemPresentation;
@@ -267,19 +266,22 @@ public class JavaByteCodePsiImplUtil {
     // PsiElementFactory.SERVICE.getInstance(element.getProject()).createMethodFromText(element.getText(), null).getPresentation();
     return coloredItemPresentation;
   }
-  public static void navigate(JavaByteCodeMethodDeclaration element, boolean requestFocus){
-      navigate((JavaByteCodeNamedElement)element,requestFocus);
+
+  public static void navigate(JavaByteCodeMethodDeclaration element, boolean requestFocus) {
+    navigate((JavaByteCodeNamedElement) element, requestFocus);
   }
-  public static void navigate(JavaByteCodeLocVarTableDeclaration element, boolean requestFocus){
-        navigate((JavaByteCodeNamedElement)element,requestFocus);
+
+  public static void navigate(JavaByteCodeLocVarTableDeclaration element, boolean requestFocus) {
+    navigate((JavaByteCodeNamedElement) element, requestFocus);
   }
-    public static void navigate(JavaByteCodeNamedElement element,boolean requestFocus) {
-        Navigatable descriptor = PsiNavigationSupport.getInstance().getDescriptor(element);
-        FileEditor editor = FileEditorManager.getInstance(element.getProject()).getSelectedEditor();
-        if(editor instanceof DisTextEditor) {
-            ((DisTextEditor)editor).navigateTo(descriptor);
-        }else{
-            ((Navigatable)element).navigate(requestFocus);
-        }
+
+  public static void navigate(JavaByteCodeNamedElement element, boolean requestFocus) {
+    Navigatable descriptor = PsiNavigationSupport.getInstance().getDescriptor(element);
+    FileEditor editor = FileEditorManager.getInstance(element.getProject()).getSelectedEditor();
+    if (editor instanceof DisTextEditor) {
+      ((DisTextEditor) editor).navigateTo(descriptor);
+    } else {
+      ((Navigatable) element).navigate(requestFocus);
     }
+  }
 }

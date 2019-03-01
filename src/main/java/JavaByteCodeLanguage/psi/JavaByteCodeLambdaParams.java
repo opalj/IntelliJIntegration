@@ -4,11 +4,4 @@ package JavaByteCodeLanguage.psi;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.*;
 
-public interface JavaByteCodeMethodName extends PsiElement {
-
-  @Nullable
-  JavaByteCodeDefMethodName getDefMethodName();
-
-  @NotNull
-  JavaByteCodeParams getParams();
-}
+public interface JavaByteCodeLambdaParams extends PsiElement {}

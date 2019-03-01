@@ -4,6 +4,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
+import java.util.Arrays;
 import org.jetbrains.annotations.NotNull;
 
 /** for elaborate JavaDoc, see {@link PsiReferenceContributor} */
@@ -17,18 +18,42 @@ public class JbcReferenceContributor extends PsiReferenceContributor {
           @Override
           public PsiReference[] getReferencesByElement(
               @NotNull PsiElement element, @NotNull ProcessingContext context) {
+            JbcMethodReference methodReference = null;
+
             // the element is guaranteed to be of type JavaByteCodeDefMethodName (see below)
             TextRange range = new TextRange(0, element.getTextLength());
-            PsiElement javaOP = element.getParent().getParent();
-            PsiElement type = javaOP.getFirstChild();
-            JbcMethodReference methodRef = new JbcMethodReference(element, range, type.getText());
 
-            return new PsiReference[] {methodRef};
+            PsiElement grandparent = element.getParent().getParent();
+
+            // a method can either be part of an instruction
+            if (grandparent instanceof JavaByteCodeJavaOP) {
+              // example: type = java.io.PrintStream (<- the FQN)
+              PsiElement type = grandparent.getFirstChild();
+              methodReference = new JbcMethodReference(element, range, type.getText());
+            }
+            // or be part of "this" file (for which the bytecode has been generated for)
+            else {
+              PsiElement file = element.getContainingFile();
+              PsiElement classHead =
+                  Arrays.stream(file.getChildren())
+                      .filter(psiElement -> psiElement instanceof JavaByteCodeClassHead)
+                      .findFirst()
+                      .get();
+              PsiElement typeOfClass =
+                  Arrays.stream(classHead.getChildren())
+                      .filter(psiElement -> psiElement instanceof JavaByteCodeJType)
+                      .findFirst()
+                      .get();
+
+              methodReference = new JbcMethodReference(element, range, typeOfClass.getText());
+            }
+
+            return new PsiReference[] {methodReference};
           }
         };
 
     /**
-     * the Pattern guarantees that psiReferenceProvider#getReferencesByElement(...) is only executed
+     * the Pattern ensures that psiReferenceProvider#getReferencesByElement(...) is only executed
      * for JavaByteCodeDefMethodName elements
      *
      * @see com.intellij.psi.PsiReferenceRegistrar
