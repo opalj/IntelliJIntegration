@@ -15,7 +15,7 @@ public class JavaByteCodeColorSettingPage implements ColorSettingsPage {
       new AttributesDescriptor[] {
         new AttributesDescriptor("Type", JavaByteCodeSyntaxHighlighter.TYPE),
         new AttributesDescriptor("Number", JavaByteCodeSyntaxHighlighter.NUMBER),
-        new AttributesDescriptor("Instruction", JavaByteCodeSyntaxHighlighter.INST),
+        new AttributesDescriptor("Instruction", JavaByteCodeSyntaxHighlighter.MNEMONIC),
         new AttributesDescriptor("Comment", JavaByteCodeSyntaxHighlighter.COMMENT),
         new AttributesDescriptor("String", JavaByteCodeSyntaxHighlighter.STRING)
       };

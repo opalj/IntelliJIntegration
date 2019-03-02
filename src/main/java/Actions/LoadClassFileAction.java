@@ -45,6 +45,7 @@ public class LoadClassFileAction extends AnAction {
     // show Action only for java files
     e.getPresentation()
         .setEnabledAndVisible(
-            project != null && virtualFile != null && virtualFile.getExtension().equals("class"));
+            // YODA to prevent NullPointerException of getExtension()
+            project != null && virtualFile != null && "class".equals(virtualFile.getExtension()));
   }
 }

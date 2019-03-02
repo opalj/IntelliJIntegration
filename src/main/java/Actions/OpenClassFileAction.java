@@ -35,7 +35,10 @@ public class OpenClassFileAction extends AnAction {
     // show Action only for java files
     e.getPresentation()
         .setEnabledAndVisible(
-            project != null && virtualFile != null && virtualFile.getExtension().equals("java"));
+            project != null
+                && virtualFile != null
+                && (virtualFile.getExtension().equals("java")
+                    || virtualFile.getExtension().equals("scala")));
   }
 
   @Override
