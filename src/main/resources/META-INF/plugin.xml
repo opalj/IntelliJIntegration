@@ -37,7 +37,6 @@
 
         <fileTypeFactory implementation="syntaxHighlighting.TAC_fileTypeFactory"/>
         <fileTypeFactory implementation="JavaByteCodeLanguage.LanguageAndFileType.JavaByteCodeFileTypeFactory"/>
-
         <lang.parserDefinition language="TAC" implementationClass="syntaxHighlighting.TAC_parserDefinition"/>
         <lang.parserDefinition language="jbc" implementationClass="JavaByteCodeLanguage.parser.JavaByteCodeParserDefinition"/>
         <lang.syntaxHighlighterFactory language="TAC"
@@ -65,4 +64,10 @@
             <implementation-class>Actions.LoadClassFileComponent</implementation-class>
         </component>
     </application-components>
+    <project-components>
+        <component>
+            <implementation-class>Components.OpalVirtualFileListener</implementation-class>
+            <interface-class>Components.OpalVirtualFileListener</interface-class>
+        </component>
+    </project-components>
 </idea-plugin>

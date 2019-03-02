@@ -6,6 +6,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,21 +18,21 @@ public final class Compiler {
    */
   public static boolean make(@NotNull final Project project) {
     CompilerManager compManager = CompilerManager.getInstance(project);
-    CompileScope projectCompileScope = compManager.createProjectCompileScope(project);
-    boolean uptoDate = compManager.isUpToDate(projectCompileScope);
-    if (!uptoDate) {
-      // ApplicationManager.getApplication().invokeAndWait( () -
-      // compManager.make(null);
-      compManager.makeWithModalProgress(projectCompileScope, null);
+      CompileScope projectCompileScope = compManager.createProjectCompileScope(project);
+      boolean uptoDate = compManager.isUpToDate(projectCompileScope);
+      if (!uptoDate) {
+        // ApplicationManager.getApplication().invokeAndWait( () -
+        // compManager.make(null);
+        compManager.make(projectCompileScope, null);
       do {
         try {
-          TimeUnit.SECONDS.sleep(2);
+          TimeUnit.MILLISECONDS.sleep(200);
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
       } while (compManager.isCompilationActive());
-    }
-    return uptoDate;
+      }
+      return uptoDate;
   }
 
   /*

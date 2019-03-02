@@ -1,22 +1,33 @@
 package opalintegration;
 
 import Compile.Compiler;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.fileTypes.FileTypeManager;
+import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.*;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.SearchScope;
+import com.intellij.util.FileContentUtil;
+import com.typesafe.config.Optional;
 import globalData.GlobalData;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.jar.JarInputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.mozilla.classfile.ByteCode;
 import org.opalj.bi.AccessFlags;
 import org.opalj.bi.AccessFlagsContexts;
@@ -26,10 +37,12 @@ import org.opalj.br.analyses.JavaProject;
 import org.opalj.br.analyses.Project;
 import org.opalj.br.instructions.Instruction;
 import org.opalj.collection.IntIterator;
+import org.opalj.collection.RefIterator;
 import org.opalj.collection.immutable.ConstArray;
 import org.opalj.collection.immutable.IntArraySet;
 import org.opalj.collection.immutable.RefArray;
 import org.opalj.da.ClassFileReader;
+import org.opalj.da.RuntimeVisibleAnnotations_attribute;
 import org.opalj.tac.*;
 import org.opalj.value.KnownTypedValue;
 import scala.Function0;
@@ -131,7 +144,7 @@ public class Opal {
         ByteCodeString.append(classFile.interfaceTypes().apply(j).toJava()).append(" ");
       }
     }
-    ByteCodeString.append("\n// Source File: ").append(classFile.sourceFile()).append(" Version: ").append(classFile.jdkVersion()).append("Size : \n");
+    ByteCodeString.append("\n// Source File: ").append(classFile.sourceFile().isDefined()?classFile.sourceFile().get():"").append(" Version: ").append(classFile.jdkVersion()).append("Size : \n");
     // TODO Constant Pool Maybe working with DA.
     RefArray<Field> fields = classFile.fields();
     ByteCodeString.append("Fields\n");
@@ -158,7 +171,7 @@ public class Opal {
         for (int k = 0; k < instructions.length; k++) {
           if (instructions[k] != null) {
             try {
-              ByteCodeString.append("\t").append(k).append("\t").append(body.lineNumber(k).get().toString()).append("\t\t").append(instructions[k]).append("\n");
+              ByteCodeString.append("\t").append(k).append("\t").append(body.lineNumber(k).isDefined()?body.lineNumber(k).get().toString():"|").append("\t\t").append(instructions[k]).append("\n");
             } catch (NoSuchElementException e) {
               return "Issue with Java 5? \n\n " + e.getMessage();
             }
@@ -183,9 +196,36 @@ public class Opal {
         //if(body.runtimeInvisibleTypeAnnotations().length() > 0 || body.runtimeVisibleTypeAnnotations().length()> 0 )
           System.out.println("RTIV:"+body.runtimeInvisibleTypeAnnotations().mkString("\n"));
           System.out.println("RTV"+body.runtimeVisibleTypeAnnotations().mkString("\n"));
+          // method.exexceptionTable()
+          if(method.exceptionTable().isDefined()) {
+            ExceptionTable exceptionTable= method.exceptionTable().get();
+            ByteCodeString.append("ExceptionTable:\n");
+            RefIterator<ObjectType> exceptions = exceptionTable.exceptions().iterator();
+            while(exceptions.hasNext()){
+              ObjectType exception = exceptions.next();
+              ByteCodeString.append(exception.id()).append("\t").append(exception.toJava()).append("\n");
+            }
+          }
+        // end method.exceptionTable
+
+        if(method.runtimeVisibleAnnotations().iterator().hasNext()){
+          ByteCodeString.append("RuntimeVisibleAnnotations:\n");
+          RefIterator<Annotation> annotationRefIterator = method.runtimeVisibleAnnotations().iterator();
+          while(annotationRefIterator.hasNext()){
+            ByteCodeString.append(annotationRefIterator.next().toJava());
+          }
+        }
+        if(method.runtimeInvisibleAnnotations().iterator().hasNext()){
+          ByteCodeString.append("RuntimeInvisibleAnnotations:\n");
+          RefIterator<Annotation> annotationRefIterator = method.runtimeInvisibleAnnotations().iterator();
+          while(annotationRefIterator.hasNext()){
+            ByteCodeString.append(annotationRefIterator.next().toJava());
+          }
+        }
         if(body.stackMapTable().isDefined()){
           StackMapTable stackMapTable = body.stackMapTable().get();
           RefArray<StackMapFrame> stackMapFrameRefArray = stackMapTable.stackMapFrames();
+          ByteCodeString.append("StackMapTable").append("\n");
           IntIterator pcIterator = stackMapTable.pcs().iterator();
           for(int i = 0; i < stackMapFrameRefArray.length(); i++) {
             StackMapFrame stackMapFrame = stackMapFrameRefArray.apply(i);
@@ -389,92 +429,32 @@ public class Opal {
   public static VirtualFile prepareHtml(
       @NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
     // All files selected in the "Project"-View
-    setProject(project);
-    Collection<VirtualFile> virtualFilesByName =
-        FilenameIndex.getVirtualFilesByName(
-            project,
-            virtualFile
-                .getNameWithoutExtension()
-                .concat(".")
-                .concat(GlobalData.DISASSEMBLED_FILE_ENDING_HTML),
-            GlobalSearchScope.projectScope(project));
-    if (!Compiler.make(project) || virtualFilesByName.isEmpty()) {
-      // Save the decompiled code to a file
-      LocalFileSystem.getInstance()
-          .refreshAndFindFileByIoFile(
-              prepare(GlobalData.DISASSEMBLED_FILE_ENDING_TAC, virtualFile));
-      LocalFileSystem.getInstance()
-          .refreshAndFindFileByIoFile(
-              prepare(GlobalData.DISASSEMBLED_FILE_ENDING_JBC, virtualFile));
-      return LocalFileSystem.getInstance()
-          .refreshAndFindFileByIoFile(
-              prepare(GlobalData.DISASSEMBLED_FILE_ENDING_HTML, virtualFile));
-    }
-    return virtualFilesByName.stream().findFirst().get();
+      setProject(project);
+      Compiler.make(project);
+      File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_HTML, virtualFile,null);
+      return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
   } // prepareHtml()
 
   public static VirtualFile prepareTAC(
       @NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
-    setProject(project);
-    Collection<VirtualFile> virtualFilesByName =
-        FilenameIndex.getVirtualFilesByName(
-            project,
-            virtualFile
-                .getNameWithoutExtension()
-                .concat(".")
-                .concat(GlobalData.DISASSEMBLED_FILE_ENDING_TAC),
-            GlobalSearchScope.projectScope(project));
-    if (!Compiler.make(project) || virtualFilesByName.isEmpty()) {
-      LocalFileSystem.getInstance()
-          .refreshAndFindFileByIoFile(
-              prepare(GlobalData.DISASSEMBLED_FILE_ENDING_HTML, virtualFile));
-      LocalFileSystem.getInstance()
-          .refreshAndFindFileByIoFile(
-              prepare(GlobalData.DISASSEMBLED_FILE_ENDING_JBC, virtualFile));
-      return LocalFileSystem.getInstance()
-          .refreshAndFindFileByIoFile(
-              prepare(GlobalData.DISASSEMBLED_FILE_ENDING_TAC, virtualFile));
-    }
-    return virtualFilesByName.stream().findFirst().get();
+      setProject(project);
+      Compiler.make(project);
+      File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_TAC, virtualFile,null);
+      return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
   }
 
   // this should be called by constructor
   public static VirtualFile prepareJBC(
       @NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
     setProject(project);
-    Collection<VirtualFile> virtualFilesByName =
-        FilenameIndex.getVirtualFilesByName(
-            project,
-            virtualFile
-                .getNameWithoutExtension()
-                .concat(".")
-                .concat(GlobalData.DISASSEMBLED_FILE_ENDING_JBC),
-            GlobalSearchScope.projectScope(project));
-    if (!Compiler.make(project) || virtualFilesByName.isEmpty()) {
-      LocalFileSystem.getInstance()
-          .refreshAndFindFileByIoFile(
-              prepare(GlobalData.DISASSEMBLED_FILE_ENDING_HTML, virtualFile));
-      LocalFileSystem.getInstance()
-          .refreshAndFindFileByIoFile(
-              prepare(GlobalData.DISASSEMBLED_FILE_ENDING_TAC, virtualFile));
-      return LocalFileSystem.getInstance()
-          .refreshAndFindFileByIoFile(
-              prepare(GlobalData.DISASSEMBLED_FILE_ENDING_JBC, virtualFile));
-    }
-
-    return virtualFilesByName.stream().findFirst().get();
+    Compiler.make(project);
+    File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_JBC, virtualFile,null);
+    return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
   }
 
   // todo SaveFile Class erweitern?
-  private static File prepare(@NotNull String prepareID, VirtualFile virtualFile) {
-    String basePath = project.getBasePath();
+  public static File prepare(@NotNull String prepareID, VirtualFile virtualFile,@Nullable VirtualFile olderFile) {
     classPath = virtualFile.getParent().getPath();
-    String absPath =
-        basePath
-            + File.separator
-            + GlobalData.DISASSEMBLED_FILES_DIR
-            + classPath.substring(basePath.length());
-
     String fileName = virtualFile.getNameWithoutExtension();
     String representableForm = null;
     ClassFile classFile;
@@ -494,24 +474,35 @@ public class Opal {
         representableForm = Opal.createBytecodeString(classFile);
         break;
     }
-
-    File disassembledFile = new File(absPath + File.separator + fileName);
-    writeContentToFile(disassembledFile, representableForm, false);
-    return disassembledFile;
+    if(olderFile!=null){
+        fileName = olderFile.getPath();
+    }
+    return writeContentToFile(fileName, representableForm, false,olderFile==null?false:true);
   }
 
   /**
    * an auxiliary method that writes 'content' to a 'file' (main purpose of this method is to
    * encapsulate the try/catch block)
    *
-   * @param file file to write to
+   * @param filename the Name of the temporal file
    * @param content content to write into the file
    */
-  private static void writeContentToFile(File file, String content, boolean append) {
+  private static File writeContentToFile(String filename, String content, boolean append,boolean olderFile) {
     try {
-      FileUtil.writeToFile(file, content, append);
+        File file = null;
+        if(!olderFile){
+        String[] filenameArray = filename.split("\\.");
+         file = FileUtil.createTempFile(filenameArray[0],"."+filenameArray[1],true);
+        }else{
+            file = new File(filename);
+        }
+        FileUtil.writeToFile(file, content, append);
+        return file;
     } catch (IOException e) {
       e.printStackTrace();
     }
+    //TODO not null
+    return null;
   }
+
 }
