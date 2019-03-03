@@ -179,6 +179,8 @@ public class Opal {
       Annotation annotation = annotations.apply(i);
       byteCodeString.append("//").append(annotation.toJava()).append("\n");
     }
+
+    byteCodeString.append("Methods\n\n");
     RefArray<Method> methods = classFile.methods();
     for (int j = 0; j < methods.length(); j++) {
       Method method = methods.apply(j);
@@ -187,6 +189,7 @@ public class Opal {
         Instruction[] instructions = body.instructions();
         byteCodeString
             .append(method.toString())
+            .append(" { ")                // TODO: added "{"
             .append("// [size :")
             .append(body.codeSize())
             .append(" bytes, max Stack: ")
@@ -314,6 +317,7 @@ public class Opal {
                 .append(stackMapFrame.offset(0) - 1 + "\n");
           }
         }
+        byteCodeString.append("}");         // TODO: added "}"
         byteCodeString.append(threeTimeNL);
       }
     }

@@ -59,7 +59,7 @@ RBRACKET=\)|\}|\]|»|\u00bb
 CONSTMETHODNAMES=<(cl)?init>
 LOAD_INSTR=Load([A-Za-z]+)
 PRIMITIVETYPE=void|boolean|byte|char|short|int|long|float|double
-MODIFIER=public|private|protected|default|static|final|abstract|default|synchronized|native|strictfp|volatile
+MODIFIER=public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile
 STRINGVAR=[a-zA-Z$_][a-zA-Z0-9$_]*
 
 %%
@@ -75,6 +75,7 @@ STRINGVAR=[a-zA-Z$_][a-zA-Z0-9$_]*
   "implements"            { return IMPLEMENTS; }
   "Fields"                { return FIELDS; }
   "\\n"                   { return EOF; }
+  "Methods"               { return METHODS; }
   "enum"                  { return ENUM; }
   "interface"             { return INTERFACE; }
   "PC"                    { return PC; }
@@ -82,6 +83,7 @@ STRINGVAR=[a-zA-Z$_][a-zA-Z0-9$_]*
   "Instruction"           { return INSTRUCTION; }
   "LocalVariableTable"    { return LOCALVARIABLETABLE; }
   "this"                  { return THIS; }
+  "StackMapTable"         { return STACKMAPTABLE; }
 
   {COMMENT}               { return COMMENT; }
   {BLOCK_COMMENT}         { return BLOCK_COMMENT; }

@@ -22,18 +22,26 @@ public class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
       createTextAttributesKey("JBC_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
   public static final TextAttributesKey BAD_CHARACTER =
       createTextAttributesKey("JBC_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
-  public static final TextAttributesKey MNEMONIC =
-      createTextAttributesKey("JBC_INSTRUCTION", DefaultLanguageHighlighterColors.IDENTIFIER);
   public static final TextAttributesKey STRING =
       createTextAttributesKey("JBC_STRING", DefaultLanguageHighlighterColors.STRING);
+
+  public static final TextAttributesKey MNEMONIC =
+          createTextAttributesKey("JBC_MNEMONIC", DefaultLanguageHighlighterColors.CONSTANT);
+  public static final TextAttributesKey MODIFIER =
+          createTextAttributesKey("JBC_MODIFIER", DefaultLanguageHighlighterColors.KEYWORD);
+  public static final TextAttributesKey BLOCK_COMMENT =
+          createTextAttributesKey("JBC_BLOCK_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT);
 
   private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[] {BAD_CHARACTER};
   private static final TextAttributesKey[] NUMBER_KEYS = new TextAttributesKey[] {NUMBER};
   private static final TextAttributesKey[] TYPE_KEYS = new TextAttributesKey[] {TYPE};
   private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[] {COMMENT};
-  private static final TextAttributesKey[] MNEMONIC_KEYS = new TextAttributesKey[] {MNEMONIC};
   private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[] {STRING};
   private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
+
+  private static final TextAttributesKey[] MNEMONIC_KEYS = new TextAttributesKey[] {MNEMONIC};
+  private static final TextAttributesKey[] MODIFIER_KEYS = new TextAttributesKey[] {MODIFIER};
+  private static final TextAttributesKey[] BLOCK_KEYS = new TextAttributesKey[] {BLOCK_COMMENT};
 
   @NotNull
   @Override
@@ -46,14 +54,19 @@ public class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
   public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
     if (tokenType.equals(JavaByteCodeTypes.COMMENT)) {
       return COMMENT_KEYS;
+    } else if(tokenType.equals(JavaByteCodeTypes.BLOCK_COMMENT)) {
+      return BLOCK_KEYS;
     } else if (tokenType.equals(JavaByteCodeTypes.J_TYPE)
         || tokenType.equals(
             JavaByteCodeTypes.PRIMITIVETYPE)) { // tokenType.equals(JavaByteCodeTypes.JAVATYPE)
       return TYPE_KEYS;
+    } else if(tokenType.equals(JavaByteCodeTypes.MODIFIER)) {
+      return MODIFIER_KEYS;
+    } else if (tokenType.equals(JavaByteCodeTypes.MNEMONIC)
+        || tokenType.equals(JavaByteCodeTypes.LOAD_INSTR)) {
+      return MNEMONIC_KEYS;
     } else if (tokenType.equals(JavaByteCodeTypes.NUMBER)) {
       return NUMBER_KEYS;
-    } else if (tokenType.equals(JavaByteCodeTypes.MNEMONIC)) {
-      return MNEMONIC_KEYS;
     } else if (tokenType.equals(JavaByteCodeTypes.STRING)) {
       return STRING_KEYS;
     } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {
