@@ -1,6 +1,8 @@
 package opalintegration;
 
 import java.util.Arrays;
+
+import org.opalj.br.Type;
 import org.opalj.br.instructions.*;
 
 public class StringVisitor extends ListVisitor<Instruction, String> implements InstructionVisitor {
@@ -58,7 +60,7 @@ public class StringVisitor extends ListVisitor<Instruction, String> implements I
 
   @Override
   public String visit(LDC ldc) {
-    return ldc.mnemonic().toUpperCase(); // +"("+((Type)ldc.value()).toJava()+")";
+    return ldc.mnemonic().toUpperCase()+"("+((Type)ldc.value()).toJava()+")";
   }
 
   @Override
