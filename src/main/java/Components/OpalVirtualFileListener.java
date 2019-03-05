@@ -25,7 +25,8 @@ public class OpalVirtualFileListener implements ProjectComponent {
         // Messages.showMessageDialog("Classfile "+event.getFile().getName()+" contents
         // changed","property",Messages.getInformationIcon());
         Arrays.stream(FileEditorManager.getInstance(project).getEditors(event.getFile()))
-            .filter((e) -> !e.getFile().getExtension().equals(StdFileTypes.CLASS.getDefaultExtension()))
+            .filter(
+                (e) -> !e.getFile().getExtension().equals(StdFileTypes.CLASS.getDefaultExtension()))
             .forEach(
                 e -> {
                   Opal.prepare(e.getFile().getExtension(), event.getFile(), e.getFile());

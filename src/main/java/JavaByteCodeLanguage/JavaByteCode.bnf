@@ -64,6 +64,7 @@
   EXTENDS='extends'
   IMPLEMENTS='implements'
   FIELDS='Fields'
+  FUCKINGTOKEN = "lvIndex="
   // TYPES
   PRIMITIVETYPE="regexp:void|boolean|byte|char|short|int|long|float|double"
   MODIFIER="regexp:public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile"
@@ -125,7 +126,7 @@ private InstructionBody ::= NUMBER NUMBER Instr
 Instr ::= ((MNEMONIC|LOAD_INSTR) (JType ":" Type                            // put someFQN : someFQN
                                     | "("((JavaOP|NUMBER|STRING)','?)*")"   // LoadString("someString") or ALOAD(5) or ...
                                     | JavaOP)?) //| (PUT_GET_INSTR Type)    // INVOKEVIRTUAL(byte[] { java.lang.Object clone() })
-JavaOP ::= ((Type|STRINGVAR)('{'Type MethodName'}')?)+| 'lvIndex=' NUMBER
+JavaOP ::= "lvIndex=" NUMBER|((Type|STRINGVAR)('{'Type MethodName'}')?)+
 
 
 // tables

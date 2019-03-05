@@ -134,7 +134,7 @@ public class JavaByteCodePsiImplUtil {
       return null;
     }
   }
-
+  /** @see PsiNameIdentifierOwner#getNameIdentifier() */
   public static PsiElement getNameIdentifier(@NotNull JavaByteCodeLocVarTableDeclaration element) {
     ASTNode keyNode = element.getLocVarTableHead().getNode();
     if (keyNode != null) {
@@ -143,7 +143,7 @@ public class JavaByteCodePsiImplUtil {
       return null;
     }
   }
-
+  /** @see PsiNameIdentifierOwner#getNameIdentifier() */
   public static PsiElement getNameIdentifier(@NotNull JavaByteCodeMethodDeclaration element) {
     ASTNode keyNode = element.getMethodHead().getNode();
     if (keyNode != null) {

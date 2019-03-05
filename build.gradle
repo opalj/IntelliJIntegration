@@ -18,6 +18,7 @@ targetCompatibility = 1.8
 repositories {
     mavenCentral()
     maven { url = 'http://maven.teamdev.com/repository/products' }
+    maven { url = 'http://perfectjpattern.sourceforge.net/m2repo'}
 }
 
 
@@ -26,7 +27,8 @@ dependencies {
     compile 'de.opal-project:abstract-interpretation-framework_2.12:2.0.1'
     compile 'de.opal-project:bytecode-disassembler_2.12:2.0.1'
     // jsoup HTML parser library @ https://jsoup.org/
-    compile 'org.jsoup:jsoup:1.11.3'
+    //compile 'org.jsoup:jsoup:1.11.3'
+    //compile group: 'perfectjpattern', name: 'perfectjpattern-core', version: '1.0.2'
 }
 
 intellij {

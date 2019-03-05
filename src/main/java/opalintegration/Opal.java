@@ -1,53 +1,34 @@
 package opalintegration;
 
 import Compile.Compiler;
-import com.intellij.openapi.fileEditor.FileEditor;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.fileTypes.FileTypeManager;
-import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.*;
-import com.intellij.psi.search.FilenameIndex;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.SearchScope;
-import com.intellij.util.FileContentUtil;
-import com.typesafe.config.Optional;
 import globalData.GlobalData;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.jar.JarInputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.mozilla.classfile.ByteCode;
 import org.opalj.bi.AccessFlags;
 import org.opalj.bi.AccessFlagsContexts;
-import org.opalj.bi.VisibilityModifier;
 import org.opalj.br.*;
 import org.opalj.br.analyses.JavaProject;
 import org.opalj.br.analyses.Project;
-import org.opalj.br.instructions.Instruction;
+import org.opalj.br.instructions.*;
 import org.opalj.collection.IntIterator;
 import org.opalj.collection.RefIterator;
 import org.opalj.collection.immutable.ConstArray;
-import org.opalj.collection.immutable.IntArraySet;
 import org.opalj.collection.immutable.RefArray;
 import org.opalj.da.ClassFileReader;
-import org.opalj.da.RuntimeVisibleAnnotations_attribute;
 import org.opalj.tac.*;
 import org.opalj.value.KnownTypedValue;
 import scala.Function0;
 import scala.Function1;
-import scala.Option;
 import scala.Some;
 
 public class Opal {
@@ -155,41 +136,43 @@ public class Opal {
     }
     byteCodeString
         .append("\n// Source File: ")
-        .append(classFile.sourceFile().isDefined()?classFile.sourceFile().get():"")
+        .append(classFile.sourceFile().isDefined() ? classFile.sourceFile().get() : "")
         .append(" -- Version: (")
         .append(classFile.jdkVersion())
         .append(") -- Size: \n");
     // TODO Constant Pool Maybe working with DA.
-    RefArray<Field> fields = classFile.fields();
-    byteCodeString.append("Fields\n");
-    for (int j = 0; j < fields.length(); j++) {
-      Field field = fields.apply(j);
-      // TODO: if access flags empty don't insert empty space before fieldType()
-      byteCodeString
-          .append(AccessFlags.toString(field.accessFlags(), AccessFlagsContexts.FIELD()))
-          .append(" ")
-          .append(field.fieldType().toJava())
-          .append(" ")
-          .append(field.name())
-          .append("\n");
-    }
-    byteCodeString.append(threeTimeNL);
+    byteCodeString.append(ByteCodeFieldToString(classFile));
     RefArray<Annotation> annotations = classFile.annotations();
     for (int i = 0; i < annotations.length(); i++) {
       Annotation annotation = annotations.apply(i);
       byteCodeString.append("//").append(annotation.toJava()).append("\n");
     }
+    byteCodeString.append(byteCodeMethodsToString(classFile));
 
+    return byteCodeString.toString();
+  }
+  /**
+   * creates a bytecode representation of the implemented methods of the passed classfile
+   *
+   * @param classFile ...
+   * @return the methodsbytecode representation as a String
+   */
+  public static String byteCodeMethodsToString(ClassFile classFile) {
+    StringBuilder byteCodeString = new StringBuilder();
+    StringVisitor stringVisitor = new StringVisitor();
+    // RefArray<Method> methods = classFile.methods();
+    RefIterator<Method> methods = classFile.methodsWithBody();
     byteCodeString.append("Methods\n\n");
-    RefArray<Method> methods = classFile.methods();
-    for (int j = 0; j < methods.length(); j++) {
-      Method method = methods.apply(j);
+    // for (int j = 0; j < methods.length(); j++) {
+    // Method method = methods.apply(j);
+    while (methods.hasNext()) {
+      Method method = methods.next();
       if (method.body().isDefined()) {
         Code body = method.body().get();
         Instruction[] instructions = body.instructions();
         byteCodeString
-            .append(method.toString())
-            .append(" { ")                // TODO: added "{"
+            .append(method.toString().replaceFirst("\\).*", ")"))
+            .append(" { ")
             .append("// [size :")
             .append(body.codeSize())
             .append(" bytes, max Stack: ")
@@ -199,36 +182,9 @@ public class Opal {
         for (int k = 0; k < instructions.length; k++) {
           if (instructions[k] != null) {
             try {
-              String instruction = instructions[k].toString();
-              // ByteCodeString.append("\t").append(k).append("\t").append(body.lineNumber(k).isDefined()?body.lineNumber(k).get().toString():"|").append("\t\t").append(instructions[k]).append("\n");
-              // ANEWARRAY(ObjectType(java/lang/String)) -> ANEWARRAY(java.lang.String)
-              // wanted like this?
-              if (instruction.contains("ObjectType")) {
-                instruction = instruction.replaceAll("/", ".");
-                instruction = instruction.replace("ObjectType(", "");
-                instruction = instruction.replaceFirst("\\)", "");
-              }
-              // TODO: ugly, fix this
-              else if (instruction.startsWith("get")) {
-                if (instruction.startsWith("get field")) {
-                  instruction = instruction.replaceFirst("get\\sfield", "GETFIELD");
-                } else if (instruction.startsWith("get static")) {
-                  instruction = instruction.replaceFirst("get\\sstatic", "GETSTATIC");
-                } else {
-                  instruction = instruction.replaceFirst("get", "GET");
-                }
-              }
-              // TODO: ugly, fix this
-              else if (instruction.startsWith("put")) {
-                if (instruction.startsWith("put field")) {
-                  instruction = instruction.replaceFirst("put\\sfield", "PUTFIELD");
-                } else if (instruction.startsWith("put static")) {
-                  instruction = instruction.replaceFirst("put\\sstatic", "PUTSTATIC");
-                } else {
-                  instruction = instruction.replaceFirst("put", "PUT");
-                }
-              }
-
+              String instruction;
+              instruction = stringVisitor.accept(instructions[k]);
+              // }else(instructions[k] instanceof INVOKEVIRTUAL)
               // TODO replace \n (and \t...??) and the likes with spaces
               instruction = instruction.replaceAll("\n", " ");
               instruction = instruction.replaceAll("\t", " ");
@@ -266,45 +222,50 @@ public class Opal {
                 .append("\n");
           }
         }
-        RefArray<Attribute> attributes = method.attributes();
-        for (int i = 0; i < attributes.length(); i++) {
-          Attribute attribute = attributes.apply(i);
-          byteCodeString.append(
-              attribute.toString() + " " + attribute.getClass().getAnnotations().length + "\n");
-        }
-        //if(body.runtimeInvisibleTypeAnnotations().length() > 0 || body.runtimeVisibleTypeAnnotations().length()> 0 )
-          System.out.println("RTIV:"+body.runtimeInvisibleTypeAnnotations().mkString("\n"));
-          System.out.println("RTV"+body.runtimeVisibleTypeAnnotations().mkString("\n"));
-          // method.exexceptionTable()
-          if(method.exceptionTable().isDefined()) {
-            ExceptionTable exceptionTable= method.exceptionTable().get();
-            byteCodeString.append("ExceptionTable\n");
-            RefIterator<ObjectType> exceptions = exceptionTable.exceptions().iterator();
-            while(exceptions.hasNext()){
-              ObjectType exception = exceptions.next();
-              byteCodeString.append(exception.id()).append("\t").append(exception.toJava()).append("\n");
-            }
-          }
+        // method.attributes
+        //        RefArray<Attribute> attributes = method.attributes();
+        //        for (int i = 0; i < attributes.length(); i++) {
+        //          Attribute attribute = attributes.apply(i);
+        //          byteCodeString.append(
+        //                  // attribute.toString() + " " +
+        // attribute.getClass().getAnnotations().length + "\n");
+        //        }
+        // method.attributes
+        // method.exexceptionTable()
+        //        if (method.exceptionTable().isDefined()) {
+        //          ExceptionTable exceptionTable = method.exceptionTable().get();
+        //          byteCodeString.append("ExceptionTable\n");
+        //          RefIterator<ObjectType> exceptions = exceptionTable.exceptions().iterator();
+        //          while (exceptions.hasNext()) {
+        //            ObjectType exception = exceptions.next();
+        //
+        // byteCodeString.append(exception.id()).append("\t").append(exception.toJava()).append("\n");
+        //          }
+        //        }
         // end method.exceptionTable
-
-        if(method.runtimeVisibleAnnotations().iterator().hasNext()){
-          byteCodeString.append("RuntimeVisibleAnnotations\n");
-          RefIterator<Annotation> annotationRefIterator = method.runtimeVisibleAnnotations().iterator();
-          while(annotationRefIterator.hasNext()){
-            byteCodeString.append(annotationRefIterator.next().toJava());
-          }
-        }
-        if(method.runtimeInvisibleAnnotations().iterator().hasNext()){
-          byteCodeString.append("RuntimeInvisibleAnnotations\n");
-          RefIterator<Annotation> annotationRefIterator = method.runtimeInvisibleAnnotations().iterator();
-          while(annotationRefIterator.hasNext()){
-            byteCodeString.append(annotationRefIterator.next().toJava());
-          }
-        }
-        if(body.stackMapTable().isDefined()){
+        //        if (method.runtimeVisibleAnnotations().iterator().hasNext()) {
+        //          byteCodeString.append("RuntimeVisibleAnnotations\n");
+        //          RefIterator<Annotation> annotationRefIterator =
+        // method.runtimeVisibleAnnotations().iterator();
+        //          while (annotationRefIterator.hasNext()) {
+        //            byteCodeString.append(annotationRefIterator.next().toJava());
+        //          }
+        //        }
+        //        if (method.runtimeInvisibleAnnotations().iterator().hasNext()) {
+        //          byteCodeString.append("RuntimeInvisibleAnnotations\n");
+        //          RefIterator<Annotation> annotationRefIterator =
+        // method.runtimeInvisibleAnnotations().iterator();
+        //          while (annotationRefIterator.hasNext()) {
+        //            byteCodeString.append(annotationRefIterator.next().toJava());
+        //          }
+        //        }
+        if (body.stackMapTable().isDefined()) {
           StackMapTable stackMapTable = body.stackMapTable().get();
           RefArray<StackMapFrame> stackMapFrameRefArray = stackMapTable.stackMapFrames();
-          byteCodeString.append("StackMapTable").append("\n");
+          byteCodeString
+              .append("StackMapTable")
+              .append("\n")
+              .append("//PC\tName\tframeType\toffsetDelta\n");
           IntIterator pcIterator = stackMapTable.pcs().iterator();
           for (int i = 0; i < stackMapFrameRefArray.length(); i++) {
             StackMapFrame stackMapFrame = stackMapFrameRefArray.apply(i);
@@ -317,14 +278,35 @@ public class Opal {
                 .append(stackMapFrame.offset(0) - 1 + "\n");
           }
         }
-        byteCodeString.append("}");         // TODO: added "}"
-        byteCodeString.append(threeTimeNL);
       }
+      byteCodeString.append("}").append("\n\n\n");
     }
-
     return byteCodeString.toString();
   }
-
+  /**
+   * creates a bytecode representation of the implemented fields of the passed classfile
+   *
+   * @param classFile ...
+   * @return the bytecode representation as a String
+   */
+  public static String ByteCodeFieldToString(ClassFile classFile) {
+    StringBuilder byteCodeString = new StringBuilder();
+    RefArray<Field> fields = classFile.fields();
+    byteCodeString.append("Fields\n");
+    for (int j = 0; j < fields.length(); j++) {
+      Field field = fields.apply(j);
+      // TODO: if access flags empty don't insert empty space before fieldType()
+      byteCodeString
+          .append(AccessFlags.toString(field.accessFlags(), AccessFlagsContexts.FIELD()))
+          .append(" ")
+          .append(field.fieldType().toJava())
+          .append(" ")
+          .append(field.name())
+          .append("\n");
+    }
+    byteCodeString.append("\n\n\n");
+    return byteCodeString.toString();
+  }
   // =====================================================================================
   // =====================================================================================
   // =====================================================================================
@@ -508,18 +490,18 @@ public class Opal {
   public static VirtualFile prepareHtml(
       @NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
     // All files selected in the "Project"-View
-      setProject(project);
-      Compiler.make(project);
-      File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_HTML, virtualFile,null);
-      return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
+    setProject(project);
+    Compiler.make(project);
+    File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_HTML, virtualFile, null);
+    return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
   } // prepareHtml()
 
   public static VirtualFile prepareTAC(
       @NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
-      setProject(project);
-      Compiler.make(project);
-      File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_TAC, virtualFile,null);
-      return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
+    setProject(project);
+    Compiler.make(project);
+    File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_TAC, virtualFile, null);
+    return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
   }
 
   // this should be called by constructor
@@ -527,16 +509,17 @@ public class Opal {
       @NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
     setProject(project);
     Compiler.make(project);
-    File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_JBC, virtualFile,null);
+    File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_JBC, virtualFile, null);
     return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
   }
 
   // todo SaveFile Class erweitern?
-  public static File prepare(@NotNull String prepareID, VirtualFile virtualFile,@Nullable VirtualFile olderFile) {
+  public static File prepare(
+      @NotNull String prepareID, VirtualFile virtualFile, @Nullable VirtualFile olderFile) {
     classPath = virtualFile.getParent().getPath();
     String fileName = virtualFile.getNameWithoutExtension();
     String representableForm = null;
-    ClassFile classFile;
+    ClassFile classFile = getClassFile(virtualFile);
     switch (prepareID) {
       case GlobalData.DISASSEMBLED_FILE_ENDING_HTML:
         fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_HTML);
@@ -544,19 +527,17 @@ public class Opal {
         break;
       case GlobalData.DISASSEMBLED_FILE_ENDING_TAC:
         fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_TAC);
-        classFile = getClassFile(virtualFile);
         representableForm = Opal.createTacString(classFile, virtualFile.getPath());
         break;
       case GlobalData.DISASSEMBLED_FILE_ENDING_JBC:
         fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_JBC);
-        classFile = getClassFile(virtualFile);
         representableForm = Opal.createBytecodeString(classFile);
         break;
     }
-    if(olderFile!=null){
-        fileName = olderFile.getPath();
+    if (olderFile != null) {
+      fileName = olderFile.getPath();
     }
-    return writeContentToFile(fileName, representableForm, false,olderFile==null?false:true);
+    return writeContentToFile(fileName, representableForm, false, olderFile == null ? false : true);
   }
 
   /**
@@ -566,22 +547,22 @@ public class Opal {
    * @param filename the Name of the temporal file
    * @param content content to write into the file
    */
-  private static File writeContentToFile(String filename, String content, boolean append,boolean olderFile) {
+  private static File writeContentToFile(
+      String filename, String content, boolean append, boolean olderFile) {
     try {
-        File file = null;
-        if(!olderFile){
+      File file = null;
+      if (!olderFile) {
         String[] filenameArray = filename.split("\\.");
-         file = FileUtil.createTempFile(filenameArray[0],"."+filenameArray[1],true);
-        }else{
-            file = new File(filename);
-        }
-        FileUtil.writeToFile(file, content, append);
-        return file;
+        file = FileUtil.createTempFile(filenameArray[0], "." + filenameArray[1], true);
+      } else {
+        file = new File(filename);
+      }
+      FileUtil.writeToFile(file, content, append);
+      return file;
     } catch (IOException e) {
       e.printStackTrace();
     }
-    //TODO not null
+    // TODO not null
     return null;
   }
-
 }
