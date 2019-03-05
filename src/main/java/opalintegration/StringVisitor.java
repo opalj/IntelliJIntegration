@@ -1,7 +1,6 @@
 package opalintegration;
 
 import java.util.Arrays;
-
 import org.opalj.br.Type;
 import org.opalj.br.instructions.*;
 
@@ -14,7 +13,10 @@ public class StringVisitor extends ListVisitor<Instruction, String> implements I
             PUTSTATIC.class,
             GETSTATIC.class,
             GETFIELD.class,
-            LDC.class));
+            LoadString.class, // eigentlich LDC visitor
+            LoadString_W.class,
+            LDC.class,
+            LDC_W.class));
   }
 
   public String visit(ANEWARRAY anewarray) {
@@ -60,11 +62,26 @@ public class StringVisitor extends ListVisitor<Instruction, String> implements I
 
   @Override
   public String visit(LDC ldc) {
-    return ldc.mnemonic().toUpperCase()+"("+((Type)ldc.value()).toJava()+")";
+    return ldc.mnemonic().toUpperCase() + "(" + ((Type) ldc.value()).toJava() + ")";
+  }
+
+  @Override
+  public String visit(LDC_W ldc_w) {
+    return ldc_w.mnemonic().toUpperCase() + "(" + ((Type) ldc_w.value()).toJava() + ")";
+  }
+
+  @Override
+  public String visit(LoadString_W lsw) {
+    return lsw.mnemonic().toUpperCase() + "(\"" + lsw.value() + "\")";
+  }
+
+  @Override
+  public String visit(LoadString ls) {
+    return ls.mnemonic().toUpperCase() + "(\"" + ls.value() + "\")";
   }
 
   @Override
   public String visit(Instruction instruction) {
-    return instruction.toString(); // .replaceAll("\\(", "\t\t").replaceAll("\\)", "");
+    return instruction.toString();
   }
 }

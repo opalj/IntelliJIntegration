@@ -244,17 +244,20 @@ public class JavaByteCodePsiImplUtil {
             //
             // PsiElementFactory.SERVICE.getInstance(element.getProject()).createMethod().getModifierList()
             int flags = Iconable.ICON_FLAG_READ_STATUS | Iconable.ICON_FLAG_VISIBILITY;
-            Icon icon =
-                PsiElementFactory.SERVICE
-                    .getInstance(element.getProject())
-                    .createMethodFromText(
-                        methodHead.getModifierV().getText()
-                            + " "
-                            + methodHead.getType().getText()
-                            + " method()",
-                        null)
-                    .getIcon(flags);
-            return icon;
+            try {
+              String helpinger =
+                  methodHead.getModifierV().getText().length() == 0
+                      ? methodHead.getType().getText()
+                      : methodHead.getModifierV().getText() + " " + methodHead.getType().getText();
+              Icon icon =
+                  PsiElementFactory.SERVICE
+                      .getInstance(element.getProject())
+                      .createMethodFromText(helpinger + " method()", null)
+                      .getIcon(flags);
+              return icon;
+            } catch (Exception e) {
+              return null;
+            }
           }
 
           @Nullable
