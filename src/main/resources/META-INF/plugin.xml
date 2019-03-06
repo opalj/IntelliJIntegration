@@ -27,11 +27,9 @@
                     factoryClass="toolWindows.DisassemblerToolWindowFactory"
                     anchor="right"
                     secondary="true"/>
-         -->
-        <!--
-        <fileEditorProvider implementation="Editors.HTMLEditor.HTMLEditorProvider"
+                            <fileEditorProvider implementation="Editors.HTMLEditor.HTMLEditorProvider"
                             id="OpalHTMLEditorProvider"/>
-        -->
+         -->
         <fileEditorProvider implementation="Editors.FileEditor.TacTextEditorProvider"
                             id="OpalTACEditorProvider"/>
         <fileEditorProvider implementation="Editors.disEditor.DisTextEditorProvider"

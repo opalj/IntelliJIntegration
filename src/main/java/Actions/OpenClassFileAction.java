@@ -16,6 +16,7 @@ import com.intellij.openapi.vfs.VirtualFileVisitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 
 public class OpenClassFileAction extends AnAction {

@@ -20,7 +20,7 @@ import org.opalj.bi.AccessFlagsContexts;
 import org.opalj.br.*;
 import org.opalj.br.analyses.JavaProject;
 import org.opalj.br.analyses.Project;
-import org.opalj.br.instructions.Instruction;
+import org.opalj.br.instructions.*;
 import org.opalj.collection.IntIterator;
 import org.opalj.collection.RefIterator;
 import org.opalj.collection.immutable.ConstArray;
@@ -163,36 +163,38 @@ public class Opal {
         .append(classFile.jdkVersion())
         .append(") -- Size: \n");
     // TODO Constant Pool Maybe working with DA.
-    RefArray<Field> fields = classFile.fields();
-    byteCodeString.append("Fields\n");
-    for (int j = 0; j < fields.length(); j++) {
-      Field field = fields.apply(j);
-      // TODO: if access flags empty don't insert empty space before fieldType()
-      byteCodeString
-          .append(AccessFlags.toString(field.accessFlags(), AccessFlagsContexts.FIELD()))
-          .append(" ")
-          .append(field.fieldType().toJava())
-          .append(" ")
-          .append(field.name())
-          .append("\n");
-    }
-    byteCodeString.append(threeTimeNL);
+    byteCodeString.append(ByteCodeFieldToString(classFile));
     RefArray<Annotation> annotations = classFile.annotations();
     for (int i = 0; i < annotations.length(); i++) {
       Annotation annotation = annotations.apply(i);
       byteCodeString.append("//").append(annotation.toJava()).append("\n");
     }
+    byteCodeString.append(byteCodeMethodsToString(classFile));
 
+    return byteCodeString.toString();
+  }
+  /**
+   * creates a bytecode representation of the implemented methods of the passed classfile
+   *
+   * @param classFile ...
+   * @return the methodsbytecode representation as a String
+   */
+  public static String byteCodeMethodsToString(ClassFile classFile) {
+    StringBuilder byteCodeString = new StringBuilder();
+    StringVisitor stringVisitor = new StringVisitor();
+    // RefArray<Method> methods = classFile.methods();
+    RefIterator<Method> methods = classFile.methodsWithBody();
     byteCodeString.append("Methods\n\n");
-    RefArray<Method> methods = classFile.methods();
-    for (int j = 0; j < methods.length(); j++) {
-      Method method = methods.apply(j);
+    // for (int j = 0; j < methods.length(); j++) {
+    // Method method = methods.apply(j);
+    while (methods.hasNext()) {
+      Method method = methods.next();
       if (method.body().isDefined()) {
         Code body = method.body().get();
         Instruction[] instructions = body.instructions();
         byteCodeString
-            .append(method.toString())
-            .append(" { ") // TODO: added "{"
+            .append(method.toString().replaceFirst("\\).*", ")"))
+            .append(" { ")
             .append("// [size :")
             .append(body.codeSize())
             .append(" bytes, max Stack: ")
@@ -202,36 +204,9 @@ public class Opal {
         for (int k = 0; k < instructions.length; k++) {
           if (instructions[k] != null) {
             try {
-              String instruction = instructions[k].toString();
-              // ByteCodeString.append("\t").append(k).append("\t").append(body.lineNumber(k).isDefined()?body.lineNumber(k).get().toString():"|").append("\t\t").append(instructions[k]).append("\n");
-              // ANEWARRAY(ObjectType(java/lang/String)) -> ANEWARRAY(java.lang.String)
-              // wanted like this?
-              if (instruction.contains("ObjectType")) {
-                instruction = instruction.replaceAll("/", ".");
-                instruction = instruction.replace("ObjectType(", "");
-                instruction = instruction.replaceFirst("\\)", "");
-              }
-              // TODO: ugly, fix this
-              else if (instruction.startsWith("get")) {
-                if (instruction.startsWith("get field")) {
-                  instruction = instruction.replaceFirst("get\\sfield", "GETFIELD");
-                } else if (instruction.startsWith("get static")) {
-                  instruction = instruction.replaceFirst("get\\sstatic", "GETSTATIC");
-                } else {
-                  instruction = instruction.replaceFirst("get", "GET");
-                }
-              }
-              // TODO: ugly, fix this
-              else if (instruction.startsWith("put")) {
-                if (instruction.startsWith("put field")) {
-                  instruction = instruction.replaceFirst("put\\sfield", "PUTFIELD");
-                } else if (instruction.startsWith("put static")) {
-                  instruction = instruction.replaceFirst("put\\sstatic", "PUTSTATIC");
-                } else {
-                  instruction = instruction.replaceFirst("put", "PUT");
-                }
-              }
-
+              String instruction;
+              instruction = stringVisitor.accept(instructions[k]);
+              // }else(instructions[k] instanceof INVOKEVIRTUAL)
               // TODO replace \n (and \t...??) and the likes with spaces
               instruction = instruction.replaceAll("\n", " ");
               instruction = instruction.replaceAll("\t", " ");
@@ -245,7 +220,6 @@ public class Opal {
                   .append(instruction)
                   .append("\n");
             } catch (NoSuchElementException e) {
-              e.printStackTrace();
               return "Issue with Java 5? \n\n " + e.getMessage();
             }
           }
@@ -270,52 +244,50 @@ public class Opal {
                 .append("\n");
           }
         }
-        RefArray<Attribute> attributes = method.attributes();
-        for (int i = 0; i < attributes.length(); i++) {
-          Attribute attribute = attributes.apply(i);
-          byteCodeString.append(
-              attribute.toString() + " " + attribute.getClass().getAnnotations().length + "\n");
-        }
-        // if(body.runtimeInvisibleTypeAnnotations().length() > 0 ||
-        // body.runtimeVisibleTypeAnnotations().length()> 0 )
-        System.out.println("RTIV:" + body.runtimeInvisibleTypeAnnotations().mkString("\n"));
-        System.out.println("RTV" + body.runtimeVisibleTypeAnnotations().mkString("\n"));
+        // method.attributes
+        //        RefArray<Attribute> attributes = method.attributes();
+        //        for (int i = 0; i < attributes.length(); i++) {
+        //          Attribute attribute = attributes.apply(i);
+        //          byteCodeString.append(
+        //                  // attribute.toString() + " " +
+        // attribute.getClass().getAnnotations().length + "\n");
+        //        }
+        // method.attributes
         // method.exexceptionTable()
-        if (method.exceptionTable().isDefined()) {
-          ExceptionTable exceptionTable = method.exceptionTable().get();
-          byteCodeString.append("ExceptionTable\n");
-          RefIterator<ObjectType> exceptions = exceptionTable.exceptions().iterator();
-          while (exceptions.hasNext()) {
-            ObjectType exception = exceptions.next();
-            byteCodeString
-                .append(exception.id())
-                .append("\t")
-                .append(exception.toJava())
-                .append("\n");
-          }
-        }
+        //        if (method.exceptionTable().isDefined()) {
+        //          ExceptionTable exceptionTable = method.exceptionTable().get();
+        //          byteCodeString.append("ExceptionTable\n");
+        //          RefIterator<ObjectType> exceptions = exceptionTable.exceptions().iterator();
+        //          while (exceptions.hasNext()) {
+        //            ObjectType exception = exceptions.next();
+        //
+        // byteCodeString.append(exception.id()).append("\t").append(exception.toJava()).append("\n");
+        //          }
+        //        }
         // end method.exceptionTable
-
-        if (method.runtimeVisibleAnnotations().iterator().hasNext()) {
-          byteCodeString.append("RuntimeVisibleAnnotations\n");
-          RefIterator<Annotation> annotationRefIterator =
-              method.runtimeVisibleAnnotations().iterator();
-          while (annotationRefIterator.hasNext()) {
-            byteCodeString.append(annotationRefIterator.next().toJava());
-          }
-        }
-        if (method.runtimeInvisibleAnnotations().iterator().hasNext()) {
-          byteCodeString.append("RuntimeInvisibleAnnotations\n");
-          RefIterator<Annotation> annotationRefIterator =
-              method.runtimeInvisibleAnnotations().iterator();
-          while (annotationRefIterator.hasNext()) {
-            byteCodeString.append(annotationRefIterator.next().toJava());
-          }
-        }
+        //        if (method.runtimeVisibleAnnotations().iterator().hasNext()) {
+        //          byteCodeString.append("RuntimeVisibleAnnotations\n");
+        //          RefIterator<Annotation> annotationRefIterator =
+        // method.runtimeVisibleAnnotations().iterator();
+        //          while (annotationRefIterator.hasNext()) {
+        //            byteCodeString.append(annotationRefIterator.next().toJava());
+        //          }
+        //        }
+        //        if (method.runtimeInvisibleAnnotations().iterator().hasNext()) {
+        //          byteCodeString.append("RuntimeInvisibleAnnotations\n");
+        //          RefIterator<Annotation> annotationRefIterator =
+        // method.runtimeInvisibleAnnotations().iterator();
+        //          while (annotationRefIterator.hasNext()) {
+        //            byteCodeString.append(annotationRefIterator.next().toJava());
+        //          }
+        //        }
         if (body.stackMapTable().isDefined()) {
           StackMapTable stackMapTable = body.stackMapTable().get();
           RefArray<StackMapFrame> stackMapFrameRefArray = stackMapTable.stackMapFrames();
-          byteCodeString.append("StackMapTable").append("\n");
+          byteCodeString
+              .append("StackMapTable")
+              .append("\n")
+              .append("//PC\tName\tframeType\toffsetDelta\n");
           IntIterator pcIterator = stackMapTable.pcs().iterator();
           for (int i = 0; i < stackMapFrameRefArray.length(); i++) {
             StackMapFrame stackMapFrame = stackMapFrameRefArray.apply(i);
@@ -328,14 +300,36 @@ public class Opal {
                 .append(stackMapFrame.offset(0) - 1 + "\n");
           }
         }
-        byteCodeString.append("}"); // TODO: added "}"
-        byteCodeString.append(threeTimeNL);
       }
+      byteCodeString.append("}").append("\n\n\n");
     }
 
     return byteCodeString.toString();
   }
-
+  /**
+   * creates a bytecode representation of the implemented fields of the passed classfile
+   *
+   * @param classFile ...
+   * @return the bytecode representation as a String
+   */
+  public static String ByteCodeFieldToString(ClassFile classFile) {
+    StringBuilder byteCodeString = new StringBuilder();
+    RefArray<Field> fields = classFile.fields();
+    byteCodeString.append("Fields\n");
+    for (int j = 0; j < fields.length(); j++) {
+      Field field = fields.apply(j);
+      // TODO: if access flags empty don't insert empty space before fieldType()
+      byteCodeString
+          .append(AccessFlags.toString(field.accessFlags(), AccessFlagsContexts.FIELD()))
+          .append(" ")
+          .append(field.fieldType().toJava())
+          .append(" ")
+          .append(field.name())
+          .append("\n");
+    }
+    byteCodeString.append("\n\n\n");
+    return byteCodeString.toString();
+  }
   // =====================================================================================
   // =====================================================================================
   // =====================================================================================
@@ -587,17 +581,18 @@ public class Opal {
     String representableForm = null;
     ClassFile classFile = getClassFile(virtualFile);
     switch (prepareID) {
-      // keep the HTML editor for the time being (helps to debug/compare bytecode output)
       case GlobalData.DISASSEMBLED_FILE_ENDING_HTML:
         fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_HTML);
         representableForm = Opal.JavaClassToHtmlForm(virtualFile);
         break;
       case GlobalData.DISASSEMBLED_FILE_ENDING_TAC:
         fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_TAC);
+        classFile = getClassFile(virtualFile);
         representableForm = Opal.createTacString(classFile, virtualFile.getPath());
         break;
       case GlobalData.DISASSEMBLED_FILE_ENDING_JBC:
         fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_JBC);
+        classFile = getClassFile(virtualFile);
         representableForm = Opal.createBytecodeString(classFile);
         break;
     }
@@ -614,7 +609,6 @@ public class Opal {
    * @param filename the Name of the temporal file
    * @param content content to write into the file
    */
-  @Nullable
   private static File writeContentToFile(
       String filename, String content, boolean append, boolean olderFile) {
     try {
