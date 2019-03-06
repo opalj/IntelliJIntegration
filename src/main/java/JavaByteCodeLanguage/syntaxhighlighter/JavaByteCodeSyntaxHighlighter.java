@@ -26,11 +26,11 @@ public class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
       createTextAttributesKey("JBC_STRING", DefaultLanguageHighlighterColors.STRING);
 
   public static final TextAttributesKey MNEMONIC =
-          createTextAttributesKey("JBC_MNEMONIC", DefaultLanguageHighlighterColors.CONSTANT);
+      createTextAttributesKey("JBC_MNEMONIC", DefaultLanguageHighlighterColors.CONSTANT);
   public static final TextAttributesKey MODIFIER =
-          createTextAttributesKey("JBC_MODIFIER", DefaultLanguageHighlighterColors.KEYWORD);
+      createTextAttributesKey("JBC_MODIFIER", DefaultLanguageHighlighterColors.KEYWORD);
   public static final TextAttributesKey BLOCK_COMMENT =
-          createTextAttributesKey("JBC_BLOCK_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT);
+      createTextAttributesKey("JBC_BLOCK_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT);
 
   private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[] {BAD_CHARACTER};
   private static final TextAttributesKey[] NUMBER_KEYS = new TextAttributesKey[] {NUMBER};
@@ -54,13 +54,13 @@ public class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
   public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
     if (tokenType.equals(JavaByteCodeTypes.COMMENT)) {
       return COMMENT_KEYS;
-    } else if(tokenType.equals(JavaByteCodeTypes.BLOCK_COMMENT)) {
+    } else if (tokenType.equals(JavaByteCodeTypes.BLOCK_COMMENT)) {
       return BLOCK_KEYS;
     } else if (tokenType.equals(JavaByteCodeTypes.J_TYPE)
         || tokenType.equals(
             JavaByteCodeTypes.PRIMITIVETYPE)) { // tokenType.equals(JavaByteCodeTypes.JAVATYPE)
       return TYPE_KEYS;
-    } else if(tokenType.equals(JavaByteCodeTypes.MODIFIER)) {
+    } else if (tokenType.equals(JavaByteCodeTypes.MODIFIER)) {
       return MODIFIER_KEYS;
     } else if (tokenType.equals(JavaByteCodeTypes.MNEMONIC)
         || tokenType.equals(JavaByteCodeTypes.LOAD_INSTR)) {

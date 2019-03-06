@@ -54,8 +54,8 @@ MNEMONIC=AALOAD|AASTORE|ACONST_NULL|ALOAD_0|ALOAD_1|ALOAD_2|ALOAD_3|ALOAD|\
                        |GETFIELD|GETSTATIC|GET|PUTFIELD|PUTSTATIC|PUT
 SPACE=[ \t\n\x0B\f\r]+
 TO=>|=>
-LBRACKET=\(|\{|\[|«|\u00ab
-RBRACKET=\)|\}|\]|»|\u00bb
+LBRACKET=\(|\{|\[|«
+RBRACKET=\)|\}|\]|»
 CONSTMETHODNAMES=<(cl)?init>
 LOAD_INSTR=Load([A-Za-z]+)
 PRIMITIVETYPE=void|boolean|byte|char|short|int|long|float|double

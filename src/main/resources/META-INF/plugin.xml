@@ -28,8 +28,10 @@
                     anchor="right"
                     secondary="true"/>
          -->
+        <!--
         <fileEditorProvider implementation="Editors.HTMLEditor.HTMLEditorProvider"
                             id="OpalHTMLEditorProvider"/>
+        -->
         <fileEditorProvider implementation="Editors.FileEditor.TacTextEditorProvider"
                             id="OpalTACEditorProvider"/>
         <fileEditorProvider implementation="Editors.disEditor.DisTextEditorProvider"
@@ -53,8 +55,12 @@
 
     <actions>
         <!-- Add your actions here -->
-        <action id="JumpToJBCEID" class="Actions.OpenClassFileAction" text="Open Bytecodeanalyse">
+        <action id="JumpToJBCEID" class="Actions.OpenClassFileAction" text="Show Bytecode" icon="/icons/jar-gray.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+
+        <action id="JumpToJbcFromRMB" class="Actions.OpenCorrespondingClassFileAction" text="Compile And Show Bytecode" icon="/icons/jar-gray.png">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </action>
     </actions>
 

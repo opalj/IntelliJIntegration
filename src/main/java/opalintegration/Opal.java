@@ -1,37 +1,22 @@
 package opalintegration;
 
 import Compile.Compiler;
-import com.intellij.openapi.fileEditor.FileEditor;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.fileTypes.FileTypeManager;
-import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.*;
-import com.intellij.psi.search.FilenameIndex;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.SearchScope;
-import com.intellij.util.FileContentUtil;
-import com.typesafe.config.Optional;
 import globalData.GlobalData;
 import java.io.*;
+import java.lang.Deprecated;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.jar.JarInputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.mozilla.classfile.ByteCode;
 import org.opalj.bi.AccessFlags;
 import org.opalj.bi.AccessFlagsContexts;
-import org.opalj.bi.VisibilityModifier;
 import org.opalj.br.*;
 import org.opalj.br.analyses.JavaProject;
 import org.opalj.br.analyses.Project;
@@ -39,15 +24,12 @@ import org.opalj.br.instructions.Instruction;
 import org.opalj.collection.IntIterator;
 import org.opalj.collection.RefIterator;
 import org.opalj.collection.immutable.ConstArray;
-import org.opalj.collection.immutable.IntArraySet;
 import org.opalj.collection.immutable.RefArray;
 import org.opalj.da.ClassFileReader;
-import org.opalj.da.RuntimeVisibleAnnotations_attribute;
 import org.opalj.tac.*;
 import org.opalj.value.KnownTypedValue;
 import scala.Function0;
 import scala.Function1;
-import scala.Option;
 import scala.Some;
 
 public class Opal {
@@ -64,7 +46,16 @@ public class Opal {
   // =====================================================================================
   // =====================================================================================
 
-  private static ClassFile getClassFile(VirtualFile virtualClassFile) {
+  /**
+   * Returns an OPAL ClassFile for a given class file. The ClassFile from OPAL
+   * contains necessary information to produce the desired bytecode and TAC
+   * representations for a class file.
+   *
+   * @param virtualClassFile
+   * @return an OPAL ClassFile
+   */
+  @Nullable
+  private static ClassFile getClassFile(@NotNull VirtualFile virtualClassFile) {
     String filepath = virtualClassFile.getPath();
     Project<URL> uriProject = Project.apply(new File(filepath));
     ConstArray<ClassFile> classFileConstArray = uriProject.allProjectClassFiles();
@@ -85,7 +76,12 @@ public class Opal {
     }
   }
 
-  private static String getJarFileRoot(VirtualFile virtualClassFile) {
+  /**
+   *
+   * @param virtualClassFile - a class file (assumed to be located in a JAR)
+   * @return the path to the JAR
+   */
+  private static String getJarFileRoot(@NotNull VirtualFile virtualClassFile) {
     String jarPathWithoutClassExtension =
         virtualClassFile.getParent().getPath()
             + File.separator
@@ -98,6 +94,13 @@ public class Opal {
     return jarFileRoot;
   }
 
+
+
+  /**
+   *
+   * @param jarFileRoot - path to a JAR
+   * @return
+   */
   // TODO: this gets called for classes we haven't clicked on as well?
   private static ClassFile createClassFileFromJar(String jarFileRoot) {
     Project<URL> uriProject = Project.apply(new File(jarFileRoot));
@@ -155,7 +158,7 @@ public class Opal {
     }
     byteCodeString
         .append("\n// Source File: ")
-        .append(classFile.sourceFile().isDefined()?classFile.sourceFile().get():"")
+        .append(classFile.sourceFile().isDefined() ? classFile.sourceFile().get() : "")
         .append(" -- Version: (")
         .append(classFile.jdkVersion())
         .append(") -- Size: \n");
@@ -189,7 +192,7 @@ public class Opal {
         Instruction[] instructions = body.instructions();
         byteCodeString
             .append(method.toString())
-            .append(" { ")                // TODO: added "{"
+            .append(" { ") // TODO: added "{"
             .append("// [size :")
             .append(body.codeSize())
             .append(" bytes, max Stack: ")
@@ -242,6 +245,7 @@ public class Opal {
                   .append(instruction)
                   .append("\n");
             } catch (NoSuchElementException e) {
+              e.printStackTrace();
               return "Issue with Java 5? \n\n " + e.getMessage();
             }
           }
@@ -272,36 +276,43 @@ public class Opal {
           byteCodeString.append(
               attribute.toString() + " " + attribute.getClass().getAnnotations().length + "\n");
         }
-        //if(body.runtimeInvisibleTypeAnnotations().length() > 0 || body.runtimeVisibleTypeAnnotations().length()> 0 )
-          System.out.println("RTIV:"+body.runtimeInvisibleTypeAnnotations().mkString("\n"));
-          System.out.println("RTV"+body.runtimeVisibleTypeAnnotations().mkString("\n"));
-          // method.exexceptionTable()
-          if(method.exceptionTable().isDefined()) {
-            ExceptionTable exceptionTable= method.exceptionTable().get();
-            byteCodeString.append("ExceptionTable\n");
-            RefIterator<ObjectType> exceptions = exceptionTable.exceptions().iterator();
-            while(exceptions.hasNext()){
-              ObjectType exception = exceptions.next();
-              byteCodeString.append(exception.id()).append("\t").append(exception.toJava()).append("\n");
-            }
+        // if(body.runtimeInvisibleTypeAnnotations().length() > 0 ||
+        // body.runtimeVisibleTypeAnnotations().length()> 0 )
+        System.out.println("RTIV:" + body.runtimeInvisibleTypeAnnotations().mkString("\n"));
+        System.out.println("RTV" + body.runtimeVisibleTypeAnnotations().mkString("\n"));
+        // method.exexceptionTable()
+        if (method.exceptionTable().isDefined()) {
+          ExceptionTable exceptionTable = method.exceptionTable().get();
+          byteCodeString.append("ExceptionTable\n");
+          RefIterator<ObjectType> exceptions = exceptionTable.exceptions().iterator();
+          while (exceptions.hasNext()) {
+            ObjectType exception = exceptions.next();
+            byteCodeString
+                .append(exception.id())
+                .append("\t")
+                .append(exception.toJava())
+                .append("\n");
           }
+        }
         // end method.exceptionTable
 
-        if(method.runtimeVisibleAnnotations().iterator().hasNext()){
+        if (method.runtimeVisibleAnnotations().iterator().hasNext()) {
           byteCodeString.append("RuntimeVisibleAnnotations\n");
-          RefIterator<Annotation> annotationRefIterator = method.runtimeVisibleAnnotations().iterator();
-          while(annotationRefIterator.hasNext()){
+          RefIterator<Annotation> annotationRefIterator =
+              method.runtimeVisibleAnnotations().iterator();
+          while (annotationRefIterator.hasNext()) {
             byteCodeString.append(annotationRefIterator.next().toJava());
           }
         }
-        if(method.runtimeInvisibleAnnotations().iterator().hasNext()){
+        if (method.runtimeInvisibleAnnotations().iterator().hasNext()) {
           byteCodeString.append("RuntimeInvisibleAnnotations\n");
-          RefIterator<Annotation> annotationRefIterator = method.runtimeInvisibleAnnotations().iterator();
-          while(annotationRefIterator.hasNext()){
+          RefIterator<Annotation> annotationRefIterator =
+              method.runtimeInvisibleAnnotations().iterator();
+          while (annotationRefIterator.hasNext()) {
             byteCodeString.append(annotationRefIterator.next().toJava());
           }
         }
-        if(body.stackMapTable().isDefined()){
+        if (body.stackMapTable().isDefined()) {
           StackMapTable stackMapTable = body.stackMapTable().get();
           RefArray<StackMapFrame> stackMapFrameRefArray = stackMapTable.stackMapFrames();
           byteCodeString.append("StackMapTable").append("\n");
@@ -317,7 +328,7 @@ public class Opal {
                 .append(stackMapFrame.offset(0) - 1 + "\n");
           }
         }
-        byteCodeString.append("}");         // TODO: added "}"
+        byteCodeString.append("}"); // TODO: added "}"
         byteCodeString.append(threeTimeNL);
       }
     }
@@ -329,6 +340,13 @@ public class Opal {
   // =====================================================================================
   // =====================================================================================
 
+  /**
+   * Creates the Three-Address-Code for a given class file
+   *
+   * @param classFile
+   * @param filepath  - the path of the class file
+   * @return the TAC for the class file
+   */
   @NotNull
   public static String createTacString(@NotNull ClassFile classFile, String filepath) {
     StringBuilder tacCodeString = new StringBuilder();
@@ -356,12 +374,14 @@ public class Opal {
   // ====================================================================================
   // ====================================================================================
 
+  @Deprecated
   public static String JavaClassToHtmlForm(VirtualFile virtualClassFile) {
     classPath = virtualClassFile.getPath();
     String JavaHTMLClass = JavaClassToHTMLForm(classPath);
     return JavaHTMLClass;
   }
 
+  @Deprecated
   public static String JavaClassToHTMLForm(String classPath) {
     Path path = Paths.get(classPath);
     File file = path.toFile();
@@ -393,6 +413,7 @@ public class Opal {
     return toHtmlAsString;
   }
 
+  @Deprecated
   private static String fixInitSymbols(String htmlString) {
     // e.g. id="&lt;clinit&gt;()V" should become id="<clinit>()V"
     final String regex = "(id=\"|data-name=\")(&lt;)(\\w+)(&gt;)([^\"]*\")";
@@ -410,6 +431,7 @@ public class Opal {
     return htmlString;
   }
 
+  @Deprecated
   private static String jsOpenField() {
     String script =
         "<script>\n"
@@ -421,6 +443,7 @@ public class Opal {
     return script;
   }
 
+  @Deprecated
   private static String jsOpenMethod() {
     String script =
         "<script>\n"
@@ -432,6 +455,7 @@ public class Opal {
     return script;
   }
 
+  @Deprecated
   private static String jsScrollToField() {
     // differentiate between light and dark IDE theme
     String lightThemeHighlight = "\"#FDFF47\"";
@@ -467,6 +491,7 @@ public class Opal {
     return script;
   }
 
+  @Deprecated
   private static String jsScrollToID() {
     // differentiate between light and dark IDE theme
     String lightThemeHighlight = "\"#FDFF47\"";
@@ -504,59 +529,82 @@ public class Opal {
     project = inteliProject;
   }
 
-  // TODO check if date is create & up2date GOT ERROS
+  @Deprecated
   public static VirtualFile prepareHtml(
       @NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
     // All files selected in the "Project"-View
-      setProject(project);
-      Compiler.make(project);
-      File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_HTML, virtualFile,null);
-      return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
+    setProject(project);
+    Compiler.make(project);
+    File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_HTML, virtualFile, null);
+    return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
   } // prepareHtml()
 
+
+  /**
+   * Creates the Three-Address-Code for the given class file
+   *
+   * @param project     - the project the file belongs to
+   * @param virtualFile - the class file for which we want to create the TAC
+   * @return a file (.tac) which contains the TAC for the class file
+   */
   public static VirtualFile prepareTAC(
       @NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
-      setProject(project);
-      Compiler.make(project);
-      File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_TAC, virtualFile,null);
-      return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
+    setProject(project);
+    Compiler.make(project);
+    File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_TAC, virtualFile, null);
+    return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
   }
 
-  // this should be called by constructor
+
+  /**
+   * Creates the Java bytecode for the given class file
+   *
+   * @param project     - the project the file belongs to
+   * @param virtualFile - the class file for which we want to create the bytecode
+   * @return a file (.jbc) which contains the bytecode for the class file
+   */
   public static VirtualFile prepareJBC(
       @NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
     setProject(project);
     Compiler.make(project);
-    File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_JBC, virtualFile,null);
+    File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_JBC, virtualFile, null);
     return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
   }
 
-  // todo SaveFile Class erweitern?
-  public static File prepare(@NotNull String prepareID, VirtualFile virtualFile,@Nullable VirtualFile olderFile) {
+
+  /**
+   * Does the actual preparation of the desired output
+   *
+   * @param prepareID   - defines the type of file to be generated (TAC or Bytecode)
+   * @param virtualFile - the class file
+   * @param olderFile   -
+   * @return the TAC or Bytecode file
+   */
+  public static File prepare(
+          @NotNull String prepareID, @NotNull VirtualFile virtualFile, @Nullable VirtualFile olderFile) {
     classPath = virtualFile.getParent().getPath();
     String fileName = virtualFile.getNameWithoutExtension();
     String representableForm = null;
-    ClassFile classFile;
+    ClassFile classFile = getClassFile(virtualFile);
     switch (prepareID) {
+      // keep the HTML editor for the time being (helps to debug/compare bytecode output)
       case GlobalData.DISASSEMBLED_FILE_ENDING_HTML:
         fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_HTML);
         representableForm = Opal.JavaClassToHtmlForm(virtualFile);
         break;
       case GlobalData.DISASSEMBLED_FILE_ENDING_TAC:
         fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_TAC);
-        classFile = getClassFile(virtualFile);
         representableForm = Opal.createTacString(classFile, virtualFile.getPath());
         break;
       case GlobalData.DISASSEMBLED_FILE_ENDING_JBC:
         fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_JBC);
-        classFile = getClassFile(virtualFile);
         representableForm = Opal.createBytecodeString(classFile);
         break;
     }
-    if(olderFile!=null){
-        fileName = olderFile.getPath();
+    if (olderFile != null) {
+      fileName = olderFile.getPath();
     }
-    return writeContentToFile(fileName, representableForm, false,olderFile==null?false:true);
+    return writeContentToFile(fileName, representableForm, false, olderFile == null ? false : true);
   }
 
   /**
@@ -566,22 +614,23 @@ public class Opal {
    * @param filename the Name of the temporal file
    * @param content content to write into the file
    */
-  private static File writeContentToFile(String filename, String content, boolean append,boolean olderFile) {
+  @Nullable
+  private static File writeContentToFile(
+      String filename, String content, boolean append, boolean olderFile) {
     try {
-        File file = null;
-        if(!olderFile){
+      File file = null;
+      if (!olderFile) {
         String[] filenameArray = filename.split("\\.");
-         file = FileUtil.createTempFile(filenameArray[0],"."+filenameArray[1],true);
-        }else{
-            file = new File(filename);
-        }
-        FileUtil.writeToFile(file, content, append);
-        return file;
+        file = FileUtil.createTempFile(filenameArray[0], "." + filenameArray[1], true);
+      } else {
+        file = new File(filename);
+      }
+      FileUtil.writeToFile(file, content, append);
+      return file;
     } catch (IOException e) {
       e.printStackTrace();
     }
-    //TODO not null
+    // TODO not null
     return null;
   }
-
 }

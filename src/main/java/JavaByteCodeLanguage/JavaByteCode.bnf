@@ -54,8 +54,8 @@
   COLON=":"
   AT="@"
   TO="regexp:>|=>"
-  LBRACKET="regexp:\(|\{|\[|«|\u00ab"
-  RBRACKET="regexp:\)|\}|\]|»|\u00bb"
+  LBRACKET="regexp:\(|\{|\[|«"
+  RBRACKET="regexp:\)|\}|\]|»"
   CONSTMETHODNAMES = "regexp:<(cl)?init>"
 
   LOAD_INSTR="regexp:Load([A-Za-z]+)"

@@ -13,7 +13,11 @@ public class LoadClassFileAction extends AnAction {
 
   public LoadClassFileAction() {
     // Set the menu item name.
-    super("Load Class-file into bytecode disassembler");
+    super("Show Three-Address-Code");
+  }
+
+  public LoadClassFileAction(Icon icon) {
+    super("Show Three-Address-Code", "", icon);
   }
 
   public static final void openClassFile(Project project, VirtualFile classFile) {
