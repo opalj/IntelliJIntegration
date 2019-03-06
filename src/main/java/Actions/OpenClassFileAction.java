@@ -5,18 +5,22 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.compiler.CompilerManager;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.CompilerModuleExtension;
 import com.intellij.openapi.roots.ProjectFileIndex;
-import com.intellij.openapi.vfs.VfsUtilCore;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileVisitor;
+import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.vfs.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import javax.swing.*;
+
+import opalintegration.Opal;
 import org.jetbrains.annotations.NotNull;
 
 public class OpenClassFileAction extends AnAction {
@@ -51,8 +55,8 @@ public class OpenClassFileAction extends AnAction {
       VirtualFile classFile = getCorrespondingClassFile(project, javaFile);
       if (classFile == null) {
         // TODO: compile entire module (think about dependencies) or just the current file?
-        // CompilerManager.getInstance(project).compile(new VirtualFile[] {javaFile}, );
-        CompilerManager.getInstance(project).rebuild(null);
+        CompilerManager.getInstance(project).compile(new VirtualFile[] {javaFile}, null);
+        //CompilerManager.getInstance(project).rebuild(null);
         do {
           try {
             TimeUnit.SECONDS.sleep(2);
@@ -80,31 +84,70 @@ public class OpenClassFileAction extends AnAction {
     ProjectFileIndex projectFileIndex = ProjectFileIndex.getInstance(project);
     Module module = projectFileIndex.getModuleForFile(javaFile);
     // get the output directory
-    VirtualFile outputPath = CompilerModuleExtension.getInstance(module).getCompilerOutputPath();
-    outputPath.refresh(false, true);
-    // the name of the class file we are looking for
-    String classFileName = javaFile.getNameWithoutExtension() + ".class";
+    if (module != null) {
+      VirtualFile outputPath = CompilerModuleExtension.getInstance(module).getCompilerOutputPath();
+      outputPath.refresh(false, true);
+      // the name of the class file we are looking for
+      String classFileName = javaFile.getNameWithoutExtension() + ".class";
 
-    // collect all classFiles in the output directory
-    List<VirtualFile> classFiles = new ArrayList<>();
-    VfsUtilCore.visitChildrenRecursively(
-        outputPath,
-        new VirtualFileVisitor<VirtualFile>() {
-          @NotNull
-          @Override
-          public Result visitFileEx(@NotNull VirtualFile file) {
-            if (!file.isDirectory() && file.getName().equals(classFileName)) {
-              classFiles.add(file);
-              VirtualFileVisitor.limit(-1);
-              return VirtualFileVisitor.SKIP_CHILDREN;
+      // collect all classFiles in the output directory
+      List<VirtualFile> classFiles = new ArrayList<>();
+      VfsUtilCore.visitChildrenRecursively(
+          outputPath,
+          new VirtualFileVisitor<VirtualFile>() {
+            @NotNull
+            @Override
+            public Result visitFileEx(@NotNull VirtualFile file) {
+              if (!file.isDirectory() && file.getName().equals(classFileName)) {
+                classFiles.add(file);
+                VirtualFileVisitor.limit(-1);
+                return VirtualFileVisitor.SKIP_CHILDREN;
+              }
+              return CONTINUE;
             }
-            return CONTINUE;
-          }
-        });
-    VirtualFile classFile = null;
-    if (!classFiles.isEmpty()) {
-      classFile = classFiles.get(0);
+          });
+      VirtualFile classFile = null;
+      if (!classFiles.isEmpty()) {
+        classFile = classFiles.get(0);
+      }
+      return classFile;
     }
-    return classFile;
+    File tempJavaFile = null;
+    File tempClassFile = null;
+    try {
+      tempJavaFile = new File(FileUtil.getTempDirectory() + File.separator + javaFile.getName());
+      Document document = FileDocumentManager.getInstance().getDocument(javaFile);
+      FileUtil.writeToFile(tempJavaFile, document.getText());
+      VirtualFile virtualTempJavaFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(tempJavaFile);
+      //todo should maybe be dont with compileManager(Impl).compile(new VirtualFile[]{virtualTempJavaFile},null);
+      String jarFilePath = javaFile.getPath().contains("!")?
+              Opal.getJarFileRoot(javaFile)
+              .substring(0, Opal.getJarFileRoot(javaFile).lastIndexOf("/") + 1):
+              javaFile.getPath();
+      String reduceequalsfold =
+              recFolder(new File(jarFilePath), new ArrayList<String>()).stream().reduce("", (s, s2) -> s.concat("/*;").concat(s2)).replaceFirst("/\\*;","");
+      RunCommand.runJavaC(tempJavaFile.getPath(), reduceequalsfold);
+      tempClassFile =
+          new File(
+              FileUtil.getTempDirectory()
+                  + File.separator
+                  + javaFile.getNameWithoutExtension()
+                  + ".class");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(tempClassFile);
   } // getCorrespondingClassFile()
+
+  public ArrayList<String> recFolder(File parrent, ArrayList<String> jarName) {
+    for (File file : parrent.listFiles()) {
+      if (file.isDirectory()) {
+        recFolder(file, jarName);
+      }else if(file.getName().contains("jar")){
+        if(!jarName.contains(file.getParentFile() + "\\"))
+        jarName.add(file.getParentFile() + "\\");
+      }
+    }
+    return jarName;
+  }
 }

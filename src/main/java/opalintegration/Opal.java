@@ -30,6 +30,8 @@ import org.opalj.value.KnownTypedValue;
 import scala.Function0;
 import scala.Function1;
 import scala.Some;
+import scala.collection.immutable.List;
+
 
 public class Opal {
   // uriProject wird benötigt um die OpalFrameworks mit dem Project zu verbinden.
@@ -47,9 +49,9 @@ public class Opal {
 
   private static ClassFile getClassFile(VirtualFile virtualClassFile) {
     String filepath = virtualClassFile.getPath();
-    Project<URL> uriProject = Project.apply(new File(filepath));
+    File classFile = new File(filepath);
+    Project<URL> uriProject = Project.apply(classFile);
     ConstArray<ClassFile> classFileConstArray = uriProject.allProjectClassFiles();
-
     if (classFileConstArray.length() > 0) {
       System.out.println("Apply(0): " + classFileConstArray.apply(0));
       return classFileConstArray.apply(0);
@@ -59,14 +61,22 @@ public class Opal {
       System.out.println("getClassFile() JAR? : " + virtualClassFile.getName());
       String jarFileRoot = getJarFileRoot(virtualClassFile);
       return createClassFileFromJar(jarFileRoot);
+    } else {
+      try {
+        FileInputStream inputStream = new FileInputStream(classFile);
+        Object classFileObj = Project.JavaClassFileReader(uriProject.logContext(), uriProject.config()).ClassFile(() -> inputStream).head();
+        if(classFileObj instanceof ClassFile){
+          return (ClassFile) classFileObj;
+        }
+      } catch (FileNotFoundException e) {
+        e.printStackTrace();
+      }
     }
-    // TODO: what to do in this case?
-    else {
-      return null;
-    }
+    //todo 
+    return null;
   }
 
-  private static String getJarFileRoot(VirtualFile virtualClassFile) {
+  public static String getJarFileRoot(VirtualFile virtualClassFile) {
     String jarPathWithoutClassExtension =
         virtualClassFile.getParent().getPath()
             + File.separator
@@ -78,7 +88,6 @@ public class Opal {
         jarPathWithoutClassExtension.substring(0, jarPathWithoutClassExtension.indexOf("!/"));
     return jarFileRoot;
   }
-
   // TODO: this gets called for classes we haven't clicked on as well?
   private static ClassFile createClassFileFromJar(String jarFileRoot) {
     Project<URL> uriProject = Project.apply(new File(jarFileRoot));
@@ -94,8 +103,6 @@ public class Opal {
                     } catch (IOException e) {
                       // ....
                     }
-
-                    System.out.println("ABOUT TO RETURN NULL (1)");
                     return null;
                   }
                 })
