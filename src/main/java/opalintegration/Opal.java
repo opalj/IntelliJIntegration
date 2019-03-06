@@ -86,7 +86,7 @@ public class Opal {
     return null;
   }
     /**
-     *
+     * One proper method name say more then thousand comments
      * @param virtualClassFile - a class file (assumed to be located in a JAR)
      * @return the path to the JAR
      */
