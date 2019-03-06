@@ -72,7 +72,7 @@ public class Opal {
         e.printStackTrace();
       }
     }
-    //todo 
+    //todo
     return null;
   }
 
