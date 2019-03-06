@@ -53,8 +53,11 @@
 
     <actions>
         <!-- Add your actions here -->
-        <action id="JumpToJBCEID" class="Actions.OpenClassFileAction" text="Open Bytecodeanalyse" icon="">
+        <action id="JumpToJBCEID" class="Actions.OpenClassFileAction" text="Show Bytecode" icon="/icons/jar-gray.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+
+        <action id="JumpToJbcFromRMB" class="Actions.OpenCorrespondingClassFileAction" text="Compile And Show Bytecode" icon="/icons/jar-gray.png">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </action>
     </actions>

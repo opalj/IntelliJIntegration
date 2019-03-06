@@ -4,6 +4,6 @@ public class OpenCorrespondingClassFileAction extends OpenClassFileAction {
 
   public OpenCorrespondingClassFileAction() {
     // Set the menu item name.
-    super("Compile And Open .class-File");
+    super("Compile And Show Bytecode");
   }
 }
