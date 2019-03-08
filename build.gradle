@@ -40,11 +40,11 @@ dependencies {
 
 intellij {
     version '2018.2.2' // maybe need to be changed to latest eap snapshot
+    intellij.updateSinceUntilBuild false //Disables updating since-build attribute in plugin.xml
 }
 patchPluginXml {
     changeNotes """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
+      Lots of added functionality. See Readme."""
 }
 
 // ================
