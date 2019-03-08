@@ -1,12 +1,18 @@
 <idea-plugin>
     <id>23.bytecode-disassembler</id>
-    <name>Plugin display name here</name>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <name>OPAL Integration</name>
+    <vendor email="marcel.dieter@stud.tu-darmstadt.de" >Kollektiv 23</vendor>
 
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
+    OPAL Framework integration for IntelliJ IDEA.<br>
     ]]></description>
+
+    <change-notes>Lots of added functionality. See Readme.</change-notes>
+
+    <version>0.2.0</version>
+    <!-- until-build version is looking into the future might be wrong!! -->
+    <idea-version since-build="181" until-build="183.*"/>
+
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
