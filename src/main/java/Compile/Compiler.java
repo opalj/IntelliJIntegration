@@ -2,25 +2,31 @@ package Compile;
 
 import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompilerManager;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
-
+/**
+ * a compiler helper class
+ */
 public final class Compiler {
 
-  /*
-   * Compile a project with a given (open) Project-Object
+  /**
+   *  compiles an whole project
+   * @param project
+   * @return true if the project was up-to-date
    */
   public static boolean make(@NotNull final Project project) {
     CompilerManager compManager = CompilerManager.getInstance(project);
     CompileScope projectCompileScope = compManager.createProjectCompileScope(project);
     boolean uptoDate = compManager.isUpToDate(projectCompileScope);
     if (!uptoDate) {
-      // ApplicationManager.getApplication().invokeAndWait( () -
-      // compManager.make(null);
       compManager.make(projectCompileScope, null);
       do {
         try {
@@ -32,34 +38,25 @@ public final class Compiler {
     }
     return uptoDate;
   }
-
-  /*
-   * Compile a project with a given filePath-String,
-   * searches naively the first .idea-Dir or *.ipr-file
+  /**
+   *  compiles an a specific java file for a given project if the java file contains in the given the project
+   * @param project
+   * @param javaFile
+   * @return true if java file contains in the given project
    */
-  public boolean make(@NotNull String filePath) {
-    // filePath = find(filePath);
-
-    ProjectManager projectManager = ProjectManager.getInstance();
-    Project project;
-    // Look for OpenProjects
-    for (Project openProject : projectManager.getOpenProjects()) {
-      if (openProject != null && openProject.getBasePath().equals(filePath)) {
-        project = openProject;
-        return make(project);
-      }
-    }
-    // try to open project
-    try {
-      project = projectManager.loadAndOpenProject(filePath);
-      if (project == null) {
-        return false;
-      }
-      boolean bMade = make(project);
-      projectManager.closeProject(project);
-      return bMade;
-    } catch (IOException | JDOMException e) {
-      e.printStackTrace();
+  public static boolean make(@NotNull final Project project, VirtualFile javaFile){
+    ProjectFileIndex projectFileIndex = ProjectFileIndex.getInstance(project);
+    Module module = projectFileIndex.getModuleForFile(javaFile);
+    if(module != null) {
+      CompilerManager.getInstance(project).compile(new VirtualFile[]{javaFile}, null);
+      do {
+        try {
+          TimeUnit.SECONDS.sleep(2);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      } while (CompilerManager.getInstance(project).isCompilationActive());
+      return true;
     }
     return false;
   }

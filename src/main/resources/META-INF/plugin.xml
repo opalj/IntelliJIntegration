@@ -59,20 +59,18 @@
 
     <actions>
         <!-- Add your actions here -->
-        <action id="JumpToJBCEID" class="Actions.OpenClassFileAction" text="Show Bytecode" icon="/icons/jar-gray.png">
+        <action id="JumpToJBCEID" class="Actions.OpenClassFileJBCAction" text="Show Bytecode" icon="/icons/jar-gray.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </action>
-
-        <action id="JumpToJbcFromRMB" class="Actions.OpenCorrespondingClassFileAction" text="Compile And Show Bytecode" icon="/icons/jar-gray.png">
+        <action id="JumpToTACFromRMB" class="Actions.OpenClassFileTACAction" text="Show Three-Address-Code" icon="/icons/jar-gray.png">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </action>
     </actions>
 
     <application-components>
         <!-- Add your application components here -->
-        <component>
-            <implementation-class>Actions.LoadClassFileComponent</implementation-class>
-        </component>
     </application-components>
     <project-components>
         <component>

@@ -1,6 +1,7 @@
 package opalintegration;
 
 import Compile.Compiler;
+import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.*;
 import globalData.GlobalData;
@@ -9,7 +10,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.NoSuchElementException;
-import java.util.jar.JarInputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
@@ -27,10 +27,8 @@ import org.opalj.collection.immutable.RefArray;
 import org.opalj.da.ClassFileReader;
 import org.opalj.tac.*;
 import org.opalj.value.KnownTypedValue;
-import scala.Function0;
 import scala.Function1;
 import scala.Some;
-import scala.collection.immutable.List;
 
 
 public class Opal {
@@ -38,15 +36,34 @@ public class Opal {
   private static Project<URL> uriProject;
   // noch nicht wichtig könnted
   private static JavaProject javaProject;
-  static Function1<Method, TACode<TACMethodParameter, DUVar<KnownTypedValue>>> methodTACodeFunction;
+  private static Function1<Method, TACode<TACMethodParameter, DUVar<KnownTypedValue>>> methodTACodeFunction;
+  private static ClassFile classFile;
   // INTELIJ VARS
   private static com.intellij.openapi.project.Project project;
-  private static String classPath;
-
+  private static String projectPath;
+  private static String fqClassName;
+  private static File projectFile;
+  private static VirtualFile currentWorkingVF;
   // =====================================================================================
   // =====================================================================================
   // =====================================================================================
-
+  private static void isNewClassFile(@NotNull VirtualFile virtualClassFile){
+    if(!virtualClassFile.equals(currentWorkingVF) && virtualClassFile.getExtension().equals(StdFileTypes.CLASS.getDefaultExtension())){
+     currentWorkingVF = virtualClassFile;
+     Compiler.make(project);
+     if(!virtualClassFile.getCanonicalPath().contains("!")) {
+       projectPath = virtualClassFile.getPath();
+       fqClassName = virtualClassFile.getName();
+     }else{
+       String[] jarPath = getJarFileRootAndFileName(virtualClassFile);
+       projectPath = jarPath[0];
+       fqClassName = jarPath[1];
+     }
+       projectFile = new File(projectPath);
+       uriProject = Project.apply(projectFile);
+     classFile = getClassFile(virtualClassFile);
+    }
+  }
   /**
    * Returns an OPAL ClassFile for a given class file. The ClassFile from OPAL
    * contains necessary information to produce the desired bytecode and TAC
@@ -57,23 +74,23 @@ public class Opal {
    */
   @Nullable
   private static ClassFile getClassFile(@NotNull VirtualFile virtualClassFile) {
-    String filepath = virtualClassFile.getPath();
-    File classFile = new File(filepath);
-    Project<URL> uriProject = Project.apply(classFile);
     ConstArray<ClassFile> classFileConstArray = uriProject.allProjectClassFiles();
-    if (classFileConstArray.length() > 0) {
-      System.out.println("Apply(0): " + classFileConstArray.apply(0));
-      return classFileConstArray.apply(0);
+      for(int i = 0 ; i < classFileConstArray.length(); i++ ){
+        ClassFile cf = classFileConstArray.apply(i);
+        if(cf.fqn().equals(fqClassName.replace(".class",""))) {
+          System.out.println("Apply(0): " + cf);
+          return cf;
+        }
     }
-    // else (might be) JAR
-    else if (virtualClassFile.getCanonicalPath().contains("jar!")) {
+    // (might be) JAR
+    if (virtualClassFile.getCanonicalPath().contains("!")) {
       System.out.println("getClassFile() JAR? : " + virtualClassFile.getName());
-      String jarFileRoot = getJarFileRoot(virtualClassFile);
-      return createClassFileFromJar(jarFileRoot);
-        // TODO: specifie case
-    } else {
+      return createClassFileFromJar(projectPath,fqClassName);
+    }
+    // use the input stream instead
+    else {
       try {
-        FileInputStream inputStream = new FileInputStream(classFile);
+        FileInputStream inputStream = new FileInputStream(projectFile);
         Object classFileObj = Project.JavaClassFileReader(uriProject.logContext(), uriProject.config()).ClassFile(() -> inputStream).head();
         if(classFileObj instanceof ClassFile){
           return (ClassFile) classFileObj;
@@ -88,57 +105,36 @@ public class Opal {
     /**
      * One proper method name say more then thousand comments
      * @param virtualClassFile - a class file (assumed to be located in a JAR)
-     * @return the path to the JAR
+     * @return a string array with a jar/zip path & full qualified class name
      */
-  public static String getJarFileRoot(VirtualFile virtualClassFile) {
-
+  public static String[] getJarFileRootAndFileName(VirtualFile virtualClassFile) {
     String jarPathWithoutClassExtension =
         virtualClassFile.getParent().getPath()
             + File.separator
-            + virtualClassFile.getNameWithoutExtension();
+            + virtualClassFile.getName();
     // this\is\the\jarPath -> this/is/the/jarPath
     jarPathWithoutClassExtension = jarPathWithoutClassExtension.replaceAll("\\\\", "/");
-
-    String jarFileRoot =
-        jarPathWithoutClassExtension.substring(0, jarPathWithoutClassExtension.indexOf("!/"));
+    String[] jarFileRoot = jarPathWithoutClassExtension.split("!/",2);
     return jarFileRoot;
   }
-
-
 
   /**
    *  One proper method name say more then thousand comments
    * @param jarFileRoot - path to a JAR
-   * @return
+   * @param  className the fully qualified class name with extention
+   * @return ClassFile
    */
   // TODO: this gets called for classes we haven't clicked on as well?
-  private static ClassFile createClassFileFromJar(String jarFileRoot) {
-    Project<URL> uriProject = Project.apply(new File(jarFileRoot));
-
-    Object classObj =
-        Project.JavaClassFileReader(uriProject.logContext(), uriProject.config())
-            .ClassFiles(
-                new Function0<JarInputStream>() {
-                  @Override
-                  public JarInputStream apply() {
-                    try {
-                      return new JarInputStream(new FileInputStream(new File(jarFileRoot)));
-                    } catch (IOException e) {
-                      // ....
-                    }
-
-                    System.out.println("ABOUT TO RETURN NULL (1)");
-                    return null;
-                  }
-                })
-            .head()
-            ._1();
-
+  private static ClassFile createClassFileFromJar(String jarFileRoot, String className) {
     ClassFile classFileFromJar = null;
-    if (classObj instanceof ClassFile) {
-      classFileFromJar = (ClassFile) classObj;
+    try {
+      scala.collection.immutable.List classFileList = Project.JavaClassFileReader(uriProject.logContext(), uriProject.config()).ClassFile(jarFileRoot, className);
+      if(classFileList.size() == 1 ) {
+        classFileFromJar = (ClassFile) classFileList.head();
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
     }
-
     return classFileFromJar;
   }
 
@@ -346,7 +342,7 @@ public class Opal {
   @NotNull
   public static String createTacString(@NotNull ClassFile classFile, String filepath) {
     StringBuilder tacCodeString = new StringBuilder();
-    uriProject = Project.apply(new File(filepath));
+    //uriProject = Project.apply(new File(filepath));
     javaProject = new JavaProject(uriProject);
     methodTACodeFunction = javaProject.project().get(DefaultTACAIKey$.MODULE$);
 
@@ -371,8 +367,7 @@ public class Opal {
   // ====================================================================================
 
   public static String JavaClassToHtmlForm(VirtualFile virtualClassFile) {
-    classPath = virtualClassFile.getPath();
-    String JavaHTMLClass = JavaClassToHTMLForm(classPath);
+    String JavaHTMLClass = JavaClassToHTMLForm( virtualClassFile.getPath());
     return JavaHTMLClass;
   }
 
@@ -514,8 +509,9 @@ public class Opal {
   // ====================================================================================
   // ====================================================================================
 
-  public static void setProject(com.intellij.openapi.project.Project inteliProject) {
-    project = inteliProject;
+
+  public static void setProject(com.intellij.openapi.project.Project project) {
+    Opal.project = project;
   }
 
   // TODO check if date is create & up2date GOT ERROS
@@ -523,7 +519,6 @@ public class Opal {
       @NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
     // All files selected in the "Project"-View
     setProject(project);
-    Compiler.make(project);
     File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_HTML, virtualFile, null);
     return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
   } // prepareHtml()
@@ -531,7 +526,6 @@ public class Opal {
   public static VirtualFile prepareTAC(
       @NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
     setProject(project);
-    Compiler.make(project);
     File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_TAC, virtualFile, null);
     return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
   }
@@ -540,7 +534,6 @@ public class Opal {
   public static VirtualFile prepareJBC(
       @NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
     setProject(project);
-    Compiler.make(project);
     File preparedFile = prepare(GlobalData.DISASSEMBLED_FILE_ENDING_JBC, virtualFile, null);
     return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
   }
@@ -548,10 +541,9 @@ public class Opal {
   // todo SaveFile Class erweitern?
   public static File prepare(
       @NotNull String prepareID, VirtualFile virtualFile, @Nullable VirtualFile olderFile) {
-    classPath = virtualFile.getParent().getPath();
+    isNewClassFile(virtualFile);
     String fileName = virtualFile.getNameWithoutExtension();
     String representableForm = null;
-    ClassFile classFile = getClassFile(virtualFile);
     switch (prepareID) {
       case GlobalData.DISASSEMBLED_FILE_ENDING_HTML:
         fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_HTML);

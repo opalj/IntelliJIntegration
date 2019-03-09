@@ -12,9 +12,6 @@ shadowJar {
     transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
         resource = 'reference.conf'
     }
-    //https://openjfx.io/openjfx-docs/#gradle
-//    id 'application'
-//    id 'org.openjfx.javafxplugin' version '0.0.7'
 }
 group 'Kollektiv 23'
 version '0.2.0'
@@ -31,11 +28,11 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile 'de.opal-project:abstract-interpretation-framework_2.12:2.0.1'
-    compile 'de.opal-project:bytecode-disassembler_2.12:2.0.1'
-    // jsoup HTML parser library @ https://jsoup.org/
-    //compile 'org.jsoup:jsoup:1.11.3'
-    //compile group: 'perfectjpattern', name: 'perfectjpattern-core', version: '1.0.2'
+    // https://mvnrepository.com/artifact/de.opal-project/*
+    compile group: 'de.opal-project', name: 'abstract-interpretation-framework_2.12', version: '2.0.1'
+    compile group: 'de.opal-project', name:'bytecode-disassembler_2.12', version: '2.0.1'
+    compile group: 'de.opal-project', name: 'bytecode-representation_2.12', version: '2.0.1'
+
 }
 
 intellij {
@@ -62,16 +59,12 @@ check {
     tasks.findByName('spotbugsMain').mustRunAfter('pmdMain')
 }
 
-//runIde{
-//    dependsOn 'check'
-//}
 
 tasks.withType(com.github.spotbugs.SpotBugsTask) {
     reports {
         xml.enabled = false
         html.enabled = true
     }
-    // TODO: remove later
     ignoreFailures = true
 }
 tasks.withType(Pmd){
@@ -89,17 +82,9 @@ checkstyle {
 pmd{
     toolVersion = "6.11.0"
     ignoreFailures = true
-    //ConsoleOutput = true
     ruleSetFiles = files("config/pmd/myRuleSets.xml")
-    //ruleSets = ['category/java/errorprone.xml'
-            //'java-basic',
-            //'java-CyclomaticComplexityRule'
-            // schaut noch ob Javadoc geschrieben sind
-            //'java-comments',
-            //]
-}
 
-// needed if you use java 11
-//javafx {
-//    modules = [ 'javafx.controls', 'javafx.fxml','javafx.web', 'javafx.swing' ]
-//}
+}
+runIde {
+    maxHeapSize = "2g"
+}
