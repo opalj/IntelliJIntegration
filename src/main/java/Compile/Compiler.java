@@ -4,21 +4,17 @@ import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.jdom.JDOMException;
+import java.util.concurrent.TimeUnit;
 import org.jetbrains.annotations.NotNull;
-/**
- * a compiler helper class
- */
+
+/** a compiler helper class */
 public final class Compiler {
 
   /**
-   *  compiles an whole project
+   * compiles an whole project
+   *
    * @param project
    * @return true if the project was up-to-date
    */
@@ -39,16 +35,18 @@ public final class Compiler {
     return uptoDate;
   }
   /**
-   *  compiles an a specific java file for a given project if the java file contains in the given the project
+   * compiles an a specific java file for a given project if the java file contains in the given the
+   * project
+   *
    * @param project
    * @param javaFile
    * @return true if java file contains in the given project
    */
-  public static boolean make(@NotNull final Project project, VirtualFile javaFile){
+  public static boolean make(@NotNull final Project project, VirtualFile javaFile) {
     ProjectFileIndex projectFileIndex = ProjectFileIndex.getInstance(project);
     Module module = projectFileIndex.getModuleForFile(javaFile);
-    if(module != null) {
-      CompilerManager.getInstance(project).compile(new VirtualFile[]{javaFile}, null);
+    if (module != null) {
+      CompilerManager.getInstance(project).compile(new VirtualFile[] {javaFile}, null);
       do {
         try {
           TimeUnit.SECONDS.sleep(2);

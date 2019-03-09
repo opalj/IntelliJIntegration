@@ -1,9 +1,7 @@
 package Actions;
-/**
- * {@link OpenClassFileAction}
- */
+/** {@link OpenClassFileAction} */
 public class OpenClassFileTACAction extends OpenClassFileAction {
-    public OpenClassFileTACAction() {
-        super("OPAL-TAC");
-    }
+  public OpenClassFileTACAction() {
+    super("OPAL-TAC");
+  }
 }

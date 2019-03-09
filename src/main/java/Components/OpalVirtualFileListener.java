@@ -9,9 +9,7 @@ import java.util.Arrays;
 import opalintegration.Opal;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * a project component to load a virtual file listener to *.class-files.
- */
+/** a project component to load a virtual file listener to *.class-files. */
 public class OpalVirtualFileListener implements ProjectComponent {
   private static Project project;
 
@@ -28,7 +26,8 @@ public class OpalVirtualFileListener implements ProjectComponent {
 
   private static class myVirtualFileListener implements VirtualFileListener {
     /**
-     *  if a *.class content had been changed it will automaticly update the bytecode-&tac-file  with
+     * if a *.class content had been changed it will automaticly update the bytecode-&tac-file with
+     *
      * @param event the changed file
      */
     @Override

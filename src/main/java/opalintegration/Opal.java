@@ -30,13 +30,13 @@ import org.opalj.value.KnownTypedValue;
 import scala.Function1;
 import scala.Some;
 
-
 public class Opal {
   // uriProject wird benötigt um die OpalFrameworks mit dem Project zu verbinden.
   private static Project<URL> uriProject;
   // noch nicht wichtig könnted
   private static JavaProject javaProject;
-  private static Function1<Method, TACode<TACMethodParameter, DUVar<KnownTypedValue>>> methodTACodeFunction;
+  private static Function1<Method, TACode<TACMethodParameter, DUVar<KnownTypedValue>>>
+      methodTACodeFunction;
   private static ClassFile classFile;
   // INTELIJ VARS
   private static com.intellij.openapi.project.Project project;
@@ -47,27 +47,27 @@ public class Opal {
   // =====================================================================================
   // =====================================================================================
   // =====================================================================================
-  private static void isNewClassFile(@NotNull VirtualFile virtualClassFile){
-    if(!virtualClassFile.equals(currentWorkingVF) && virtualClassFile.getExtension().equals(StdFileTypes.CLASS.getDefaultExtension())){
-     currentWorkingVF = virtualClassFile;
-     Compiler.make(project);
-     if(!virtualClassFile.getCanonicalPath().contains("!")) {
-       projectPath = virtualClassFile.getPath();
-       fqClassName = virtualClassFile.getName();
-     }else{
-       String[] jarPath = getJarFileRootAndFileName(virtualClassFile);
-       projectPath = jarPath[0];
-       fqClassName = jarPath[1];
-     }
-       projectFile = new File(projectPath);
-       uriProject = Project.apply(projectFile);
-     classFile = getClassFile(virtualClassFile);
+  private static void isNewClassFile(@NotNull VirtualFile virtualClassFile) {
+    if (!virtualClassFile.equals(currentWorkingVF)
+        && virtualClassFile.getExtension().equals(StdFileTypes.CLASS.getDefaultExtension())) {
+      currentWorkingVF = virtualClassFile;
+      Compiler.make(project);
+      if (!virtualClassFile.getCanonicalPath().contains("!")) {
+        projectPath = virtualClassFile.getPath();
+        fqClassName = virtualClassFile.getName();
+      } else {
+        String[] jarPath = getJarFileRootAndFileName(virtualClassFile);
+        projectPath = jarPath[0];
+        fqClassName = jarPath[1];
+      }
+      projectFile = new File(projectPath);
+      uriProject = Project.apply(projectFile);
+      classFile = getClassFile(virtualClassFile);
     }
   }
   /**
-   * Returns an OPAL ClassFile for a given class file. The ClassFile from OPAL
-   * contains necessary information to produce the desired bytecode and TAC
-   * representations for a class file.
+   * Returns an OPAL ClassFile for a given class file. The ClassFile from OPAL contains necessary
+   * information to produce the desired bytecode and TAC representations for a class file.
    *
    * @param virtualClassFile
    * @return an OPAL ClassFile
@@ -75,24 +75,27 @@ public class Opal {
   @Nullable
   private static ClassFile getClassFile(@NotNull VirtualFile virtualClassFile) {
     ConstArray<ClassFile> classFileConstArray = uriProject.allProjectClassFiles();
-      for(int i = 0 ; i < classFileConstArray.length(); i++ ){
-        ClassFile cf = classFileConstArray.apply(i);
-        if(cf.fqn().equals(fqClassName.replace(".class",""))) {
-          System.out.println("Apply(0): " + cf);
-          return cf;
-        }
+    for (int i = 0; i < classFileConstArray.length(); i++) {
+      ClassFile cf = classFileConstArray.apply(i);
+      if (cf.fqn().equals(fqClassName.replace(".class", ""))) {
+        System.out.println("Apply(0): " + cf);
+        return cf;
+      }
     }
     // (might be) JAR
     if (virtualClassFile.getCanonicalPath().contains("!")) {
       System.out.println("getClassFile() JAR? : " + virtualClassFile.getName());
-      return createClassFileFromJar(projectPath,fqClassName);
+      return createClassFileFromJar(projectPath, fqClassName);
     }
     // use the input stream instead
     else {
       try {
         FileInputStream inputStream = new FileInputStream(projectFile);
-        Object classFileObj = Project.JavaClassFileReader(uriProject.logContext(), uriProject.config()).ClassFile(() -> inputStream).head();
-        if(classFileObj instanceof ClassFile){
+        Object classFileObj =
+            Project.JavaClassFileReader(uriProject.logContext(), uriProject.config())
+                .ClassFile(() -> inputStream)
+                .head();
+        if (classFileObj instanceof ClassFile) {
           return (ClassFile) classFileObj;
         }
       } catch (FileNotFoundException e) {
@@ -102,34 +105,36 @@ public class Opal {
     // TODO: what to do in this case?
     return null;
   }
-    /**
-     * One proper method name say more then thousand comments
-     * @param virtualClassFile - a class file (assumed to be located in a JAR)
-     * @return a string array with a jar/zip path & full qualified class name
-     */
+  /**
+   * One proper method name say more then thousand comments
+   *
+   * @param virtualClassFile - a class file (assumed to be located in a JAR)
+   * @return a string array with a jar/zip path & full qualified class name
+   */
   public static String[] getJarFileRootAndFileName(VirtualFile virtualClassFile) {
     String jarPathWithoutClassExtension =
-        virtualClassFile.getParent().getPath()
-            + File.separator
-            + virtualClassFile.getName();
+        virtualClassFile.getParent().getPath() + File.separator + virtualClassFile.getName();
     // this\is\the\jarPath -> this/is/the/jarPath
     jarPathWithoutClassExtension = jarPathWithoutClassExtension.replaceAll("\\\\", "/");
-    String[] jarFileRoot = jarPathWithoutClassExtension.split("!/",2);
+    String[] jarFileRoot = jarPathWithoutClassExtension.split("!/", 2);
     return jarFileRoot;
   }
 
   /**
-   *  One proper method name say more then thousand comments
+   * One proper method name say more then thousand comments
+   *
    * @param jarFileRoot - path to a JAR
-   * @param  className the fully qualified class name with extention
+   * @param className the fully qualified class name with extention
    * @return ClassFile
    */
   // TODO: this gets called for classes we haven't clicked on as well?
   private static ClassFile createClassFileFromJar(String jarFileRoot, String className) {
     ClassFile classFileFromJar = null;
     try {
-      scala.collection.immutable.List classFileList = Project.JavaClassFileReader(uriProject.logContext(), uriProject.config()).ClassFile(jarFileRoot, className);
-      if(classFileList.size() == 1 ) {
+      scala.collection.immutable.List classFileList =
+          Project.JavaClassFileReader(uriProject.logContext(), uriProject.config())
+              .ClassFile(jarFileRoot, className);
+      if (classFileList.size() == 1) {
         classFileFromJar = (ClassFile) classFileList.head();
       }
     } catch (IOException e) {
@@ -342,7 +347,7 @@ public class Opal {
   @NotNull
   public static String createTacString(@NotNull ClassFile classFile, String filepath) {
     StringBuilder tacCodeString = new StringBuilder();
-    //uriProject = Project.apply(new File(filepath));
+    // uriProject = Project.apply(new File(filepath));
     javaProject = new JavaProject(uriProject);
     methodTACodeFunction = javaProject.project().get(DefaultTACAIKey$.MODULE$);
 
@@ -367,7 +372,7 @@ public class Opal {
   // ====================================================================================
 
   public static String JavaClassToHtmlForm(VirtualFile virtualClassFile) {
-    String JavaHTMLClass = JavaClassToHTMLForm( virtualClassFile.getPath());
+    String JavaHTMLClass = JavaClassToHTMLForm(virtualClassFile.getPath());
     return JavaHTMLClass;
   }
 
@@ -508,7 +513,6 @@ public class Opal {
 
   // ====================================================================================
   // ====================================================================================
-
 
   public static void setProject(com.intellij.openapi.project.Project project) {
     Opal.project = project;

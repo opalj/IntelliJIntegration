@@ -5,36 +5,21 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.compiler.CompilerManager;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectCoreUtil;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.roots.*;
-import com.intellij.openapi.roots.ui.configuration.projectRoot.daemon.ProjectStructureElement;
-import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.*;
-import java.io.File;
-import java.io.IOException;
+import com.intellij.psi.search.FilenameIndex;
+import com.intellij.psi.search.GlobalSearchScope;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import com.intellij.psi.PsiJavaFile;
-import com.intellij.psi.search.FilenameIndex;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.messages.impl.Message;
 import opalintegration.Opal;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * The type Open class file action performs to open a specified editor (tac/bytecode)
- */
+/** The type Open class file action performs to open a specified editor (tac/bytecode) */
 public class OpenClassFileAction extends AnAction {
   private String editorName;
 
@@ -54,11 +39,11 @@ public class OpenClassFileAction extends AnAction {
     final VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
     // show Action only for java files
     e.getPresentation()
-            .setEnabledAndVisible(
-                    project != null
-                            && ("java".equals(virtualFile.getExtension())
-                            || "scala".equals(virtualFile.getExtension())
-                            || "class".equals(virtualFile.getExtension())));
+        .setEnabledAndVisible(
+            project != null
+                && ("java".equals(virtualFile.getExtension())
+                    || "scala".equals(virtualFile.getExtension())
+                    || "class".equals(virtualFile.getExtension())));
   }
 
   /**
@@ -78,7 +63,11 @@ public class OpenClassFileAction extends AnAction {
         classFile = getCorrespondingClassFile(project, virtualFile);
       } else if (ProjectFileIndex.getInstance(project).isInLibrary(virtualFile)) {
         String FileName = Opal.getJarFileRootAndFileName(virtualFile.getParent())[1];
-        Collection<VirtualFile> virtualFilesByName = FilenameIndex.getVirtualFilesByName(project, virtualFile.getNameWithoutExtension() + ".class", GlobalSearchScope.allScope(project));
+        Collection<VirtualFile> virtualFilesByName =
+            FilenameIndex.getVirtualFilesByName(
+                project,
+                virtualFile.getNameWithoutExtension() + ".class",
+                GlobalSearchScope.allScope(project));
         for (VirtualFile vf : virtualFilesByName) {
           if (vf.getPath().contains(FileName)) {
             classFile = vf;
@@ -93,7 +82,12 @@ public class OpenClassFileAction extends AnAction {
       FileEditorManager.getInstance(project).openFile(classFile, true);
       FileEditorManager.getInstance(project).setSelectedEditor(classFile, editorName);
     } else {
-      Notifications.Bus.notify(new Notification("OpalPlugin", "OpalPlugin", "can't find or create a class file for : " + virtualFile.getName(), NotificationType.INFORMATION));
+      Notifications.Bus.notify(
+          new Notification(
+              "OpalPlugin",
+              "OpalPlugin",
+              "can't find or create a class file for : " + virtualFile.getName(),
+              NotificationType.INFORMATION));
     }
   } // actionPerformed
 
@@ -101,7 +95,7 @@ public class OpenClassFileAction extends AnAction {
    * Will look for the corresponding .class-file of the passed in .java-file in the output directory
    * of the module, and return it
    *
-   * @param project  the current project (needed to determine the current module)
+   * @param project the current project (needed to determine the current module)
    * @param javaFile the .java-file whose corresponding .class-file we're looking for
    * @return the .class-File corresponding to javaFile
    */
@@ -118,19 +112,19 @@ public class OpenClassFileAction extends AnAction {
       // collect all classFiles in the output directory
       List<VirtualFile> classFiles = new ArrayList<>();
       VfsUtilCore.visitChildrenRecursively(
-              outputPath,
-              new VirtualFileVisitor<VirtualFile>() {
-                @NotNull
-                @Override
-                public Result visitFileEx(@NotNull VirtualFile file) {
-                  if (!file.isDirectory() && file.getName().equals(classFileName)) {
-                    classFiles.add(file);
-                    VirtualFileVisitor.limit(-1);
-                    return VirtualFileVisitor.SKIP_CHILDREN;
-                  }
-                  return CONTINUE;
-                }
-              });
+          outputPath,
+          new VirtualFileVisitor<VirtualFile>() {
+            @NotNull
+            @Override
+            public Result visitFileEx(@NotNull VirtualFile file) {
+              if (!file.isDirectory() && file.getName().equals(classFileName)) {
+                classFiles.add(file);
+                VirtualFileVisitor.limit(-1);
+                return VirtualFileVisitor.SKIP_CHILDREN;
+              }
+              return CONTINUE;
+            }
+          });
       VirtualFile classFile = null;
       if (!classFiles.isEmpty()) {
         classFile = classFiles.get(0);
@@ -140,4 +134,3 @@ public class OpenClassFileAction extends AnAction {
     return null;
   } // getCorrespondingClassFile()
 }
-
