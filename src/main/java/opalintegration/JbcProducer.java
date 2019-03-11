@@ -11,9 +11,32 @@ import org.opalj.br.instructions.Instruction;
 import org.opalj.collection.IntIterator;
 import org.opalj.collection.RefIterator;
 import org.opalj.collection.immutable.RefArray;
+import scala.Function1;
 
 /** Is responsible for creating and providing the bytecode representation of a class file */
 public class JbcProducer {
+
+  /** Converts a given list of annotations into a Java-like representation. */
+  private static String annotationsToJava(
+      RefArray<Annotation> annotations, String before, String after) {
+    Function1 function1 = (Function1<Annotation, String>) v1 -> v1.toJava();
+    if (!annotations.isEmpty()) {
+      return before + annotations._UNSAFE_mapped(function1).mkString("\n") + after;
+    } else {
+      return "";
+    }
+  }
+  /** Converts a given list of annotations into a Java-like representation. */
+  // todo UNDER WORK
+  private static String attributesToJava(
+      RefArray<Attribute> annotations, String before, String after) {
+    Function1 function1 = (Function1<Attribute, String>) v1 -> v1.toString();
+    if (!annotations.isEmpty()) {
+      return before + annotations._UNSAFE_mapped(function1).mkString(" ") + after;
+    } else {
+      return "";
+    }
+  }
 
   /**
    * @param project the project the file belongs to
@@ -72,7 +95,7 @@ public class JbcProducer {
    * @param classFile ...
    * @return the method's bytecode representation as a String
    */
-  private static String byteCodeMethodsToString(ClassFile classFile) {
+  public static String byteCodeMethodsToString(ClassFile classFile) {
     StringBuilder byteCodeString = new StringBuilder();
     StringVisitor stringVisitor = new StringVisitor();
     // RefArray<Method> methods = classFile.methods();
@@ -108,7 +131,7 @@ public class JbcProducer {
                   .append("\t")
                   .append(k)
                   .append("\t")
-                  .append(body.lineNumber(k).get().toString())
+                  .append(body.lineNumber(k).isDefined() ? body.lineNumber(k).get() : 0)
                   .append("\t\t")
                   .append(instruction)
                   .append("\n");
@@ -187,16 +210,14 @@ public class JbcProducer {
             Class<? extends StackMapFrame> frameClass = stackMapFrame.getClass();
             int pc = pcIterator.next();
             byteCodeString
-                .append(pc)
-                .append(" ")
-                .append(frameClass.getName())
-                .append(" ")
-                .append(stackMapFrame.frameType())
-                .append(" ")
-                .append(stackMapFrame.offset(0) - 1)
-                .append("\n");
+                .append(pc + " ")
+                .append(frameClass.getName() + " ")
+                .append(stackMapFrame.frameType() + " ")
+                .append(stackMapFrame.offset(0) - 1 + "\n");
           }
         }
+        byteCodeString.append(annotationsToJava(method.annotations(), "\n/*", "*/"));
+        // byteCodeString.append(attributesToJava(method.attributes(),"\n/*","*/"));
       }
       byteCodeString.append("}").append("\n\n\n");
     }
