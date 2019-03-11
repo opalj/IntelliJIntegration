@@ -6,7 +6,7 @@ import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
-import opalintegration.Opal;
+import opalintegration.JbcProducer;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +26,7 @@ public class DisTextEditorProvider extends PsiAwareTextEditorProvider {
   @Override
   public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
     if (!file.getExtension().equals(GlobalData.DISASSEMBLED_FILE_ENDING_JBC)) {
-      file = Opal.prepareJBC(project, file);
+      file = JbcProducer.prepareJBC(project, file);
     }
     return new DisTextEditor(project, file, this);
   }

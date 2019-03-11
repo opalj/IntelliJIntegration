@@ -3,6 +3,7 @@ package Editors.HTMLEditor;
 import com.intellij.openapi.util.IconLoader;
 import javax.swing.*;
 
+@Deprecated
 public interface OutlineIcons {
   Icon DUMMY_ICON = IconLoader.getIcon("/icons/jar-gray.png");
 

@@ -22,7 +22,7 @@ public class JbcReferenceContributor extends PsiReferenceContributor {
           @Override
           public PsiReference[] getReferencesByElement(
               @NotNull PsiElement element, @NotNull ProcessingContext context) {
-            JbcMethodReference methodReference = null;
+            JbcMethodReference methodReference;
 
             // the element is guaranteed to be of type JavaByteCodeDefMethodName (see below)
             TextRange range = new TextRange(0, element.getTextLength());
@@ -57,7 +57,9 @@ public class JbcReferenceContributor extends PsiReferenceContributor {
         };
 
     /**
-     * the Pattern ensures that psiReferenceProvider#getReferencesByElement(...) is only executed
+     * (note: this is a dangling JavaDoc; purpose: provide easy link to class mentioned below)
+     *
+     * <p>the Pattern ensures that psiReferenceProvider#getReferencesByElement(...) is only executed
      * for JavaByteCodeDefMethodName elements
      *
      * @see com.intellij.psi.PsiReferenceRegistrar

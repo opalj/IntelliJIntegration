@@ -6,7 +6,7 @@ import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
-import opalintegration.Opal;
+import opalintegration.TacProducer;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,7 +41,7 @@ public class TacTextEditorProvider extends PsiAwareTextEditorProvider {
     //        }
     if (!file.getExtension().equals(GlobalData.DISASSEMBLED_FILE_ENDING_TAC)) {
       // Eventuell eine eigene EditorKlasse?
-      file = Opal.prepareTAC(project, file);
+      file = TacProducer.prepareTAC(project, file);
       //            Collection<VirtualFile> allTACFiles = FilenameIndex.getAllFilesByExt(project,
       // GlobalData.DISASSEMBLED_FILE_ENDING_TAC);
       //            for (VirtualFile tacfile : allTACFiles) {

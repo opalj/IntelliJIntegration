@@ -22,6 +22,7 @@ import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements LocationPresentation {
   static final int MAX_TEXT_LENGTH = 50;
 

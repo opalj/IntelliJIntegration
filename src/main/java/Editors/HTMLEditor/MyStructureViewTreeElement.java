@@ -24,6 +24,7 @@ import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
   private final boolean myInStructureViewPopup;
   private HTMLEditor htmlEditor;
