@@ -5,9 +5,15 @@ import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.*;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiJavaFile;
+import com.intellij.psi.PsiManager;
 import globalData.GlobalData;
 import java.io.*;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.opalj.br.*;
@@ -35,6 +41,8 @@ public class OpalUtil {
   private static String fqClassName;
   private static File projectFile;
   private static VirtualFile currentWorkingVF;
+
+  private static final Logger LOGGER = Logger.getLogger(OpalUtil.class.getName());
 
   /**
    * @param prepareID indicates what type the output is going to be (e.g. JBC or TAC)
@@ -96,7 +104,7 @@ public class OpalUtil {
       FileUtil.writeToFile(file, content, append);
       return file;
     } catch (IOException e) {
-      e.printStackTrace();
+      LOGGER.log(Level.SEVERE, e.toString(), e);
     }
     // TODO not null
     return null;
@@ -110,7 +118,10 @@ public class OpalUtil {
       Compiler.make(project);
       if (!virtualClassFile.getCanonicalPath().contains("!")) {
         projectPath = virtualClassFile.getPath();
-        fqClassName = virtualClassFile.getName();
+        PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualClassFile);
+        PsiJavaFile psiJavaFile = (PsiJavaFile) psiFile;
+        final PsiClass[] classes = psiJavaFile.getClasses();
+        fqClassName = classes[0].getQualifiedName().replace('.', '/');
       } else {
         String[] jarPath = getJarFileRootAndFileName(virtualClassFile);
         projectPath = jarPath[0];
@@ -157,7 +168,7 @@ public class OpalUtil {
           return (ClassFile) classFileObj;
         }
       } catch (FileNotFoundException e) {
-        e.printStackTrace();
+        LOGGER.log(Level.SEVERE, e.toString(), e);
       }
     }
     // TODO: what to do in this case?
@@ -194,7 +205,7 @@ public class OpalUtil {
         classFileFromJar = (ClassFile) classFileList.head();
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      LOGGER.log(Level.SEVERE, e.toString(), e);
     }
     return classFileFromJar;
   }

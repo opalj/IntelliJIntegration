@@ -3,6 +3,8 @@ package opalintegration;
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.opalj.bi.AccessFlags;
 import org.opalj.bi.AccessFlagsContexts;
@@ -11,32 +13,11 @@ import org.opalj.br.instructions.Instruction;
 import org.opalj.collection.IntIterator;
 import org.opalj.collection.RefIterator;
 import org.opalj.collection.immutable.RefArray;
-import scala.Function1;
 
 /** Is responsible for creating and providing the bytecode representation of a class file */
 public class JbcProducer {
 
-  /** Converts a given list of annotations into a Java-like representation. */
-  private static String annotationsToJava(
-      RefArray<Annotation> annotations, String before, String after) {
-    Function1 function1 = (Function1<Annotation, String>) v1 -> v1.toJava();
-    if (!annotations.isEmpty()) {
-      return before + annotations._UNSAFE_mapped(function1).mkString("\n") + after;
-    } else {
-      return "";
-    }
-  }
-  /** Converts a given list of annotations into a Java-like representation. */
-  // todo UNDER WORK
-  private static String attributesToJava(
-      RefArray<Attribute> annotations, String before, String after) {
-    Function1 function1 = (Function1<Attribute, String>) v1 -> v1.toString();
-    if (!annotations.isEmpty()) {
-      return before + annotations._UNSAFE_mapped(function1).mkString(" ") + after;
-    } else {
-      return "";
-    }
-  }
+  private static final Logger LOGGER = Logger.getLogger(JbcProducer.class.getName());
 
   /**
    * @param project the project the file belongs to
@@ -51,7 +32,7 @@ public class JbcProducer {
   /**
    * create the bytecode representation (of OPAL) for a given class file
    *
-   * @param classFile ...
+   * @param classFile the classfile of which we want the bytecode
    * @return the bytecode representation as a String
    */
   static String createBytecodeString(ClassFile classFile) {
@@ -90,19 +71,42 @@ public class JbcProducer {
   }
 
   /**
+   * creates a bytecode representation of the implemented fields of the passed classfile
+   *
+   * @param classFile the classfile of which we want the bytecode
+   * @return the fields' bytecode representation as a String
+   */
+  private static String byteCodeFieldToString(ClassFile classFile) {
+    StringBuilder byteCodeString = new StringBuilder();
+    RefArray<Field> fields = classFile.fields();
+    byteCodeString.append("Fields\n");
+    for (int j = 0; j < fields.length(); j++) {
+      Field field = fields.apply(j);
+      // TODO: if access flags empty don't insert empty space before fieldType()
+      String accessFlags = AccessFlags.toString(field.accessFlags(), AccessFlagsContexts.FIELD());
+      byteCodeString
+          .append(accessFlags)
+          .append(accessFlags.isEmpty() ? "" : " ")
+          .append(field.fieldType().toJava())
+          .append(" ")
+          .append(field.name())
+          .append("\n");
+    }
+    byteCodeString.append("\n\n\n");
+    return byteCodeString.toString();
+  }
+
+  /**
    * creates a bytecode representation of the implemented methods of the passed classfile
    *
-   * @param classFile ...
-   * @return the method's bytecode representation as a String
+   * @param classFile the classfile of which we want the bytecode
+   * @return the methods' bytecode representation as a String
    */
   public static String byteCodeMethodsToString(ClassFile classFile) {
     StringBuilder byteCodeString = new StringBuilder();
     StringVisitor stringVisitor = new StringVisitor();
-    // RefArray<Method> methods = classFile.methods();
     RefIterator<Method> methods = classFile.methodsWithBody();
     byteCodeString.append("Methods\n\n");
-    // for (int j = 0; j < methods.length(); j++) {
-    // Method method = methods.apply(j);
     while (methods.hasNext()) {
       Method method = methods.next();
       if (method.body().isDefined()) {
@@ -116,108 +120,35 @@ public class JbcProducer {
             .append(" bytes, max Stack: ")
             .append(body.maxStack())
             .append("] \n");
-        byteCodeString.append("\tPC\tLine\tInstruction\n");
+
+        String pcLineInstr = String.format("\t%-6s %-6s %s\n", "PC", "Line", "Instruction");
+        byteCodeString.append(pcLineInstr);
         for (int k = 0; k < instructions.length; k++) {
           if (instructions[k] != null) {
             try {
               String instruction;
               instruction = stringVisitor.accept(instructions[k]);
-              // }else(instructions[k] instanceof INVOKEVIRTUAL)
               // TODO replace \n (and \t...??) and the likes with spaces
               instruction = instruction.replaceAll("\n", " ");
               instruction = instruction.replaceAll("\t", " ");
 
-              byteCodeString
-                  .append("\t")
-                  .append(k)
-                  .append("\t")
-                  .append(body.lineNumber(k).isDefined() ? body.lineNumber(k).get() : 0)
-                  .append("\t\t")
-                  .append(instruction)
-                  .append("\n");
+              String formattedInstrLine =
+                  String.format(
+                      "\t%-6d %-6s %s\n",
+                      k,
+                      body.lineNumber(k).isDefined() ? body.lineNumber(k).get() : 0,
+                      instruction);
+              byteCodeString.append(formattedInstrLine);
             } catch (NoSuchElementException e) {
+              LOGGER.log(Level.SEVERE, e.toString(), e);
               return "Issue with Java 5? \n\n " + e.getMessage();
             }
           }
         }
-        if (body.localVariableTable().isDefined()) {
-          RefArray<LocalVariable> refArrayOption = body.localVariableTable().get();
-          byteCodeString
-              .append("\n\nLocalVariableTable // [size: ")
-              .append(refArrayOption.length())
-              .append(" item(s)]\n");
-          for (int k = 0; k < refArrayOption.length(); k++) {
-            LocalVariable localVariable = refArrayOption.apply(k);
-            byteCodeString
-                .append("[")
-                .append(localVariable.startPC())
-                .append(" > ")
-                .append(localVariable.length())
-                .append(") => ")
-                .append(localVariable.fieldType().toJava())
-                .append(" ")
-                .append(localVariable.name())
-                .append("\n");
-          }
-        }
-        // method.attributes
-        //        RefArray<Attribute> attributes = method.attributes();
-        //        for (int i = 0; i < attributes.length(); i++) {
-        //          Attribute attribute = attributes.apply(i);
-        //          byteCodeString.append(
-        //                  // attribute.toString() + " " +
-        // attribute.getClass().getAnnotations().length + "\n");
-        //        }
-        // method.attributes
-        // method.exexceptionTable()
-        //        if (method.exceptionTable().isDefined()) {
-        //          ExceptionTable exceptionTable = method.exceptionTable().get();
-        //          byteCodeString.append("ExceptionTable\n");
-        //          RefIterator<ObjectType> exceptions = exceptionTable.exceptions().iterator();
-        //          while (exceptions.hasNext()) {
-        //            ObjectType exception = exceptions.next();
-        //
-        // byteCodeString.append(exception.id()).append("\t").append(exception.toJava()).append("\n");
-        //          }
-        //        }
-        // end method.exceptionTable
-        //        if (method.runtimeVisibleAnnotations().iterator().hasNext()) {
-        //          byteCodeString.append("RuntimeVisibleAnnotations\n");
-        //          RefIterator<Annotation> annotationRefIterator =
-        // method.runtimeVisibleAnnotations().iterator();
-        //          while (annotationRefIterator.hasNext()) {
-        //            byteCodeString.append(annotationRefIterator.next().toJava());
-        //          }
-        //        }
-        //        if (method.runtimeInvisibleAnnotations().iterator().hasNext()) {
-        //          byteCodeString.append("RuntimeInvisibleAnnotations\n");
-        //          RefIterator<Annotation> annotationRefIterator =
-        // method.runtimeInvisibleAnnotations().iterator();
-        //          while (annotationRefIterator.hasNext()) {
-        //            byteCodeString.append(annotationRefIterator.next().toJava());
-        //          }
-        //        }
-        if (body.stackMapTable().isDefined()) {
-          StackMapTable stackMapTable = body.stackMapTable().get();
-          RefArray<StackMapFrame> stackMapFrameRefArray = stackMapTable.stackMapFrames();
-          byteCodeString
-              .append("StackMapTable")
-              .append("\n")
-              .append("//PC\tName\tframeType\toffsetDelta\n");
-          IntIterator pcIterator = stackMapTable.pcs().iterator();
-          for (int i = 0; i < stackMapFrameRefArray.length(); i++) {
-            StackMapFrame stackMapFrame = stackMapFrameRefArray.apply(i);
-            Class<? extends StackMapFrame> frameClass = stackMapFrame.getClass();
-            int pc = pcIterator.next();
-            byteCodeString
-                .append(pc + " ")
-                .append(frameClass.getName() + " ")
-                .append(stackMapFrame.frameType() + " ")
-                .append(stackMapFrame.offset(0) - 1 + "\n");
-          }
-        }
-        byteCodeString.append(annotationsToJava(method.annotations(), "\n/*", "*/"));
-        // byteCodeString.append(attributesToJava(method.attributes(),"\n/*","*/"));
+
+        // append tables, if existent
+        byteCodeString.append(localVariableTable(body));
+        byteCodeString.append(stackMapTable(body));
       }
       byteCodeString.append("}").append("\n\n\n");
     }
@@ -225,27 +156,70 @@ public class JbcProducer {
   }
 
   /**
-   * creates a bytecode representation of the implemented fields of the passed classfile
-   *
-   * @param classFile ...
-   * @return the fields' bytecode representation as a String
+   * @param body the method body of which we want the local variable table
+   * @return the local variable table of a method as a string, if it exists, empty string otherwise
    */
-  private static String byteCodeFieldToString(ClassFile classFile) {
-    StringBuilder byteCodeString = new StringBuilder();
-    RefArray<Field> fields = classFile.fields();
-    byteCodeString.append("Fields\n");
-    for (int j = 0; j < fields.length(); j++) {
-      Field field = fields.apply(j);
-      // TODO: if access flags empty don't insert empty space before fieldType()
-      byteCodeString
-          .append(AccessFlags.toString(field.accessFlags(), AccessFlagsContexts.FIELD()))
+  @NotNull
+  private static String localVariableTable(@NotNull Code body) {
+    // if there is no local variable table, return an empty string
+    if (!body.localVariableTable().isDefined()) {
+      return "";
+    }
+
+    StringBuilder localVariableTable = new StringBuilder();
+
+    RefArray<LocalVariable> refArrayOption = body.localVariableTable().get();
+    localVariableTable
+        .append("\n\nLocalVariableTable // [size: ")
+        .append(refArrayOption.length())
+        .append(" item(s)]\n");
+    for (int k = 0; k < refArrayOption.length(); k++) {
+      LocalVariable localVariable = refArrayOption.apply(k);
+      localVariableTable
+          .append("[")
+          .append(localVariable.startPC())
+          .append(" > ")
+          .append(localVariable.length())
+          .append(") => ")
+          .append(localVariable.fieldType().toJava())
           .append(" ")
-          .append(field.fieldType().toJava())
-          .append(" ")
-          .append(field.name())
+          .append(localVariable.name())
           .append("\n");
     }
-    byteCodeString.append("\n\n\n");
-    return byteCodeString.toString();
+
+    return localVariableTable.toString();
+  }
+
+  /**
+   * @param body the method body of which we want the stack map table
+   * @return the stack map table of a method as a string, if it exists, empty string otherwise
+   */
+  @NotNull
+  private static String stackMapTable(@NotNull Code body) {
+    if (!body.stackMapTable().isDefined()) {
+      return "";
+    }
+
+    StringBuilder stackMapTableString = new StringBuilder();
+
+    StackMapTable stackMapTable = body.stackMapTable().get();
+    RefArray<StackMapFrame> stackMapFrameRefArray = stackMapTable.stackMapFrames();
+    stackMapTableString
+        .append("StackMapTable")
+        .append("\n")
+        .append("//PC\tName\tframeType\toffsetDelta\n");
+    IntIterator pcIterator = stackMapTable.pcs().iterator();
+    for (int i = 0; i < stackMapFrameRefArray.length(); i++) {
+      StackMapFrame stackMapFrame = stackMapFrameRefArray.apply(i);
+      Class<? extends StackMapFrame> frameClass = stackMapFrame.getClass();
+      int pc = pcIterator.next();
+      stackMapTableString
+          .append(pc + " ")
+          .append(frameClass.getName() + " ")
+          .append(stackMapFrame.frameType() + " ")
+          .append(stackMapFrame.offset(0) - 1 + "\n");
+    }
+
+    return stackMapTableString.toString();
   }
 }

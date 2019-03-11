@@ -15,7 +15,7 @@ public class DisTextEditorProvider extends PsiAwareTextEditorProvider {
 
   @Override
   public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
-    // for now restrict to .class files only
+    // restrict to .class files only
     String fileExtension = file.getExtension();
     return (fileExtension != null)
         && (fileExtension.equals("class")
@@ -40,7 +40,6 @@ public class DisTextEditorProvider extends PsiAwareTextEditorProvider {
   @NotNull
   @Override
   public FileEditorPolicy getPolicy() {
-    // This keeps the default editor so that one can switch between the two
     return FileEditorPolicy.NONE;
   }
 }

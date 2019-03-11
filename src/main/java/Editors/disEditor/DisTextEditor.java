@@ -15,6 +15,6 @@ public class DisTextEditor extends PsiAwareTextEditorImpl {
   @Override
   @NotNull
   public String getName() {
-    return "ByteCodeText";
+    return "Bytecode";
   }
 }

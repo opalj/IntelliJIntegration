@@ -7,10 +7,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 
 /** a compiler helper class */
 public final class Compiler {
+
+  private static final Logger LOGGER = Logger.getLogger(Compiler.class.getName());
 
   /**
    * compiles an whole project
@@ -55,7 +59,7 @@ public final class Compiler {
       try {
         TimeUnit.MILLISECONDS.sleep(200);
       } catch (InterruptedException e) {
-        e.printStackTrace();
+        LOGGER.log(Level.SEVERE, e.toString(), e);
       }
     } while (compilerManager.isCompilationActive());
   }
