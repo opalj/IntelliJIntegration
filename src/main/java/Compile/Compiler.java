@@ -15,31 +15,23 @@ public final class Compiler {
   /**
    * compiles an whole project
    *
-   * @param project
-   * @return true if the project was up-to-date
+   * @param project the actual project
    */
-  public static boolean make(@NotNull final Project project) {
+  public static void make(@NotNull final Project project) {
     CompilerManager compManager = CompilerManager.getInstance(project);
     CompileScope projectCompileScope = compManager.createProjectCompileScope(project);
     boolean uptoDate = compManager.isUpToDate(projectCompileScope);
     if (!uptoDate) {
       compManager.make(projectCompileScope, null);
-      do {
-        try {
-          TimeUnit.MILLISECONDS.sleep(200);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-      } while (compManager.isCompilationActive());
+      asyncCompiling(CompilerManager.getInstance(project));
     }
-    return uptoDate;
   }
   /**
    * compiles an a specific java file for a given project if the java file contains in the given the
    * project
    *
-   * @param project
-   * @param javaFile
+   * @param project the actual project
+   * @param javaFile the java file to compile
    * @return true if java file contains in the given project
    */
   public static boolean make(@NotNull final Project project, VirtualFile javaFile) {
@@ -47,15 +39,24 @@ public final class Compiler {
     Module module = projectFileIndex.getModuleForFile(javaFile);
     if (module != null) {
       CompilerManager.getInstance(project).compile(new VirtualFile[] {javaFile}, null);
-      do {
-        try {
-          TimeUnit.SECONDS.sleep(2);
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      } while (CompilerManager.getInstance(project).isCompilationActive());
+      asyncCompiling(CompilerManager.getInstance(project));
       return true;
     }
     return false;
+  }
+
+  /**
+   * wait until the compiling process is finished
+   *
+   * @param compilerManager the manager for the current project
+   */
+  private static void asyncCompiling(CompilerManager compilerManager) {
+    do {
+      try {
+        TimeUnit.MILLISECONDS.sleep(200);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    } while (compilerManager.isCompilationActive());
   }
 }

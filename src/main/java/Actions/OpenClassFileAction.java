@@ -20,7 +20,7 @@ import opalintegration.OpalUtil;
 import org.jetbrains.annotations.NotNull;
 
 /** The type Open class file action performs to open a specified editor (tac/bytecode) */
-public class OpenClassFileAction extends AnAction {
+class OpenClassFileAction extends AnAction {
   private String editorName;
 
   /**
@@ -37,28 +37,30 @@ public class OpenClassFileAction extends AnAction {
   public void update(AnActionEvent e) {
     final Project project = e.getProject();
     final VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
-    // show Action only for java files
+    final String extension = virtualFile != null ? virtualFile.getExtension() : "";
+    // show Action only for java,class & scala files
     e.getPresentation()
         .setEnabledAndVisible(
             project != null
-                && ("java".equals(virtualFile.getExtension())
-                    || "scala".equals(virtualFile.getExtension())
-                    || "class".equals(virtualFile.getExtension())));
+                && ("java".equals(extension)
+                    || "scala".equals(extension)
+                    || "class".equals(extension)));
   }
 
   /**
    * performed after a clickevent to open a the specified editor
    *
-   * @param event
+   * @param event the event fired if action is peformed
    */
   @Override
   public void actionPerformed(AnActionEvent event) {
     // Load the file
-    final Project project = event.getProject();
+    Project project = event.getData(CommonDataKeys.PROJECT);
     // currently selected file in the project view
     VirtualFile virtualFile = event.getData(CommonDataKeys.VIRTUAL_FILE);
+    String extension = virtualFile != null ? virtualFile.getExtension() : "";
     VirtualFile classFile = null;
-    if (!virtualFile.getExtension().equals(StdFileTypes.CLASS.getDefaultExtension())) {
+    if (project != null && !extension.equals(StdFileTypes.CLASS.getDefaultExtension())) {
       if (Compiler.make(project, virtualFile)) {
         classFile = getCorrespondingClassFile(project, virtualFile);
       } else if (ProjectFileIndex.getInstance(project).isInLibrary(virtualFile)) {

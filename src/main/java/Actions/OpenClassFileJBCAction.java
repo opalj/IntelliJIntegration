@@ -2,7 +2,7 @@ package Actions;
 
 /** {@link OpenClassFileAction} */
 public class OpenClassFileJBCAction extends OpenClassFileAction {
-  public OpenClassFileJBCAction() {
+  private OpenClassFileJBCAction() {
     super("OPAL-DIS");
   }
 }
