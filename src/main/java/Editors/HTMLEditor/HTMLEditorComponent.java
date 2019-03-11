@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 
 // DataProvider: Allows a component hosting actions to provide context information to the actions.
 // CopyProvider: performs copy, enables/disables copy, shows/hide copy
+@Deprecated
 public class HTMLEditorComponent extends JPanel
     implements DataProvider, Disposable, DocumentListener, KeyListener {
 

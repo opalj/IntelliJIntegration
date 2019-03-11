@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 /*
  * @example: https://github.com/JetBrains/intellij-community/blob/master/images/src/org/intellij/images/editor/impl/ImageFileEditorProvider.java
  */
+@Deprecated
 public class HTMLEditorProvider implements FileEditorProvider {
   // TODO: should this class implement "DumbAware" ?
 

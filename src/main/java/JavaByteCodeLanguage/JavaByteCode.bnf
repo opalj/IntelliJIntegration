@@ -67,7 +67,7 @@
   FUCKINGTOKEN = "lvIndex="
   // TYPES
   PRIMITIVETYPE="regexp:void|boolean|byte|char|short|int|long|float|double"
-  MODIFIER="regexp:public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile"
+  MODIFIER="regexp:public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient"
   //PREMODIFIER="regexp:public|private|protected|default"
   EOF = "\n"
   STRINGVAR = "regexp:[a-zA-Z$_][a-zA-Z0-9$_]*"

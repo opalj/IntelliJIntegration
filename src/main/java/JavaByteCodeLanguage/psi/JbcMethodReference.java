@@ -9,8 +9,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * a class that resolves references for methods in the JavaByteCode-Editor (e.g. for
+ * TODO: improve name, as it covers both member/non-member methods and fields
+ *
+ * <p>a class that resolves references for methods and fields in the JavaByteCode-Editor (e.g. for
  * println(java.lang.String) it finds the println(String) method in PrintStream.java)
+ *
+ * <p>the methods/fields may or may not be members of the current class
  */
 public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
 
@@ -30,6 +34,12 @@ public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
       PsiClass psiClass =
           JavaPsiFacade.getInstance(project).findClass(fqn, GlobalSearchScope.allScope(project));
       PsiMethod psiMethod = (psiClass != null) ? findAppropriateOverload(psiClass) : null;
+
+      // if it's not a method, it might be a field
+      if (psiMethod == null) {
+        return psiClass.findFieldByName(myElement.getText(), true);
+      }
+
       return psiMethod;
     }
 

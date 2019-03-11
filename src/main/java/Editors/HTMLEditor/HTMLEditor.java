@@ -20,13 +20,14 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import javafx.scene.web.WebEngine;
 import javax.swing.*;
-import opalintegration.Opal;
+import opalintegration.HtmlProducer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /*
  * @example: https://github.com/JetBrains/intellij-community/blob/master/images/src/org/intellij/images/editor/impl/ImageEditorImpl.java
  */
+@Deprecated
 public class HTMLEditor extends UserDataHolderBase implements NavigatableFileEditor {
 
   private final HTMLEditorComponent editorUI;
@@ -39,10 +40,7 @@ public class HTMLEditor extends UserDataHolderBase implements NavigatableFileEdi
   public HTMLEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
     this.project = project;
     this.virtualFile = virtualFile;
-    htmlFile =
-        Opal.prepareHtml(
-            project,
-            virtualFile); // TODO: doesn't update after .class file changes (similar for TAC)
+    htmlFile = HtmlProducer.prepareHtml(project, virtualFile);
     editorUI = new HTMLEditorComponent(htmlFile, this, project);
 
     Disposer.register(this, editorUI);

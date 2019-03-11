@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 
+@Deprecated
 public class MyStructureView implements StructureView {
 
   private HTMLEditor htmlEditor;

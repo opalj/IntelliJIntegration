@@ -6,7 +6,7 @@ import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.*;
 import java.util.Arrays;
-import opalintegration.Opal;
+import opalintegration.OpalUtil;
 import org.jetbrains.annotations.NotNull;
 
 /** a project component to load a virtual file listener to *.class-files. */
@@ -38,7 +38,8 @@ public class OpalVirtualFileListener implements ProjectComponent {
                 (e) -> !e.getFile().getExtension().equals(StdFileTypes.CLASS.getDefaultExtension()))
             .forEach(
                 e -> {
-                  Opal.prepare(e.getFile().getExtension(), event.getFile(), e.getFile());
+                  OpalUtil.prepare(
+                      project, e.getFile().getExtension(), event.getFile(), e.getFile());
                   e.getFile().refresh(false, false);
                 });
       }

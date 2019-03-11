@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 // TODO: currently many methods unimplemented, how much of them is needed ?
+@Deprecated
 public class OpalEditorBasedStructureViewModel implements StructureViewModel {
   private final HTMLEditor myEditor;
   private final PsiFile myPsiFile;

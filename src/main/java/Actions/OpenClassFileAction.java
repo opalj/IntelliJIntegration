@@ -16,7 +16,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import opalintegration.Opal;
+import opalintegration.OpalUtil;
 import org.jetbrains.annotations.NotNull;
 
 /** The type Open class file action performs to open a specified editor (tac/bytecode) */
@@ -62,7 +62,7 @@ public class OpenClassFileAction extends AnAction {
       if (Compiler.make(project, virtualFile)) {
         classFile = getCorrespondingClassFile(project, virtualFile);
       } else if (ProjectFileIndex.getInstance(project).isInLibrary(virtualFile)) {
-        String FileName = Opal.getJarFileRootAndFileName(virtualFile.getParent())[1];
+        String FileName = OpalUtil.getJarFileRootAndFileName(virtualFile.getParent())[1];
         Collection<VirtualFile> virtualFilesByName =
             FilenameIndex.getVirtualFilesByName(
                 project,
