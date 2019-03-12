@@ -8,11 +8,13 @@ import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.HighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 
+/** @see SyntaxHighlighter */
 public class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
   public static final TextAttributesKey TYPE =
       createTextAttributesKey("JBC_TYPE", DefaultLanguageHighlighterColors.KEYWORD);

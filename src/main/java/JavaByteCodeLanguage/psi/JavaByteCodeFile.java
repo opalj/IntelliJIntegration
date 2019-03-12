@@ -8,6 +8,7 @@ import com.intellij.psi.FileViewProvider;
 import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 
+/** defines the root of the .jbc file */
 public class JavaByteCodeFile extends PsiFileBase {
   public JavaByteCodeFile(@NotNull FileViewProvider viewProvider) {
     super(viewProvider, JavaByteCode.INSTANCE);

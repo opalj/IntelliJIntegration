@@ -7,6 +7,10 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * The SyntaxHighlighterFactory is used to register a syntax highlighter via the
+ * com.intellij.lang.syntaxHighlighterFactory platform extension point in plugin.xml
+ */
 public class JavaByteCodeHighlighterFactory extends SyntaxHighlighterFactory {
   @NotNull
   @Override

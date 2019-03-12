@@ -35,14 +35,16 @@ public class JbcReferenceContributor extends PsiReferenceContributor {
               PsiElement type = grandparent.getFirstChild();
               methodReference = new JbcMethodReference(element, range, type.getText());
             }
-            // or be part of "this" file (for which the bytecode has been generated for)
+            // or be part of "this" file (for which the bytecode has been generated)
             else {
               PsiElement file = element.getContainingFile();
+              // example: classHead = public class io.ChainedReader extends java.lang.Object
               PsiElement classHead =
                   Arrays.stream(file.getChildren())
                       .filter(psiElement -> psiElement instanceof JavaByteCodeClassHead)
                       .findFirst()
                       .get();
+              // example: typeOfClass = io.ChainedReader
               PsiElement typeOfClass =
                   Arrays.stream(classHead.getChildren())
                       .filter(psiElement -> psiElement instanceof JavaByteCodeJType)

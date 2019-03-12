@@ -113,6 +113,7 @@ public class JavaByteCodePsiImplUtil {
     }
     return element;
   }
+
   /** @see PsiNameIdentifierOwner#getNameIdentifier() */
   @Nullable
   public static PsiElement getNameIdentifier(@NotNull JavaByteCodeJType element) {
@@ -134,6 +135,7 @@ public class JavaByteCodePsiImplUtil {
       return null;
     }
   }
+
   /** @see PsiNameIdentifierOwner#getNameIdentifier() */
   public static PsiElement getNameIdentifier(@NotNull JavaByteCodeLocVarTableDeclaration element) {
     ASTNode keyNode = element.getLocVarTableHead().getNode();
@@ -143,6 +145,7 @@ public class JavaByteCodePsiImplUtil {
       return null;
     }
   }
+
   /** @see PsiNameIdentifierOwner#getNameIdentifier() */
   public static PsiElement getNameIdentifier(@NotNull JavaByteCodeMethodDeclaration element) {
     ASTNode keyNode = element.getMethodHead().getNode();
@@ -154,7 +157,6 @@ public class JavaByteCodePsiImplUtil {
   }
   /**
    * @see PsiElement#getReferences() for further details
-   *     <p>TODO: handle this in a Provider as well?
    * @see com.intellij.psi.PsiReferenceRegistrar for further details
    * @param element a class type (as FQN, e.g. java.lang.String)
    * @return the references to each element in the FQN (e.g. ["java", "lang", "String"])
@@ -209,17 +211,6 @@ public class JavaByteCodePsiImplUtil {
   }
 
   public static ItemPresentation getPresentation(JavaByteCodeMethodDeclaration element) {
-    //    JavaByteCodeMethodHead methodHead = element.getMethodHead();
-    //    int i = 0;
-    //    String myString = "";
-    //    for (JavaByteCodeType javaByteCodeType :
-    // methodHead.getMethodName().getParams().getTypeList()) {
-    //      myString = myString + javaByteCodeType.getText()+" p"+i+",";
-    //      i++;
-    //    }
-    //    myString = myString.length()== 0 ? "" :myString.substring(0,myString.length()-1);
-    //    return
-    // PsiElementFactory.SERVICE.getInstance(element.getProject()).createMethodFromText(methodHead.getModifierV().getText() +" "+ methodHead.getType().getText()+" "+methodHead.getMethodName()+"("+myString+")",null).getPresentation();
     ColoredItemPresentation coloredItemPresentation =
         new ColoredItemPresentation() {
           private final JavaByteCodeMethodHead methodHead = element.getMethodHead();
@@ -239,10 +230,6 @@ public class JavaByteCodePsiImplUtil {
           @Nullable
           @Override
           public Icon getIcon(boolean unused) {
-            //           Icon methodIcon = premodifier.getText().equals("abstract") ?
-            // PlatformIcons.ABSTRACT_METHOD_ICON : PlatformIcons.METHOD_ICON;
-            //
-            // PsiElementFactory.SERVICE.getInstance(element.getProject()).createMethod().getModifierList()
             int flags = Iconable.ICON_FLAG_READ_STATUS | Iconable.ICON_FLAG_VISIBILITY;
             try {
               String helpinger =
@@ -266,8 +253,6 @@ public class JavaByteCodePsiImplUtil {
             return null;
           }
         };
-    // return
-    // PsiElementFactory.SERVICE.getInstance(element.getProject()).createMethodFromText(element.getText(), null).getPresentation();
     return coloredItemPresentation;
   }
 

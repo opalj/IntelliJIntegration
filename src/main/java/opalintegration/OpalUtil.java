@@ -146,13 +146,11 @@ public class OpalUtil {
     for (int i = 0; i < classFileConstArray.length(); i++) {
       ClassFile cf = classFileConstArray.apply(i);
       if (cf.fqn().equals(fqClassName.replace(".class", ""))) {
-        System.out.println("Apply(0): " + cf);
         return cf;
       }
     }
     // (might be) JAR
     if (virtualClassFile.getCanonicalPath().contains("!")) {
-      System.out.println("getClassFile() JAR? : " + virtualClassFile.getName());
       return createClassFileFromJar(projectPath, fqClassName);
     }
     // use the input stream instead

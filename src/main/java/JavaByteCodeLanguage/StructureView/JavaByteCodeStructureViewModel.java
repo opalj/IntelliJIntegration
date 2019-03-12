@@ -4,10 +4,12 @@ import JavaByteCodeLanguage.LanguageAndFileType.JavaByteCode;
 import com.intellij.ide.structureView.StructureViewModel;
 import com.intellij.ide.structureView.StructureViewModelBase;
 import com.intellij.ide.structureView.StructureViewTreeElement;
+import com.intellij.ide.structureView.TextEditorBasedStructureViewModel;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 
+/** @see TextEditorBasedStructureViewModel */
 public class JavaByteCodeStructureViewModel extends StructureViewModelBase
     implements StructureViewModel.ElementInfoProvider {
 

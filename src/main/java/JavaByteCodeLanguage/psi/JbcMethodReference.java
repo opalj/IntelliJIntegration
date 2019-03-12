@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * TODO: improve name, as it covers both member/non-member methods and fields
+ * TODO: improve name (?), as it covers both member/non-member methods and fields
  *
  * <p>a class that resolves references for methods and fields in the JavaByteCode-Editor (e.g. for
  * println(java.lang.String) it finds the println(String) method in PrintStream.java)
@@ -88,7 +88,7 @@ public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
   }
 
   /**
-   * TODO: what about varargs and generics ?
+   * TODO: what about varargs and generics ? ... seems to work just fine?
    *
    * @param ourParams the parameter list that is found in our JavaByteCode-Editor
    * @param theirParams the parameter list of an overload of the reference we're looking for

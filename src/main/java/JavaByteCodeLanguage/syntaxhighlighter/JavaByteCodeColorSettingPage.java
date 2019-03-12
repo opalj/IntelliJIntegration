@@ -10,6 +10,16 @@ import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Provides an interface to allow the user to configure the colors used for highlighting specific
+ * items (of our JavaByteCode language).
+ *
+ * <p>The user can access it from the Settings menu (currently: Settings -> Editor -> Color Scheme
+ * -> JavaByteCode).
+ *
+ * <p>Note that the settings page must be registered in the com.intellij.colorSettingsPage extension
+ * point.
+ */
 public class JavaByteCodeColorSettingPage implements ColorSettingsPage {
   private static final AttributesDescriptor[] DESCRIPTORS =
       new AttributesDescriptor[] {
@@ -35,6 +45,7 @@ public class JavaByteCodeColorSettingPage implements ColorSettingsPage {
   @NotNull
   @Override
   public String getDemoText() {
+    // TODO: provide a better demo text which actually shows bytecode
     return "Das ist ein Test";
   }
 

@@ -6,6 +6,11 @@ import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A file type that associates itself with our JavaByteCode language.
+ *
+ * @see LanguageFileType for further details.
+ */
 public class JavaByteCodeFileType extends LanguageFileType {
   public static final JavaByteCodeFileType INSTANCE = new JavaByteCodeFileType();
 
@@ -34,8 +39,7 @@ public class JavaByteCodeFileType extends LanguageFileType {
   @Nullable
   @Override
   public Icon getIcon() {
-    // TODO
-    // http://www.jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/language_and_filetype.html
+    // We do not associate an icon with this file type
     return null;
   }
 }

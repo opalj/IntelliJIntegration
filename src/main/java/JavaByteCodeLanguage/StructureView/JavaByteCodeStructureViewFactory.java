@@ -9,6 +9,10 @@ import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * The PsiStructureViewFactory is used to register a structure view via the
+ * com.intellij.lang.psiStructureViewFactory extension point in plugin.xml
+ */
 public class JavaByteCodeStructureViewFactory implements PsiStructureViewFactory {
   @Nullable
   @Override

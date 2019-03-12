@@ -9,6 +9,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opalj.br.instructions.LoadString_W;
 
+/**
+ * A generic visitor which accepts a type of 'E' (e.g. Instruction), and for each one computes a
+ * value of type 'R' (e.g. String).
+ *
+ * <p>It uses a set to store the types of elements it can visit (i.e. traverse through)
+ *
+ * <p>TODO: rename to SetVisitor ?
+ *
+ * @param <E> type of element that can be visited
+ * @param <R> type of value computed on a visit
+ */
 public abstract class ListVisitor<E, R> implements Visitor<E, R> {
   private Set<Class<? extends E>> Elements;
 
@@ -19,6 +30,13 @@ public abstract class ListVisitor<E, R> implements Visitor<E, R> {
     Elements.addAll(c);
   }
 
+  /**
+   * Visits each element type in the set, and if e's type 'E' is contained within it, a value of
+   * type 'R' is computed
+   *
+   * @param e the element to visit, if contained within the set
+   * @return a value of type 'R' that is computed for this specific element e
+   */
   public R accept(E e) {
     Class<?>[] interfaces = this.getClass().getInterfaces();
     if (e instanceof LoadString_W) {

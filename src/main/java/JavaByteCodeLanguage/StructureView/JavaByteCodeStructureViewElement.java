@@ -15,6 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @see StructureViewTreeElement
+ * @see SortableTreeElement
+ */
 public class JavaByteCodeStructureViewElement
     implements StructureViewTreeElement, SortableTreeElement {
   private NavigatablePsiElement element;

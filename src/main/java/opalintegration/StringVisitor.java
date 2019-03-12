@@ -4,6 +4,15 @@ import java.util.Arrays;
 import org.opalj.br.Type;
 import org.opalj.br.instructions.*;
 
+/**
+ * Visits specific bytecode instructions which are defined in the list, and for each of them it
+ * returns a string representation.
+ *
+ * <p>This visitor does not handle all bytecode instructions. Instead, it visits those instructions
+ * for which the default "toString()" method does not behave as wanted.
+ *
+ * <p>TODO: visit(TABLESWITCH)
+ */
 public class StringVisitor extends ListVisitor<Instruction, String> implements InstructionVisitor {
   public StringVisitor() {
     super(
@@ -13,7 +22,7 @@ public class StringVisitor extends ListVisitor<Instruction, String> implements I
             PUTSTATIC.class,
             GETSTATIC.class,
             GETFIELD.class,
-            LoadString.class, // eigentlich LDC visitor
+            LoadString.class, // rather LDC visitor
             LoadString_W.class,
             LDC.class,
             LDC_W.class));

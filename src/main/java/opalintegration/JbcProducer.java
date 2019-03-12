@@ -141,7 +141,6 @@ public class JbcProducer {
               byteCodeString.append(formattedInstrLine);
             } catch (NoSuchElementException e) {
               LOGGER.log(Level.SEVERE, e.toString(), e);
-              return "Issue with Java 5? \n\n " + e.getMessage();
             }
           }
         }
