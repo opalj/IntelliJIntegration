@@ -2,106 +2,65 @@ package Compile;
 
 import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompilerManager;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
-import org.jdom.JDOMException;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.vfs.VirtualFile;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.jetbrains.annotations.NotNull;
 
+/** a compiler helper class */
 public final class Compiler {
 
-  /*
-   * Compile a project with a given (open) Project-Object
+  private static final Logger LOGGER = Logger.getLogger(Compiler.class.getName());
+
+  /**
+   * compiles an whole project
+   *
+   * @param project the actual project
    */
-  public static boolean make(@NotNull final Project project) {
+  public static void make(@NotNull final Project project) {
     CompilerManager compManager = CompilerManager.getInstance(project);
     CompileScope projectCompileScope = compManager.createProjectCompileScope(project);
     boolean uptoDate = compManager.isUpToDate(projectCompileScope);
     if (!uptoDate) {
-      // ApplicationManager.getApplication().invokeAndWait( () -
-      //compManager.make(null);
-      compManager.makeWithModalProgress(projectCompileScope,null);
-      do
-      {
-        try {
-          TimeUnit.SECONDS.sleep(2);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-      }while(CompilerManager.getInstance(project).isCompilationActive());
+      compManager.make(projectCompileScope, null);
+      asyncCompiling(CompilerManager.getInstance(project));
     }
-    return uptoDate;
   }
-
-  /*
-     Finds filebased or dirbased Projectpaths
-  */
-  private String find(String filePath) {
-    Path path = Paths.get(filePath);
-    String s;
-    while (path != null) {
-      s = find(path.toFile());
-      if (s != null) {
-        return s;
-      }
-      path = path.getParent();
-    }
-    return "";
-  }
-
-  /*
-   * recursive helpfunction for the find method
+  /**
+   * compiles an a specific java file for a given project if the java file contains in the given the
+   * project
+   *
+   * @param project the actual project
+   * @param javaFile the java file to compile
+   * @return true if java file contains in the given project
    */
-  @Nullable
-  private String find(@NotNull File fl) {
-    for (File f : fl.listFiles()) {
-      if (f.isDirectory() && f.getName().equals(".idea")) {
-        return f.getParentFile().getAbsolutePath();
-      } else if (f.isFile() && f.getName().endsWith(".ipr")) {
-        return f.getAbsolutePath(); // nocht nicht getestet
-      } else if (f.isDirectory()) {
-        return find(f);
-      }
-    }
-    return null;
-  }
-
-  /*
-   * Compile a project with a given filePath-String,
-   * searches naively the first .idea-Dir or *.ipr-file
-   */
-  public boolean make(@NotNull String filePath) {
-    filePath = find(filePath);
-    if (filePath == null) {
-      return false;
-    }
-    ProjectManager projectManager = ProjectManager.getInstance();
-    Project project;
-    // Look for OpenProjects
-    for (Project openProject : projectManager.getOpenProjects()) {
-      if (openProject != null && openProject.getBasePath().equals(filePath)) {
-        project = openProject;
-        return make(project);
-      }
-    }
-    // try to open project
-    try {
-      project = projectManager.loadAndOpenProject(filePath);
-      if (project == null) {
-        return false;
-      }
-      boolean bMade = make(project);
-      projectManager.closeProject(project);
-      return bMade;
-    } catch (IOException | JDOMException e) {
-      e.printStackTrace();
+  public static boolean make(@NotNull final Project project, VirtualFile javaFile) {
+    ProjectFileIndex projectFileIndex = ProjectFileIndex.getInstance(project);
+    Module module = projectFileIndex.getModuleForFile(javaFile);
+    if (module != null) {
+      CompilerManager.getInstance(project).compile(new VirtualFile[] {javaFile}, null);
+      asyncCompiling(CompilerManager.getInstance(project));
+      return true;
     }
     return false;
+  }
+
+  /**
+   * wait until the compiling process is finished
+   *
+   * @param compilerManager the manager for the current project
+   */
+  private static void asyncCompiling(CompilerManager compilerManager) {
+    do {
+      try {
+        TimeUnit.MILLISECONDS.sleep(200);
+      } catch (InterruptedException e) {
+        LOGGER.log(Level.SEVERE, e.toString(), e);
+      }
+    } while (compilerManager.isCompilationActive());
   }
 }
