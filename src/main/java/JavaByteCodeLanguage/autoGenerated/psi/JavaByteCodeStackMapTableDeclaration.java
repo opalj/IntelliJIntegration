@@ -5,6 +5,15 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface JavaByteCodeModifierV extends PsiElement {
+public interface JavaByteCodeStackMapTableDeclaration extends PsiElement {
+
+  @NotNull
+  List<JavaByteCodeType> getTypeList();
+
+  @NotNull
+  PsiElement getLbracket();
+
+  @NotNull
+  PsiElement getRbracket();
 
 }

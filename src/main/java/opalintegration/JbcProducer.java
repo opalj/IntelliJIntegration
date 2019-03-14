@@ -2,6 +2,13 @@ package opalintegration;
 
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
+
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,12 +20,14 @@ import org.opalj.br.instructions.Instruction;
 import org.opalj.collection.IntIterator;
 import org.opalj.collection.RefIterator;
 import org.opalj.collection.immutable.RefArray;
+import org.opalj.da.ClassFileReader;
 import scala.Function1;
 import scala.collection.immutable.List;
 
 /** Is responsible for creating and providing the bytecode representation of a class file */
 public class JbcProducer {
 
+  private static VirtualFile virtualFile;
   private static final Logger LOGGER = Logger.getLogger(JbcProducer.class.getName());
 
   /**
@@ -28,6 +37,7 @@ public class JbcProducer {
    */
   public static VirtualFile prepareJBC(
       @NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
+    JbcProducer.virtualFile = virtualFile;
     return OpalUtil.prepare(project, GlobalData.DISASSEMBLED_FILE_ENDING_JBC, virtualFile, null);
   }
 
@@ -59,15 +69,72 @@ public class JbcProducer {
         .append(classFile.sourceFile().isDefined() ? classFile.sourceFile().get() : "")
         .append(" -- Version: (")
         .append(classFile.jdkVersion())
-        .append(") -- Size: \n");
+        .append(") -- size: \n");
     // TODO Constant Pool Maybe working with DA.
     RefArray<Annotation> annotations = classFile.annotations();
-    byteCodeString.append(attributesToJava(classFile.attributes(), "\n/*", "*/\n"));
-    byteCodeString.append(annotationsToJava(annotations, "\n/*", "*/\n"));
+    byteCodeString.append(attributesToJava(classFile.attributes(), "\n///*", "*/\n"));
+    byteCodeString.append(annotationsToJava(annotations, "\n///*", "*/\n"));
+//    byteCodeString.append(byteCodeConstantPoolToString(virtualFile.getPath())); // TODO
     byteCodeString.append(byteCodeFieldToString(classFile));
     byteCodeString.append(byteCodeMethodsToString(classFile));
 
     return byteCodeString.toString();
+  }
+
+  // TODO
+  private static String byteCodeConstantPoolToString(String classPath) {
+    StringBuilder constantPool = new StringBuilder();
+    constantPool.append("Constant Pool {\n");
+
+    Path path = Paths.get(classPath);
+    File file = path.toFile();
+
+    try (FileInputStream fis = new FileInputStream(file);
+         DataInputStream dis = new DataInputStream(fis)) {
+      // get the class file and construct the HTML string
+      org.opalj.da.ClassFile daClassFile = (org.opalj.da.ClassFile) ClassFileReader.ClassFile(dis).head();
+
+      org.opalj.da.Constant_Pool_Entry firstEntry = daClassFile.constant_pool()[0];
+      if(firstEntry != null) {
+        try {
+          constantPool.append(firstEntry.toString()).append("\n");
+          constantPool.append(firstEntry.toString(daClassFile.constant_pool())).append("\n");
+          constantPool.append(firstEntry.asString()).append("\n");
+          constantPool.append(firstEntry.Constant_Type_Value()).append("\n");
+          constantPool.append(firstEntry.Constant_Type_Value().id()).append("\n");
+          constantPool.append(firstEntry.asConstantUTF8()).append("\n");
+          constantPool.append(firstEntry.asConstantPackage()).append("\n");
+        } catch(Exception e) {
+
+        }
+      }
+      for(org.opalj.da.Constant_Pool_Entry constantPoolEntry : daClassFile.constant_pool()) {
+        if(constantPoolEntry == null) {
+          continue;
+        }
+
+
+//        constantPool.append(constantPoolEntry.toString()).append("\n");
+//
+        try {
+//          constantPool.append(constantPoolEntry.asString()).append("\n");
+//          constantPool.append(constantPoolEntry.toString(daClassFile.constant_pool())).append("\n");
+          constantPool.append(constantPoolEntry.toString()).append("\n");
+          constantPool.append(constantPoolEntry.toString(daClassFile.constant_pool())).append("\n");
+          constantPool.append(constantPoolEntry.asString()).append("\n");
+          constantPool.append(constantPoolEntry.Constant_Type_Value()).append("\n");
+          constantPool.append(constantPoolEntry.Constant_Type_Value().id()).append("\n");
+          constantPool.append(constantPoolEntry.asConstantUTF8()).append("\n");
+        } catch(UnsupportedOperationException uoe) {
+          LOGGER.log(Level.FINER, uoe.toString(), uoe);
+        }
+      }
+    } catch(IOException e) {
+      LOGGER.log(Level.SEVERE, e.toString(), e);
+    }
+    constantPool.append("}\n\n\n");
+
+    return constantPool.toString();
   }
 
   /**
@@ -79,7 +146,13 @@ public class JbcProducer {
   private static String byteCodeFieldToString(ClassFile classFile) {
     StringBuilder byteCodeString = new StringBuilder();
     RefArray<Field> fields = classFile.fields();
-    byteCodeString.append("Fields\n");
+
+    // don't show fields if there are none
+    if(fields.length() == 0) {
+      return "";
+    }
+
+    byteCodeString.append("Fields {\n");
     for (int j = 0; j < fields.length(); j++) {
       Field field = fields.apply(j);
       // TODO: if access flags empty don't insert empty space before fieldType()
@@ -92,7 +165,7 @@ public class JbcProducer {
           .append(field.name())
           .append("\n");
     }
-    byteCodeString.append("\n\n\n");
+    byteCodeString.append("}\n\n\n");
     return byteCodeString.toString();
   }
 
@@ -106,7 +179,7 @@ public class JbcProducer {
     StringBuilder byteCodeString = new StringBuilder();
     StringVisitor stringVisitor = new StringVisitor();
     RefIterator<Method> methods = classFile.methods().iterator();
-    byteCodeString.append("Methods\n\n");
+    byteCodeString.append("Methods {\n\n");
     while (methods.hasNext()) {
       Method method = methods.next();
       if (method.methodTypeSignature().isDefined()) {
@@ -120,8 +193,10 @@ public class JbcProducer {
         byteCodeString
             .append("// [size :")
             .append(body.codeSize())
-            .append(" bytes, max Stack: ")
+            .append(" bytes, max stack: ")
             .append(body.maxStack())
+            .append(" bytes, max locals: ")
+            .append(body.maxLocals())
             .append("] \n");
 
         String pcLineInstr = String.format("\t%-6s %-6s %s\n", "PC", "Line", "Instruction");
@@ -134,6 +209,8 @@ public class JbcProducer {
               // TODO replace \n (and \t...??) and the likes with spaces
               instruction = instruction.replaceAll("\n", " ");
               instruction = instruction.replaceAll("\t", " ");
+              // replaces a \ with a \\ -> needed because e.g. LDC("s\") would escape the last " and thus breaking the syntax
+              instruction = instruction.replaceAll("\\\\", "\\\\\\\\");
 
               String formattedInstrLine =
                   String.format(
@@ -166,13 +243,15 @@ public class JbcProducer {
         // append tables, if existent
         // weird ass bug
         RefArray<Annotation> annotations = method.annotations();
-        byteCodeString.append(attributesToJava(method.attributes(), "\n/*", "*/\n"));
-        byteCodeString.append(annotationsToJava(annotations, "\n/*", "*/\n"));
+        byteCodeString.append(attributesToJava(method.attributes(), "\n///*", "*/\n"));
+        byteCodeString.append(annotationsToJava(annotations, "\n///*", "*/\n"));
         byteCodeString.append(localVariableTable(body));
         byteCodeString.append(stackMapTable(body));
       }
       byteCodeString.append("}").append("\n\n\n");
     }
+
+    byteCodeString.append("} // Methods");
     return byteCodeString.toString();
   }
 
@@ -191,13 +270,13 @@ public class JbcProducer {
 
     RefArray<LocalVariable> refArrayOption = body.localVariableTable().get();
     localVariableTable
-        .append("\n\nLocalVariableTable // [size: ")
+        .append("\n\n\tLocalVariableTable { // [size: ")
         .append(refArrayOption.length())
         .append(" item(s)]\n");
     for (int k = 0; k < refArrayOption.length(); k++) {
       LocalVariable localVariable = refArrayOption.apply(k);
       localVariableTable
-          .append("[")
+          .append("\t\t[")
           .append(localVariable.startPC())
           .append(" > ")
           .append(localVariable.length())
@@ -207,6 +286,7 @@ public class JbcProducer {
           .append(localVariable.name())
           .append("\n");
     }
+    localVariableTable.append("\t}\n");
 
     return localVariableTable.toString();
   }
@@ -226,7 +306,7 @@ public class JbcProducer {
     StackMapTable stackMapTable = body.stackMapTable().get();
     RefArray<StackMapFrame> stackMapFrameRefArray = stackMapTable.stackMapFrames();
     stackMapTableString
-        .append("StackMapTable")
+        .append("\n\n\tStackMapTable {")
         .append("\n")
         .append("//PC\tName\tframeType\toffsetDelta\n");
     IntIterator pcIterator = stackMapTable.pcs().iterator();
@@ -235,14 +315,19 @@ public class JbcProducer {
       Class<? extends StackMapFrame> frameClass = stackMapFrame.getClass();
       int pc = pcIterator.next();
       stackMapTableString
-          .append(pc + " ")
-          .append(frameClass.getName() + " ")
-          .append(stackMapFrame.frameType() + " ")
-          .append(stackMapFrame.offset(0) - 1 + "\n");
+              .append("\t\t")
+              .append(pc).append(" ")
+              .append(frameClass.getName()).append(" ")
+              .append(stackMapFrame.frameType()).append(" ")
+              .append(stackMapFrame.offset(0) - 1)
+              .append("\n");
     }
+    stackMapTableString.append("\t}\n");
 
     return stackMapTableString.toString();
   }
+
+
   /** Converts a given list of annotations into a Java-like representation. */
   private static String annotationsToJava(
       RefArray<Annotation> annotations, String before, String after) {
