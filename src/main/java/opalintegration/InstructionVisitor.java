@@ -20,4 +20,6 @@ public interface InstructionVisitor {
   String visit(LoadString_W lsw);
 
   String visit(LoadString ls);
+
+  String visit(SimpleBranchInstruction sbi);
 }

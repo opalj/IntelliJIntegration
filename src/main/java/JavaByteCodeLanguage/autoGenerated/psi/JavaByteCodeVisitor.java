@@ -23,6 +23,10 @@ public class JavaByteCodeVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitInstructionBody(@NotNull JavaByteCodeInstructionBody o) {
+    visitPsiElement(o);
+  }
+
   public void visitJType(@NotNull JavaByteCodeJType o) {
     visitNamedElement(o);
   }
@@ -32,6 +36,10 @@ public class JavaByteCodeVisitor extends PsiElementVisitor {
   }
 
   public void visitLambdaType(@NotNull JavaByteCodeLambdaType o) {
+    visitPsiElement(o);
+  }
+
+  public void visitLineNumber(@NotNull JavaByteCodeLineNumber o) {
     visitPsiElement(o);
   }
 
@@ -56,6 +64,10 @@ public class JavaByteCodeVisitor extends PsiElementVisitor {
   }
 
   public void visitModifierV(@NotNull JavaByteCodeModifierV o) {
+    visitPsiElement(o);
+  }
+
+  public void visitPcNumber(@NotNull JavaByteCodePcNumber o) {
     visitPsiElement(o);
   }
 

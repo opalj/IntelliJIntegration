@@ -9,7 +9,7 @@ import org.jetbrains.annotations.*;
 public interface JavaByteCodeMethodDeclaration extends JavaByteCodeNamedElement {
 
   @NotNull
-  List<JavaByteCodeInstr> getInstrList();
+  List<JavaByteCodeInstructionBody> getInstructionBodyList();
 
   @Nullable
   JavaByteCodeLocVarTableDeclaration getLocVarTableDeclaration();

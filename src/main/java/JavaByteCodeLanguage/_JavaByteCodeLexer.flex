@@ -57,7 +57,6 @@ TO=>|=>
 LBRACKET=\(|\{|\[|«
 RBRACKET=\)|\}|\]|»
 CONSTMETHODNAMES=<(cl)?init>
-LOAD_INSTR=Load([A-Za-z]+)
 PRIMITIVETYPE=void|boolean|byte|char|short|int|long|float|double
 MODIFIER=public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient
 STRINGVAR=[a-zA-Z$_][a-zA-Z0-9$_]*
@@ -75,7 +74,6 @@ STRINGVAR=[a-zA-Z$_][a-zA-Z0-9$_]*
   "implements"            { return IMPLEMENTS; }
   "Fields"                { return FIELDS; }
   "lvIndex="              { return FUCKINGTOKEN; }
-  "\\n"                   { return EOF; }
   "Methods"               { return METHODS; }
   "enum"                  { return ENUM; }
   "interface"             { return INTERFACE; }
@@ -96,7 +94,6 @@ STRINGVAR=[a-zA-Z$_][a-zA-Z0-9$_]*
   {LBRACKET}              { return LBRACKET; }
   {RBRACKET}              { return RBRACKET; }
   {CONSTMETHODNAMES}      { return CONSTMETHODNAMES; }
-  {LOAD_INSTR}            { return LOAD_INSTR; }
   {PRIMITIVETYPE}         { return PRIMITIVETYPE; }
   {MODIFIER}              { return MODIFIER; }
   {STRINGVAR}             { return STRINGVAR; }

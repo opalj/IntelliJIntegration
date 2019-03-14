@@ -57,8 +57,6 @@
   LBRACKET="regexp:\(|\{|\[|«"
   RBRACKET="regexp:\)|\}|\]|»"
   CONSTMETHODNAMES = "regexp:<(cl)?init>"
-
-  LOAD_INSTR="regexp:Load([A-Za-z]+)"
   //JAVACONST
   CLASS='class'
   EXTENDS='extends'
@@ -69,7 +67,6 @@
   PRIMITIVETYPE="regexp:void|boolean|byte|char|short|int|long|float|double"
   MODIFIER="regexp:public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient"
   //PREMODIFIER="regexp:public|private|protected|default"
-  EOF = "\n"
   STRINGVAR = "regexp:[a-zA-Z$_][a-zA-Z0-9$_]*"
 
    // PUT_GET_INSTR="regexp:(put|get) .* :"
@@ -121,11 +118,15 @@ params ::= ('('(Type ','?)*')')?
 // instructions (part of method body)
 
 private InstructionHead ::= PC Line Instruction
-private InstructionBody ::= NUMBER NUMBER Instr
+InstructionBody ::= PcNumber LineNumber Instr
+PcNumber ::= NUMBER
+LineNumber ::= NUMBER
 // TODO {recoverWhile=recoverTillNextInstr}
-Instr ::= ((MNEMONIC|LOAD_INSTR) (JType ":" Type                            // put someFQN : someFQN
-                                    | "("((JavaOP|NUMBER|STRING)','?)*")"   // LoadString("someString") or ALOAD(5) or ...
-                                    | JavaOP)?) //| (PUT_GET_INSTR Type)    // INVOKEVIRTUAL(byte[] { java.lang.Object clone() })
+Instr ::= (MNEMONIC (JType ":" Type                            // put someFQN : someFQN
+                                    | "("NUMBER")"
+                                    | "("((JavaOP|NUMBER|STRING)','?)*")"   // LDC("someString") or ALOAD(5) or ...
+                                    | JavaOP)?)                             // INVOKEVIRTUAL(byte[] { java.lang.Object clone() })
+
 JavaOP ::= "lvIndex=" NUMBER|((Type|STRINGVAR)('{'Type MethodName'}')?)+
 
 
@@ -137,7 +138,6 @@ LocVarTableDeclaration ::= LocVarTableHead LocVarTableBody* {mixin="JavaByteCode
 
 LocVarTableHead ::= LocalVariableTable
 private LocVarTableBody ::= "["NUMBER ">" NUMBER ")" "=>" Type (this | STRINGVAR) // NOT RIGHT
-
 
 private StackMapTableDeclaration ::= StackMapTableHead StackMapTableBody*
 private StackMapTableHead ::= StackMapTable

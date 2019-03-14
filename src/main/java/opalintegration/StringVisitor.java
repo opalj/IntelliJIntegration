@@ -25,7 +25,8 @@ public class StringVisitor extends ListVisitor<Instruction, String> implements I
             LoadString.class, // rather LDC visitor
             LoadString_W.class,
             LDC.class,
-            LDC_W.class));
+            LDC_W.class,
+            SimpleBranchInstruction.class));
   }
 
   public String visit(ANEWARRAY anewarray) {
@@ -87,6 +88,11 @@ public class StringVisitor extends ListVisitor<Instruction, String> implements I
   @Override
   public String visit(LoadString ls) {
     return ls.mnemonic().toUpperCase() + "(\"" + ls.value() + "\")";
+  }
+
+  @Override
+  public String visit(SimpleBranchInstruction sbi) {
+    return sbi.mnemonic().toUpperCase() + "(" + (super.pc[0] + sbi.branchoffset()) + ")";
   }
 
   @Override

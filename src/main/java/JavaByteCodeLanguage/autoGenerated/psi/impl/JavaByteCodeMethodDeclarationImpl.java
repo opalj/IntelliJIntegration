@@ -31,8 +31,8 @@ public class JavaByteCodeMethodDeclarationImpl extends JavaByteCodeNamedElementI
 
   @Override
   @NotNull
-  public List<JavaByteCodeInstr> getInstrList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeInstr.class);
+  public List<JavaByteCodeInstructionBody> getInstructionBodyList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeInstructionBody.class);
   }
 
   @Override

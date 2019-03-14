@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.opalj.br.instructions.LoadString_W;
 
 /**
  * A generic visitor which accepts a type of 'E' (e.g. Instruction), and for each one computes a
@@ -22,7 +21,7 @@ import org.opalj.br.instructions.LoadString_W;
  */
 public abstract class ListVisitor<E, R> implements Visitor<E, R> {
   private Set<Class<? extends E>> Elements;
-
+  protected int[] pc;
   private static final Logger LOGGER = Logger.getLogger(ListVisitor.class.getName());
 
   public ListVisitor(Collection<Class<? extends E>> c) {
@@ -37,11 +36,9 @@ public abstract class ListVisitor<E, R> implements Visitor<E, R> {
    * @param e the element to visit, if contained within the set
    * @return a value of type 'R' that is computed for this specific element e
    */
-  public R accept(E e) {
+  public R accept(E e, int... pc) {
+    this.pc = pc;
     Class<?>[] interfaces = this.getClass().getInterfaces();
-    if (e instanceof LoadString_W) {
-      LoadString_W o = (LoadString_W) e;
-    }
     for (Class<? extends E> in : Elements)
       if (in.isInstance(e)) {
         try {

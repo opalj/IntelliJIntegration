@@ -13,6 +13,8 @@ import org.opalj.br.instructions.Instruction;
 import org.opalj.collection.IntIterator;
 import org.opalj.collection.RefIterator;
 import org.opalj.collection.immutable.RefArray;
+import scala.Function1;
+import scala.collection.immutable.List;
 
 /** Is responsible for creating and providing the bytecode representation of a class file */
 public class JbcProducer {
@@ -59,12 +61,10 @@ public class JbcProducer {
         .append(classFile.jdkVersion())
         .append(") -- Size: \n");
     // TODO Constant Pool Maybe working with DA.
-    byteCodeString.append(byteCodeFieldToString(classFile));
     RefArray<Annotation> annotations = classFile.annotations();
-    for (int i = 0; i < annotations.length(); i++) {
-      Annotation annotation = annotations.apply(i);
-      byteCodeString.append("//").append(annotation.toJava()).append("\n");
-    }
+    byteCodeString.append(attributesToJava(classFile.attributes(), "\n/*", "*/\n"));
+    byteCodeString.append(annotationsToJava(annotations, "\n/*", "*/\n"));
+    byteCodeString.append(byteCodeFieldToString(classFile));
     byteCodeString.append(byteCodeMethodsToString(classFile));
 
     return byteCodeString.toString();
@@ -105,16 +105,19 @@ public class JbcProducer {
   public static String byteCodeMethodsToString(ClassFile classFile) {
     StringBuilder byteCodeString = new StringBuilder();
     StringVisitor stringVisitor = new StringVisitor();
-    RefIterator<Method> methods = classFile.methodsWithBody();
+    RefIterator<Method> methods = classFile.methods().iterator();
     byteCodeString.append("Methods\n\n");
     while (methods.hasNext()) {
       Method method = methods.next();
+      if (method.methodTypeSignature().isDefined()) {
+        MethodTypeSignature methodTypeSignatureOption = method.methodTypeSignature().get();
+        List<ThrowsSignature> throwsSignatureList = methodTypeSignatureOption.throwsSignature();
+      }
+      byteCodeString.append(method.toString().replaceFirst("\\).*", ")")).append(" { ");
       if (method.body().isDefined()) {
         Code body = method.body().get();
         Instruction[] instructions = body.instructions();
         byteCodeString
-            .append(method.toString().replaceFirst("\\).*", ")"))
-            .append(" { ")
             .append("// [size :")
             .append(body.codeSize())
             .append(" bytes, max Stack: ")
@@ -127,7 +130,7 @@ public class JbcProducer {
           if (instructions[k] != null) {
             try {
               String instruction;
-              instruction = stringVisitor.accept(instructions[k]);
+              instruction = stringVisitor.accept(instructions[k], k);
               // TODO replace \n (and \t...??) and the likes with spaces
               instruction = instruction.replaceAll("\n", " ");
               instruction = instruction.replaceAll("\t", " ");
@@ -144,8 +147,27 @@ public class JbcProducer {
             }
           }
         }
+        // method.exexceptionTable()
+        if (method.exceptionTable().isDefined()) {
+          ExceptionTable exceptionTable = method.exceptionTable().get();
+          byteCodeString.append("ExceptionTable\n");
+          RefIterator<ObjectType> exceptions = exceptionTable.exceptions().iterator();
+          while (exceptions.hasNext()) {
+            ObjectType exception = exceptions.next();
 
+            byteCodeString
+                .append(exception.id())
+                .append("\t")
+                .append(exception.toJava())
+                .append("\n");
+          }
+        }
+        // end method.exceptionTable
         // append tables, if existent
+        // weird ass bug
+        RefArray<Annotation> annotations = method.annotations();
+        byteCodeString.append(attributesToJava(method.attributes(), "\n/*", "*/\n"));
+        byteCodeString.append(annotationsToJava(annotations, "\n/*", "*/\n"));
         byteCodeString.append(localVariableTable(body));
         byteCodeString.append(stackMapTable(body));
       }
@@ -220,5 +242,26 @@ public class JbcProducer {
     }
 
     return stackMapTableString.toString();
+  }
+  /** Converts a given list of annotations into a Java-like representation. */
+  private static String annotationsToJava(
+      RefArray<Annotation> annotations, String before, String after) {
+    Function1 function1 = (Function1<Annotation, String>) v1 -> v1.toJava();
+    if (!annotations.isEmpty()) {
+      return before + annotations._UNSAFE_mapped(function1).mkString("\n") + after;
+    } else {
+      return "";
+    }
+  }
+  /** Converts a given list of annotations into a Java-like representation. */
+  // todo UNDER WORK
+  private static String attributesToJava(
+      RefArray<Attribute> annotations, String before, String after) {
+    Function1 function1 = (Function1<Attribute, String>) v1 -> v1.toString();
+    if (!annotations.isEmpty()) {
+      return before + annotations._UNSAFE_mapped(function1).mkString(" ") + after;
+    } else {
+      return "";
+    }
   }
 }

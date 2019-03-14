@@ -46,14 +46,14 @@ public class JavaByteCodeInstrImpl extends ASTWrapperPsiElement implements JavaB
   }
 
   @Override
-  @Nullable
-  public PsiElement getLoadInstr() {
-    return findChildByType(LOAD_INSTR);
+  @NotNull
+  public PsiElement getMnemonic() {
+    return findNotNullChildByType(MNEMONIC);
   }
 
   @Override
   @Nullable
-  public PsiElement getMnemonic() {
-    return findChildByType(MNEMONIC);
+  public PsiElement getNumber() {
+    return findChildByType(NUMBER);
   }
 }

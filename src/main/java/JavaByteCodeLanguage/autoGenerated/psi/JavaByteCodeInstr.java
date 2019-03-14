@@ -16,9 +16,9 @@ public interface JavaByteCodeInstr extends PsiElement {
   @Nullable
   JavaByteCodeType getType();
 
-  @Nullable
-  PsiElement getLoadInstr();
+  @NotNull
+  PsiElement getMnemonic();
 
   @Nullable
-  PsiElement getMnemonic();
+  PsiElement getNumber();
 }

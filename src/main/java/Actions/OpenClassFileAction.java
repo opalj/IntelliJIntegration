@@ -81,6 +81,12 @@ class OpenClassFileAction extends AnAction {
       classFile = virtualFile;
     }
     if (classFile != null) {
+      Notifications.Bus.notify(
+          new Notification(
+              "OpalPlugin",
+              "OpalPlugin",
+              "decompiling : " + classFile.getName(),
+              NotificationType.INFORMATION));
       FileEditorManager.getInstance(project).openFile(classFile, true);
       FileEditorManager.getInstance(project).setSelectedEditor(classFile, editorName);
     } else {

@@ -110,6 +110,10 @@ public class OpalUtil {
     return null;
   }
 
+  /**
+   * @param virtualClassFile
+   * @param project
+   */
   private static void isNewClassFile(
       @NotNull VirtualFile virtualClassFile, @NotNull Project project) {
     if (!virtualClassFile.equals(currentWorkingVF)

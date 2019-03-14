@@ -14,10 +14,12 @@ public interface JavaByteCodeTypes {
   IElementType DEF_METHOD_NAME = new JavaByteCodeElementType("DEF_METHOD_NAME");
   IElementType FIELDS_DECLARATION = new JavaByteCodeElementType("FIELDS_DECLARATION");
   IElementType INSTR = new JavaByteCodeElementType("INSTR");
+  IElementType INSTRUCTION_BODY = new JavaByteCodeElementType("INSTRUCTION_BODY");
   IElementType JAVA_OP = new JavaByteCodeElementType("JAVA_OP");
   IElementType J_TYPE = new JavaByteCodeElementType("J_TYPE");
   IElementType LAMBDA_PARAMS = new JavaByteCodeElementType("LAMBDA_PARAMS");
   IElementType LAMBDA_TYPE = new JavaByteCodeElementType("LAMBDA_TYPE");
+  IElementType LINE_NUMBER = new JavaByteCodeElementType("LINE_NUMBER");
   IElementType LOC_VAR_TABLE_DECLARATION = new JavaByteCodeElementType("LOC_VAR_TABLE_DECLARATION");
   IElementType LOC_VAR_TABLE_HEAD = new JavaByteCodeElementType("LOC_VAR_TABLE_HEAD");
   IElementType METHOD_DECLARATION = new JavaByteCodeElementType("METHOD_DECLARATION");
@@ -25,6 +27,7 @@ public interface JavaByteCodeTypes {
   IElementType METHOD_NAME = new JavaByteCodeElementType("METHOD_NAME");
   IElementType MODIFIER_V = new JavaByteCodeElementType("MODIFIER_V");
   IElementType PARAMS = new JavaByteCodeElementType("PARAMS");
+  IElementType PC_NUMBER = new JavaByteCodeElementType("PC_NUMBER");
   IElementType TYPE = new JavaByteCodeElementType("TYPE");
 
   IElementType AT = new JavaByteCodeTokenType("@");
@@ -36,7 +39,6 @@ public interface JavaByteCodeTypes {
   IElementType CONSTMETHODNAMES = new JavaByteCodeTokenType("CONSTMETHODNAMES");
   IElementType DOT = new JavaByteCodeTokenType(".");
   IElementType ENUM = new JavaByteCodeTokenType("enum");
-  IElementType EOF = new JavaByteCodeTokenType("\\n");
   IElementType EXTENDS = new JavaByteCodeTokenType("extends");
   IElementType FIELDS = new JavaByteCodeTokenType("Fields");
   IElementType FUCKINGTOKEN = new JavaByteCodeTokenType("lvIndex=");
@@ -45,7 +47,6 @@ public interface JavaByteCodeTypes {
   IElementType INTERFACE = new JavaByteCodeTokenType("interface");
   IElementType LBRACKET = new JavaByteCodeTokenType("LBRACKET");
   IElementType LINE = new JavaByteCodeTokenType("Line");
-  IElementType LOAD_INSTR = new JavaByteCodeTokenType("LOAD_INSTR");
   IElementType LOCALVARIABLETABLE = new JavaByteCodeTokenType("LocalVariableTable");
   IElementType METHODS = new JavaByteCodeTokenType("Methods");
   IElementType MNEMONIC = new JavaByteCodeTokenType("MNEMONIC");
@@ -71,6 +72,8 @@ public interface JavaByteCodeTypes {
         return new JavaByteCodeFieldsDeclarationImpl(node);
       } else if (type == INSTR) {
         return new JavaByteCodeInstrImpl(node);
+      } else if (type == INSTRUCTION_BODY) {
+        return new JavaByteCodeInstructionBodyImpl(node);
       } else if (type == JAVA_OP) {
         return new JavaByteCodeJavaOPImpl(node);
       } else if (type == J_TYPE) {
@@ -79,6 +82,8 @@ public interface JavaByteCodeTypes {
         return new JavaByteCodeLambdaParamsImpl(node);
       } else if (type == LAMBDA_TYPE) {
         return new JavaByteCodeLambdaTypeImpl(node);
+      } else if (type == LINE_NUMBER) {
+        return new JavaByteCodeLineNumberImpl(node);
       } else if (type == LOC_VAR_TABLE_DECLARATION) {
         return new JavaByteCodeLocVarTableDeclarationImpl(node);
       } else if (type == LOC_VAR_TABLE_HEAD) {
@@ -93,6 +98,8 @@ public interface JavaByteCodeTypes {
         return new JavaByteCodeModifierVImpl(node);
       } else if (type == PARAMS) {
         return new JavaByteCodeParamsImpl(node);
+      } else if (type == PC_NUMBER) {
+        return new JavaByteCodePcNumberImpl(node);
       } else if (type == TYPE) {
         return new JavaByteCodeTypeImpl(node);
       }

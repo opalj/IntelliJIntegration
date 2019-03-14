@@ -64,8 +64,7 @@ public class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
       return TYPE_KEYS;
     } else if (tokenType.equals(JavaByteCodeTypes.MODIFIER)) {
       return MODIFIER_KEYS;
-    } else if (tokenType.equals(JavaByteCodeTypes.MNEMONIC)
-        || tokenType.equals(JavaByteCodeTypes.LOAD_INSTR)) {
+    } else if (tokenType.equals(JavaByteCodeTypes.MNEMONIC)) {
       return MNEMONIC_KEYS;
     } else if (tokenType.equals(JavaByteCodeTypes.NUMBER)) {
       return NUMBER_KEYS;
