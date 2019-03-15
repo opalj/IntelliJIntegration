@@ -2,15 +2,13 @@ package opalintegration;
 
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
+import java.util.Arrays;
 import java.util.NoSuchElementException;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import opalintegration.Visitor.Instruction.InstructionVisitorImpl;
 import org.jetbrains.annotations.NotNull;
@@ -21,14 +19,12 @@ import org.opalj.br.instructions.Instruction;
 import org.opalj.collection.IntIterator;
 import org.opalj.collection.RefIterator;
 import org.opalj.collection.immutable.RefArray;
-import org.opalj.da.ClassFileReader;
 import scala.Function1;
 import scala.collection.immutable.List;
 
 /** Is responsible for creating and providing the bytecode representation of a class file */
 public class JbcProducer {
 
-  private static VirtualFile virtualFile;
   private static final Logger LOGGER = Logger.getLogger(JbcProducer.class.getName());
 
   /**
@@ -38,7 +34,6 @@ public class JbcProducer {
    */
   public static VirtualFile prepareJBC(
       @NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
-    JbcProducer.virtualFile = virtualFile;
     return OpalUtil.prepare(project, GlobalData.DISASSEMBLED_FILE_ENDING_JBC, virtualFile, null);
   }
 
@@ -71,72 +66,13 @@ public class JbcProducer {
         .append(" -- Version: (")
         .append(classFile.jdkVersion())
         .append(") -- size: \n");
-    // TODO Constant Pool Maybe working with DA.
-    RefArray<Annotation> annotations = classFile.annotations();
+
     byteCodeString.append(attributesToJava(classFile.attributes(), "\n///*", "*/\n"));
-    byteCodeString.append(annotationsToJava(annotations, "\n///*", "*/\n"));
-    //    byteCodeString.append(byteCodeConstantPoolToString(virtualFile.getPath())); // TODO
+    byteCodeString.append(annotationsToJava(classFile.annotations(), "\n///*", "*/\n"));
     byteCodeString.append(byteCodeFieldToString(classFile));
     byteCodeString.append(byteCodeMethodsToString(classFile));
 
     return byteCodeString.toString();
-  }
-
-  // TODO
-  private static String byteCodeConstantPoolToString(String classPath) {
-    StringBuilder constantPool = new StringBuilder();
-    constantPool.append("Constant Pool {\n");
-
-    Path path = Paths.get(classPath);
-    File file = path.toFile();
-
-    try (FileInputStream fis = new FileInputStream(file);
-        DataInputStream dis = new DataInputStream(fis)) {
-      // get the class file and construct the HTML string
-      org.opalj.da.ClassFile daClassFile =
-          (org.opalj.da.ClassFile) ClassFileReader.ClassFile(dis).head();
-
-      org.opalj.da.Constant_Pool_Entry firstEntry = daClassFile.constant_pool()[0];
-      if (firstEntry != null) {
-        try {
-          constantPool.append(firstEntry.toString()).append("\n");
-          constantPool.append(firstEntry.toString(daClassFile.constant_pool())).append("\n");
-          constantPool.append(firstEntry.asString()).append("\n");
-          constantPool.append(firstEntry.Constant_Type_Value()).append("\n");
-          constantPool.append(firstEntry.Constant_Type_Value().id()).append("\n");
-          constantPool.append(firstEntry.asConstantUTF8()).append("\n");
-          constantPool.append(firstEntry.asConstantPackage()).append("\n");
-        } catch (Exception e) {
-
-        }
-      }
-      for (org.opalj.da.Constant_Pool_Entry constantPoolEntry : daClassFile.constant_pool()) {
-        if (constantPoolEntry == null) {
-          continue;
-        }
-
-        //        constantPool.append(constantPoolEntry.toString()).append("\n");
-        //
-        try {
-          //          constantPool.append(constantPoolEntry.asString()).append("\n");
-          //
-          // constantPool.append(constantPoolEntry.toString(daClassFile.constant_pool())).append("\n");
-          constantPool.append(constantPoolEntry.toString()).append("\n");
-          constantPool.append(constantPoolEntry.toString(daClassFile.constant_pool())).append("\n");
-          constantPool.append(constantPoolEntry.asString()).append("\n");
-          constantPool.append(constantPoolEntry.Constant_Type_Value()).append("\n");
-          constantPool.append(constantPoolEntry.Constant_Type_Value().id()).append("\n");
-          constantPool.append(constantPoolEntry.asConstantUTF8()).append("\n");
-        } catch (UnsupportedOperationException uoe) {
-          LOGGER.log(Level.FINER, uoe.toString(), uoe);
-        }
-      }
-    } catch (IOException e) {
-      LOGGER.log(Level.SEVERE, e.toString(), e);
-    }
-    constantPool.append("}\n\n\n");
-
-    return constantPool.toString();
   }
 
   /**
@@ -177,7 +113,7 @@ public class JbcProducer {
    * @param classFile the classfile of which we want the bytecode
    * @return the methods' bytecode representation as a String
    */
-  public static String byteCodeMethodsToString(ClassFile classFile) {
+  private static String byteCodeMethodsToString(ClassFile classFile) {
     StringBuilder byteCodeString = new StringBuilder();
     InstructionVisitorImpl instructionVisitorImpl = new InstructionVisitorImpl();
     RefIterator<Method> methods = classFile.methods().iterator();
@@ -188,6 +124,7 @@ public class JbcProducer {
         MethodTypeSignature methodTypeSignatureOption = method.methodTypeSignature().get();
         List<ThrowsSignature> throwsSignatureList = methodTypeSignatureOption.throwsSignature();
       }
+      byteCodeString.append(annotationsToJava(method.annotations(), "\n///*", "*/\n"));
       byteCodeString.append(method.toString().replaceFirst("\\).*", ")")).append(" { ");
       if (method.body().isDefined()) {
         Code body = method.body().get();
@@ -248,7 +185,7 @@ public class JbcProducer {
         byteCodeString.append(exceptionTable(method));
         RefArray<Annotation> annotations = method.annotations();
         byteCodeString.append(attributesToJava(method.attributes(), "\n///*", "*/\n"));
-        byteCodeString.append(annotationsToJava(annotations, "\n///*", "*/\n"));
+
 
         byteCodeString.append(localVariableTable(body));
         byteCodeString.append(stackMapTable(body));
@@ -363,21 +300,30 @@ public class JbcProducer {
   /** Converts a given list of annotations into a Java-like representation. */
   private static String annotationsToJava(
       RefArray<Annotation> annotations, String before, String after) {
-    Function1 function1 = (Function1<Annotation, String>) v1 -> v1.toJava();
     if (!annotations.isEmpty()) {
-      return before + annotations._UNSAFE_mapped(function1).mkString("\n") + after;
+      Annotation[] annotationsCopy = new Annotation[annotations.size()];
+      annotations.copyToArray(annotationsCopy);
+      String annotationsString = Arrays.stream(annotationsCopy)
+              .map(Annotation::toString)
+              .collect(Collectors.joining(" "));
+      return before + annotationsString + after;
     } else {
       return "";
     }
   }
 
   /** Converts a given list of annotations into a Java-like representation. */
-  // todo UNDER WORK
+  // todo UNDER WORK (weirdest bug ever)
   private static String attributesToJava(
-      RefArray<Attribute> annotations, String before, String after) {
-    Function1 function1 = (Function1<Attribute, String>) v1 -> v1.toString();
-    if (!annotations.isEmpty()) {
-      return before + annotations._UNSAFE_mapped(function1).mkString(" ") + after;
+      RefArray<Attribute> attributes, String before, String after) {
+    if (!attributes.isEmpty()) {
+      Attribute[] attributesCopy = new Attribute[attributes.size()];
+      attributes.copyToArray(attributesCopy);
+      String attributeString = Arrays.stream(attributesCopy)
+              .map(Attribute::toString)
+              .collect(Collectors.joining(" "));
+//              .reduce("", (s1, s2) -> s1 + " " + s2);
+      return before + attributeString + after;
     } else {
       return "";
     }

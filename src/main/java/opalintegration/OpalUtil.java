@@ -41,6 +41,7 @@ public class OpalUtil {
   private static String fqClassName;
   private static File projectFile;
   private static VirtualFile currentWorkingVF;
+  private static File tempDirectory;
 
   private static final Logger LOGGER = Logger.getLogger(OpalUtil.class.getName());
 
@@ -84,6 +85,8 @@ public class OpalUtil {
     return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
   }
 
+
+
   /**
    * an auxiliary method that writes 'content' to a 'file' (main purpose of this method is to
    * encapsulate the try/catch block)
@@ -94,15 +97,32 @@ public class OpalUtil {
   private static File writeContentToFile(
       String filename, String content, boolean append, boolean olderFile) {
     try {
-      File file = null;
-      if (!olderFile) {
-        String[] filenameArray = filename.split("\\.");
-        file = FileUtil.createTempFile(filenameArray[0], "." + filenameArray[1], true);
-      } else {
-        file = new File(filename);
+      File fileToWriteTo = null;
+
+      if(tempDirectory == null) {
+        tempDirectory = FileUtil.createTempDirectory("tempJbcDirectory", "", true);
       }
-      FileUtil.writeToFile(file, content, append);
-      return file;
+
+      if(!olderFile) {
+        boolean fileContained = false;
+        for(File fileInTemp : tempDirectory.listFiles()) {
+          if(fileInTemp.getName().equals(filename)) {
+            fileContained = true;
+            fileToWriteTo = fileInTemp;
+            break;
+          }
+        }
+
+        if(!fileContained) {
+          fileToWriteTo = new File(tempDirectory.getAbsolutePath() + File.separator + filename);
+        }
+      }
+      else {
+        fileToWriteTo = new File(filename);
+      }
+
+      FileUtil.writeToFile(fileToWriteTo, content, false);
+      return fileToWriteTo;
     } catch (IOException e) {
       LOGGER.log(Level.SEVERE, e.toString(), e);
     }
