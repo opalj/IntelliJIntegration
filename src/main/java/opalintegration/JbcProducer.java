@@ -2,7 +2,12 @@ package opalintegration;
 
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
-
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
@@ -20,6 +25,7 @@ import org.opalj.collection.IntIterator;
 import org.opalj.collection.RefIterator;
 import org.opalj.collection.immutable.RefArray;
 import scala.Function1;
+import scala.Option;
 import scala.collection.immutable.List;
 
 /** Is responsible for creating and providing the bytecode representation of a class file */
@@ -124,8 +130,9 @@ public class JbcProducer {
         MethodTypeSignature methodTypeSignatureOption = method.methodTypeSignature().get();
         List<ThrowsSignature> throwsSignatureList = methodTypeSignatureOption.throwsSignature();
       }
-      byteCodeString.append(annotationsToJava(method.annotations(), "\n///*", "*/\n"));
-      byteCodeString.append(method.toString().replaceFirst("\\).*", ")")).append(" { ");
+      byteCodeString.append(method.toString().replaceFirst("\\).*", ")"))
+              .append(exceptionTable(method.exceptionTable()))
+              .append(" { ");
       if (method.body().isDefined()) {
         Code body = method.body().get();
         Instruction[] instructions = body.instructions();
@@ -164,25 +171,6 @@ public class JbcProducer {
             }
           }
         }
-        // method.exexceptionTable()
-        //        if (method.exceptionTable().isDefined()) {
-        //          ExceptionTable exceptionTable = method.exceptionTable().get();
-        //          byteCodeString.append("ExceptionTable\n");
-        //          RefIterator<ObjectType> exceptions = exceptionTable.exceptions().iterator();
-        //          while (exceptions.hasNext()) {
-        //            ObjectType exception = exceptions.next();
-        //
-        //            byteCodeString
-        //                .append(exception.id())
-        //                .append("\t")
-        //                .append(exception.toJava())
-        //                .append("\n");
-        //          }
-        //        }
-        // end method.exceptionTable
-        // append tables, if existent
-        // weird ass bug
-        byteCodeString.append(exceptionTable(method));
         RefArray<Annotation> annotations = method.annotations();
         byteCodeString.append(attributesToJava(method.attributes(), "\n///*", "*/\n"));
 
@@ -197,28 +185,15 @@ public class JbcProducer {
     return byteCodeString.toString();
   }
 
-  private static String exceptionTable(Method method) {
-
-    if (!method.exceptionTable().isDefined()) {
+  private static String exceptionTable(Option<ExceptionTable> exceptionTable ) {
+    if (!exceptionTable.isDefined()) {
       return "";
     }
-
     StringBuilder exceptionTableString = new StringBuilder();
-    ExceptionTable exceptionTable = method.exceptionTable().get();
-    exceptionTableString.append("\n\n\tExceptionTable {\n");
-    RefIterator<ObjectType> exceptions = exceptionTable.exceptions().iterator();
-    while (exceptions.hasNext()) {
-      ObjectType exception = exceptions.next();
-
-      exceptionTableString
-          .append("\t\t")
-          .append(exception.id())
-          .append("\t")
-          .append(exception.toJava())
-          .append("\n");
-    }
-    exceptionTableString.append("\t}\n");
-
+    exceptionTableString.append(" throws ");
+    ObjectType[] exceptions = new ObjectType[exceptionTable.get().exceptions().size()];
+    exceptionTable.get().exceptions().copyToArray(exceptions);
+    exceptionTableString.append(Arrays.stream(exceptions).map(o->o.toJava()).collect(Collectors.joining(", ")));
     return exceptionTableString.toString();
   }
 
