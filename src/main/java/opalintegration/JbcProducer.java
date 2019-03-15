@@ -2,7 +2,6 @@ package opalintegration;
 
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
-
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -74,7 +73,7 @@ public class JbcProducer {
     RefArray<Annotation> annotations = classFile.annotations();
     byteCodeString.append(attributesToJava(classFile.attributes(), "\n///*", "*/\n"));
     byteCodeString.append(annotationsToJava(annotations, "\n///*", "*/\n"));
-//    byteCodeString.append(byteCodeConstantPoolToString(virtualFile.getPath())); // TODO
+    //    byteCodeString.append(byteCodeConstantPoolToString(virtualFile.getPath())); // TODO
     byteCodeString.append(byteCodeFieldToString(classFile));
     byteCodeString.append(byteCodeMethodsToString(classFile));
 
@@ -90,12 +89,13 @@ public class JbcProducer {
     File file = path.toFile();
 
     try (FileInputStream fis = new FileInputStream(file);
-         DataInputStream dis = new DataInputStream(fis)) {
+        DataInputStream dis = new DataInputStream(fis)) {
       // get the class file and construct the HTML string
-      org.opalj.da.ClassFile daClassFile = (org.opalj.da.ClassFile) ClassFileReader.ClassFile(dis).head();
+      org.opalj.da.ClassFile daClassFile =
+          (org.opalj.da.ClassFile) ClassFileReader.ClassFile(dis).head();
 
       org.opalj.da.Constant_Pool_Entry firstEntry = daClassFile.constant_pool()[0];
-      if(firstEntry != null) {
+      if (firstEntry != null) {
         try {
           constantPool.append(firstEntry.toString()).append("\n");
           constantPool.append(firstEntry.toString(daClassFile.constant_pool())).append("\n");
@@ -104,32 +104,32 @@ public class JbcProducer {
           constantPool.append(firstEntry.Constant_Type_Value().id()).append("\n");
           constantPool.append(firstEntry.asConstantUTF8()).append("\n");
           constantPool.append(firstEntry.asConstantPackage()).append("\n");
-        } catch(Exception e) {
+        } catch (Exception e) {
 
         }
       }
-      for(org.opalj.da.Constant_Pool_Entry constantPoolEntry : daClassFile.constant_pool()) {
-        if(constantPoolEntry == null) {
+      for (org.opalj.da.Constant_Pool_Entry constantPoolEntry : daClassFile.constant_pool()) {
+        if (constantPoolEntry == null) {
           continue;
         }
 
-
-//        constantPool.append(constantPoolEntry.toString()).append("\n");
-//
+        //        constantPool.append(constantPoolEntry.toString()).append("\n");
+        //
         try {
-//          constantPool.append(constantPoolEntry.asString()).append("\n");
-//          constantPool.append(constantPoolEntry.toString(daClassFile.constant_pool())).append("\n");
+          //          constantPool.append(constantPoolEntry.asString()).append("\n");
+          //
+          // constantPool.append(constantPoolEntry.toString(daClassFile.constant_pool())).append("\n");
           constantPool.append(constantPoolEntry.toString()).append("\n");
           constantPool.append(constantPoolEntry.toString(daClassFile.constant_pool())).append("\n");
           constantPool.append(constantPoolEntry.asString()).append("\n");
           constantPool.append(constantPoolEntry.Constant_Type_Value()).append("\n");
           constantPool.append(constantPoolEntry.Constant_Type_Value().id()).append("\n");
           constantPool.append(constantPoolEntry.asConstantUTF8()).append("\n");
-        } catch(UnsupportedOperationException uoe) {
+        } catch (UnsupportedOperationException uoe) {
           LOGGER.log(Level.FINER, uoe.toString(), uoe);
         }
       }
-    } catch(IOException e) {
+    } catch (IOException e) {
       LOGGER.log(Level.SEVERE, e.toString(), e);
     }
     constantPool.append("}\n\n\n");
@@ -148,7 +148,7 @@ public class JbcProducer {
     RefArray<Field> fields = classFile.fields();
 
     // don't show fields if there are none
-    if(fields.length() == 0) {
+    if (fields.length() == 0) {
       return "";
     }
 
@@ -209,7 +209,8 @@ public class JbcProducer {
               // TODO replace \n (and \t...??) and the likes with spaces
               instruction = instruction.replaceAll("\n", " ");
               instruction = instruction.replaceAll("\t", " ");
-              // replaces a \ with a \\ -> needed because e.g. LDC("s\") would escape the last " and thus breaking the syntax
+              // replaces a \ with a \\ -> needed because e.g. LDC("s\") would escape the last " and
+              // thus breaking the syntax
               instruction = instruction.replaceAll("\\\\", "\\\\\\\\");
 
               String formattedInstrLine =
@@ -225,26 +226,28 @@ public class JbcProducer {
           }
         }
         // method.exexceptionTable()
-        if (method.exceptionTable().isDefined()) {
-          ExceptionTable exceptionTable = method.exceptionTable().get();
-          byteCodeString.append("ExceptionTable\n");
-          RefIterator<ObjectType> exceptions = exceptionTable.exceptions().iterator();
-          while (exceptions.hasNext()) {
-            ObjectType exception = exceptions.next();
-
-            byteCodeString
-                .append(exception.id())
-                .append("\t")
-                .append(exception.toJava())
-                .append("\n");
-          }
-        }
+        //        if (method.exceptionTable().isDefined()) {
+        //          ExceptionTable exceptionTable = method.exceptionTable().get();
+        //          byteCodeString.append("ExceptionTable\n");
+        //          RefIterator<ObjectType> exceptions = exceptionTable.exceptions().iterator();
+        //          while (exceptions.hasNext()) {
+        //            ObjectType exception = exceptions.next();
+        //
+        //            byteCodeString
+        //                .append(exception.id())
+        //                .append("\t")
+        //                .append(exception.toJava())
+        //                .append("\n");
+        //          }
+        //        }
         // end method.exceptionTable
         // append tables, if existent
         // weird ass bug
+        byteCodeString.append(exceptionTable(method));
         RefArray<Annotation> annotations = method.annotations();
         byteCodeString.append(attributesToJava(method.attributes(), "\n///*", "*/\n"));
         byteCodeString.append(annotationsToJava(annotations, "\n///*", "*/\n"));
+
         byteCodeString.append(localVariableTable(body));
         byteCodeString.append(stackMapTable(body));
       }
@@ -253,6 +256,31 @@ public class JbcProducer {
 
     byteCodeString.append("} // Methods");
     return byteCodeString.toString();
+  }
+
+  private static String exceptionTable(Method method) {
+
+    if (!method.exceptionTable().isDefined()) {
+      return "";
+    }
+
+    StringBuilder exceptionTableString = new StringBuilder();
+    ExceptionTable exceptionTable = method.exceptionTable().get();
+    exceptionTableString.append("\n\n\tExceptionTable {\n");
+    RefIterator<ObjectType> exceptions = exceptionTable.exceptions().iterator();
+    while (exceptions.hasNext()) {
+      ObjectType exception = exceptions.next();
+
+      exceptionTableString
+          .append("\t\t")
+          .append(exception.id())
+          .append("\t")
+          .append(exception.toJava())
+          .append("\n");
+    }
+    exceptionTableString.append("\t}\n");
+
+    return exceptionTableString.toString();
   }
 
   /**
@@ -315,18 +343,20 @@ public class JbcProducer {
       Class<? extends StackMapFrame> frameClass = stackMapFrame.getClass();
       int pc = pcIterator.next();
       stackMapTableString
-              .append("\t\t")
-              .append(pc).append(" ")
-              .append(frameClass.getName()).append(" ")
-              .append(stackMapFrame.frameType()).append(" ")
-              .append(stackMapFrame.offset(0) - 1)
-              .append("\n");
+          .append("\t\t")
+          .append(pc)
+          .append(" ")
+          .append(frameClass.getName())
+          .append(" ")
+          .append(stackMapFrame.frameType())
+          .append(" ")
+          .append(stackMapFrame.offset(0) - 1)
+          .append("\n");
     }
     stackMapTableString.append("\t}\n");
 
     return stackMapTableString.toString();
   }
-
 
   /** Converts a given list of annotations into a Java-like representation. */
   private static String annotationsToJava(
@@ -338,6 +368,7 @@ public class JbcProducer {
       return "";
     }
   }
+
   /** Converts a given list of annotations into a Java-like representation. */
   // todo UNDER WORK
   private static String attributesToJava(

@@ -5,8 +5,14 @@ import com.intellij.psi.PsiElement;
 import java.util.List;
 import org.jetbrains.annotations.*;
 
-public interface JavaByteCodeParams extends PsiElement {
+public interface JavaByteCodeExceptionTableDeclaration extends PsiElement {
 
   @NotNull
   List<JavaByteCodeType> getTypeList();
+
+  @NotNull
+  PsiElement getLbracket();
+
+  @NotNull
+  PsiElement getRbracket();
 }

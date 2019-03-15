@@ -81,6 +81,7 @@ STRINGVAR=[a-zA-Z$_][a-zA-Z0-9$_]*
   "PC"                    { return PC; }
   "Line"                  { return LINE; }
   "Instruction"           { return INSTRUCTION; }
+  "ExceptionTable"        { return EXCEPTIONTABLE; }
   "LocalVariableTable"    { return LOCALVARIABLETABLE; }
   "this"                  { return THIS; }
   "StackMapTable"         { return STACKMAPTABLE; }
