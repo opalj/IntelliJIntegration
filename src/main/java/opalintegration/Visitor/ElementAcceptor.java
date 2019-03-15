@@ -1,4 +1,4 @@
-package opalintegration;
+package opalintegration.Visitor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -14,17 +14,26 @@ import java.util.logging.Logger;
  *
  * <p>It uses a set to store the types of elements it can visit (i.e. traverse through)
  *
- * <p>TODO: rename to SetVisitor ?
  *
  * @param <E> type of element that can be visited
  * @param <R> type of value computed on a visit
  */
-public abstract class ListVisitor<E, R> implements Visitor<E, R> {
+public abstract class ElementAcceptor<E, R> implements DefaultVistor<E, R> {
   private Set<Class<? extends E>> Elements;
   protected int[] pc;
-  private static final Logger LOGGER = Logger.getLogger(ListVisitor.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(ElementAcceptor.class.getName());
 
-  public ListVisitor(Collection<Class<? extends E>> c) {
+  public ElementAcceptor(){
+    Elements = new HashSet<>();
+    for (Class<?> inter : this.getClass().getInterfaces()) {
+      for (Method method : inter.getMethods()) {
+        for (Class<?> parameterType : method.getParameterTypes()) {
+          Elements.add((Class<? extends E>)parameterType);
+        }
+      }
+    }
+  }
+  public ElementAcceptor(Collection<Class<? extends E>> c) {
     Elements = new HashSet<>();
     Elements.addAll(c);
   }
@@ -38,7 +47,6 @@ public abstract class ListVisitor<E, R> implements Visitor<E, R> {
    */
   public R accept(E e, int... pc) {
     this.pc = pc;
-    Class<?>[] interfaces = this.getClass().getInterfaces();
     for (Class<? extends E> in : Elements)
       if (in.isInstance(e)) {
         try {

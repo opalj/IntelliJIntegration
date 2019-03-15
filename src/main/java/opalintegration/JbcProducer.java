@@ -11,6 +11,8 @@ import java.nio.file.Paths;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import opalintegration.Visitor.Instruction.InstructionVisitorImpl;
 import org.jetbrains.annotations.NotNull;
 import org.opalj.bi.AccessFlags;
 import org.opalj.bi.AccessFlagsContexts;
@@ -177,7 +179,7 @@ public class JbcProducer {
    */
   public static String byteCodeMethodsToString(ClassFile classFile) {
     StringBuilder byteCodeString = new StringBuilder();
-    StringVisitor stringVisitor = new StringVisitor();
+    InstructionVisitorImpl instructionVisitorImpl = new InstructionVisitorImpl();
     RefIterator<Method> methods = classFile.methods().iterator();
     byteCodeString.append("Methods {\n\n");
     while (methods.hasNext()) {
@@ -205,7 +207,7 @@ public class JbcProducer {
           if (instructions[k] != null) {
             try {
               String instruction;
-              instruction = stringVisitor.accept(instructions[k], k);
+              instruction = instructionVisitorImpl.accept(instructions[k], k);
               // TODO replace \n (and \t...??) and the likes with spaces
               instruction = instruction.replaceAll("\n", " ");
               instruction = instruction.replaceAll("\t", " ");

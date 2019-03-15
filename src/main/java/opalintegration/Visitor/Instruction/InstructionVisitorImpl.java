@@ -1,6 +1,7 @@
-package opalintegration;
+package opalintegration.Visitor.Instruction;
 
-import java.util.Arrays;
+import opalintegration.Visitor.ElementAcceptor;
+import opalintegration.Visitor.Instruction.InstructionVisitor;
 import org.opalj.br.Type;
 import org.opalj.br.instructions.*;
 
@@ -13,20 +14,65 @@ import org.opalj.br.instructions.*;
  *
  * <p>TODO: visit(TABLESWITCH)
  */
-public class StringVisitor extends ListVisitor<Instruction, String> implements InstructionVisitor {
-  public StringVisitor() {
-    super(
-        Arrays.asList(
-            ANEWARRAY.class,
-            PUTFIELD.class,
-            PUTSTATIC.class,
-            GETSTATIC.class,
-            GETFIELD.class,
-            LoadString.class, // rather LDC visitor
-            LoadString_W.class,
-            LDC.class,
-            LDC_W.class,
-            SimpleBranchInstruction.class));
+public class InstructionVisitorImpl extends ElementAcceptor<Instruction, String> implements InstructionVisitor {
+  @Override
+  public String visit(LoadInt l) {
+    return l.mnemonic().toUpperCase()+"("+l.value()+")";
+  }
+
+  @Override
+  public String visit(LoadInt_W l) {
+    return l.mnemonic().toUpperCase()+"("+l.value()+")";
+  }
+
+  @Override
+  public String visit(LoadDouble l) {
+    return l.mnemonic().toUpperCase()+"("+l.value()+")";
+  }
+
+  @Override
+  public String visit(LoadLong l) {
+    return l.mnemonic().toUpperCase()+"("+l.value()+")";
+  }
+
+  @Override
+  public String visit(LoadFloat l) {
+    return l.mnemonic().toUpperCase()+"("+l.value()+")";
+  }
+
+  @Override
+  public String visit(LoadFloat_W l) {
+    return l.mnemonic().toUpperCase()+"("+l.value()+")";
+  }
+
+  @Override
+  public String visit(LoadClass l) {
+    return l.mnemonic().toUpperCase()+"("+l.value().toJava()+")";
+  }
+
+  @Override
+  public String visit(LoadClass_W l) {
+    return l.mnemonic().toUpperCase()+"("+l.value().toJava()+")";
+  }
+
+  @Override
+  public String visit(LoadMethodHandle l) {
+    return l.mnemonic().toUpperCase()+"("+l.value().toJava()+")";
+  }
+
+  @Override
+  public String visit(LoadMethodHandle_W l) {
+    return l.mnemonic().toUpperCase()+"("+l.value().toJava()+")";
+  }
+
+  @Override
+  public String visit(LoadMethodType l) {
+    return l.mnemonic().toUpperCase()+"("+l.value().toJava()+")";
+  }
+
+  @Override
+  public String visit(LoadMethodType_W l) {
+    return l.mnemonic().toUpperCase()+"("+l.value().toJava()+")";
   }
 
   public String visit(ANEWARRAY anewarray) {
@@ -69,17 +115,6 @@ public class StringVisitor extends ListVisitor<Instruction, String> implements I
         + " : "
         + putstatic.fieldType().toJava();
   }
-
-  @Override
-  public String visit(LDC ldc) {
-    return ldc.mnemonic().toUpperCase() + "(" + ((Type) ldc.value()).toJava() + ")";
-  }
-
-  @Override
-  public String visit(LDC_W ldc_w) {
-    return ldc_w.mnemonic().toUpperCase() + "(" + ((Type) ldc_w.value()).toJava() + ")";
-  }
-
   @Override
   public String visit(LoadString_W lsw) {
     return lsw.mnemonic().toUpperCase() + "(\"" + lsw.value() + "\")";
