@@ -56,8 +56,6 @@ public class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
   public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
     if (tokenType.equals(JavaByteCodeTypes.COMMENT)) {
       return COMMENT_KEYS;
-    } else if (tokenType.equals(JavaByteCodeTypes.BLOCK_COMMENT)) {
-      return BLOCK_KEYS;
     } else if (tokenType.equals(JavaByteCodeTypes.J_TYPE)
         || tokenType.equals(
             JavaByteCodeTypes.PRIMITIVETYPE)) { // tokenType.equals(JavaByteCodeTypes.JAVATYPE)

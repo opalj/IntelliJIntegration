@@ -68,7 +68,7 @@ public class JavaByteCodePsiImplUtil {
   }
 
   public static String getName(JavaByteCodeLocVarTableDeclaration element) {
-    return element.getLocVarTableHead().getText();
+    return element.getTablename().getText();
   }
 
   public static String getName(JavaByteCodeMethodDeclaration element) {
@@ -99,7 +99,7 @@ public class JavaByteCodePsiImplUtil {
 
   public static PsiElement setName(
       @NotNull JavaByteCodeLocVarTableDeclaration element, String newName) {
-    ASTNode keyNode = element.getLocVarTableHead().getNode();
+    ASTNode keyNode = element.getTablename().getNode();
     if (keyNode != null) {
       // SEE ABOVE
     }
@@ -138,7 +138,7 @@ public class JavaByteCodePsiImplUtil {
 
   /** @see PsiNameIdentifierOwner#getNameIdentifier() */
   public static PsiElement getNameIdentifier(@NotNull JavaByteCodeLocVarTableDeclaration element) {
-    ASTNode keyNode = element.getLocVarTableHead().getNode();
+    ASTNode keyNode = element.getTablename().getNode();
     if (keyNode != null) {
       return keyNode.getPsi();
     } else {
