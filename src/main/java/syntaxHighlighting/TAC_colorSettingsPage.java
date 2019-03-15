@@ -10,9 +10,13 @@ import org.jetbrains.annotations.*;
 public class TAC_colorSettingsPage implements ColorSettingsPage {
   private static final AttributesDescriptor[] DESCRIPTORS =
       new AttributesDescriptor[] {
-        new AttributesDescriptor("Key", syntaxHighlighting.SyntaxHighlighter.KEY),
+        new AttributesDescriptor("Keywords", syntaxHighlighting.SyntaxHighlighter.KEYWORDS),
         new AttributesDescriptor("Separator", syntaxHighlighting.SyntaxHighlighter.SEPARATOR),
-        new AttributesDescriptor("Value", syntaxHighlighting.SyntaxHighlighter.VALUE),
+        new AttributesDescriptor("Number", syntaxHighlighting.SyntaxHighlighter.NUMBER),
+        new AttributesDescriptor("Comment", syntaxHighlighting.SyntaxHighlighter.COMMENT),
+        new AttributesDescriptor("Javatype", syntaxHighlighting.SyntaxHighlighter.JAVATYPE),
+        new AttributesDescriptor("String", syntaxHighlighting.SyntaxHighlighter.STRING),
+        new AttributesDescriptor("Level", syntaxHighlighting.SyntaxHighlighter.LEVEL)
       };
 
   @Nullable
@@ -30,18 +34,18 @@ public class TAC_colorSettingsPage implements ColorSettingsPage {
   @NotNull
   @Override
   public String getDemoText() {
-    return "# You are reading the \".properties\" entry.\n"
-        + "! The exclamation mark can also mark text as comments.\n"
-        + "website = http://en.wikipedia.org/\n"
-        + "language = English\n"
-        + "# The backslash below tells the application to continue reading\n"
-        + "# the value onto the next line.\n"
-        + "message = Welcome to \\\n"
-        + "          Wikipedia!\n"
-        + "# Add spaces to the key\n"
-        + "key\\ with\\ spaces = This is the value that could be looked up with the key \"key with spaces\".\n"
-        + "# Unicode\n"
-        + "tab : \\u0009";
+    return "0: lv0 = \"Argument for @NotNull parameter '%s' of %s.%s must not be null\"\n"
+        + "1: lv1 = 3\n"
+        + "2: lv2 = new java.lang.Object[{lv1}]\n"
+        + "3: switch({param1}){\n"
+        + "0: goto 4;\n"
+        + "1: goto 8;\n"
+        + "default: goto 4\n"
+        + "}\n"
+        + "// 3 →\n"
+        + "6: {lv2}[{lv4}] = {lv5}\n"
+        + "17: lv11 = java.lang.String.format({lv0}, {lv2})\n"
+        + "// ️ <uncaught exception  abnormal return>";
   }
 
   @Nullable

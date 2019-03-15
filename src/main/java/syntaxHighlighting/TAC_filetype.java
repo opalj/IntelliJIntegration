@@ -24,7 +24,7 @@ public class TAC_filetype extends LanguageFileType {
   @NotNull
   @Override
   public String getDescription() {
-    return "Threaa-address-code";
+    return "Three-address-code";
   }
 
   @NotNull

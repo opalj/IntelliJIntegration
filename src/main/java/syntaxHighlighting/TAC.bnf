@@ -1,20 +1,71 @@
 {
   parserClass="syntaxHighlighting.TAC_parser"
-
+  parserUtilClass="syntaxHighlighting.TAC_parserParserUtil"
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
   psiClassPrefix="TAC"
   psiImplClassSuffix="Impl"
   psiPackage="syntaxHighlighting"
-  psiImplPackage="syntaxHighlighting.impl"
+  psiImplPackage="syntaxHighlighting.psi.impl"
 
   elementTypeHolderClass="syntaxHighlighting.TAC_elementTypeHolder"
-  elementTypeClass="syntaxHighlighting.TAC_elementType"
-  tokenTypeClass="syntaxHighlighting.TAC_tokenType"
+  elementTypeClass="syntaxHighlighting.psi.TAC_elementType"
+  tokenTypeClass="syntaxHighlighting.psi.TAC_tokenType"
+
+  psiImplUtilClass="syntaxHighlighting.psi.impl.TACPsiImplUtil"
+
+  tokens=[
+    CRLF='regexp:\R'
+    WHITE_SPACE='regexp:\s+'
+    STRING="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\")"
+    COMMENT='regexp://.*'
+    BLOCK_COMMENT="regexp:/\*[^\*/]*\*/"
+    NUMBER ='regexp:(-)?[0-9]+'
+    //JAVA="regexp:(([A-Za-z])*\.)+([A-Za-z])*(\{(.)*\})?"
+    KEYWORDS="regexp:new|goto|if|else|throw|throws|catch|caught|return"
+    MODIFIER="regexp:public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient"
+    CLASS="regexp:class";
+    EXTENDS="regexp:extends";
+    IMPLEMENTS="regexp:implemenmts";
+    THROW="regexp:throw";
+    THROWS="regexp:throws";
+    VOID="regexp:void";
+    THIS="regexp:this";
+    //JAVA_TYPE="regexp:(([A-Za-z])*\.)+[A-Z-a-z]*"
+    LEVEL="regexp:lv+([A-Za-z0-9])*"
+    COMMA="regexp:,"
+    DOT="regexp:."
+    COLON="regexp::"
+    SEMICOLON="regexp:;"
+    AT="regexp:@"
+    RARROW="regexp:>|=>"
+    LARROW="regexp:<|<="
+    LBRACKET="regexp:\(|\{|\[|«"
+    RBRACKET="regexp:\)|\}|\]|»"
+    CONSTMETHODNAMES = "regexp:<(cl)?init>"
+    CLASS='regexp:class'
+    EXTENDS='regexp:extends'
+    IMPLEMENTS='regexp:implements'
+    NEW_LINE="regexp:\n"
+    EQ="regexp:="
+    UEQ="regexp:!="
+    JAVA_TYPE="regexp:((([A-Za-z])([A-Za-z0-9])*)\.)+(([A-Za-z])([A-Za-z0-9])*)"
+    STRINGVAR = "regexp:[a-zA-Z$_][a-zA-Z0-9$_]*"
+    ]
+
 }
 
 tacFile ::= item_*
 
-private item_ ::= (property|COMMENT|CRLF)
+// private item_ ::= (property|COMMENT|CRLF)
+//private item_ ::= (property|COMMENT|CRLF|WHITE_SPACE|STRING|NUMBER|KEYWORDS)
+private item_ ::= (Type|COMMENT|CRLF|WHITE_SPACE|STRING|NUMBER|KEYWORDS)
 
-property ::= (KEY? SEPARATOR VALUE?) | KEY
+Type ::= (JType | NUMBER)('[]')*
+
+JType ::= ((STRINGVAR | THIS) DOT)*(STRINGVAR | THIS)  {mixin="syntaxHighlighting.psi.impl.TAC_namedElementImpl"
+                                       implements="syntaxHighlighting.TAC_namedElement"
+                                       methods=[getJavaType getName setName getNameIdentifier getReferences]}
+
+property ::= (KEY? SEPARATOR VALUE?) | KEY {mixin="syntaxHighlighting.psi.impl.TAC_namedElementImpl"
+  implements="syntaxHighlighting.TAC_namedElement" methods=[getKey getValue getName setName getNameIdentifier getPresentation]}

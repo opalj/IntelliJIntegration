@@ -134,5 +134,5 @@ class OpenClassFileAction extends AnAction {
       return classFile;
     }
     return null;
-  }
+  } // getCorrespondingClassFile()
 }
