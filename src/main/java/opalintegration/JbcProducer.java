@@ -2,19 +2,11 @@ package opalintegration;
 
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
 import opalintegration.Visitor.Instruction.InstructionVisitorImpl;
 import org.jetbrains.annotations.NotNull;
 import org.opalj.bi.AccessFlags;
@@ -24,7 +16,6 @@ import org.opalj.br.instructions.Instruction;
 import org.opalj.collection.IntIterator;
 import org.opalj.collection.RefIterator;
 import org.opalj.collection.immutable.RefArray;
-import scala.Function1;
 import scala.Option;
 import scala.collection.immutable.List;
 
@@ -49,14 +40,13 @@ public class JbcProducer {
    * @param classFile the classfile of which we want the bytecode
    * @return the bytecode representation as a String
    */
-  static String createBytecodeString(ClassFile classFile) {
+  @NotNull
+  static String createBytecodeString(@NotNull ClassFile classFile) {
     StringBuilder byteCodeString = new StringBuilder();
     byteCodeString
         .append(AccessFlags.classFlagsToJava(classFile.accessFlags()))
         .append(" ")
         .append(classFile.fqn().replace("/", "."));
-    //    ByteCodeString.append(AccessFlags.toString(classFile.accessFlags(),
-    // AccessFlagsContexts.CLASS())).append( " ").append(classFile.fqn().replace("/", "."));
     if (classFile.superclassType().isDefined()) {
       byteCodeString.append(" extends ").append(classFile.superclassType().get().toJava());
     }
@@ -87,7 +77,8 @@ public class JbcProducer {
    * @param classFile the classfile of which we want the bytecode
    * @return the fields' bytecode representation as a String
    */
-  private static String byteCodeFieldToString(ClassFile classFile) {
+  @NotNull
+  private static String byteCodeFieldToString(@NotNull ClassFile classFile) {
     StringBuilder byteCodeString = new StringBuilder();
     RefArray<Field> fields = classFile.fields();
 
@@ -119,7 +110,8 @@ public class JbcProducer {
    * @param classFile the classfile of which we want the bytecode
    * @return the methods' bytecode representation as a String
    */
-  private static String byteCodeMethodsToString(ClassFile classFile) {
+  @NotNull
+  private static String byteCodeMethodsToString(@NotNull ClassFile classFile) {
     StringBuilder byteCodeString = new StringBuilder();
     InstructionVisitorImpl instructionVisitorImpl = new InstructionVisitorImpl();
     RefIterator<Method> methods = classFile.methods().iterator();
@@ -127,12 +119,15 @@ public class JbcProducer {
     while (methods.hasNext()) {
       Method method = methods.next();
       if (method.methodTypeSignature().isDefined()) {
+        // TODO "diamond operator"
         MethodTypeSignature methodTypeSignatureOption = method.methodTypeSignature().get();
         List<ThrowsSignature> throwsSignatureList = methodTypeSignatureOption.throwsSignature();
       }
-      byteCodeString.append(method.toString().replaceFirst("\\).*", ")"))
-              .append(exceptionTable(method.exceptionTable()))
-              .append(" { ");
+      byteCodeString.append(annotationsToJava(method.annotations(), "\n///*", "*/\n"));
+      byteCodeString
+          .append(method.toString().replaceFirst("\\).*", ")"))
+          .append(thrownExceptions(method.exceptionTable()))
+          .append(" { ");
       if (method.body().isDefined()) {
         Code body = method.body().get();
         Instruction[] instructions = body.instructions();
@@ -171,9 +166,7 @@ public class JbcProducer {
             }
           }
         }
-        RefArray<Annotation> annotations = method.annotations();
         byteCodeString.append(attributesToJava(method.attributes(), "\n///*", "*/\n"));
-
 
         byteCodeString.append(localVariableTable(body));
         byteCodeString.append(stackMapTable(body));
@@ -185,7 +178,15 @@ public class JbcProducer {
     return byteCodeString.toString();
   }
 
-  private static String exceptionTable(Option<ExceptionTable> exceptionTable ) {
+  /**
+   * E.g. if the exception table contains two exceptions, say IOException and RuntimeException, then
+   * the output will be: throws java.io.IOException, java.lang.RuntimeException
+   *
+   * @param exceptionTable The table which contains the exceptions that the method throws
+   * @return a string which contains a throws clause
+   */
+  @NotNull
+  private static String thrownExceptions(@NotNull Option<ExceptionTable> exceptionTable) {
     if (!exceptionTable.isDefined()) {
       return "";
     }
@@ -193,7 +194,8 @@ public class JbcProducer {
     exceptionTableString.append(" throws ");
     ObjectType[] exceptions = new ObjectType[exceptionTable.get().exceptions().size()];
     exceptionTable.get().exceptions().copyToArray(exceptions);
-    exceptionTableString.append(Arrays.stream(exceptions).map(o->o.toJava()).collect(Collectors.joining(", ")));
+    exceptionTableString.append(
+        Arrays.stream(exceptions).map(ObjectType::toJava).collect(Collectors.joining(", ")));
     return exceptionTableString.toString();
   }
 
@@ -272,32 +274,31 @@ public class JbcProducer {
     return stackMapTableString.toString();
   }
 
+  // TODO: doesn't quite work yet (grammar, etc.)
   /** Converts a given list of annotations into a Java-like representation. */
+  @NotNull
   private static String annotationsToJava(
-      RefArray<Annotation> annotations, String before, String after) {
+      @NotNull RefArray<Annotation> annotations, String before, String after) {
     if (!annotations.isEmpty()) {
       Annotation[] annotationsCopy = new Annotation[annotations.size()];
       annotations.copyToArray(annotationsCopy);
-      String annotationsString = Arrays.stream(annotationsCopy)
-              .map(Annotation::toString)
-              .collect(Collectors.joining(" "));
+      String annotationsString =
+          Arrays.stream(annotationsCopy).map(Annotation::toString).collect(Collectors.joining(" "));
       return before + annotationsString + after;
     } else {
       return "";
     }
   }
 
-  /** Converts a given list of annotations into a Java-like representation. */
-  // todo UNDER WORK (weirdest bug ever)
+  // TODO: doesn't quite work yet (grammar, etc.)
+  /** Converts a given list of attributes into a Java-like representation. */
   private static String attributesToJava(
       RefArray<Attribute> attributes, String before, String after) {
     if (!attributes.isEmpty()) {
       Attribute[] attributesCopy = new Attribute[attributes.size()];
       attributes.copyToArray(attributesCopy);
-      String attributeString = Arrays.stream(attributesCopy)
-              .map(Attribute::toString)
-              .collect(Collectors.joining(" "));
-//              .reduce("", (s1, s2) -> s1 + " " + s2);
+      String attributeString =
+          Arrays.stream(attributesCopy).map(Attribute::toString).collect(Collectors.joining(" "));
       return before + attributeString + after;
     } else {
       return "";

@@ -11,6 +11,8 @@ import org.jetbrains.annotations.Nullable;
 /**
  * TODO: improve name (?), as it covers both member/non-member methods and fields
  *
+ * <p>TODO: a method in here has thrown a NullPointerException once ... try to reproduce
+ *
  * <p>a class that resolves references for methods and fields in the JavaByteCode-Editor (e.g. for
  * println(java.lang.String) it finds the println(String) method in PrintStream.java)
  *

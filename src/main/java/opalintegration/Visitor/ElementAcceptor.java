@@ -14,7 +14,6 @@ import java.util.logging.Logger;
  *
  * <p>It uses a set to store the types of elements it can visit (i.e. traverse through)
  *
- *
  * @param <E> type of element that can be visited
  * @param <R> type of value computed on a visit
  */
@@ -23,16 +22,17 @@ public abstract class ElementAcceptor<E, R> implements DefaultVistor<E, R> {
   protected int[] pc;
   private static final Logger LOGGER = Logger.getLogger(ElementAcceptor.class.getName());
 
-  public ElementAcceptor(){
+  public ElementAcceptor() {
     Elements = new HashSet<>();
     for (Class<?> inter : this.getClass().getInterfaces()) {
       for (Method method : inter.getMethods()) {
         for (Class<?> parameterType : method.getParameterTypes()) {
-          Elements.add((Class<? extends E>)parameterType);
+          Elements.add((Class<? extends E>) parameterType);
         }
       }
     }
   }
+
   public ElementAcceptor(Collection<Class<? extends E>> c) {
     Elements = new HashSet<>();
     Elements.addAll(c);

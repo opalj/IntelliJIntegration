@@ -62,6 +62,7 @@ TABLENAME=LocalVariableTable|StackMapTable|ExceptionTable
 PRIMITIVETYPE=void|boolean|byte|char|short|int|long|float|double
 MODIFIER=public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient
 STRINGVAR=[a-zA-Z$_][a-zA-Z0-9$_]*
+EOL=\n
 
 %%
 <YYINITIAL> {
@@ -73,6 +74,7 @@ STRINGVAR=[a-zA-Z$_][a-zA-Z0-9$_]*
   "@"                     { return AT; }
   "extends"               { return EXTENDS; }
   "implements"            { return IMPLEMENTS; }
+  "throws"                { return THROWS; }
   "Fields"                { return FIELDS; }
   "Methods"               { return METHODS; }
   "lvIndex="              { return FUCKINGTOKEN; }
@@ -93,6 +95,7 @@ STRINGVAR=[a-zA-Z$_][a-zA-Z0-9$_]*
   {PRIMITIVETYPE}         { return PRIMITIVETYPE; }
   {MODIFIER}              { return MODIFIER; }
   {STRINGVAR}             { return STRINGVAR; }
+  {EOL}                   { return EOL; }
 
 }
 

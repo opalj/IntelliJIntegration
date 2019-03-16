@@ -10,6 +10,14 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 
+/**
+ * TODO: rename to JumpToPC or JumpToProgramCounter (not doing it now because previously refactoring
+ * had caused severe issues)
+ *
+ * <p>This action performs on jump statements in the bytecode. It puts the caret on the line with
+ * the matching PC, e.g. GOTO(523) will put the caret on the line where the program counter equals
+ * 523.
+ */
 public class JumpToLine extends AnAction {
 
   @Override
@@ -17,23 +25,31 @@ public class JumpToLine extends AnAction {
     Editor editor = e.getData(CommonDataKeys.EDITOR);
     PsiFile element = e.getData(CommonDataKeys.PSI_FILE);
     PsiElement elementAt = element.findElementAt(editor.getCaretModel().getOffset());
+
+    // the parent is the current instruction line, e.g. 40 223 GOTO(523),
+    // where 40 is the PC and 223 is the Line
     JavaByteCodeInstructionBody parent =
         PsiTreeUtil.getParentOfType(elementAt, JavaByteCodeInstructionBody.class);
+
+    // filter instructions for which this action should work
     if (parent != null
         && (parent.getInstr().getMnemonic().getText().contains("GOTO")
             || parent.getInstr().getMnemonic().getText().contains("IF"))) {
-      PsiElement number = parent.getInstr().getNumber();
-      if (number != null) {
+      PsiElement jumpTargetPC = parent.getInstr().getNumber();
+      if (jumpTargetPC != null) {
+        // take the method to which this instruction belongs to...
         JavaByteCodeMethodDeclaration methodDeclaration =
             PsiTreeUtil.getParentOfType(elementAt, JavaByteCodeMethodDeclaration.class);
+        // ... and iterate over all instructions until the jump target has been found...
         for (JavaByteCodePcNumber javaByteCodePcNumber :
             PsiTreeUtil.findChildrenOfType(methodDeclaration, JavaByteCodePcNumber.class)) {
-          if (javaByteCodePcNumber.getNumber().getText().equals(number.getText())) {
+          // ... and set the caret accordingly
+          if (javaByteCodePcNumber.getNumber().getText().equals(jumpTargetPC.getText())) {
             editor.getCaretModel().moveToOffset(javaByteCodePcNumber.getTextOffset(), true);
             editor.getScrollingModel().scrollToCaret(ScrollType.CENTER_UP);
           }
-        }
-      }
-    }
-  }
+        } // for()
+      } // jumpTargetPC
+    } // GOTO/IF
+  } // actionPerformed()
 }
