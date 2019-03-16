@@ -218,7 +218,9 @@ public class JavaByteCodePsiImplUtil {
           @Nullable
           @Override
           public String getPresentableText() {
-            return methodHead.getMethodName().getText() + ":" + methodHead.getType().getText();
+            return methodHead.getMethodName().getText().replaceAll("throws .*", "")
+                + ": "
+                + methodHead.getType().getText();
           }
 
           @Nullable

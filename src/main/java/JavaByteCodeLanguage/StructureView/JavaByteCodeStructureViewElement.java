@@ -22,7 +22,7 @@ public class JavaByteCodeStructureViewElement
     implements StructureViewTreeElement, SortableTreeElement {
   private NavigatablePsiElement element;
 
-  public JavaByteCodeStructureViewElement(NavigatablePsiElement element) {
+  JavaByteCodeStructureViewElement(NavigatablePsiElement element) {
     this.element = element;
   }
 
@@ -47,7 +47,7 @@ public class JavaByteCodeStructureViewElement
   @NotNull
   @Override
   public TreeElement[] getChildren() {
-    if (element instanceof PsiElement) {
+    if (element != null) {
       PsiElement[] properties = PsiTreeUtil.getChildrenOfType(element, PsiElement.class);
       List<TreeElement> treeElements = new ArrayList<>(properties.length);
       for (PsiElement property : properties) {
@@ -59,6 +59,13 @@ public class JavaByteCodeStructureViewElement
         if (property instanceof JavaByteCodeMethodArea) {
           treeElements.addAll(iterateThroughMethods(property));
           continue;
+        }
+
+        // tables
+        if (property instanceof JavaByteCodeLocVarTableDeclaration) {
+          treeElements.add(
+              new JavaByteCodeStructureViewElement(
+                  (JavaByteCodeLocVarTableDeclarationImpl) property));
         }
       }
       return treeElements.toArray(new TreeElement[treeElements.size()]);
@@ -82,18 +89,6 @@ public class JavaByteCodeStructureViewElement
         treeElements.add(
             new JavaByteCodeStructureViewElement((JavaByteCodeMethodDeclarationImpl) method));
       }
-
-      if (method instanceof JavaByteCodeLocVarTableDeclaration) {
-        treeElements.add(
-            new JavaByteCodeStructureViewElement((JavaByteCodeLocVarTableDeclarationImpl) method));
-      }
-
-      // TODO: other tables
-      //      if(method instanceof JavaByteCodeStackMapTableDeclaration) {
-      //        treeElements.add(
-      //                new JavaByteCodeStructureViewElement(
-      //                        (JavaByteCodeStackMapTableDeclarationImpl) method));
-      //      }
     }
 
     return treeElements;

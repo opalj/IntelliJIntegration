@@ -43,7 +43,7 @@ class OpenClassFileAction extends AnAction {
         .setEnabledAndVisible(
             project != null
                 && ("java".equals(extension)
-                    || "scala".equals(extension)
+                    // || "scala".equals(extension) // TODO: check how it works for scala files
                     || "class".equals(extension)));
   }
 

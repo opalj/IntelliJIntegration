@@ -15,6 +15,10 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * @see FoldingBuilderEx for documentation
+ *     <p>The FoldingBuilder is registered in the com.intellij.lang.foldingBuilder extension point
+ */
 public class JbcFoldingBuilder extends FoldingBuilderEx {
 
   private static final List<Class<? extends PsiElement>> psiTypesWithFoldingSupport =
@@ -22,7 +26,8 @@ public class JbcFoldingBuilder extends FoldingBuilderEx {
           JavaByteCodeFieldsDeclaration.class,
           JavaByteCodeMethodArea.class,
           JavaByteCodeMethodDeclaration.class,
-          JavaByteCodeExceptionTableDeclaration.class,
+          JavaByteCodeExceptionTableDeclaration
+              .class, // TODO: not used as a table anymore, speak with employer
           JavaByteCodeLocVarTableDeclaration.class,
           JavaByteCodeStackMapTableDeclaration.class);
 
@@ -42,8 +47,10 @@ public class JbcFoldingBuilder extends FoldingBuilderEx {
 
   @Override
   public boolean isCollapsedByDefault(@NotNull ASTNode node) {
-    // collapse everything apart from the methods
-    return !(node.getPsi() instanceof JavaByteCodeMethodDeclaration);
+    // collapse everything apart from the methods (hence method area should be open too)
+    PsiElement psiElement = node.getPsi();
+    return !(psiElement instanceof JavaByteCodeMethodDeclaration
+        || psiElement instanceof JavaByteCodeMethodArea);
   }
 
   @Nullable
