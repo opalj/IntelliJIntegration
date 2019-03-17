@@ -98,7 +98,7 @@ public class OpalUtil {
     try {
       File fileToWriteTo = null;
 
-      if (tempDirectory == null) {
+      if (tempDirectory == null || !tempDirectory.exists()) {
         tempDirectory = FileUtil.createTempDirectory("tempJbcDirectory", "", true);
       }
 

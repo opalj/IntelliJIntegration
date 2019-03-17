@@ -55,47 +55,45 @@ SPACE=[ \t\n\x0B\f\r]+
 TO=>|=>
 LBRACKET=\(|\{|\[|[«]
 RBRACKET=\)|\}|\]|[»]
-CONSTMETHODNAMES=<(cl)?init>
 JAVATYPEHEAD=class|enum|interface
 INSTRUCTIONHEAD=PC[ \t\n\x0B\f\r]+Line[ \t\n\x0B\f\r]+Instruction
 TABLENAME=LocalVariableTable|StackMapTable|ExceptionTable
 PRIMITIVETYPE=void|boolean|byte|char|short|int|long|float|double
 MODIFIER=public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient
-STRINGVAR=[a-zA-Z$_][a-zA-Z0-9$_]*
+STRINGVAR=<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?
 EOL=\n
 
 %%
 <YYINITIAL> {
-  {WHITE_SPACE}           { return WHITE_SPACE; }
+  {WHITE_SPACE}          { return WHITE_SPACE; }
 
-  ","                     { return COMMA; }
-  "."                     { return DOT; }
-  ":"                     { return COLON; }
-  "@"                     { return AT; }
-  "extends"               { return EXTENDS; }
-  "implements"            { return IMPLEMENTS; }
-  "throws"                { return THROWS; }
-  "Fields"                { return FIELDS; }
-  "Methods"               { return METHODS; }
-  "lvIndex="              { return FUCKINGTOKEN; }
-  "this"                  { return THIS; }
+  ","                    { return COMMA; }
+  "."                    { return DOT; }
+  ":"                    { return COLON; }
+  "@"                    { return AT; }
+  "extends"              { return EXTENDS; }
+  "implements"           { return IMPLEMENTS; }
+  "throws"               { return THROWS; }
+  "Fields"               { return FIELDS; }
+  "Methods"              { return METHODS; }
+  "lvIndex="             { return FUCKINGTOKEN; }
+  "this"                 { return THIS; }
 
-  {COMMENT}               { return COMMENT; }
-  {NUMBER}                { return NUMBER; }
-  {STRING}                { return STRING; }
-  {MNEMONIC}              { return MNEMONIC; }
-  {SPACE}                 { return SPACE; }
-  {TO}                    { return TO; }
-  {LBRACKET}              { return LBRACKET; }
-  {RBRACKET}              { return RBRACKET; }
-  {CONSTMETHODNAMES}      { return CONSTMETHODNAMES; }
-  {JAVATYPEHEAD}          { return JAVATYPEHEAD; }
-  {INSTRUCTIONHEAD}       { return INSTRUCTIONHEAD; }
-  {TABLENAME}             { return TABLENAME; }
-  {PRIMITIVETYPE}         { return PRIMITIVETYPE; }
-  {MODIFIER}              { return MODIFIER; }
-  {STRINGVAR}             { return STRINGVAR; }
-  {EOL}                   { return EOL; }
+  {COMMENT}              { return COMMENT; }
+  {NUMBER}               { return NUMBER; }
+  {STRING}               { return STRING; }
+  {MNEMONIC}             { return MNEMONIC; }
+  {SPACE}                { return SPACE; }
+  {TO}                   { return TO; }
+  {LBRACKET}             { return LBRACKET; }
+  {RBRACKET}             { return RBRACKET; }
+  {JAVATYPEHEAD}         { return JAVATYPEHEAD; }
+  {INSTRUCTIONHEAD}      { return INSTRUCTIONHEAD; }
+  {TABLENAME}            { return TABLENAME; }
+  {PRIMITIVETYPE}        { return PRIMITIVETYPE; }
+  {MODIFIER}             { return MODIFIER; }
+  {STRINGVAR}            { return STRINGVAR; }
+  {EOL}                  { return EOL; }
 
 }
 

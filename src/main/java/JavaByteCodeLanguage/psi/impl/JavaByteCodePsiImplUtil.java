@@ -165,6 +165,7 @@ public class JavaByteCodePsiImplUtil {
     try {
       return provider.getReferencesByString(element.getName(), element, 0);
     } catch (Exception e) {
+      // TODO: this can cause StackOverFlowError
       return element.getReferences();
     }
   }
