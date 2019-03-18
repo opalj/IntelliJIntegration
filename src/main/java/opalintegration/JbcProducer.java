@@ -16,6 +16,8 @@ import org.opalj.br.instructions.Instruction;
 import org.opalj.collection.IntIterator;
 import org.opalj.collection.RefIterator;
 import org.opalj.collection.immutable.RefArray;
+import scala.Function0;
+import scala.Function1;
 import scala.Option;
 import scala.collection.immutable.List;
 
@@ -43,6 +45,8 @@ public class JbcProducer {
   @NotNull
   static String createBytecodeString(@NotNull ClassFile classFile) {
     StringBuilder byteCodeString = new StringBuilder();
+
+    byteCodeString.append(annotationsToJava(classFile.annotations(), "/*", "*/\n"));
     byteCodeString
         .append(AccessFlags.classFlagsToJava(classFile.accessFlags()))
         .append(" ")
@@ -64,7 +68,23 @@ public class JbcProducer {
         .append(") -- size: \n");
 
     byteCodeString.append(attributesToJava(classFile.attributes(), "\n///*", "*/\n"));
-    byteCodeString.append(annotationsToJava(classFile.annotations(), "\n///*", "*/\n"));
+
+    if(classFile.bootstrapMethodTable().isDefined()) {
+      System.out.println("bootstrap");
+      System.out.println(classFile.bootstrapMethodTable().get().toString());
+    }
+
+//    InnerClass[] innerClassesCopy = new InnerClass[1024];
+//    classFile.innerClasses().get().copyToArray(innerClassesCopy);
+//    if(innerClassesCopy[0] != null) {
+//      byteCodeString.append(Arrays.stream(innerClassesCopy)
+//              .map(innerClass -> innerClass.outerClassType().get().toJava()
+//                      + " { " + AccessFlags.classFlagsToJava(innerClass.innerClassAccessFlags())
+//                      + " " + innerClass.innerClassType().toJava() + " }")
+//              .collect(Collectors.joining("\n")));
+//    }
+
+
     byteCodeString.append(byteCodeFieldToString(classFile));
     byteCodeString.append(byteCodeMethodsToString(classFile));
 
@@ -123,7 +143,7 @@ public class JbcProducer {
         MethodTypeSignature methodTypeSignatureOption = method.methodTypeSignature().get();
         List<ThrowsSignature> throwsSignatureList = methodTypeSignatureOption.throwsSignature();
       }
-      byteCodeString.append(annotationsToJava(method.annotations(), "\n///*", "*/\n"));
+      byteCodeString.append(annotationsToJava(method.annotations(), "\n/*", "*/\n"));
       byteCodeString
           .append(method.toString().replaceFirst("\\).*", ")"))
           .append(thrownExceptions(method.exceptionTable()))
@@ -151,7 +171,7 @@ public class JbcProducer {
               instruction = instruction.replaceAll("\n", " ");
               instruction = instruction.replaceAll("\t", " ");
               // replaces a \ with a \\ -> needed because e.g. LDC("s\") would escape the last " and
-              // thus breaking the syntax
+              // thus break the syntax
               instruction = instruction.replaceAll("\\\\", "\\\\\\\\");
 
               String formattedInstrLine =
@@ -252,7 +272,7 @@ public class JbcProducer {
     stackMapTableString
         .append("\n\n\tStackMapTable {")
         .append("\n")
-        .append("//PC\tName\tframeType\toffsetDelta\n");
+        .append("\t\t//PC\tKind\tFrame Type\tOffset Delta\n");
     IntIterator pcIterator = stackMapTable.pcs().iterator();
     for (int i = 0; i < stackMapFrameRefArray.length(); i++) {
       StackMapFrame stackMapFrame = stackMapFrameRefArray.apply(i);
@@ -262,7 +282,7 @@ public class JbcProducer {
           .append("\t\t")
           .append(pc)
           .append(" ")
-          .append(frameClass.getName())
+          .append(frameClass.getSimpleName())
           .append(" ")
           .append(stackMapFrame.frameType())
           .append(" ")
@@ -282,9 +302,11 @@ public class JbcProducer {
     if (!annotations.isEmpty()) {
       Annotation[] annotationsCopy = new Annotation[annotations.size()];
       annotations.copyToArray(annotationsCopy);
-      String annotationsString =
-          Arrays.stream(annotationsCopy).map(Annotation::toString).collect(Collectors.joining(" "));
-      return before + annotationsString + after;
+
+      String javaStyle = Arrays.stream(annotationsCopy)
+              .map(Annotation::toJava)
+              .collect(Collectors.joining("\n"));
+      return before + javaStyle + after;
     } else {
       return "";
     }
@@ -292,16 +314,38 @@ public class JbcProducer {
 
   // TODO: doesn't quite work yet (grammar, etc.)
   /** Converts a given list of attributes into a Java-like representation. */
+  @NotNull
   private static String attributesToJava(
-      RefArray<Attribute> attributes, String before, String after) {
+          @NotNull RefArray<Attribute> attributes, String before, String after) {
     if (!attributes.isEmpty()) {
       Attribute[] attributesCopy = new Attribute[attributes.size()];
       attributes.copyToArray(attributesCopy);
       String attributeString =
           Arrays.stream(attributesCopy).map(Attribute::toString).collect(Collectors.joining(" "));
+
       return before + attributeString + after;
     } else {
       return "";
     }
   }
+
+//  private static String localVariableTypeTable(Code body) {
+//    StringBuilder localVariableTypeTable = new StringBuilder();
+//
+//    Function1 function1 = new Function1<RefArray<LocalVariableTypeTable>, String>() {
+//      @Override
+//      public String apply(RefArray<LocalVariableTypeTable> v1) {
+//        LocalVariableTypeTable[] temp = new LocalVariableTypeTable[v1.size()];
+//        v1.copyToArray(temp);
+//        String result =
+//                Arrays.stream(temp).map(LocalVariableTypeTable::toString).collect(Collectors.joining("\n"));
+//        localVariableTypeTable.append(result);
+//        return result;
+//      }
+//    };
+//
+//    body.localVariableTypeTable().foreach(function1);
+//
+//    return localVariableTypeTable.toString();
+//  }
 }
