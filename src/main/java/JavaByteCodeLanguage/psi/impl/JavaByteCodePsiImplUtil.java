@@ -29,19 +29,32 @@ import org.jetbrains.annotations.Nullable;
  */
 public class JavaByteCodePsiImplUtil {
 
-  /**
-   * @param element a Java type, i.e. a class type (e.g. java.lang.String)
-   * @return the String representation of the type
-   */
-  @Nullable
-  public static String getJavaType(@NotNull JavaByteCodeJType element) {
-    ASTNode javaTypeNode = element.getNode();
-    if (javaTypeNode != null) {
-      // IMPORTANT: Convert embedded escaped spaces to simple spaces
-      return javaTypeNode.getText().replaceAll("\\\\ ", " ");
+  public static void navigate(JavaByteCodeNamedElement element, boolean requestFocus) {
+    Navigatable descriptor = PsiNavigationSupport.getInstance().getDescriptor(element);
+    FileEditor editor = FileEditorManager.getInstance(element.getProject()).getSelectedEditor();
+    if (editor instanceof DisTextEditor) {
+      ((DisTextEditor) editor).navigateTo(descriptor);
+    } else {
+      ((Navigatable) element).navigate(requestFocus);
     }
+  }
 
-    return null;
+  // =============================
+  // =========DefMethodName=======
+  // =============================
+
+  /**
+   * @see PsiElement#getReferences() for details
+   * @param element an invoked method in our JavaByteCode-Editor
+   * @return the Java-references to this method
+   */
+  @NotNull
+  public static PsiReference[] getReferences(JavaByteCodeDefMethodName element) {
+    return ReferenceProvidersRegistry.getReferencesFromProviders(element);
+  }
+
+  public static String getName(JavaByteCodeDefMethodName element) {
+    return getStringVar(element);
   }
 
   /**
@@ -59,32 +72,6 @@ public class JavaByteCodePsiImplUtil {
     return null;
   }
 
-  public static String getName(JavaByteCodeJType element) {
-    return getJavaType(element);
-  }
-
-  public static String getName(JavaByteCodeDefMethodName element) {
-    return getStringVar(element);
-  }
-
-  public static String getName(JavaByteCodeLocVarTableDeclaration element) {
-    return element.getTablename().getText();
-  }
-
-  public static String getName(JavaByteCodeMethodDeclaration element) {
-    return element.getMethodHead().getText();
-  }
-  /** @see PsiNamedElement#setName */
-  public static PsiElement setName(@NotNull JavaByteCodeJType element, String newName) {
-    ASTNode keyNode = element.getNode();
-    if (keyNode != null) {
-      JavaByteCodeType type = JavaByteCodeElementFactory.createType(element.getProject(), newName);
-      ASTNode newKeyNode = type.getFirstChild().getNode();
-      element.getNode().replaceChild(keyNode, newKeyNode);
-    }
-    return element;
-  }
-
   /** @see PsiNamedElement#setName */
   public static PsiElement setName(@NotNull JavaByteCodeDefMethodName element, String newName) {
     ASTNode keyNode = element.getNode().findChildByType(JavaByteCodeTypes.STRINGVAR);
@@ -95,34 +82,6 @@ public class JavaByteCodePsiImplUtil {
       element.getNode().replaceChild(keyNode, newKeyNode);
     }
     return element;
-  }
-
-  public static PsiElement setName(
-      @NotNull JavaByteCodeLocVarTableDeclaration element, String newName) {
-    ASTNode keyNode = element.getTablename().getNode();
-    if (keyNode != null) {
-      // SEE ABOVE
-    }
-    return element;
-  }
-
-  public static PsiElement setName(@NotNull JavaByteCodeMethodDeclaration element, String newName) {
-    ASTNode keyNode = element.getMethodHead().getNode();
-    if (keyNode != null) {
-      // SEE ABOVE
-    }
-    return element;
-  }
-
-  /** @see PsiNameIdentifierOwner#getNameIdentifier() */
-  @Nullable
-  public static PsiElement getNameIdentifier(@NotNull JavaByteCodeJType element) {
-    ASTNode keyNode = element.getNode();
-    if (keyNode != null) {
-      return keyNode.getPsi();
-    } else {
-      return null;
-    }
   }
 
   /** @see PsiNameIdentifierOwner#getNameIdentifier() */
@@ -136,25 +95,10 @@ public class JavaByteCodePsiImplUtil {
     }
   }
 
-  /** @see PsiNameIdentifierOwner#getNameIdentifier() */
-  public static PsiElement getNameIdentifier(@NotNull JavaByteCodeLocVarTableDeclaration element) {
-    ASTNode keyNode = element.getTablename().getNode();
-    if (keyNode != null) {
-      return keyNode.getPsi();
-    } else {
-      return null;
-    }
-  }
+  // =============================
+  // =============JType===========
+  // =============================
 
-  /** @see PsiNameIdentifierOwner#getNameIdentifier() */
-  public static PsiElement getNameIdentifier(@NotNull JavaByteCodeMethodDeclaration element) {
-    ASTNode keyNode = element.getMethodHead().getNode();
-    if (keyNode != null) {
-      return keyNode.getPsi();
-    } else {
-      return null;
-    }
-  }
   /**
    * @see PsiElement#getReferences() for details
    * @param element a class type (as FQN, e.g. java.lang.String)
@@ -170,44 +114,71 @@ public class JavaByteCodePsiImplUtil {
     }
   }
 
-  /**
-   * @see PsiElement#getReferences() for details
-   * @param element an invoked method in our JavaByteCode-Editor
-   * @return the Java-references to this method
-   */
-  @NotNull
-  public static PsiReference[] getReferences(JavaByteCodeDefMethodName element) {
-    return ReferenceProvidersRegistry.getReferencesFromProviders(element);
+  public static String getName(JavaByteCodeJType element) {
+    return getJavaType(element);
   }
 
-  public static ItemPresentation getPresentation(JavaByteCodeLocVarTableDeclaration element) {
-    ColoredItemPresentation coloredItemPresentation =
-        new ColoredItemPresentation() {
-          @Nullable
-          @Override
-          public String getPresentableText() {
-            return element.getName();
-          }
+  /**
+   * @param element a Java type, i.e. a class type (e.g. java.lang.String)
+   * @return the String representation of the type
+   */
+  @Nullable
+  public static String getJavaType(@NotNull JavaByteCodeJType element) {
+    ASTNode javaTypeNode = element.getNode();
+    if (javaTypeNode != null) {
+      // IMPORTANT: Convert embedded escaped spaces to simple spaces
+      return javaTypeNode.getText().replaceAll("\\\\ ", " ");
+    }
 
-          @Nullable
-          @Override
-          public String getLocationString() {
-            return null;
-          }
+    return null;
+  }
 
-          @Nullable
-          @Override
-          public Icon getIcon(boolean unused) {
-            return null;
-          }
+  /** @see PsiNamedElement#setName */
+  public static PsiElement setName(@NotNull JavaByteCodeJType element, String newName) {
+    ASTNode keyNode = element.getNode();
+    if (keyNode != null) {
+      JavaByteCodeType type = JavaByteCodeElementFactory.createType(element.getProject(), newName);
+      ASTNode newKeyNode = type.getFirstChild().getNode();
+      element.getNode().replaceChild(keyNode, newKeyNode);
+    }
+    return element;
+  }
 
-          @Nullable
-          @Override
-          public TextAttributesKey getTextAttributesKey() {
-            return null;
-          }
-        };
-    return coloredItemPresentation;
+  /** @see PsiNameIdentifierOwner#getNameIdentifier() */
+  @Nullable
+  public static PsiElement getNameIdentifier(@NotNull JavaByteCodeJType element) {
+    ASTNode keyNode = element.getNode();
+    if (keyNode != null) {
+      return keyNode.getPsi();
+    } else {
+      return null;
+    }
+  }
+
+  // =============================
+  // ======MethodDeclaration======
+  // =============================
+
+  public static String getName(JavaByteCodeMethodDeclaration element) {
+    return element.getMethodHead().getText();
+  }
+
+  public static PsiElement setName(@NotNull JavaByteCodeMethodDeclaration element, String newName) {
+    ASTNode keyNode = element.getMethodHead().getNode();
+    if (keyNode != null) {
+      // SEE ABOVE
+    }
+    return element;
+  }
+
+  /** @see PsiNameIdentifierOwner#getNameIdentifier() */
+  public static PsiElement getNameIdentifier(@NotNull JavaByteCodeMethodDeclaration element) {
+    ASTNode keyNode = element.getMethodHead().getNode();
+    if (keyNode != null) {
+      return keyNode.getPsi();
+    } else {
+      return null;
+    }
   }
 
   public static ItemPresentation getPresentation(JavaByteCodeMethodDeclaration element) {
@@ -262,17 +233,64 @@ public class JavaByteCodePsiImplUtil {
     navigate((JavaByteCodeNamedElement) element, requestFocus);
   }
 
-  public static void navigate(JavaByteCodeLocVarTableDeclaration element, boolean requestFocus) {
-    navigate((JavaByteCodeNamedElement) element, requestFocus);
+  // =============================
+  // ===LocVarTableDeclaration====
+  // =============================
+
+  public static String getName(JavaByteCodeLocVarTableDeclaration element) {
+    return element.getTablename().getText();
   }
 
-  public static void navigate(JavaByteCodeNamedElement element, boolean requestFocus) {
-    Navigatable descriptor = PsiNavigationSupport.getInstance().getDescriptor(element);
-    FileEditor editor = FileEditorManager.getInstance(element.getProject()).getSelectedEditor();
-    if (editor instanceof DisTextEditor) {
-      ((DisTextEditor) editor).navigateTo(descriptor);
-    } else {
-      ((Navigatable) element).navigate(requestFocus);
+  public static PsiElement setName(
+      @NotNull JavaByteCodeLocVarTableDeclaration element, String newName) {
+    ASTNode keyNode = element.getTablename().getNode();
+    if (keyNode != null) {
+      // SEE ABOVE
     }
+    return element;
+  }
+
+  /** @see PsiNameIdentifierOwner#getNameIdentifier() */
+  public static PsiElement getNameIdentifier(@NotNull JavaByteCodeLocVarTableDeclaration element) {
+    ASTNode keyNode = element.getTablename().getNode();
+    if (keyNode != null) {
+      return keyNode.getPsi();
+    } else {
+      return null;
+    }
+  }
+
+  public static ItemPresentation getPresentation(JavaByteCodeLocVarTableDeclaration element) {
+    ColoredItemPresentation coloredItemPresentation =
+        new ColoredItemPresentation() {
+          @Nullable
+          @Override
+          public String getPresentableText() {
+            return element.getName();
+          }
+
+          @Nullable
+          @Override
+          public String getLocationString() {
+            return null;
+          }
+
+          @Nullable
+          @Override
+          public Icon getIcon(boolean unused) {
+            return null;
+          }
+
+          @Nullable
+          @Override
+          public TextAttributesKey getTextAttributesKey() {
+            return null;
+          }
+        };
+    return coloredItemPresentation;
+  }
+
+  public static void navigate(JavaByteCodeLocVarTableDeclaration element, boolean requestFocus) {
+    navigate((JavaByteCodeNamedElement) element, requestFocus);
   }
 }

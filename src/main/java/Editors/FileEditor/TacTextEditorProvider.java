@@ -6,7 +6,7 @@ import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
-import opalintegration.TacProducer;
+import opalintegration.OpalUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +26,7 @@ public class TacTextEditorProvider extends PsiAwareTextEditorProvider {
   @Override
   public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
     if (!file.getExtension().equals(GlobalData.DISASSEMBLED_FILE_ENDING_TAC)) {
-      file = TacProducer.prepareTAC(project, file);
+      file = OpalUtil.prepare(project, GlobalData.DISASSEMBLED_FILE_ENDING_TAC, file, null);
     }
     return new TacTextEditor(project, file, this);
   }

@@ -68,11 +68,13 @@ public class OpalUtil {
         break;
       case GlobalData.DISASSEMBLED_FILE_ENDING_TAC:
         fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_TAC);
-        representableForm = TacProducer.createTacString(classFile, virtualFile.getPath());
+        //        representableForm = TacProducer.createTacString(classFile, virtualFile.getPath());
+        representableForm = new TacProducer(virtualFile.getPath()).decompiledText(classFile);
         break;
       case GlobalData.DISASSEMBLED_FILE_ENDING_JBC:
         fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_JBC);
-        representableForm = JbcProducer.createBytecodeString(classFile);
+        //        representableForm = JbcProducer.createBytecodeString(classFile);
+        representableForm = new JbcProducer().decompiledText(classFile);
         break;
     }
 

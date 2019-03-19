@@ -1,9 +1,7 @@
 package Actions;
 
 import Compile.Compiler;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
+import com.intellij.notification.*;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.StdFileTypes;
@@ -81,21 +79,29 @@ class OpenClassFileAction extends AnAction {
       classFile = virtualFile;
     }
     if (classFile != null) {
+      //      Notifications.Bus.notify(
+      //          new Notification(
+      //              "OpalPlugin",
+      //              "OpalPlugin",
+      //              "decompiling : " + classFile.getName(),
+      //              NotificationType.INFORMATION));
       Notifications.Bus.notify(
-          new Notification(
-              "OpalPlugin",
-              "OpalPlugin",
-              "decompiling : " + classFile.getName(),
-              NotificationType.INFORMATION));
+          new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
+              .createNotification()
+              .setContent("decompiling : " + classFile.getName()));
       FileEditorManager.getInstance(project).openFile(classFile, true);
       FileEditorManager.getInstance(project).setSelectedEditor(classFile, editorName);
     } else {
+      //      Notifications.Bus.notify(
+      //          new Notification(
+      //              "OpalPlugin",
+      //              "OpalPlugin",
+      //              "can't find or create a class file for : " + virtualFile.getName(),
+      //              NotificationType.INFORMATION));
       Notifications.Bus.notify(
-          new Notification(
-              "OpalPlugin",
-              "OpalPlugin",
-              "can't find or create a class file for : " + virtualFile.getName(),
-              NotificationType.INFORMATION));
+          new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
+              .createNotification()
+              .setContent("can't find or create a class file for : " + virtualFile.getName()));
     }
   } // actionPerformed
 

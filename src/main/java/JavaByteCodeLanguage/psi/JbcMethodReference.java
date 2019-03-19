@@ -6,18 +6,15 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * TODO: improve name (?), as it covers both member/non-member methods and fields
- *
- * <p>TODO: a method in here has thrown a NullPointerException once ... try to reproduce
  *
  * <p>a class that resolves references for methods and fields in the JavaByteCode-Editor (e.g. for
  * println(java.lang.String) it finds the println(String) method in PrintStream.java)
@@ -43,7 +40,7 @@ public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
     memberName = myElement.getText();
 
     // <init> is the constructor
-    if(memberName.equals("<init>")) {
+    if (memberName.equals("<init>")) {
       String simpleClassName = this.fqn.substring(this.fqn.lastIndexOf('.') + 1);
       memberName = simpleClassName;
       isConstructor = true;
@@ -56,25 +53,26 @@ public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
     return fqn.matches("(boolean|byte|char|short|int|long|float|double)(\\Q[]\\E)+");
   }
 
-
   @Nullable
   @Override
   public PsiElement resolve() {
-    if(!(myElement instanceof JavaByteCodeDefMethodName)) {
+    if (!(myElement instanceof JavaByteCodeDefMethodName)) {
       // this should not happen (@see JbcReferenceContributor), so log it if it does
-      LOGGER.log(Level.WARNING, "JbcMethodReference has been called for a type that is"
-          + " not an instance of JavaByteCodeDefMethodName");
+      LOGGER.log(
+          Level.WARNING,
+          "JbcMethodReference has been called for a type that is"
+              + " not an instance of JavaByteCodeDefMethodName");
       return null;
     }
 
     final Project project = myElement.getProject();
     PsiClass psiClass =
-            JavaPsiFacade.getInstance(project).findClass(fqn, GlobalSearchScope.allScope(project));
+        JavaPsiFacade.getInstance(project).findClass(fqn, GlobalSearchScope.allScope(project));
     PsiMethod psiMethod = (psiClass != null) ? findAppropriateOverload(psiClass) : null;
 
-    if(psiClass != null && psiMethod == null) {
+    if (psiClass != null && psiMethod == null) {
       // it might be an implicit (standard) constructor
-      if(isConstructor) {
+      if (isConstructor) {
         return psiClass;
       }
       // if it's not a method, it might be a field
@@ -105,17 +103,22 @@ public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
   @Nullable
   private PsiMethod findAppropriateOverload(@NotNull PsiClass psiClass) {
     String methodName = memberName;
-    String parameterList = Arrays.stream(myElement.getParent().getChildren())
+    String parameterList =
+        Arrays.stream(myElement.getParent().getChildren())
             .filter(psiElement -> psiElement instanceof JavaByteCodeParams)
             .map(PsiElement::getText)
             .collect(Collectors.joining());
+
+    // no parentheses -> not a method
+    if (!parameterList.contains("(")) {
+      return null;
+    }
 
     // this guarantees that the name matches, if the method exists in the class
     PsiMethod[] psiMethods = psiClass.findMethodsByName(methodName, true);
 
     // get rid of the parentheses and split at comma,
     // e.g. "(java.lang.String,int)" -> [java.lang.String,int]
-    // TODO: can throw IndexOutOfBoundsException ... try to reproduce
     String[] params = parameterList.substring(1, parameterList.length() - 1).split(",");
 
     for (PsiMethod psiMethod : psiMethods) {
