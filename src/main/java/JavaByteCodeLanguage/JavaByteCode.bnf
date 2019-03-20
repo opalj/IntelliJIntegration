@@ -43,8 +43,10 @@
   COMMA=","
   DOT="."
   COLON=":"
+  SEMICOLON=";"
   AT="@"
-  TO="regexp:>|=>"
+  TO="regexp:>|=>|->"
+  SWITCH="⤼"
   LBRACKET="regexp:\(|\{|\[|[«]"
   RBRACKET="regexp:\)|\}|\]|[»]"
   //CONSTMETHODNAMES = "regexp:<(cl)?init>"
@@ -69,11 +71,13 @@
 }
 jbcFile ::=  item_
 
-private item_ ::= ClassHead FieldsDeclaration? MethodArea?
+private item_ ::= Annotation* ClassHead FieldsDeclaration? MethodArea?
 
 ClassHead ::= ModifierV? (AT?) JAVATYPEHEAD JType (EXTENDS JType)? (IMPLEMENTS (JType(COMMA)?)+)?
 
 // generic stuff
+
+Annotation ::= AT JType
 
 ModifierV ::= MODIFIER*
 
@@ -98,7 +102,7 @@ FieldsDeclaration ::= FIELDS LBRACKET (ModifierV? Type DefMethodName)* RBRACKET
 MethodArea ::= METHODS LBRACKET MethodDeclaration* RBRACKET
 
 // method body is optional (in case of abstract methods
-MethodDeclaration ::= MethodHead LBRACKET
+MethodDeclaration ::= Annotation* MethodHead LBRACKET
         (INSTRUCTIONHEAD
          InstructionBody*
          ExceptionTableDeclaration?
@@ -133,6 +137,10 @@ left Instr ::= (MNEMONIC (JType COLON Type                            // put som
                                     | LBRACKET NUMBER RBRACKET
                                     | LBRACKET STRING RBRACKET
                                     | LBRACKET ((JavaOP|NUMBER|STRING)COMMA?)* RBRACKET   // LDC("someString") or ALOAD(5) or ...
+                                    | LBRACKET NUMBER TO NUMBER SEMICOLON
+                                               (NUMBER SWITCH NUMBER COMMA?)* SEMICOLON?
+                                               MODIFIER SWITCH NUMBER
+                                      RBRACKET
                                     | JavaOP)?)
                                                                 // INVOKEVIRTUAL(byte[] { java.lang.Object clone() })
 

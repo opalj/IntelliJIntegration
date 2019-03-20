@@ -22,7 +22,7 @@ abstract class DecompiledTextProducer {
   String decompiledText(ClassFile classFile) {
     String decompiledText = "";
 
-    decompiledText += annotationsToJava(classFile.annotations(), "/*", "*/\n");
+    decompiledText += annotationsToJava(classFile.annotations(), "", "\n");
     decompiledText += classHeader(classFile);
     // TODO: hooks for JbcProducer for class attributes
     decompiledText += fields(classFile);

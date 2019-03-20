@@ -58,6 +58,7 @@
 
         <lang.psiStructureViewFactory language="jbc" implementationClass="JavaByteCodeLanguage.StructureView.JavaByteCodeStructureViewFactory"/>
         <lang.foldingBuilder language="jbc" implementationClass="JavaByteCodeLanguage.folding.JbcFoldingBuilder"/>
+        <lang.findUsagesProvider language="jbc" implementationClass="com.intellij.lang.java.JavaFindUsagesProvider"/>
     </extensions>
 
     <actions>

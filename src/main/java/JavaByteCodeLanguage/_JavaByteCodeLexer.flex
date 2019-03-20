@@ -52,7 +52,7 @@ MNEMONIC=AALOAD|AASTORE|ACONST_NULL|ALOAD_0|ALOAD_1|ALOAD_2|ALOAD_3|ALOAD|\
                        |RETURN|RET|SALOAD|SASTORE|SIPUSH|SWAP|TABLESWITCH|WIDE|\
                        |GETFIELD|GETSTATIC|GET|PUTFIELD|PUTSTATIC|PUT
 SPACE=[ \t\n\x0B\f\r]+
-TO=>|=>
+TO=>|=>|->
 LBRACKET=\(|\{|\[|[«]
 RBRACKET=\)|\}|\]|[»]
 JAVATYPEHEAD=class|enum|interface
@@ -70,7 +70,9 @@ EOL=\n
   ","                    { return COMMA; }
   "."                    { return DOT; }
   ":"                    { return COLON; }
+  ";"                    { return SEMICOLON; }
   "@"                    { return AT; }
+  "⤼"                    { return SWITCH; }
   "extends"              { return EXTENDS; }
   "implements"           { return IMPLEMENTS; }
   "throws"               { return THROWS; }

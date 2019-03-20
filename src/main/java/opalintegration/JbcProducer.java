@@ -13,7 +13,7 @@ import org.opalj.collection.IntIterator;
 import org.opalj.collection.immutable.RefArray;
 
 /** Is responsible for creating and providing the bytecode representation of a class file */
-public class JbcProducer extends DecompiledTextProducer {
+class JbcProducer extends DecompiledTextProducer {
 
   private static final Logger LOGGER = Logger.getLogger(JbcProducer.class.getName());
 
