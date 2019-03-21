@@ -9,4 +9,10 @@ public interface JavaByteCodeParams extends PsiElement {
 
   @NotNull
   List<JavaByteCodeType> getTypeList();
+
+  @Nullable
+  PsiElement getLbracket();
+
+  @Nullable
+  PsiElement getRbracket();
 }

@@ -43,7 +43,7 @@ class OpenClassFileAction extends AnAction {
         .setEnabledAndVisible(
             project != null
                 && ("java".equals(extension)
-                    || "scala".equals(extension)
+                    // || "scala".equals(extension) // TODO: check how it works for scala files
                     || "class".equals(extension)));
   }
 
@@ -81,6 +81,12 @@ class OpenClassFileAction extends AnAction {
       classFile = virtualFile;
     }
     if (classFile != null) {
+      Notifications.Bus.notify(
+          new Notification(
+              "OpalPlugin",
+              "OpalPlugin",
+              "decompiling : " + classFile.getName(),
+              NotificationType.INFORMATION));
       FileEditorManager.getInstance(project).openFile(classFile, true);
       FileEditorManager.getInstance(project).setSelectedEditor(classFile, editorName);
     } else {

@@ -9,19 +9,25 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import org.jetbrains.annotations.*;
 
-public class JavaByteCodeLocVarTableHeadImpl extends ASTWrapperPsiElement
-    implements JavaByteCodeLocVarTableHead {
+public class JavaByteCodeInstructionBodyImpl extends ASTWrapperPsiElement
+    implements JavaByteCodeInstructionBody {
 
-  public JavaByteCodeLocVarTableHeadImpl(@NotNull ASTNode node) {
+  public JavaByteCodeInstructionBodyImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull JavaByteCodeVisitor visitor) {
-    visitor.visitLocVarTableHead(this);
+    visitor.visitInstructionBody(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof JavaByteCodeVisitor) accept((JavaByteCodeVisitor) visitor);
     else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public JavaByteCodeInstr getInstr() {
+    return findNotNullChildByClass(JavaByteCodeInstr.class);
   }
 }

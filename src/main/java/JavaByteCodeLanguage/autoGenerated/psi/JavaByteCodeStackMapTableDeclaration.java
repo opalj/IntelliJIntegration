@@ -5,14 +5,17 @@ import com.intellij.psi.PsiElement;
 import java.util.List;
 import org.jetbrains.annotations.*;
 
-public interface JavaByteCodeClassHead extends PsiElement {
+public interface JavaByteCodeStackMapTableDeclaration extends PsiElement {
 
   @NotNull
-  List<JavaByteCodeJType> getJTypeList();
-
-  @Nullable
-  JavaByteCodeModifierV getModifierV();
+  List<JavaByteCodeType> getTypeList();
 
   @NotNull
-  PsiElement getJavatypehead();
+  PsiElement getLbracket();
+
+  @NotNull
+  PsiElement getRbracket();
+
+  @NotNull
+  PsiElement getTablename();
 }

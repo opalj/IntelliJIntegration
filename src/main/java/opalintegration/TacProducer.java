@@ -5,6 +5,7 @@ import globalData.GlobalData;
 import java.io.File;
 import java.net.URL;
 import org.jetbrains.annotations.NotNull;
+import org.opalj.bi.AccessFlags;
 import org.opalj.br.ClassFile;
 import org.opalj.br.Method;
 import org.opalj.br.analyses.JavaProject;
@@ -44,19 +45,49 @@ public class TacProducer {
     Function1<Method, TACode<TACMethodParameter, DUVar<KnownTypedValue>>> methodTACodeFunction =
         javaProject.project().get(DefaultTACAIKey$.MODULE$);
 
+    tacCodeString.append(createClassHeader(classFile));
+    tacCodeString.append("\n");
+
     // iterate through the methods and generate the TAC for each
     RefArray<Method> methods = classFile.methods();
     for (int j = 0; j < methods.length(); j++) {
       Method method = methods.apply(j);
       if (method.body().isDefined()) {
-        tacCodeString.append(method.toString()).append("\n");
+        tacCodeString.append(method.toString()).append(" {\n");
         TACode<TACMethodParameter, DUVar<KnownTypedValue>> TacCode =
             methodTACodeFunction.apply(method);
         tacCodeString.append(ToTxt.apply(TacCode).mkString("\n"));
+        tacCodeString.append("\n}");
         tacCodeString.append("\n\n\n");
       }
     }
 
     return tacCodeString.toString();
+  }
+
+  private static String createClassHeader(ClassFile classFile) {
+    StringBuilder classHeader = new StringBuilder();
+
+    classHeader
+        .append(AccessFlags.classFlagsToJava(classFile.accessFlags()))
+        .append(" ")
+        .append(classFile.fqn().replace("/", "."));
+    if (classFile.superclassType().isDefined()) {
+      classHeader.append(" extends ").append(classFile.superclassType().get().toJava());
+    }
+    if (classFile.interfaceTypes().length() > 0) {
+      classHeader.append(" implements ");
+      for (int j = 0; j < classFile.interfaceTypes().length(); j++) {
+        classHeader.append(classFile.interfaceTypes().apply(j).toJava()).append(" ");
+      }
+    }
+    classHeader
+        .append("\n// Source File: ")
+        .append(classFile.sourceFile().isDefined() ? classFile.sourceFile().get() : "")
+        .append(" -- Version: (")
+        .append(classFile.jdkVersion())
+        .append(") -- size: \n");
+
+    return classHeader.toString();
   }
 }

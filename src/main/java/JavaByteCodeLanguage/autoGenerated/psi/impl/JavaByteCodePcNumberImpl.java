@@ -10,15 +10,14 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import org.jetbrains.annotations.*;
 
-public class JavaByteCodeLambdaParamsImpl extends ASTWrapperPsiElement
-    implements JavaByteCodeLambdaParams {
+public class JavaByteCodePcNumberImpl extends ASTWrapperPsiElement implements JavaByteCodePcNumber {
 
-  public JavaByteCodeLambdaParamsImpl(@NotNull ASTNode node) {
+  public JavaByteCodePcNumberImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull JavaByteCodeVisitor visitor) {
-    visitor.visitLambdaParams(this);
+    visitor.visitPcNumber(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -28,13 +27,7 @@ public class JavaByteCodeLambdaParamsImpl extends ASTWrapperPsiElement
 
   @Override
   @NotNull
-  public PsiElement getLbracket() {
-    return findNotNullChildByType(LBRACKET);
-  }
-
-  @Override
-  @NotNull
-  public PsiElement getRbracket() {
-    return findNotNullChildByType(RBRACKET);
+  public PsiElement getNumber() {
+    return findNotNullChildByType(NUMBER);
   }
 }

@@ -15,4 +15,10 @@ public interface JavaByteCodeFieldsDeclaration extends PsiElement {
 
   @NotNull
   List<JavaByteCodeType> getTypeList();
+
+  @NotNull
+  PsiElement getLbracket();
+
+  @NotNull
+  PsiElement getRbracket();
 }

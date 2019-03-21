@@ -8,22 +8,30 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import java.util.List;
 import org.jetbrains.annotations.*;
 
-public class JavaByteCodeLambdaParamsImpl extends ASTWrapperPsiElement
-    implements JavaByteCodeLambdaParams {
+public class JavaByteCodeExceptionTableDeclarationImpl extends ASTWrapperPsiElement
+    implements JavaByteCodeExceptionTableDeclaration {
 
-  public JavaByteCodeLambdaParamsImpl(@NotNull ASTNode node) {
+  public JavaByteCodeExceptionTableDeclarationImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull JavaByteCodeVisitor visitor) {
-    visitor.visitLambdaParams(this);
+    visitor.visitExceptionTableDeclaration(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof JavaByteCodeVisitor) accept((JavaByteCodeVisitor) visitor);
     else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public List<JavaByteCodeType> getTypeList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeType.class);
   }
 
   @Override
@@ -36,5 +44,11 @@ public class JavaByteCodeLambdaParamsImpl extends ASTWrapperPsiElement
   @NotNull
   public PsiElement getRbracket() {
     return findNotNullChildByType(RBRACKET);
+  }
+
+  @Override
+  @NotNull
+  public PsiElement getTablename() {
+    return findNotNullChildByType(TABLENAME);
   }
 }

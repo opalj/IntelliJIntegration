@@ -41,6 +41,7 @@ public class OpalUtil {
   private static String fqClassName;
   private static File projectFile;
   private static VirtualFile currentWorkingVF;
+  private static File tempDirectory;
 
   private static final Logger LOGGER = Logger.getLogger(OpalUtil.class.getName());
 
@@ -56,7 +57,7 @@ public class OpalUtil {
       @NotNull String prepareID,
       VirtualFile virtualFile,
       @Nullable VirtualFile olderFile) {
-    isNewClassFile(virtualFile, project);
+    updateStateIfNewClassFile(virtualFile, project);
     String fileName = virtualFile.getNameWithoutExtension();
     String representableForm = null;
     switch (prepareID) {
@@ -80,37 +81,61 @@ public class OpalUtil {
     }
 
     File preparedFile =
-        writeContentToFile(fileName, representableForm, false, olderFile == null ? false : true);
+        writeContentToFile(fileName, representableForm, olderFile == null ? false : true);
     return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
   }
 
   /**
-   * an auxiliary method that writes 'content' to a 'file' (main purpose of this method is to
+   * TODO: currently fails to update the content on a change
+   *
+   * <p>an auxiliary method that writes 'content' to a 'file' (main purpose of this method is to
    * encapsulate the try/catch block)
    *
    * @param filename the Name of the temporal file
    * @param content content to write into the file
    */
-  private static File writeContentToFile(
-      String filename, String content, boolean append, boolean olderFile) {
+  private static File writeContentToFile(String filename, String content, boolean olderFile) {
     try {
-      File file = null;
-      if (!olderFile) {
-        String[] filenameArray = filename.split("\\.");
-        file = FileUtil.createTempFile(filenameArray[0], "." + filenameArray[1], true);
-      } else {
-        file = new File(filename);
+      File fileToWriteTo = null;
+
+      if (tempDirectory == null) {
+        tempDirectory = FileUtil.createTempDirectory("tempJbcDirectory", "", true);
       }
-      FileUtil.writeToFile(file, content, append);
-      return file;
+
+      if (!olderFile) {
+        boolean fileContained = false;
+        for (File fileInTemp : tempDirectory.listFiles()) {
+          if (fileInTemp.getName().equals(filename)) {
+            fileContained = true;
+            fileToWriteTo = fileInTemp;
+            break;
+          }
+        }
+
+        if (!fileContained) {
+          fileToWriteTo = new File(tempDirectory.getAbsolutePath() + File.separator + filename);
+        }
+      } else {
+        fileToWriteTo = new File(filename);
+      }
+
+      FileUtil.writeToFile(fileToWriteTo, content, false);
+      return fileToWriteTo;
     } catch (IOException e) {
       LOGGER.log(Level.SEVERE, e.toString(), e);
     }
+
     // TODO not null
     return null;
   }
 
-  private static void isNewClassFile(
+  /**
+   * Updates the state when the (class) file has been changed (or is new)
+   *
+   * @param virtualClassFile The (class) file to check
+   * @param project The project the file belongs to
+   */
+  private static void updateStateIfNewClassFile(
       @NotNull VirtualFile virtualClassFile, @NotNull Project project) {
     if (!virtualClassFile.equals(currentWorkingVF)
         && virtualClassFile.getExtension().equals(StdFileTypes.CLASS.getDefaultExtension())) {

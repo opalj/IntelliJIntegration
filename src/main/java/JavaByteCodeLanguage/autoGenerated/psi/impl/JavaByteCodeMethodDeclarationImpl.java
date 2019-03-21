@@ -31,14 +31,20 @@ public class JavaByteCodeMethodDeclarationImpl extends JavaByteCodeNamedElementI
 
   @Override
   @NotNull
-  public List<JavaByteCodeInstr> getInstrList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeInstr.class);
+  public List<JavaByteCodeExceptionTableDeclaration> getExceptionTableDeclarationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeExceptionTableDeclaration.class);
   }
 
   @Override
-  @Nullable
-  public JavaByteCodeLocVarTableDeclaration getLocVarTableDeclaration() {
-    return findChildByClass(JavaByteCodeLocVarTableDeclaration.class);
+  @NotNull
+  public List<JavaByteCodeInstructionBody> getInstructionBodyList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeInstructionBody.class);
+  }
+
+  @Override
+  @NotNull
+  public List<JavaByteCodeLocVarTableDeclaration> getLocVarTableDeclarationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeLocVarTableDeclaration.class);
   }
 
   @Override
@@ -49,8 +55,8 @@ public class JavaByteCodeMethodDeclarationImpl extends JavaByteCodeNamedElementI
 
   @Override
   @NotNull
-  public List<JavaByteCodeType> getTypeList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeType.class);
+  public List<JavaByteCodeStackMapTableDeclaration> getStackMapTableDeclarationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeStackMapTableDeclaration.class);
   }
 
   @Override

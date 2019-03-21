@@ -68,7 +68,7 @@ public class JavaByteCodePsiImplUtil {
   }
 
   public static String getName(JavaByteCodeLocVarTableDeclaration element) {
-    return element.getLocVarTableHead().getText();
+    return element.getTablename().getText();
   }
 
   public static String getName(JavaByteCodeMethodDeclaration element) {
@@ -99,7 +99,7 @@ public class JavaByteCodePsiImplUtil {
 
   public static PsiElement setName(
       @NotNull JavaByteCodeLocVarTableDeclaration element, String newName) {
-    ASTNode keyNode = element.getLocVarTableHead().getNode();
+    ASTNode keyNode = element.getTablename().getNode();
     if (keyNode != null) {
       // SEE ABOVE
     }
@@ -138,7 +138,7 @@ public class JavaByteCodePsiImplUtil {
 
   /** @see PsiNameIdentifierOwner#getNameIdentifier() */
   public static PsiElement getNameIdentifier(@NotNull JavaByteCodeLocVarTableDeclaration element) {
-    ASTNode keyNode = element.getLocVarTableHead().getNode();
+    ASTNode keyNode = element.getTablename().getNode();
     if (keyNode != null) {
       return keyNode.getPsi();
     } else {
@@ -156,8 +156,7 @@ public class JavaByteCodePsiImplUtil {
     }
   }
   /**
-   * @see PsiElement#getReferences() for further details
-   * @see com.intellij.psi.PsiReferenceRegistrar for further details
+   * @see PsiElement#getReferences() for details
    * @param element a class type (as FQN, e.g. java.lang.String)
    * @return the references to each element in the FQN (e.g. ["java", "lang", "String"])
    */
@@ -171,7 +170,7 @@ public class JavaByteCodePsiImplUtil {
   }
 
   /**
-   * @see PsiElement#getReferences() for further details
+   * @see PsiElement#getReferences() for details
    * @param element an invoked method in our JavaByteCode-Editor
    * @return the Java-references to this method
    */
@@ -218,7 +217,9 @@ public class JavaByteCodePsiImplUtil {
           @Nullable
           @Override
           public String getPresentableText() {
-            return methodHead.getMethodName().getText() + ":" + methodHead.getType().getText();
+            return methodHead.getMethodName().getText().replaceAll("throws .*", "")
+                + ": "
+                + methodHead.getType().getText();
           }
 
           @Nullable
