@@ -38,14 +38,21 @@
     COLON="regexp::"
     SEMICOLON="regexp:;"
     AT="regexp:@"
-    RARROW="regexp:>|=>"
-    LARROW="regexp:<|<="
-    LBRACKET="regexp:\(|\{|\[|«"
-    RBRACKET="regexp:\)|\}|\]|»"
+    R_ARROW="regexp:=>"
+    L_ARROW="regexp:<="
+    L_DOUBLE_LACE_BRACE="regexp:\«"
+    R_DOUBLE_LACE_BRACE="regexp:\»"
+    L_LACE_BRACE="regexp:<"
+    R_LACE_BRACE="regexp:>"
+    R_BRACKET="regexp:\)"
+    L_BRACKET="regexp:\("
+    L_SQUARE_BRACKET="regexp:\["
+    R_SQUARE_BRACKET="regexp:\]"
+    L_CURVED_BRACKET="regexp:\{"
+    R_CURVED_BRACKET="regexp:\}"
+    PLUS="regexp:\+"
+    MINUS="regexp:\-"
     CONSTMETHODNAMES = "regexp:<(cl)?init>"
-    CLASS='regexp:class'
-    EXTENDS='regexp:extends'
-    IMPLEMENTS='regexp:implements'
     NEW_LINE="regexp:\n"
     EQ="regexp:="
     UEQ="regexp:!="
@@ -59,13 +66,19 @@ tacFile ::= item_*
 
 // private item_ ::= (property|COMMENT|CRLF)
 //private item_ ::= (property|COMMENT|CRLF|WHITE_SPACE|STRING|NUMBER|KEYWORDS)
-private item_ ::= (Type|COMMENT|CRLF|WHITE_SPACE|STRING|NUMBER|KEYWORDS)
+private item_ ::= (JMethodHead|Type|COMMENT|CRLF|WHITE_SPACE|STRING|NUMBER|KEYWORDS|MODIFIER | BLOCK_COMMENT|EXTENDS|IMPLEMENTS|CLASS|THROW|THROWS|VOID|THIS|LEVEL|COMMA|DOT|SEMICOLON|COLON|AT|R_ARROW|L_ARROW|L_LACE_BRACE|R_LACE_BRACE|R_BRACKET|L_BRACKET|L_SQUARE_BRACKET|R_SQUARE_BRACKET|L_CURVED_BRACKET|R_CURVED_BRACKET|CONSTMETHODNAMES|NEW_LINE|EQ|UEQ|STRINGVAR|L_DOUBLE_LACE_BRACE|R_DOUBLE_LACE_BRACE|PLUS|MINUS)
 
-Type ::= (JType | NUMBER)('[]')*
+Type ::= (JType | STRINGVAR | NUMBER)('[]')*
 
-JType ::= ((STRINGVAR | THIS) DOT)*(STRINGVAR | THIS)  {mixin="syntaxHighlighting.psi.impl.TAC_namedElementImpl"
-                                       implements="syntaxHighlighting.TAC_namedElement"
-                                       methods=[getJavaType getName setName getNameIdentifier getReferences]}
+JMethodHead ::= MODIFIER* BLOCK_COMMENT* (VOID | KEYWORDS | STRINGVAR) BLOCK_COMMENT* ((L_LACE_BRACE STRINGVAR R_LACE_BRACE) | Type) BLOCK_COMMENT* L_BRACKET (STRINGVAR | BLOCK_COMMENT | COMMA | JAVA_TYPE)* R_BRACKET BLOCK_COMMENT* (L_DOUBLE_LACE_BRACE (STRINGVAR | COMMA | BLOCK_COMMENT | JAVA_TYPE)* R_DOUBLE_LACE_BRACE)? BLOCK_COMMENT* COMMENT?
 
-property ::= (KEY? SEPARATOR VALUE?) | KEY {mixin="syntaxHighlighting.psi.impl.TAC_namedElementImpl"
-  implements="syntaxHighlighting.TAC_namedElement" methods=[getKey getValue getName setName getNameIdentifier getPresentation]}
+JType ::= JAVA_TYPE  {//mixin="syntaxHighlighting.psi.impl.TAC_namedElementImpl"
+                                                          implements="syntaxHighlighting.TAC_namedElement"
+                                                          methods=[getJavaType getName setName getNameIdentifier getReferences]}
+
+//JType ::= ((STRINGVAR | THIS) DOT)*(STRINGVAR | THIS)  {mixin="syntaxHighlighting.psi.impl.TAC_namedElementImpl"
+  //                                     implements="syntaxHighlighting.TAC_namedElement"
+    //                                   methods=[getJavaType getName setName getNameIdentifier getReferences]}
+
+//property ::= (KEY? SEPARATOR VALUE?) | KEY {mixin="syntaxHighlighting.psi.impl.TAC_namedElementImpl"
+//  implements="syntaxHighlighting.TAC_namedElement" methods=[getKey getValue getName setName getNameIdentifier getPresentation]}

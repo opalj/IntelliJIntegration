@@ -38,4 +38,10 @@ public class TACTypeImpl extends ASTWrapperPsiElement implements TACType {
     return findChildByType(NUMBER);
   }
 
+  @Override
+  @Nullable
+  public PsiElement getStringvar() {
+    return findChildByType(STRINGVAR);
+  }
+
 }

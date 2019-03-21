@@ -33,11 +33,21 @@ COMMA=,
 DOT=.
 COLON=:
 SEMICOLON=;
+PLUS=\+
+MINUS=\-
 AT=@
-RARROW=>|=>
-LARROW=<|<=
-LBRACKET=\(|\{|\[|«
-RBRACKET=\)|\}|\]|»
+R_ARROW==>
+L_ARROW=<=
+L_LACE_BRACE=<
+R_LACE_BRACE=>
+L_DOUBLE_LACE_BRACE=\«
+R_DOUBLE_LACE_BRACE=\»
+R_BRACKET=\)
+L_BRACKET=\(
+L_SQUARE_BRACKET=\[
+R_SQUARE_BRACKET=\]
+L_CURVED_BRACKET=\{
+R_CURVED_BRACKET=\}
 CONSTMETHODNAMES = <(cl)?init>
 CLASS=class
 EXTENDS=extends
@@ -58,19 +68,29 @@ STRINGVAR = [a-zA-Z$_][a-zA-Z0-9$_]*
 %%
 <YYINITIAL> {
 ","                     { return TAC_elementTypeHolder.COMMA; }
+";"                     { return TAC_elementTypeHolder.SEMICOLON; }
 "."                     { return TAC_elementTypeHolder.DOT; }
 ":"                     { return TAC_elementTypeHolder.COLON; }
 "@"                     { return TAC_elementTypeHolder.AT; }
 "class"                 { return TAC_elementTypeHolder.CLASS; }
 "extends"               { return TAC_elementTypeHolder.EXTENDS; }
 "implements"            { return TAC_elementTypeHolder.IMPLEMENTS; }
-"\\n"                   { return TAC_elementTypeHolder.NEW_LINE; }
+"\n"                   { return TAC_elementTypeHolder.NEW_LINE; }
 "this"                  { return TAC_elementTypeHolder.THIS; }
 "throw"                  { return TAC_elementTypeHolder.THROW; }
 "throws"                  { return TAC_elementTypeHolder.THROWS; }
-"void"                  { return TAC_elementTypeHolder.VOID; }
-{LBRACKET}            { return TAC_elementTypeHolder.LBRACKET; }
-{RBRACKET}            { return TAC_elementTypeHolder.RBRACKET; }
+"+"                  { return TAC_elementTypeHolder.PLUS; }
+"-"                  { return TAC_elementTypeHolder.MINUS; }
+{L_DOUBLE_LACE_BRACE}            { return TAC_elementTypeHolder.L_DOUBLE_LACE_BRACE; }
+{R_DOUBLE_LACE_BRACE}            { return TAC_elementTypeHolder.R_DOUBLE_LACE_BRACE; }
+{L_BRACKET}            { return TAC_elementTypeHolder.L_BRACKET; }
+{R_BRACKET}            { return TAC_elementTypeHolder.R_BRACKET; }
+{L_SQUARE_BRACKET}     { return TAC_elementTypeHolder.L_SQUARE_BRACKET; }
+{R_SQUARE_BRACKET}    { return TAC_elementTypeHolder.R_SQUARE_BRACKET; }
+{L_CURVED_BRACKET}   { return TAC_elementTypeHolder.L_CURVED_BRACKET; }
+{R_CURVED_BRACKET}    { return TAC_elementTypeHolder.R_CURVED_BRACKET; }
+{L_LACE_BRACE}   { return TAC_elementTypeHolder.L_LACE_BRACE; }
+{R_LACE_BRACE}    { return TAC_elementTypeHolder.R_LACE_BRACE; }
 {KEYWORDS}            { return TAC_elementTypeHolder.KEYWORDS; }
 {COMMENT}             { return TAC_elementTypeHolder.COMMENT; }
 {STRING}              { return TAC_elementTypeHolder.STRING; }
@@ -82,6 +102,8 @@ STRINGVAR = [a-zA-Z$_][a-zA-Z0-9$_]*
 {NUMBER}              { return TAC_elementTypeHolder.NUMBER; }
 {JAVA_TYPE}            { return TAC_elementTypeHolder.JAVA_TYPE; }
 {STRINGVAR}           { return TAC_elementTypeHolder.STRINGVAR; }
+{R_ARROW}            { return TAC_elementTypeHolder.R_ARROW; }
+{L_ARROW}            { return TAC_elementTypeHolder.L_ARROW; }
 }
 
 //<YYINITIAL> {COMMENT}                                       { yybegin(YYINITIAL); return TAC_elementTypeHolder.COMMENT; }

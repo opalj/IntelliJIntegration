@@ -4,20 +4,31 @@ package syntaxHighlighting;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import com.intellij.navigation.ItemPresentation;
 
 public interface TACProperty extends TAC_namedElement {
 
-  String getKey();
+  //WARNING: getKey(...) is skipped
+  //matching getKey(TACProperty, ...)
+  //methods are not found in TACPsiImplUtil
 
-  String getValue();
+  //WARNING: getValue(...) is skipped
+  //matching getValue(TACProperty, ...)
+  //methods are not found in TACPsiImplUtil
 
-  String getName();
+  //WARNING: getName(...) is skipped
+  //matching getName(TACProperty, ...)
+  //methods are not found in TACPsiImplUtil
 
-  PsiElement setName(String newName);
+  //WARNING: setName(...) is skipped
+  //matching setName(TACProperty, ...)
+  //methods are not found in TACPsiImplUtil
 
-  PsiElement getNameIdentifier();
+  //WARNING: getNameIdentifier(...) is skipped
+  //matching getNameIdentifier(TACProperty, ...)
+  //methods are not found in TACPsiImplUtil
 
-  ItemPresentation getPresentation();
+  //WARNING: getPresentation(...) is skipped
+  //matching getPresentation(TACProperty, ...)
+  //methods are not found in TACPsiImplUtil
 
 }

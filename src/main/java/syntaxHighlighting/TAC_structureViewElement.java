@@ -6,12 +6,11 @@ import com.intellij.ide.util.treeView.smartTree.SortableTreeElement;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.NavigatablePsiElement;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
-/*import com.simpleplugin.psi.SimpleFile;
-import com.simpleplugin.psi.SimpleProperty;
-import com.simpleplugin.psi.impl.SimplePropertyImpl;*/
 import org.jetbrains.annotations.NotNull;
 import syntaxHighlighting.psi.TAC_file;
+import syntaxHighlighting.psi.impl.TACJMethodHeadImpl;
 import syntaxHighlighting.psi.impl.TACJTypeImpl;
 import syntaxHighlighting.psi.impl.TACPropertyImpl;
 import syntaxHighlighting.psi.impl.TACTypeImpl;
@@ -62,6 +61,29 @@ public class TAC_structureViewElement implements StructureViewTreeElement, Sorta
 
     @Override
     public TreeElement[] getChildren() {
+        if (element instanceof PsiElement) {
+            PsiElement[] properties =
+                    PsiTreeUtil.getChildrenOfType(
+                            element, PsiElement.class); // PsiTreeUtil.getChildrenOfType(element,
+            // JavaByteCodeMethodDeclaration.class);
+            List<TreeElement> treeElements = new ArrayList<>(properties.length);
+            for (PsiElement property : properties) {
+                if (property instanceof NavigatablePsiElement) {
+
+                    if (property instanceof TACJMethodHead)
+                        treeElements.add(
+                                new TAC_structureViewElement(
+                                        (TACJMethodHeadImpl) property));
+                }
+            }
+            return treeElements.toArray(new TreeElement[treeElements.size()]);
+        } else {
+            return EMPTY_ARRAY;
+        }
+    }
+
+    /* @Override
+    public TreeElement[] getChildren() {
         if (element instanceof TAC_file) {
             TACProperty[] properties = PsiTreeUtil.getChildrenOfType(element, TACProperty.class);
             List<TreeElement> treeElements = new ArrayList<TreeElement>(properties.length);
@@ -70,6 +92,10 @@ public class TAC_structureViewElement implements StructureViewTreeElement, Sorta
                     if (property instanceof TACType)
                         treeElements.add(
                                 new TAC_structureViewElement((TACTypeImpl) property));
+                if (property instanceof NavigatablePsiElement)
+                    if (property instanceof TACJMethodHead)
+                        treeElements.add(
+                                new TAC_structureViewElement((TACJMethodHeadImpl) property));
                 if (property instanceof NavigatablePsiElement)
                     if (property instanceof TACJType)
                         treeElements.add(
@@ -80,5 +106,6 @@ public class TAC_structureViewElement implements StructureViewTreeElement, Sorta
         } else {
             return EMPTY_ARRAY;
         }
-    }
+    } */
+
 }

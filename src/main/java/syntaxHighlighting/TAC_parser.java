@@ -23,14 +23,14 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     boolean r;
     b = adapt_builder_(t, b, this, null);
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
-    if (t == J_TYPE) {
+    if (t == J_METHOD_HEAD) {
+      r = JMethodHead(b, 0);
+    }
+    else if (t == J_TYPE) {
       r = JType(b, 0);
     }
     else if (t == TYPE) {
       r = Type(b, 0);
-    }
-    else if (t == PROPERTY) {
-      r = property(b, 0);
     }
     else {
       r = parse_root_(t, b, 0);
@@ -43,60 +43,209 @@ public class TAC_parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ((STRINGVAR | THIS) DOT)*(STRINGVAR | THIS)
-  public static boolean JType(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "JType")) return false;
-    if (!nextTokenIs(b, "<j type>", STRINGVAR, THIS)) return false;
+  // MODIFIER* BLOCK_COMMENT* (VOID | KEYWORDS | STRINGVAR) BLOCK_COMMENT* ((L_LACE_BRACE STRINGVAR R_LACE_BRACE) | Type) BLOCK_COMMENT* L_BRACKET (STRINGVAR | BLOCK_COMMENT | COMMA | JAVA_TYPE)* R_BRACKET BLOCK_COMMENT* (L_DOUBLE_LACE_BRACE (STRINGVAR | COMMA | BLOCK_COMMENT | JAVA_TYPE)* R_DOUBLE_LACE_BRACE)? BLOCK_COMMENT* COMMENT?
+  public static boolean JMethodHead(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodHead")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, J_TYPE, "<j type>");
-    r = JType_0(b, l + 1);
-    r = r && JType_1(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, J_METHOD_HEAD, "<j method head>");
+    r = JMethodHead_0(b, l + 1);
+    r = r && JMethodHead_1(b, l + 1);
+    r = r && JMethodHead_2(b, l + 1);
+    r = r && JMethodHead_3(b, l + 1);
+    r = r && JMethodHead_4(b, l + 1);
+    r = r && JMethodHead_5(b, l + 1);
+    r = r && consumeToken(b, L_BRACKET);
+    r = r && JMethodHead_7(b, l + 1);
+    r = r && consumeToken(b, R_BRACKET);
+    r = r && JMethodHead_9(b, l + 1);
+    r = r && JMethodHead_10(b, l + 1);
+    r = r && JMethodHead_11(b, l + 1);
+    r = r && JMethodHead_12(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // ((STRINGVAR | THIS) DOT)*
-  private static boolean JType_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "JType_0")) return false;
+  // MODIFIER*
+  private static boolean JMethodHead_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodHead_0")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!JType_0_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "JType_0", c)) break;
+      if (!consumeToken(b, MODIFIER)) break;
+      if (!empty_element_parsed_guard_(b, "JMethodHead_0", c)) break;
     }
     return true;
   }
 
-  // (STRINGVAR | THIS) DOT
-  private static boolean JType_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "JType_0_0")) return false;
+  // BLOCK_COMMENT*
+  private static boolean JMethodHead_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodHead_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!consumeToken(b, BLOCK_COMMENT)) break;
+      if (!empty_element_parsed_guard_(b, "JMethodHead_1", c)) break;
+    }
+    return true;
+  }
+
+  // VOID | KEYWORDS | STRINGVAR
+  private static boolean JMethodHead_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodHead_2")) return false;
+    boolean r;
+    r = consumeToken(b, VOID);
+    if (!r) r = consumeToken(b, KEYWORDS);
+    if (!r) r = consumeToken(b, STRINGVAR);
+    return r;
+  }
+
+  // BLOCK_COMMENT*
+  private static boolean JMethodHead_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodHead_3")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!consumeToken(b, BLOCK_COMMENT)) break;
+      if (!empty_element_parsed_guard_(b, "JMethodHead_3", c)) break;
+    }
+    return true;
+  }
+
+  // (L_LACE_BRACE STRINGVAR R_LACE_BRACE) | Type
+  private static boolean JMethodHead_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodHead_4")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = JType_0_0_0(b, l + 1);
-    r = r && consumeToken(b, DOT);
+    r = JMethodHead_4_0(b, l + 1);
+    if (!r) r = Type(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // STRINGVAR | THIS
-  private static boolean JType_0_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "JType_0_0_0")) return false;
+  // L_LACE_BRACE STRINGVAR R_LACE_BRACE
+  private static boolean JMethodHead_4_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodHead_4_0")) return false;
     boolean r;
-    r = consumeToken(b, STRINGVAR);
-    if (!r) r = consumeToken(b, THIS);
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, L_LACE_BRACE, STRINGVAR, R_LACE_BRACE);
+    exit_section_(b, m, null, r);
     return r;
   }
 
-  // STRINGVAR | THIS
-  private static boolean JType_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "JType_1")) return false;
+  // BLOCK_COMMENT*
+  private static boolean JMethodHead_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodHead_5")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!consumeToken(b, BLOCK_COMMENT)) break;
+      if (!empty_element_parsed_guard_(b, "JMethodHead_5", c)) break;
+    }
+    return true;
+  }
+
+  // (STRINGVAR | BLOCK_COMMENT | COMMA | JAVA_TYPE)*
+  private static boolean JMethodHead_7(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodHead_7")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!JMethodHead_7_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "JMethodHead_7", c)) break;
+    }
+    return true;
+  }
+
+  // STRINGVAR | BLOCK_COMMENT | COMMA | JAVA_TYPE
+  private static boolean JMethodHead_7_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodHead_7_0")) return false;
     boolean r;
     r = consumeToken(b, STRINGVAR);
-    if (!r) r = consumeToken(b, THIS);
+    if (!r) r = consumeToken(b, BLOCK_COMMENT);
+    if (!r) r = consumeToken(b, COMMA);
+    if (!r) r = consumeToken(b, JAVA_TYPE);
+    return r;
+  }
+
+  // BLOCK_COMMENT*
+  private static boolean JMethodHead_9(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodHead_9")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!consumeToken(b, BLOCK_COMMENT)) break;
+      if (!empty_element_parsed_guard_(b, "JMethodHead_9", c)) break;
+    }
+    return true;
+  }
+
+  // (L_DOUBLE_LACE_BRACE (STRINGVAR | COMMA | BLOCK_COMMENT | JAVA_TYPE)* R_DOUBLE_LACE_BRACE)?
+  private static boolean JMethodHead_10(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodHead_10")) return false;
+    JMethodHead_10_0(b, l + 1);
+    return true;
+  }
+
+  // L_DOUBLE_LACE_BRACE (STRINGVAR | COMMA | BLOCK_COMMENT | JAVA_TYPE)* R_DOUBLE_LACE_BRACE
+  private static boolean JMethodHead_10_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodHead_10_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, L_DOUBLE_LACE_BRACE);
+    r = r && JMethodHead_10_0_1(b, l + 1);
+    r = r && consumeToken(b, R_DOUBLE_LACE_BRACE);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (STRINGVAR | COMMA | BLOCK_COMMENT | JAVA_TYPE)*
+  private static boolean JMethodHead_10_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodHead_10_0_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!JMethodHead_10_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "JMethodHead_10_0_1", c)) break;
+    }
+    return true;
+  }
+
+  // STRINGVAR | COMMA | BLOCK_COMMENT | JAVA_TYPE
+  private static boolean JMethodHead_10_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodHead_10_0_1_0")) return false;
+    boolean r;
+    r = consumeToken(b, STRINGVAR);
+    if (!r) r = consumeToken(b, COMMA);
+    if (!r) r = consumeToken(b, BLOCK_COMMENT);
+    if (!r) r = consumeToken(b, JAVA_TYPE);
+    return r;
+  }
+
+  // BLOCK_COMMENT*
+  private static boolean JMethodHead_11(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodHead_11")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!consumeToken(b, BLOCK_COMMENT)) break;
+      if (!empty_element_parsed_guard_(b, "JMethodHead_11", c)) break;
+    }
+    return true;
+  }
+
+  // COMMENT?
+  private static boolean JMethodHead_12(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodHead_12")) return false;
+    consumeToken(b, COMMENT);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // JAVA_TYPE
+  public static boolean JType(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JType")) return false;
+    if (!nextTokenIs(b, JAVA_TYPE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, JAVA_TYPE);
+    exit_section_(b, m, J_TYPE, r);
     return r;
   }
 
   /* ********************************************************** */
-  // (JType | NUMBER)('[]')*
+  // (JType | STRINGVAR | NUMBER)('[]')*
   public static boolean Type(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "Type")) return false;
     boolean r;
@@ -107,11 +256,12 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // JType | NUMBER
+  // JType | STRINGVAR | NUMBER
   private static boolean Type_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "Type_0")) return false;
     boolean r;
     r = JType(b, l + 1);
+    if (!r) r = consumeToken(b, STRINGVAR);
     if (!r) r = consumeToken(b, NUMBER);
     return r;
   }
@@ -138,57 +288,53 @@ public class TAC_parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // Type|COMMENT|CRLF|WHITE_SPACE|STRING|NUMBER|KEYWORDS
+  // JMethodHead|Type|COMMENT|CRLF|WHITE_SPACE|STRING|NUMBER|KEYWORDS|MODIFIER | BLOCK_COMMENT|EXTENDS|IMPLEMENTS|CLASS|THROW|THROWS|VOID|THIS|LEVEL|COMMA|DOT|SEMICOLON|COLON|AT|R_ARROW|L_ARROW|L_LACE_BRACE|R_LACE_BRACE|R_BRACKET|L_BRACKET|L_SQUARE_BRACKET|R_SQUARE_BRACKET|L_CURVED_BRACKET|R_CURVED_BRACKET|CONSTMETHODNAMES|NEW_LINE|EQ|UEQ|STRINGVAR|L_DOUBLE_LACE_BRACE|R_DOUBLE_LACE_BRACE|PLUS|MINUS
   static boolean item_(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "item_")) return false;
     boolean r;
-    r = Type(b, l + 1);
+    r = JMethodHead(b, l + 1);
+    if (!r) r = Type(b, l + 1);
     if (!r) r = consumeToken(b, COMMENT);
     if (!r) r = consumeToken(b, CRLF);
     if (!r) r = consumeToken(b, WHITE_SPACE);
     if (!r) r = consumeToken(b, STRING);
     if (!r) r = consumeToken(b, NUMBER);
     if (!r) r = consumeToken(b, KEYWORDS);
+    if (!r) r = consumeToken(b, MODIFIER);
+    if (!r) r = consumeToken(b, BLOCK_COMMENT);
+    if (!r) r = consumeToken(b, EXTENDS);
+    if (!r) r = consumeToken(b, IMPLEMENTS);
+    if (!r) r = consumeToken(b, CLASS);
+    if (!r) r = consumeToken(b, THROW);
+    if (!r) r = consumeToken(b, THROWS);
+    if (!r) r = consumeToken(b, VOID);
+    if (!r) r = consumeToken(b, THIS);
+    if (!r) r = consumeToken(b, LEVEL);
+    if (!r) r = consumeToken(b, COMMA);
+    if (!r) r = consumeToken(b, DOT);
+    if (!r) r = consumeToken(b, SEMICOLON);
+    if (!r) r = consumeToken(b, COLON);
+    if (!r) r = consumeToken(b, AT);
+    if (!r) r = consumeToken(b, R_ARROW);
+    if (!r) r = consumeToken(b, L_ARROW);
+    if (!r) r = consumeToken(b, L_LACE_BRACE);
+    if (!r) r = consumeToken(b, R_LACE_BRACE);
+    if (!r) r = consumeToken(b, R_BRACKET);
+    if (!r) r = consumeToken(b, L_BRACKET);
+    if (!r) r = consumeToken(b, L_SQUARE_BRACKET);
+    if (!r) r = consumeToken(b, R_SQUARE_BRACKET);
+    if (!r) r = consumeToken(b, L_CURVED_BRACKET);
+    if (!r) r = consumeToken(b, R_CURVED_BRACKET);
+    if (!r) r = consumeToken(b, CONSTMETHODNAMES);
+    if (!r) r = consumeToken(b, NEW_LINE);
+    if (!r) r = consumeToken(b, EQ);
+    if (!r) r = consumeToken(b, UEQ);
+    if (!r) r = consumeToken(b, STRINGVAR);
+    if (!r) r = consumeToken(b, L_DOUBLE_LACE_BRACE);
+    if (!r) r = consumeToken(b, R_DOUBLE_LACE_BRACE);
+    if (!r) r = consumeToken(b, PLUS);
+    if (!r) r = consumeToken(b, MINUS);
     return r;
-  }
-
-  /* ********************************************************** */
-  // (KEY? SEPARATOR VALUE?) | KEY
-  public static boolean property(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property")) return false;
-    if (!nextTokenIs(b, "<property>", KEY, SEPARATOR)) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, PROPERTY, "<property>");
-    r = property_0(b, l + 1);
-    if (!r) r = consumeToken(b, KEY);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // KEY? SEPARATOR VALUE?
-  private static boolean property_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = property_0_0(b, l + 1);
-    r = r && consumeToken(b, SEPARATOR);
-    r = r && property_0_2(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // KEY?
-  private static boolean property_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_0_0")) return false;
-    consumeToken(b, KEY);
-    return true;
-  }
-
-  // VALUE?
-  private static boolean property_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "property_0_2")) return false;
-    consumeToken(b, VALUE);
-    return true;
   }
 
   /* ********************************************************** */

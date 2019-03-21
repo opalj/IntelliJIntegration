@@ -13,4 +13,7 @@ public interface TACType extends PsiElement {
   @Nullable
   PsiElement getNumber();
 
+  @Nullable
+  PsiElement getStringvar();
+
 }

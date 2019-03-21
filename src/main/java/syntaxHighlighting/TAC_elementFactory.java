@@ -15,4 +15,14 @@ public class TAC_elementFactory {
         return (TAC_file) PsiFileFactory.getInstance(project).
                 createFileFromText(name, TAC_filetype.INSTANCE, text);
     }
+
+    public static TACJType createType(Project project, String name) {
+        final TAC_file file = createFile(project, name);
+        return (TACJType) file.getFirstChild();
+    }
+
+    public static TACJMethodHead createMethodName(Project project, String name) {
+        final TAC_file file = createFile(project, name);
+        return (TACJMethodHead) file.getFirstChild();
+    }
 }

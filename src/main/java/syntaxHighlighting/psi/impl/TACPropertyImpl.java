@@ -2,6 +2,8 @@
 package syntaxHighlighting.psi.impl;
 
 import java.util.List;
+
+import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -9,7 +11,6 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static syntaxHighlighting.TAC_elementTypeHolder.*;
 import syntaxHighlighting.*;
-import com.intellij.navigation.ItemPresentation;
 
 public class TACPropertyImpl extends TAC_namedElementImpl implements TACProperty {
 
@@ -26,28 +27,14 @@ public class TACPropertyImpl extends TAC_namedElementImpl implements TACProperty
     else super.accept(visitor);
   }
 
-  public String getKey() {
-    return TACPsiImplUtil.getKey(this);
-  }
-
-  public String getValue() {
-    return TACPsiImplUtil.getValue(this);
-  }
-
-  public String getName() {
-    return TACPsiImplUtil.getName(this);
-  }
-
-  public PsiElement setName(String newName) {
-    return TACPsiImplUtil.setName(this, newName);
-  }
-
+  @Nullable
+  @Override
   public PsiElement getNameIdentifier() {
-    return TACPsiImplUtil.getNameIdentifier(this);
+    return null;
   }
 
-  public ItemPresentation getPresentation() {
-    return TACPsiImplUtil.getPresentation(this);
+  @Override
+  public PsiElement setName(@NotNull String name) throws IncorrectOperationException {
+    return null;
   }
-
 }
