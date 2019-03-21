@@ -8,11 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static syntaxHighlighting.TAC_elementTypeHolder.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import syntaxHighlighting.*;
 import com.intellij.psi.PsiReference;
 
-public class TACJTypeImpl extends ASTWrapperPsiElement implements TACJType {
+public class TACJTypeImpl extends TAC_namedElementImpl implements TACJType {
 
   public TACJTypeImpl(@NotNull ASTNode node) {
     super(node);
@@ -34,8 +33,8 @@ public class TACJTypeImpl extends ASTWrapperPsiElement implements TACJType {
   }
 
   @Nullable
-  public String getJavaType() {
-    return TACPsiImplUtil.getJavaType(this);
+  public String getJavaTypeString() {
+    return TACPsiImplUtil.getJavaTypeString(this);
   }
 
   public String getName() {

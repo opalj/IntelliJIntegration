@@ -24,38 +24,38 @@
     //JAVA="regexp:(([A-Za-z])*\.)+([A-Za-z])*(\{(.)*\})?"
     KEYWORDS="regexp:new|goto|if|else|throw|throws|catch|caught|return"
     MODIFIER="regexp:public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient"
-    CLASS="regexp:class";
-    EXTENDS="regexp:extends";
-    IMPLEMENTS="regexp:implemenmts";
-    THROW="regexp:throw";
-    THROWS="regexp:throws";
-    VOID="regexp:void";
-    THIS="regexp:this";
+    CLASS="class";
+    EXTENDS="extends";
+    IMPLEMENTS="implemenmts";
+    THROW="throw";
+    THROWS="throws";
+    VOID="void";
+    THIS="this";
     //JAVA_TYPE="regexp:(([A-Za-z])*\.)+[A-Z-a-z]*"
     LEVEL="regexp:lv+([A-Za-z0-9])*"
-    COMMA="regexp:,"
-    DOT="regexp:."
-    COLON="regexp::"
-    SEMICOLON="regexp:;"
-    AT="regexp:@"
-    R_ARROW="regexp:=>"
-    L_ARROW="regexp:<="
-    L_DOUBLE_LACE_BRACE="regexp:\«"
-    R_DOUBLE_LACE_BRACE="regexp:\»"
-    L_LACE_BRACE="regexp:<"
-    R_LACE_BRACE="regexp:>"
-    R_BRACKET="regexp:\)"
-    L_BRACKET="regexp:\("
-    L_SQUARE_BRACKET="regexp:\["
-    R_SQUARE_BRACKET="regexp:\]"
-    L_CURVED_BRACKET="regexp:\{"
-    R_CURVED_BRACKET="regexp:\}"
-    PLUS="regexp:\+"
-    MINUS="regexp:\-"
+    COMMA=","
+    DOT="."
+    COLON=":"
+    SEMICOLON=";"
+    AT="@"
+    R_ARROW="=>"
+    L_ARROW="<="
+    L_DOUBLE_LACE_BRACE="«"
+    R_DOUBLE_LACE_BRACE="»"
+    L_LACE_BRACE="<"
+    R_LACE_BRACE=">"
+    R_BRACKET=")"
+    L_BRACKET="("
+    L_SQUARE_BRACKET="["
+    R_SQUARE_BRACKET="]"
+    L_CURVED_BRACKET="{"
+    R_CURVED_BRACKET="}"
+    PLUS="+"
+    MINUS="-"
     CONSTMETHODNAMES = "regexp:<(cl)?init>"
     NEW_LINE="regexp:\n"
-    EQ="regexp:="
-    UEQ="regexp:!="
+    EQ="="
+    UEQ="!="
     JAVA_TYPE="regexp:((([A-Za-z])([A-Za-z0-9])*)\.)+(([A-Za-z])([A-Za-z0-9])*)"
     STRINGVAR = "regexp:[a-zA-Z$_][a-zA-Z0-9$_]*"
     ]
@@ -72,9 +72,9 @@ Type ::= (JType | STRINGVAR | NUMBER)('[]')*
 
 JMethodHead ::= MODIFIER* BLOCK_COMMENT* (VOID | KEYWORDS | STRINGVAR) BLOCK_COMMENT* ((L_LACE_BRACE STRINGVAR R_LACE_BRACE) | Type) BLOCK_COMMENT* L_BRACKET (STRINGVAR | BLOCK_COMMENT | COMMA | JAVA_TYPE)* R_BRACKET BLOCK_COMMENT* (L_DOUBLE_LACE_BRACE (STRINGVAR | COMMA | BLOCK_COMMENT | JAVA_TYPE)* R_DOUBLE_LACE_BRACE)? BLOCK_COMMENT* COMMENT?
 
-JType ::= JAVA_TYPE  {//mixin="syntaxHighlighting.psi.impl.TAC_namedElementImpl"
+JType ::= JAVA_TYPE  {mixin="syntaxHighlighting.psi.impl.TAC_namedElementImpl"
                                                           implements="syntaxHighlighting.TAC_namedElement"
-                                                          methods=[getJavaType getName setName getNameIdentifier getReferences]}
+                                                          methods=[getJavaTypeString getName setName getNameIdentifier getReferences]}
 
 //JType ::= ((STRINGVAR | THIS) DOT)*(STRINGVAR | THIS)  {mixin="syntaxHighlighting.psi.impl.TAC_namedElementImpl"
   //                                     implements="syntaxHighlighting.TAC_namedElement"

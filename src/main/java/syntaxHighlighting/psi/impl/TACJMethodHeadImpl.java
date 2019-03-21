@@ -44,46 +44,4 @@ public class TACJMethodHeadImpl extends ASTWrapperPsiElement implements TACJMeth
     return findChildByType(KEYWORDS);
   }
 
-  @Override
-  @NotNull
-  public PsiElement getLBracket() {
-    return findNotNullChildByType(L_BRACKET);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getLDoubleLaceBrace() {
-    return findChildByType(L_DOUBLE_LACE_BRACE);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getLLaceBrace() {
-    return findChildByType(L_LACE_BRACE);
-  }
-
-  @Override
-  @NotNull
-  public PsiElement getRBracket() {
-    return findNotNullChildByType(R_BRACKET);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getRDoubleLaceBrace() {
-    return findChildByType(R_DOUBLE_LACE_BRACE);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getRLaceBrace() {
-    return findChildByType(R_LACE_BRACE);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getVoid() {
-    return findChildByType(VOID);
-  }
-
 }

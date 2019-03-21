@@ -23,7 +23,7 @@ import javax.swing.*;
 
 public class TACPsiImplUtil {
     @Nullable
-    public static String getJavaType(@NotNull TACJType element) {
+    public static String getJavaTypeString(@NotNull TACJType element) {
         ASTNode javaTypeNode = element.getNode();
         if (javaTypeNode != null) {
             // IMPORTANT: Convert embedded escaped spaces to simple spaces
@@ -49,7 +49,7 @@ public class TACPsiImplUtil {
     }
 
     public static String getName(TACJType element) {
-        return getJavaType(element);
+        return getJavaTypeString(element);
     }
 
     public static String getName(TACJMethodHead element) {

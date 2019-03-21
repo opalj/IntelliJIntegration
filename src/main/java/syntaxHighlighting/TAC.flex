@@ -2,127 +2,90 @@ package syntaxHighlighting;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.TokenType;
-import syntaxHighlighting.TAC_elementTypeHolder;
+
+import static com.intellij.psi.TokenType.BAD_CHARACTER;
+import static com.intellij.psi.TokenType.WHITE_SPACE;
+import static syntaxHighlighting.TAC_elementTypeHolder.*;
 
 %%
+
 %{
-  public TACLexer() {
+  public _TAC_parserLexer() {
     this((java.io.Reader)null);
   }
 %}
 
-%class TACLexer
+%public
+%class _TAC_parserLexer
 %implements FlexLexer
-%unicode
 %function advance
 %type IElementType
-%eof{  return;
-%eof}
+%unicode
+
+EOL=\R
+WHITE_SPACE=\s+
 
 CRLF=\R
-WHITE_SPACE=\s+
+WHITE_SPACE=[ \t\n\x0B\f\r]+
 STRING=('([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\")
 COMMENT="//".*
 BLOCK_COMMENT="/"\*[^\*/]*\*"/"
-NUMBER =(-)?[0-9]+
+NUMBER=(-)?[0-9]+
 KEYWORDS=new|goto|if|else|throw|throws|catch|caught|return
 MODIFIER=public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient
 LEVEL=lv+([A-Za-z0-9])*
-COMMA=,
-DOT=.
-COLON=:
-SEMICOLON=;
-PLUS=\+
-MINUS=\-
-AT=@
-R_ARROW==>
-L_ARROW=<=
-L_LACE_BRACE=<
-R_LACE_BRACE=>
-L_DOUBLE_LACE_BRACE=\«
-R_DOUBLE_LACE_BRACE=\»
-R_BRACKET=\)
-L_BRACKET=\(
-L_SQUARE_BRACKET=\[
-R_SQUARE_BRACKET=\]
-L_CURVED_BRACKET=\{
-R_CURVED_BRACKET=\}
-CONSTMETHODNAMES = <(cl)?init>
-CLASS=class
-EXTENDS=extends
-IMPLEMENTS=implements
+CONSTMETHODNAMES=<(cl)?init>
 NEW_LINE=\n
-EQ==
-UEQ=\!=
-THIS=this
-THROW=throw
-THROWS=throws
-VOID=void
-//STRINGVAR = [A-Za-z0-9]+
 JAVA_TYPE=((([A-Za-z])([A-Za-z0-9])*)\.)+(([A-Za-z])([A-Za-z0-9])*)
-STRINGVAR = [a-zA-Z$_][a-zA-Z0-9$_]*
-
-%state WAITING_VALUE
+STRINGVAR=[a-zA-Z$_][a-zA-Z0-9$_]*
 
 %%
 <YYINITIAL> {
-","                     { return TAC_elementTypeHolder.COMMA; }
-";"                     { return TAC_elementTypeHolder.SEMICOLON; }
-"."                     { return TAC_elementTypeHolder.DOT; }
-":"                     { return TAC_elementTypeHolder.COLON; }
-"@"                     { return TAC_elementTypeHolder.AT; }
-"class"                 { return TAC_elementTypeHolder.CLASS; }
-"extends"               { return TAC_elementTypeHolder.EXTENDS; }
-"implements"            { return TAC_elementTypeHolder.IMPLEMENTS; }
-"\n"                   { return TAC_elementTypeHolder.NEW_LINE; }
-"this"                  { return TAC_elementTypeHolder.THIS; }
-"throw"                  { return TAC_elementTypeHolder.THROW; }
-"throws"                  { return TAC_elementTypeHolder.THROWS; }
-"+"                  { return TAC_elementTypeHolder.PLUS; }
-"-"                  { return TAC_elementTypeHolder.MINUS; }
-{L_DOUBLE_LACE_BRACE}            { return TAC_elementTypeHolder.L_DOUBLE_LACE_BRACE; }
-{R_DOUBLE_LACE_BRACE}            { return TAC_elementTypeHolder.R_DOUBLE_LACE_BRACE; }
-{L_BRACKET}            { return TAC_elementTypeHolder.L_BRACKET; }
-{R_BRACKET}            { return TAC_elementTypeHolder.R_BRACKET; }
-{L_SQUARE_BRACKET}     { return TAC_elementTypeHolder.L_SQUARE_BRACKET; }
-{R_SQUARE_BRACKET}    { return TAC_elementTypeHolder.R_SQUARE_BRACKET; }
-{L_CURVED_BRACKET}   { return TAC_elementTypeHolder.L_CURVED_BRACKET; }
-{R_CURVED_BRACKET}    { return TAC_elementTypeHolder.R_CURVED_BRACKET; }
-{L_LACE_BRACE}   { return TAC_elementTypeHolder.L_LACE_BRACE; }
-{R_LACE_BRACE}    { return TAC_elementTypeHolder.R_LACE_BRACE; }
-{KEYWORDS}            { return TAC_elementTypeHolder.KEYWORDS; }
-{COMMENT}             { return TAC_elementTypeHolder.COMMENT; }
-{STRING}              { return TAC_elementTypeHolder.STRING; }
-{LEVEL}               { return TAC_elementTypeHolder.LEVEL; }
-{BLOCK_COMMENT}       { return TAC_elementTypeHolder.BLOCK_COMMENT; }
-{MODIFIER}           { return TAC_elementTypeHolder.MODIFIER; }
-{EQ}                 { return TAC_elementTypeHolder.EQ; }
-{UEQ}                 { return TAC_elementTypeHolder.UEQ; }
-{NUMBER}              { return TAC_elementTypeHolder.NUMBER; }
-{JAVA_TYPE}            { return TAC_elementTypeHolder.JAVA_TYPE; }
-{STRINGVAR}           { return TAC_elementTypeHolder.STRINGVAR; }
-{R_ARROW}            { return TAC_elementTypeHolder.R_ARROW; }
-{L_ARROW}            { return TAC_elementTypeHolder.L_ARROW; }
+  {WHITE_SPACE}           { return WHITE_SPACE; }
+
+  "class"                 { return CLASS; }
+  "extends"               { return EXTENDS; }
+  "implemenmts"           { return IMPLEMENTS; }
+  "throw"                 { return THROW; }
+  "throws"                { return THROWS; }
+  "void"                  { return VOID; }
+  "this"                  { return THIS; }
+  ","                     { return COMMA; }
+  "."                     { return DOT; }
+  ":"                     { return COLON; }
+  ";"                     { return SEMICOLON; }
+  "@"                     { return AT; }
+  "=>"                    { return R_ARROW; }
+  "<="                    { return L_ARROW; }
+  "«"                     { return L_DOUBLE_LACE_BRACE; }
+  "»"                     { return R_DOUBLE_LACE_BRACE; }
+  "<"                     { return L_LACE_BRACE; }
+  ">"                     { return R_LACE_BRACE; }
+  ")"                     { return R_BRACKET; }
+  "("                     { return L_BRACKET; }
+  "["                     { return L_SQUARE_BRACKET; }
+  "]"                     { return R_SQUARE_BRACKET; }
+  "{"                     { return L_CURVED_BRACKET; }
+  "}"                     { return R_CURVED_BRACKET; }
+  "+"                     { return PLUS; }
+  "-"                     { return MINUS; }
+  "="                     { return EQ; }
+  "!="                    { return UEQ; }
+
+  {CRLF}                  { return CRLF; }
+  {WHITE_SPACE}           { return WHITE_SPACE; }
+  {STRING}                { return STRING; }
+  {COMMENT}               { return COMMENT; }
+  {BLOCK_COMMENT}         { return BLOCK_COMMENT; }
+  {NUMBER}                { return NUMBER; }
+  {KEYWORDS}              { return KEYWORDS; }
+  {MODIFIER}              { return MODIFIER; }
+  {LEVEL}                 { return LEVEL; }
+  {CONSTMETHODNAMES}      { return CONSTMETHODNAMES; }
+  {NEW_LINE}              { return NEW_LINE; }
+  {JAVA_TYPE}             { return JAVA_TYPE; }
+  {STRINGVAR}             { return STRINGVAR; }
+
 }
 
-//<YYINITIAL> {COMMENT}                                       { yybegin(YYINITIAL); return TAC_elementTypeHolder.COMMENT; }
-
-//<YYINITIAL> {KEYWORDS}                                     { yybegin(YYINITIAL); return TAC_elementTypeHolder.KEYWORDS; }
-
-//<YYINITIAL> {SEPARATOR}                                     { yybegin(WAITING_VALUE); return TAC_elementTypeHolder.SEPARATOR; }
-
-//<YYINITIAL> {STRING}                                        { yybegin(YYINITIAL); return TAC_elementTypeHolder.STRING; }
-
-//<YYINITIAL> {NUMBER}                                        { yybegin(YYINITIAL); return TAC_elementTypeHolder.NUMBER; }
-
-<WAITING_VALUE> {CRLF}({CRLF}|{WHITE_SPACE})+               { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
-
-<WAITING_VALUE> {WHITE_SPACE}+                              { yybegin(WAITING_VALUE); return TokenType.WHITE_SPACE; }
-
-({CRLF}|{WHITE_SPACE})+                                     { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
-
-[^]                                                         { return TokenType.BAD_CHARACTER; }
-
-
-
+[^] { return BAD_CHARACTER; }

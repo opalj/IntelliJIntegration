@@ -12,7 +12,7 @@ public interface TACJType extends TAC_namedElement {
   PsiElement getJavaType();
 
   @Nullable
-  String getJavaType();
+  String getJavaTypeString();
 
   String getName();
 

@@ -1,19 +1,18 @@
 package syntaxHighlighting;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.util.treeView.smartTree.SortableTreeElement;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.Icons;
 import org.jetbrains.annotations.NotNull;
-import syntaxHighlighting.psi.TAC_file;
 import syntaxHighlighting.psi.impl.TACJMethodHeadImpl;
-import syntaxHighlighting.psi.impl.TACJTypeImpl;
-import syntaxHighlighting.psi.impl.TACPropertyImpl;
-import syntaxHighlighting.psi.impl.TACTypeImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +55,9 @@ public class TAC_structureViewElement implements StructureViewTreeElement, Sorta
     @Override
     public ItemPresentation getPresentation() {
         ItemPresentation presentation = element.getPresentation();
-        return presentation != null ? presentation : new PresentationData();
+        // TODO create getPresentation for TACJMethodHead in PsiImplUtil
+        return presentation != null ? presentation : new PresentationData(element.getName(), "location",
+                Icons.CLASS_ICON, null);
     }
 
     @Override
@@ -68,44 +69,19 @@ public class TAC_structureViewElement implements StructureViewTreeElement, Sorta
             // JavaByteCodeMethodDeclaration.class);
             List<TreeElement> treeElements = new ArrayList<>(properties.length);
             for (PsiElement property : properties) {
-                if (property instanceof NavigatablePsiElement) {
-
-                    if (property instanceof TACJMethodHead)
+                System.out.println(property.getClass().getSimpleName());
+                    if (property instanceof TACJMethodHead) {
                         treeElements.add(
                                 new TAC_structureViewElement(
                                         (TACJMethodHeadImpl) property));
-                }
+                    }
             }
+
             return treeElements.toArray(new TreeElement[treeElements.size()]);
         } else {
             return EMPTY_ARRAY;
         }
     }
 
-    /* @Override
-    public TreeElement[] getChildren() {
-        if (element instanceof TAC_file) {
-            TACProperty[] properties = PsiTreeUtil.getChildrenOfType(element, TACProperty.class);
-            List<TreeElement> treeElements = new ArrayList<TreeElement>(properties.length);
-            for (TACProperty property : properties) {
-                if (property instanceof NavigatablePsiElement)
-                    if (property instanceof TACType)
-                        treeElements.add(
-                                new TAC_structureViewElement((TACTypeImpl) property));
-                if (property instanceof NavigatablePsiElement)
-                    if (property instanceof TACJMethodHead)
-                        treeElements.add(
-                                new TAC_structureViewElement((TACJMethodHeadImpl) property));
-                if (property instanceof NavigatablePsiElement)
-                    if (property instanceof TACJType)
-                        treeElements.add(
-                                new TAC_structureViewElement((TACJTypeImpl) property));
-                treeElements.add(new TAC_structureViewElement((TACPropertyImpl) property));
-            }
-            return treeElements.toArray(new TreeElement[treeElements.size()]);
-        } else {
-            return EMPTY_ARRAY;
-        }
-    } */
 
 }

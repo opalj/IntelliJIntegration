@@ -54,19 +54,18 @@
 
         <psi.referenceContributor implementation="JavaByteCodeLanguage.psi.JbcReferenceContributor"/>
 
-        <codeInsight.lineMarkerProvider language="TAC" implementationClass="syntaxHighlighting.TAC_lineMarkerProvider"/>
-        <annotator language="TAC" implementationClass="syntaxHighlighting.TAC_annotator"/>
-        <lang.foldingBuilder language="TAC" implementationClass="syntaxHighlighting.TAC_foldingBuilder"/>
+        <!--<codeInsight.lineMarkerProvider language="TAC" implementationClass="syntaxHighlighting.TAC_lineMarkerProvider"/>-->
+        <!--<annotator language="TAC" implementationClass="syntaxHighlighting.TAC_annotator"/>-->
+        <!--<lang.foldingBuilder language="TAC" implementationClass="syntaxHighlighting.TAC_foldingBuilder"/>-->
 
         <lang.psiStructureViewFactory language="jbc" implementationClass="JavaByteCodeLanguage.StructureView.JavaByteCodeStructureViewFactory"/>
 
         <lang.psiStructureViewFactory language="TAC" implementationClass="syntaxHighlighting.TAC_structureViewFactory"/>
-        <psi.referenceContributor implementation="syntaxHighlighting.TAC_referenceContributor"/>
-        <lang.findUsagesProvider language="TAC" implementationClass="syntaxHighlighting.TAC_findUsagesProvider"/>
-        <lang.formatter language="TAC" implementationClass="syntaxHighlighting.TAC_formattingModelBuilder"/>
+        <!--<psi.referenceContributor implementation="syntaxHighlighting.TAC_referenceContributor"/>-->
+        <!--<lang.formatter language="TAC" implementationClass="syntaxHighlighting.TAC_formattingModelBuilder"/>-->
 
         <colorSettingsPage implementation="syntaxHighlighting.TAC_colorSettingsPage"/>
-        <completion.contributor language="TAC" implementationClass="syntaxHighlighting.TAC_completionContributor"/>
+        <!--<completion.contributor language="TAC" implementationClass="syntaxHighlighting.TAC_completionContributor"/>-->
     </extensions>
 
     <actions>

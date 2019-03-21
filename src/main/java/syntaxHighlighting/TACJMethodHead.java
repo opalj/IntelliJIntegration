@@ -16,25 +16,4 @@ public interface TACJMethodHead extends PsiElement {
   @Nullable
   PsiElement getKeywords();
 
-  @NotNull
-  PsiElement getLBracket();
-
-  @Nullable
-  PsiElement getLDoubleLaceBrace();
-
-  @Nullable
-  PsiElement getLLaceBrace();
-
-  @NotNull
-  PsiElement getRBracket();
-
-  @Nullable
-  PsiElement getRDoubleLaceBrace();
-
-  @Nullable
-  PsiElement getRLaceBrace();
-
-  @Nullable
-  PsiElement getVoid();
-
 }
