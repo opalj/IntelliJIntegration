@@ -6,8 +6,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import opalintegration.Visitor.Instruction.InstructionVisitorImpl;
-import opalintegration.Visitor.Instruction.StackMapVisitorImpl;
-import opalintegration.Visitor.StackMapVisitor;
+import opalintegration.Visitor.StackMap.StackMapVisitorImpl;
 import org.jetbrains.annotations.NotNull;
 import org.opalj.bi.AccessFlags;
 import org.opalj.bi.AccessFlagsContexts;

@@ -19,6 +19,10 @@ import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * A utility class that serves as a delegate for our PSI-elements that are automatically generated
  * by the parser.
@@ -28,11 +32,11 @@ import org.jetbrains.annotations.Nullable;
  * that the definitions aren't lost when re-generating the code.)
  */
 public class JavaByteCodePsiImplUtil {
-
+  private static final Logger LOGGER = Logger.getLogger(JavaByteCodePsiImplUtil.class.getName());
   public static void navigate(JavaByteCodeNamedElement element, boolean requestFocus) {
     Navigatable descriptor = PsiNavigationSupport.getInstance().getDescriptor(element);
     FileEditor editor = FileEditorManager.getInstance(element.getProject()).getSelectedEditor();
-    if (editor instanceof DisTextEditor) {
+    if (editor instanceof DisTextEditor && descriptor != null) {
       ((DisTextEditor) editor).navigateTo(descriptor);
     } else {
       ((Navigatable) element).navigate(requestFocus);
@@ -182,51 +186,48 @@ public class JavaByteCodePsiImplUtil {
   }
 
   public static ItemPresentation getPresentation(JavaByteCodeMethodDeclaration element) {
-    ColoredItemPresentation coloredItemPresentation =
-        new ColoredItemPresentation() {
-          private final JavaByteCodeMethodHead methodHead = element.getMethodHead();
+    return new ColoredItemPresentation() {
+              private final JavaByteCodeMethodHead methodHead = element.getMethodHead();
 
-          @Nullable
-          @Override
-          public String getPresentableText() {
-            return methodHead.getMethodName().getText().replaceAll("throws .*", "")
-                + ": "
-                + methodHead.getType().getText();
-          }
+              @Override
+              public String getPresentableText() {
+                return methodHead.getMethodName().getText().replaceAll("throws .*", "")
+                        + ": "
+                        + methodHead.getType().getText();
+              }
 
-          @Nullable
-          @Override
-          public String getLocationString() {
-            return null;
-          }
+              @Nullable
+              @Override
+              public String getLocationString() {
+                return null;
+              }
 
-          @Nullable
-          @Override
-          public Icon getIcon(boolean unused) {
-            int flags = Iconable.ICON_FLAG_READ_STATUS | Iconable.ICON_FLAG_VISIBILITY;
-            try {
-              String helpinger =
-                  methodHead.getModifierV().getText().length() == 0
-                      ? methodHead.getType().getText()
-                      : methodHead.getModifierV().getText() + " " + methodHead.getType().getText();
-              Icon icon =
-                  PsiElementFactory.SERVICE
-                      .getInstance(element.getProject())
-                      .createMethodFromText(helpinger + " method()", null)
-                      .getIcon(flags);
-              return icon;
-            } catch (Exception e) {
-              return null;
-            }
-          }
+              @Nullable
+              @Override
+              public Icon getIcon(boolean unused) {
+                int flags = Iconable.ICON_FLAG_READ_STATUS | Iconable.ICON_FLAG_VISIBILITY;
+                try {
+                  String helpinger =
+                          Objects.requireNonNull(methodHead.getModifierV()).getText().length() == 0
+                                  ? methodHead.getType().getText()
+                                  : methodHead.getModifierV().getText() + " " + methodHead.getType().getText();
+                  return PsiElementFactory.SERVICE
+                                  .getInstance(element.getProject())
+                                  .createMethodFromText(helpinger + " method()", null)
+                                  .getIcon(flags);
+                } catch (Exception e) {
+                  // just a warning because a not found methodicon dont mess up the structview
+                  LOGGER.log(Level.WARNING,e.toString(),e);
+                  return null;
+                }
+              }
 
-          @Nullable
-          @Override
-          public TextAttributesKey getTextAttributesKey() {
-            return null;
-          }
-        };
-    return coloredItemPresentation;
+              @Nullable
+              @Override
+              public TextAttributesKey getTextAttributesKey() {
+                return null;
+              }
+            };
   }
 
   public static void navigate(JavaByteCodeMethodDeclaration element, boolean requestFocus) {
@@ -261,8 +262,7 @@ public class JavaByteCodePsiImplUtil {
   }
 
   public static ItemPresentation getPresentation(JavaByteCodeLocVarTableDeclaration element) {
-    ColoredItemPresentation coloredItemPresentation =
-        new ColoredItemPresentation() {
+    return new ColoredItemPresentation() {
           @Nullable
           @Override
           public String getPresentableText() {
@@ -287,7 +287,6 @@ public class JavaByteCodePsiImplUtil {
             return null;
           }
         };
-    return coloredItemPresentation;
   }
 
   public static void navigate(JavaByteCodeLocVarTableDeclaration element, boolean requestFocus) {

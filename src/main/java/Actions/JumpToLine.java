@@ -24,7 +24,10 @@ public class JumpToLine extends AnAction {
   public void actionPerformed(AnActionEvent e) {
     Editor editor = e.getData(CommonDataKeys.EDITOR);
     PsiFile element = e.getData(CommonDataKeys.PSI_FILE);
-    PsiElement elementAt = element.findElementAt(editor.getCaretModel().getOffset());
+    if(editor == null || element == null){
+      return ;
+    }
+    PsiElement elementAt =element.findElementAt(editor.getCaretModel().getOffset());
 
     // the parent is the current instruction line, e.g. 40 223 GOTO(523),
     // where 40 is the PC and 223 is the Line
