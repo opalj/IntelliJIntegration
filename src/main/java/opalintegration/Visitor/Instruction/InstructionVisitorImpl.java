@@ -2,6 +2,11 @@ package opalintegration.Visitor.Instruction;
 
 import opalintegration.Visitor.ElementAcceptor;
 import org.opalj.br.instructions.*;
+import org.opalj.collection.immutable.IntIntPair;
+import org.opalj.collection.immutable.RefArray;
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * Visits specific bytecode instructions which are defined in the list, and for each of them it
@@ -17,6 +22,14 @@ public class InstructionVisitorImpl extends ElementAcceptor<Instruction, String>
   @Override
   public String visit(LoadInt l) {
     return l.mnemonic().toUpperCase() + "(" + l.value() + ")";
+  }
+
+  @Override
+  public String visit(LOOKUPSWITCH s) {
+    IntIntPair[] intIntPairs =new IntIntPair[s.npairs().size()];
+    s.npairs().copyToArray(intIntPairs);
+    //TODO defaultOffset
+    return s.mnemonic().toUpperCase()+"(default:"+s.defaultOffset()+"["+ Arrays.stream(intIntPairs).map(p->"(case:"+p._1()+","+p._2()+")").collect(Collectors.joining(""))+"])";
   }
 
   @Override

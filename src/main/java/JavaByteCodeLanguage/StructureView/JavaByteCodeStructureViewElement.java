@@ -57,7 +57,7 @@ public class JavaByteCodeStructureViewElement
       }
       List<TreeElement> treeElements = new ArrayList<>(jbcElements.length);
       for (PsiElement jbcElement : jbcElements) {
-        if (jbcElement instanceof JavaByteCodeFieldsDeclaration) {
+        if (jbcElement instanceof JavaByteCodeFieldArea) {
           treeElements.addAll(iterateThroughMethods(jbcElement));
           continue;
         }
@@ -98,7 +98,6 @@ public class JavaByteCodeStructureViewElement
       }
       if (method instanceof JavaByteCodeFieldsDeclaration) {
         treeElements.add(new JavaByteCodeStructureViewElement((JavaByteCodeFieldsDeclarationImpl)method));
-        continue;
       }
     }
 

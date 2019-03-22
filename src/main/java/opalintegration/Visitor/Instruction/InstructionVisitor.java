@@ -52,4 +52,6 @@ public interface InstructionVisitor {
   String visit(LoadMethodType_W l);
 
   String visit(SimpleBranchInstruction sbi);
+
+  String visit(LOOKUPSWITCH s);
 }
