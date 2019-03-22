@@ -1,7 +1,12 @@
 package opalintegration;
 
+import java.util.AbstractMap;
 import java.util.Arrays;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.jetbrains.annotations.NotNull;
 import org.opalj.bi.AccessFlags;
 import org.opalj.br.*;
@@ -24,11 +29,15 @@ abstract class DecompiledTextProducer {
 
     decompiledText += annotationsToJava(classFile.annotations(), "", "\n");
     decompiledText += classHeader(classFile);
-    // TODO: hooks for JbcProducer for class attributes
+    decompiledText += attributes(classFile);
     decompiledText += fields(classFile);
     decompiledText += methods(classFile); // contains the template method
 
     return decompiledText;
+  }
+
+  String attributes(ClassFile classFile) {
+    return "";
   }
 
   /**
@@ -71,7 +80,7 @@ abstract class DecompiledTextProducer {
         MethodTypeSignature methodTypeSignatureOption = method.methodTypeSignature().get();
         List<ThrowsSignature> throwsSignatureList = methodTypeSignatureOption.throwsSignature();
       }
-      methodText.append(annotationsToJava(method.annotations(), "\n/*", "*/\n"));
+      methodText.append(annotationsToJava(method.annotations(), "\n", "\n"));
       methodText
           .append(method.toString().replaceFirst("\\).*", ")"))
           .append(thrownExceptions(method.exceptionTable()))
@@ -134,30 +143,13 @@ abstract class DecompiledTextProducer {
         .append(classFile.jdkVersion())
         .append(") -- Size: \n\n");
 
-    // TODO: bootstrap and innerclass as hooks (only needed for JBC)
-    //        if(classFile.bootstrapMethodTable().isDefined()) {
-    //            System.out.println("bootstrap");
-    //            System.out.println(classFile.bootstrapMethodTable().get().toString());
-    //        }
-
-    //    InnerClass[] innerClassesCopy = new InnerClass[1024];
-    //    classFile.innerClasses().get().copyToArray(innerClassesCopy);
-    //    if(innerClassesCopy[0] != null) {
-    //      byteCodeString.append(Arrays.stream(innerClassesCopy)
-    //              .map(innerClass -> innerClass.outerClassType().get().toJava()
-    //                      + " { " +
-    // AccessFlags.classFlagsToJava(innerClass.innerClassAccessFlags())
-    //                      + " " + innerClass.innerClassType().toJava() + " }")
-    //              .collect(Collectors.joining("\n")));
-    //    }
-
     return classHeader.toString();
   }
 
   // TODO: doesn't quite work yet (grammar, etc.)
   /** Converts a given list of annotations into a Java-like representation. */
   @NotNull
-  String annotationsToJava(@NotNull RefArray<Annotation> annotations, String before, String after) {
+  private String annotationsToJava(@NotNull RefArray<Annotation> annotations, String before, String after) {
     if (!annotations.isEmpty()) {
       Annotation[] annotationsCopy = new Annotation[annotations.size()];
       annotations.copyToArray(annotationsCopy);
@@ -194,7 +186,7 @@ abstract class DecompiledTextProducer {
    * @return a string which contains a throws clause
    */
   @NotNull
-  String thrownExceptions(@NotNull Option<ExceptionTable> exceptionTable) {
+  private String thrownExceptions(@NotNull Option<ExceptionTable> exceptionTable) {
     if (!exceptionTable.isDefined()) {
       return "";
     }
