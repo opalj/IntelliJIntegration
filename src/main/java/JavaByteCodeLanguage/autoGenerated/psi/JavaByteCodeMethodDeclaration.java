@@ -22,6 +22,9 @@ public interface JavaByteCodeMethodDeclaration extends JavaByteCodeNamedElement 
   List<JavaByteCodeLocVarTableDeclaration> getLocVarTableDeclarationList();
 
   @NotNull
+  List<JavaByteCodeLocVarTypeTableDeclaration> getLocVarTypeTableDeclarationList();
+
+  @NotNull
   JavaByteCodeMethodHead getMethodHead();
 
   @NotNull

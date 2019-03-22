@@ -57,7 +57,7 @@ LBRACKET=\(|\{|\[|[«]
 RBRACKET=\)|\}|\]|[»]
 JAVATYPEHEAD=class|enum|interface
 INSTRUCTIONHEAD=PC[ \t\n\x0B\f\r]+Line[ \t\n\x0B\f\r]+Instruction
-TABLENAME=LocalVariableTable|StackMapTable|ExceptionTable
+TABLENAME=LocalVariableTable|StackMapTable|ExceptionTable|LocalVariableTypeTable
 PRIMITIVETYPE=void|boolean|byte|char|short|int|long|float|double
 MODIFIER=public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient
 STRINGVAR=<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?
@@ -71,11 +71,14 @@ EOL=\n
   "."                    { return DOT; }
   ":"                    { return COLON; }
   ";"                    { return SEMICOLON; }
+  "/"                    { return SLASH; }
   "@"                    { return AT; }
+  "="                    { return EQ; }
   "⤼"                    { return SWITCH; }
   "extends"              { return EXTENDS; }
   "implements"           { return IMPLEMENTS; }
   "throws"               { return THROWS; }
+  "Attributes"           { return ATTRIBUTES; }
   "Fields"               { return FIELDS; }
   "Methods"              { return METHODS; }
   "lvIndex="             { return FUCKINGTOKEN; }

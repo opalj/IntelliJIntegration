@@ -95,12 +95,14 @@ class JbcProducer extends DecompiledTextProducer {
           }
         }
       } // for(instructions)
-      methodBody.append(execptionTable(method.body()));
-      methodBody.append(attributesToJava(method.attributes(), "\n///*", "*/\n"));
+
       methodBody.append(methodTypeSignature(method)); // TODO
+//      methodBody.append(attributesToJava(method.attributes(), "\n///*", "*/\n"));
+      methodBody.append(execptionTable(method.body()));
       methodBody.append(localVariableTable(body));
-      methodBody.append(stackMapTable(body));
       methodBody.append(localVariableTypeTable(body));
+      methodBody.append(stackMapTable(body));
+
     } // if(body.defined)
     methodBody.append("}").append("\n\n\n");
 
@@ -155,19 +157,19 @@ class JbcProducer extends DecompiledTextProducer {
 
 
     classFile.innerClasses().get().foreach(innerClass -> {
-      System.out.println("INNER");
-      System.out.println(innerClass.outerClassType().get().toJava());
-      System.out.println(AccessFlags.classFlagsToJava(innerClass.innerClassAccessFlags()));
-      System.out.println(innerClass.innerClassType().toJava());
-      System.out.println(innerClass.innerName().get());
-      String innerClassEntry = String.format(
-              Locale.ENGLISH,
-              "\t\t%s { %s %s }\n",
-              innerClass.outerClassType().get().toJava(),
-              AccessFlags.classFlagsToJava(innerClass.innerClassAccessFlags()),
-              innerClass.innerName().get()
-      );
-      innerClassTable.append(innerClassEntry);
+      try {
+        String innerClassEntry = String.format(
+                Locale.ENGLISH,
+                "\t\t%s { %s %s }\n",
+                innerClass.outerClassType().get().toJava(),
+                AccessFlags.classFlagsToJava(innerClass.innerClassAccessFlags()),
+                innerClass.innerName().get()
+        );
+        innerClassTable.append(innerClassEntry);
+      } catch (NoSuchElementException e) {
+        LOGGER.log(Level.SEVERE, e.toString(), e);
+      }
+
       return "";
     });
 
@@ -290,7 +292,8 @@ class JbcProducer extends DecompiledTextProducer {
                     localVariableType.startPC() + localVariableType.length(),
                     localVariableType.index(),
                     localVariableType.name(),
-                    localVariableType.signature().toJVMSignature());
+                    localVariableType.signature().toJVMSignature().replaceAll(";>", ">"));
+              System.out.println("LLLL: " + localVariableType.signature());
             localVariableTypeTable.append(localVariableTypeEntry);
           }
           return v1.toString();
@@ -358,7 +361,7 @@ class JbcProducer extends DecompiledTextProducer {
     System.out.println(methodTypeSignature.returnTypeSignature().toJVMSignature());
     System.out.println("========");
 
-    methodTypeSig.append("\t//").append(methodTypeSignature.toJVMSignature());
+    methodTypeSig.append("\t//").append(methodTypeSignature.toJVMSignature()).append("\n");
    return methodTypeSig.toString();
   }
   /**
@@ -376,7 +379,7 @@ class JbcProducer extends DecompiledTextProducer {
     exceptionHandlerBuilder.append("\n\n\t ExceptionTable {\n");
     ExceptionHandler[] exceptionHandlers = new ExceptionHandler[body.get().exceptionHandlers().size()];
     body.get().exceptionHandlers().copyToArray(exceptionHandlers);
-    exceptionHandlerBuilder.append(Arrays.stream(exceptionHandlers).map(e-> "try ["+e.startPC()+" , "+e.endPC()+" catch "+e.handlerPC()+" "+(e.catchType().isDefined()?e.catchType().get().toJava():"ANY")).collect(Collectors.joining("\n")));
+    exceptionHandlerBuilder.append(Arrays.stream(exceptionHandlers).map(e-> "\t\ttry ["+e.startPC()+" , "+e.endPC()+") catch "+e.handlerPC()+" "+(e.catchType().isDefined()?e.catchType().get().toJava():"ANY")).collect(Collectors.joining("\n")));
     exceptionHandlerBuilder.append("\n\t}\n");
     return exceptionHandlerBuilder.toString();
   }

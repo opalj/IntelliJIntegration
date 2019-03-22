@@ -44,8 +44,10 @@
   DOT="."
   COLON=":"
   SEMICOLON=";"
+  SLASH="/"
   AT="@"
   TO="regexp:>|=>|->"
+  EQ="="
   SWITCH="⤼"
   LBRACKET="regexp:\(|\{|\[|[«]"
   RBRACKET="regexp:\)|\}|\]|[»]"
@@ -55,11 +57,12 @@
   EXTENDS='extends'
   IMPLEMENTS='implements'
   THROWS='throws'
+  ATTRIBUTES='Attributes'
   FIELDS='Fields'
   METHODS='Methods'
   INSTRUCTIONHEAD="regexp:PC\s+Line\s+Instruction"
   FUCKINGTOKEN = "lvIndex=" // TODO better rename =D
-  TABLENAME='regexp:LocalVariableTable|StackMapTable|ExceptionTable'
+  TABLENAME='regexp:LocalVariableTable|StackMapTable|ExceptionTable|LocalVariableTypeTable'
   // TYPES
   PRIMITIVETYPE="regexp:void|boolean|byte|char|short|int|long|float|double"
   MODIFIER="regexp:public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient"
@@ -71,7 +74,7 @@
 }
 jbcFile ::=  item_
 
-private item_ ::= Annotation* ClassHead FieldsDeclaration? MethodArea?
+private item_ ::= Annotation* ClassHead AttributesArea? FieldsDeclaration? MethodArea?
 
 ClassHead ::= ModifierV? (AT?) JAVATYPEHEAD JType (EXTENDS JType)? (IMPLEMENTS (JType(COMMA)?)+)?
 
@@ -93,6 +96,14 @@ JType ::= (STRINGVAR DOT)*STRINGVAR
 LambdaType ::= (STRINGVAR DOT)*STRINGVAR lambdaParams STRINGVAR COLON* NUMBER STRINGVAR
 lambdaParams ::= (LBRACKET( ("]")* STRINGVAR COLON*)*RBRACKET)
 
+// attributes
+
+AttributesArea ::= ATTRIBUTES LBRACKET InnerTable? RBRACKET
+
+InnerTable ::= STRINGVAR LBRACKET
+                    (Type LBRACKET ModifierV JAVATYPEHEAD? STRINGVAR RBRACKET)*
+               RBRACKET
+
 // fields
 
 FieldsDeclaration ::= FIELDS LBRACKET (ModifierV? Type DefMethodName)* RBRACKET
@@ -107,6 +118,7 @@ MethodDeclaration ::= Annotation* MethodHead LBRACKET
          InstructionBody*
          ExceptionTableDeclaration?
          LocVarTableDeclaration?
+         LocVarTypeTableDeclaration?
          StackMapTableDeclaration?)*
         RBRACKET
 {
@@ -124,7 +136,7 @@ DefMethodName ::= STRINGVAR
  implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
  methods=[getStringVar getName setName getNameIdentifier getReferences]
 }
-params ::= (LBRACKET(Type COMMA?)*RBRACKET)?
+params ::= (LBRACKET(Annotation? Type COMMA?)*RBRACKET)?
 private exceptionList ::= THROWS (JType COMMA?)*
 
 // instructions (part of method body)
@@ -150,7 +162,8 @@ JavaOP ::= "lvIndex=" NUMBER|((Type|STRINGVAR)(LBRACKET Type MethodName RBRACKET
 // tables
 
 ExceptionTableDeclaration ::= TABLENAME LBRACKET ExceptionTableBody* RBRACKET
-private ExceptionTableBody ::= NUMBER Type
+private ExceptionTableBody ::= "try" LBRACKET NUMBER COMMA NUMBER RBRACKET "catch" NUMBER (Type|STRINGVAR)
+
 
 LocVarTableDeclaration ::= TABLENAME LBRACKET LocVarTableBody* RBRACKET
 {
@@ -158,9 +171,13 @@ LocVarTableDeclaration ::= TABLENAME LBRACKET LocVarTableBody* RBRACKET
  implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
  methods=[getName setName getNameIdentifier getPresentation navigate]
 }
+private LocVarTableBody ::= "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET SLASH "lv" EQ NUMBER TO Type (this | STRINGVAR) // NOT RIGHT
 
-private LocVarTableBody ::= LBRACKET NUMBER TO NUMBER RBRACKET TO Type (this | STRINGVAR) // NOT RIGHT
 
 StackMapTableDeclaration ::= TABLENAME LBRACKET StackMapTableBody* RBRACKET
-private StackMapTableBody ::= NUMBER Type NUMBER NUMBER
+private StackMapTableBody ::= NUMBER Type NUMBER NUMBER [("Locals:"? (Type COMMA?)*)? SEMICOLON? ("Stack:"? (Type COMMA?)*)?]
 
+
+LocVarTypeTableDeclaration ::= TABLENAME LBRACKET LocVarTypeTableBody* RBRACKET
+LocVarTypeTableBody ::= "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET SLASH "lv" EQ NUMBER TO STRINGVAR COLON
+        ((STRINGVAR SLASH?)* SEMICOLON)*
