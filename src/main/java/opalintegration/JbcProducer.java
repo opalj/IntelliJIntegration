@@ -1,9 +1,14 @@
 package opalintegration;
 
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
 import opalintegration.Visitor.Instruction.InstructionVisitorImpl;
+import opalintegration.Visitor.Instruction.StackMapVisitorImpl;
+import opalintegration.Visitor.StackMapVisitor;
 import org.jetbrains.annotations.NotNull;
 import org.opalj.bi.AccessFlags;
 import org.opalj.bi.AccessFlagsContexts;
@@ -11,6 +16,7 @@ import org.opalj.br.*;
 import org.opalj.br.instructions.Instruction;
 import org.opalj.collection.IntIterator;
 import org.opalj.collection.immutable.RefArray;
+import scala.Option;
 
 /** Is responsible for creating and providing the bytecode representation of a class file */
 class JbcProducer extends DecompiledTextProducer {
@@ -73,7 +79,7 @@ class JbcProducer extends DecompiledTextProducer {
           }
         }
       } // for(instructions)
-
+      methodBody.append(execptionTable(method.body()));
       methodBody.append(attributesToJava(method.attributes(), "\n///*", "*/\n"));
       methodBody.append(localVariableTable(body));
       methodBody.append(stackMapTable(body));
@@ -93,7 +99,6 @@ class JbcProducer extends DecompiledTextProducer {
   private String byteCodeFieldToString(@NotNull ClassFile classFile) {
     StringBuilder byteCodeString = new StringBuilder();
     RefArray<Field> fields = classFile.fields();
-
     // don't show fields if there are none
     if (fields.length() == 0) {
       return "";
@@ -166,49 +171,37 @@ class JbcProducer extends DecompiledTextProducer {
 
     StackMapTable stackMapTable = body.stackMapTable().get();
     RefArray<StackMapFrame> stackMapFrameRefArray = stackMapTable.stackMapFrames();
+    StackMapVisitorImpl stackMapVisitor = new StackMapVisitorImpl();
     stackMapTableString
         .append("\n\n\tStackMapTable {")
         .append("\n")
         .append("\t\t//PC\tKind\tFrame Type\tOffset Delta\n");
     IntIterator pcIterator = stackMapTable.pcs().iterator();
     for (int i = 0; i < stackMapFrameRefArray.length(); i++) {
-      StackMapFrame stackMapFrame = stackMapFrameRefArray.apply(i);
-      Class<? extends StackMapFrame> frameClass = stackMapFrame.getClass();
       int pc = pcIterator.next();
-      stackMapTableString
-          .append("\t\t")
-          .append(pc)
-          .append(" ")
-          .append(frameClass.getSimpleName())
-          .append(" ")
-          .append(stackMapFrame.frameType())
-          .append(" ")
-          .append(stackMapFrame.offset(0) - 1)
-          .append("\n");
+      stackMapTableString.append(stackMapVisitor.accept(stackMapFrameRefArray.apply(i),pc));
     }
     stackMapTableString.append("\t}\n");
 
     return stackMapTableString.toString();
   }
-
-  //  private static String localVariableTypeTable(Code body) {
-  //    StringBuilder localVariableTypeTable = new StringBuilder();
-  //
-  //    Function1 function1 = new Function1<RefArray<LocalVariableTypeTable>, String>() {
-  //      @Override
-  //      public String apply(RefArray<LocalVariableTypeTable> v1) {
-  //        LocalVariableTypeTable[] temp = new LocalVariableTypeTable[v1.size()];
-  //        v1.copyToArray(temp);
-  //        String result =
-  //
-  // Arrays.stream(temp).map(LocalVariableTypeTable::toString).collect(Collectors.joining("\n"));
-  //        localVariableTypeTable.append(result);
-  //        return result;
-  //      }
-  //    };
-  //
-  //    body.localVariableTypeTable().foreach(function1);
-  //
-  //    return localVariableTypeTable.toString();
-  //  }
+  /**
+   * E.g. if the exception table contains two exceptions, say IOException and RuntimeException, then
+   * the output will be: generate in a Table TODO
+   *
+   * @param body The table which contains the exceptions that the method throws
+   * @return a string which contains a throws clause
+   */
+  private String execptionTable(Option<Code> body) {
+    if (!body.isDefined() || body.get().exceptionHandlers().isEmpty()) {
+      return "";
+    }
+    StringBuilder exceptionHandlerBuilder = new StringBuilder();
+    exceptionHandlerBuilder.append("\n\n\t ExceptionTable {\n");
+    ExceptionHandler[] exceptionHandlers = new ExceptionHandler[body.get().exceptionHandlers().size()];
+    body.get().exceptionHandlers().copyToArray(exceptionHandlers);
+    exceptionHandlerBuilder.append(Arrays.stream(exceptionHandlers).map(e-> "try ["+e.startPC()+" , "+e.endPC()+" catch "+e.handlerPC()+" "+(e.catchType().isDefined()?e.catchType().get().toJava():"ANY")).collect(Collectors.joining("\n")));
+    exceptionHandlerBuilder.append("\n\t}\n");
+    return exceptionHandlerBuilder.toString();
+  }
 }

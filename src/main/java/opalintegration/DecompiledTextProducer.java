@@ -4,10 +4,12 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.opalj.bi.AccessFlags;
+import org.opalj.bi.AccessFlagsContexts;
 import org.opalj.br.*;
 import org.opalj.collection.RefIterator;
 import org.opalj.collection.immutable.RefArray;
 import scala.Option;
+import scala.collection.Iterator;
 import scala.collection.immutable.List;
 
 /**
@@ -73,7 +75,7 @@ abstract class DecompiledTextProducer {
       }
       methodText.append(annotationsToJava(method.annotations(), "\n/*", "*/\n"));
       methodText
-          .append(method.toString().replaceFirst("\\).*", ")"))
+          .append(methodDescriptor(method))
           .append(thrownExceptions(method.exceptionTable()))
           .append(" { ");
 
@@ -134,26 +136,34 @@ abstract class DecompiledTextProducer {
         .append(classFile.jdkVersion())
         .append(") -- Size: \n\n");
 
-    // TODO: bootstrap and innerclass as hooks (only needed for JBC)
-    //        if(classFile.bootstrapMethodTable().isDefined()) {
-    //            System.out.println("bootstrap");
-    //            System.out.println(classFile.bootstrapMethodTable().get().toString());
-    //        }
-
-    //    InnerClass[] innerClassesCopy = new InnerClass[1024];
-    //    classFile.innerClasses().get().copyToArray(innerClassesCopy);
-    //    if(innerClassesCopy[0] != null) {
-    //      byteCodeString.append(Arrays.stream(innerClassesCopy)
-    //              .map(innerClass -> innerClass.outerClassType().get().toJava()
-    //                      + " { " +
-    // AccessFlags.classFlagsToJava(innerClass.innerClassAccessFlags())
-    //                      + " " + innerClass.innerClassType().toJava() + " }")
-    //              .collect(Collectors.joining("\n")));
-    //    }
-
     return classHeader.toString();
   }
-
+String methodDescriptor(Method method){
+  MethodDescriptor descriptor = method.descriptor();
+  StringBuilder methodDescriptorBuilder = new StringBuilder();
+  String flag = AccessFlags.toString(method.accessFlags(), AccessFlagsContexts.METHOD())+" ";
+  if(flag.length() > 0)
+  methodDescriptorBuilder.append(flag);
+  methodDescriptorBuilder.append(descriptor.returnType().toJava()).append(" ")
+          .append(method.name()).append("(");
+  FieldType[] parameters = new FieldType[descriptor.parametersCount()];
+  descriptor.parameterTypes().copyToArray(parameters);
+  RefArray<RefArray<Annotation>> invisibleParameterAnnotations = method.runtimeInvisibleParameterAnnotations();
+  RefArray<RefArray<Annotation>> visibleParameterAnnotations = method.runtimeVisibleParameterAnnotations();
+  for (int i = 0; i < parameters.length; i++) {
+    if(i < invisibleParameterAnnotations.size() && invisibleParameterAnnotations.apply(i).size() > 0)
+      methodDescriptorBuilder.append(annotationsToJava(invisibleParameterAnnotations.apply(i),""," "));
+    if(i < visibleParameterAnnotations.size() && visibleParameterAnnotations.apply(i).size() > 0)
+      methodDescriptorBuilder.append(annotationsToJava(visibleParameterAnnotations.apply(i),""," "));
+    methodDescriptorBuilder.append(parameters[i].toJava()).append(",");
+  }
+  //delete last comma
+  if(methodDescriptorBuilder.charAt(methodDescriptorBuilder.length()-1) == ',')
+  methodDescriptorBuilder.deleteCharAt(methodDescriptorBuilder.length()-1);
+  //methodDescriptorBuilder.append(Arrays.stream(parameters).map(p-> p.toJava()).collect(Collectors.joining(",")));
+  methodDescriptorBuilder.append(")");
+  return methodDescriptorBuilder.toString();
+}
   // TODO: doesn't quite work yet (grammar, etc.)
   /** Converts a given list of annotations into a Java-like representation. */
   @NotNull
@@ -161,7 +171,6 @@ abstract class DecompiledTextProducer {
     if (!annotations.isEmpty()) {
       Annotation[] annotationsCopy = new Annotation[annotations.size()];
       annotations.copyToArray(annotationsCopy);
-
       String javaStyle =
           Arrays.stream(annotationsCopy).map(Annotation::toJava).collect(Collectors.joining("\n"));
       return before + javaStyle + after;
@@ -187,7 +196,7 @@ abstract class DecompiledTextProducer {
   }
 
   /**
-   * E.g. if the exception table contains two exceptions, say IOException and RuntimeException, then
+   * E.g. if the method throws two exceptions, say IOException and RuntimeException, then
    * the output will be: throws java.io.IOException, java.lang.RuntimeException
    *
    * @param exceptionTable The table which contains the exceptions that the method throws
@@ -198,12 +207,14 @@ abstract class DecompiledTextProducer {
     if (!exceptionTable.isDefined()) {
       return "";
     }
-    StringBuilder exceptionTableString = new StringBuilder();
-    exceptionTableString.append(" throws ");
+    StringBuilder throwStringBuilder = new StringBuilder();
+    throwStringBuilder.append(" throws ");
     ObjectType[] exceptions = new ObjectType[exceptionTable.get().exceptions().size()];
     exceptionTable.get().exceptions().copyToArray(exceptions);
-    exceptionTableString.append(
-        Arrays.stream(exceptions).map(ObjectType::toJava).collect(Collectors.joining(", ")));
-    return exceptionTableString.toString();
+    throwStringBuilder.append(
+            Arrays.stream(exceptions).map(ObjectType::toJava).collect(Collectors.joining(", ")));
+    return throwStringBuilder.toString();
   }
+
 }
+
