@@ -38,6 +38,9 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     else if (t == EXCEPTION_TABLE_DECLARATION) {
       r = ExceptionTableDeclaration(b, 0);
     }
+    else if (t == FIELD_AREA) {
+      r = FieldArea(b, 0);
+    }
     else if (t == FIELDS_DECLARATION) {
       r = FieldsDeclaration(b, 0);
     }
@@ -306,45 +309,46 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // FIELDS LBRACKET (ModifierV? Type DefMethodName)* RBRACKET
-  public static boolean FieldsDeclaration(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "FieldsDeclaration")) return false;
+  // FIELDS LBRACKET FieldsDeclaration* RBRACKET
+  public static boolean FieldArea(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "FieldArea")) return false;
     if (!nextTokenIs(b, FIELDS)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeTokens(b, 0, FIELDS, LBRACKET);
-    r = r && FieldsDeclaration_2(b, l + 1);
+    r = r && FieldArea_2(b, l + 1);
     r = r && consumeToken(b, RBRACKET);
-    exit_section_(b, m, FIELDS_DECLARATION, r);
+    exit_section_(b, m, FIELD_AREA, r);
     return r;
   }
 
-  // (ModifierV? Type DefMethodName)*
-  private static boolean FieldsDeclaration_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "FieldsDeclaration_2")) return false;
+  // FieldsDeclaration*
+  private static boolean FieldArea_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "FieldArea_2")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!FieldsDeclaration_2_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "FieldsDeclaration_2", c)) break;
+      if (!FieldsDeclaration(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "FieldArea_2", c)) break;
     }
     return true;
   }
 
+  /* ********************************************************** */
   // ModifierV? Type DefMethodName
-  private static boolean FieldsDeclaration_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "FieldsDeclaration_2_0")) return false;
+  public static boolean FieldsDeclaration(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "FieldsDeclaration")) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = FieldsDeclaration_2_0_0(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, FIELDS_DECLARATION, "<fields declaration>");
+    r = FieldsDeclaration_0(b, l + 1);
     r = r && Type(b, l + 1);
     r = r && DefMethodName(b, l + 1);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   // ModifierV?
-  private static boolean FieldsDeclaration_2_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "FieldsDeclaration_2_0_0")) return false;
+  private static boolean FieldsDeclaration_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "FieldsDeclaration_0")) return false;
     ModifierV(b, l + 1);
     return true;
   }
@@ -398,15 +402,15 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // MNEMONIC (JType COLON Type                            // put someFQN : someFQN
-  //                                     | LBRACKET NUMBER RBRACKET
-  //                                     | LBRACKET STRING RBRACKET
-  //                                     | LBRACKET ((JavaOP|NUMBER|STRING)COMMA?)* RBRACKET   // LDC("someString") or ALOAD(5) or ...
-  //                                     | LBRACKET NUMBER TO NUMBER SEMICOLON
-  //                                                (NUMBER SWITCH NUMBER COMMA?)* SEMICOLON?
-  //                                                MODIFIER SWITCH NUMBER
-  //                                       RBRACKET
-  //                                     | JavaOP)?
+  // MNEMONIC (LBRACKET JType COLON Type RBRACKET                       // put someFQN : someFQN
+  //                           | LBRACKET NUMBER RBRACKET
+  //                           | LBRACKET STRING RBRACKET
+  //                           | LBRACKET ((JavaOP|NUMBER|STRING)COMMA?)* RBRACKET   // LDC("someString") or ALOAD(5) or ...
+  //                           | LBRACKET NUMBER TO NUMBER SEMICOLON
+  //                                      (NUMBER SWITCH NUMBER COMMA?)* SEMICOLON?
+  //                                      MODIFIER SWITCH NUMBER
+  //                             RBRACKET
+  //                           | JavaOP)?
   public static boolean Instr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "Instr")) return false;
     if (!nextTokenIs(b, MNEMONIC)) return false;
@@ -418,30 +422,30 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // (JType COLON Type                            // put someFQN : someFQN
-  //                                     | LBRACKET NUMBER RBRACKET
-  //                                     | LBRACKET STRING RBRACKET
-  //                                     | LBRACKET ((JavaOP|NUMBER|STRING)COMMA?)* RBRACKET   // LDC("someString") or ALOAD(5) or ...
-  //                                     | LBRACKET NUMBER TO NUMBER SEMICOLON
-  //                                                (NUMBER SWITCH NUMBER COMMA?)* SEMICOLON?
-  //                                                MODIFIER SWITCH NUMBER
-  //                                       RBRACKET
-  //                                     | JavaOP)?
+  // (LBRACKET JType COLON Type RBRACKET                       // put someFQN : someFQN
+  //                           | LBRACKET NUMBER RBRACKET
+  //                           | LBRACKET STRING RBRACKET
+  //                           | LBRACKET ((JavaOP|NUMBER|STRING)COMMA?)* RBRACKET   // LDC("someString") or ALOAD(5) or ...
+  //                           | LBRACKET NUMBER TO NUMBER SEMICOLON
+  //                                      (NUMBER SWITCH NUMBER COMMA?)* SEMICOLON?
+  //                                      MODIFIER SWITCH NUMBER
+  //                             RBRACKET
+  //                           | JavaOP)?
   private static boolean Instr_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "Instr_1")) return false;
     Instr_1_0(b, l + 1);
     return true;
   }
 
-  // JType COLON Type                            // put someFQN : someFQN
-  //                                     | LBRACKET NUMBER RBRACKET
-  //                                     | LBRACKET STRING RBRACKET
-  //                                     | LBRACKET ((JavaOP|NUMBER|STRING)COMMA?)* RBRACKET   // LDC("someString") or ALOAD(5) or ...
-  //                                     | LBRACKET NUMBER TO NUMBER SEMICOLON
-  //                                                (NUMBER SWITCH NUMBER COMMA?)* SEMICOLON?
-  //                                                MODIFIER SWITCH NUMBER
-  //                                       RBRACKET
-  //                                     | JavaOP
+  // LBRACKET JType COLON Type RBRACKET                       // put someFQN : someFQN
+  //                           | LBRACKET NUMBER RBRACKET
+  //                           | LBRACKET STRING RBRACKET
+  //                           | LBRACKET ((JavaOP|NUMBER|STRING)COMMA?)* RBRACKET   // LDC("someString") or ALOAD(5) or ...
+  //                           | LBRACKET NUMBER TO NUMBER SEMICOLON
+  //                                      (NUMBER SWITCH NUMBER COMMA?)* SEMICOLON?
+  //                                      MODIFIER SWITCH NUMBER
+  //                             RBRACKET
+  //                           | JavaOP
   private static boolean Instr_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "Instr_1_0")) return false;
     boolean r;
@@ -456,14 +460,16 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // JType COLON Type
+  // LBRACKET JType COLON Type RBRACKET
   private static boolean Instr_1_0_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "Instr_1_0_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = JType(b, l + 1);
+    r = consumeToken(b, LBRACKET);
+    r = r && JType(b, l + 1);
     r = r && consumeToken(b, COLON);
     r = r && Type(b, l + 1);
+    r = r && consumeToken(b, RBRACKET);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -520,9 +526,9 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   // LBRACKET NUMBER TO NUMBER SEMICOLON
-  //                                                (NUMBER SWITCH NUMBER COMMA?)* SEMICOLON?
-  //                                                MODIFIER SWITCH NUMBER
-  //                                       RBRACKET
+  //                                      (NUMBER SWITCH NUMBER COMMA?)* SEMICOLON?
+  //                                      MODIFIER SWITCH NUMBER
+  //                             RBRACKET
   private static boolean Instr_1_0_4(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "Instr_1_0_4")) return false;
     boolean r;
@@ -1354,7 +1360,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // Annotation* ClassHead AttributesArea? FieldsDeclaration? MethodArea?
+  // Annotation* ClassHead AttributesArea? FieldArea? MethodArea?
   static boolean item_(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "item_")) return false;
     boolean r;
@@ -1386,10 +1392,10 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // FieldsDeclaration?
+  // FieldArea?
   private static boolean item__3(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "item__3")) return false;
-    FieldsDeclaration(b, l + 1);
+    FieldArea(b, l + 1);
     return true;
   }
 

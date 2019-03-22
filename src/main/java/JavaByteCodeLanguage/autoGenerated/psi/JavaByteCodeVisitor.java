@@ -28,6 +28,10 @@ public class JavaByteCodeVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitFieldArea(@NotNull JavaByteCodeFieldArea o) {
+    visitPsiElement(o);
+  }
+
   public void visitFieldsDeclaration(@NotNull JavaByteCodeFieldsDeclaration o) {
     visitPsiElement(o);
   }

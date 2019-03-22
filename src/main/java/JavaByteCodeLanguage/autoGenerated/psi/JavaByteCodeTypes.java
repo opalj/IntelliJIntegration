@@ -16,6 +16,7 @@ public interface JavaByteCodeTypes {
   IElementType DEF_METHOD_NAME = new JavaByteCodeElementType("DEF_METHOD_NAME");
   IElementType EXCEPTION_TABLE_DECLARATION = new JavaByteCodeElementType("EXCEPTION_TABLE_DECLARATION");
   IElementType FIELDS_DECLARATION = new JavaByteCodeElementType("FIELDS_DECLARATION");
+  IElementType FIELD_AREA = new JavaByteCodeElementType("FIELD_AREA");
   IElementType INNER_TABLE = new JavaByteCodeElementType("INNER_TABLE");
   IElementType INSTR = new JavaByteCodeElementType("INSTR");
   IElementType INSTRUCTION_BODY = new JavaByteCodeElementType("INSTRUCTION_BODY");
@@ -87,6 +88,9 @@ public interface JavaByteCodeTypes {
       }
       else if (type == FIELDS_DECLARATION) {
         return new JavaByteCodeFieldsDeclarationImpl(node);
+      }
+      else if (type == FIELD_AREA) {
+        return new JavaByteCodeFieldAreaImpl(node);
       }
       else if (type == INNER_TABLE) {
         return new JavaByteCodeInnerTableImpl(node);

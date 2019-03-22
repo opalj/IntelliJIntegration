@@ -25,7 +25,7 @@ public class JbcFoldingBuilder extends FoldingBuilderEx {
       Arrays.asList(
           JavaByteCodeAttributesArea.class,
           JavaByteCodeInnerTable.class,
-          JavaByteCodeFieldsDeclaration.class,
+          JavaByteCodeFieldArea.class,
           JavaByteCodeMethodArea.class,
           JavaByteCodeMethodDeclaration.class,
           JavaByteCodeExceptionTableDeclaration.class,

@@ -5,15 +5,15 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface JavaByteCodeFieldsDeclaration extends PsiElement {
+public interface JavaByteCodeFieldArea extends PsiElement {
 
   @NotNull
-  JavaByteCodeDefMethodName getDefMethodName();
-
-  @Nullable
-  JavaByteCodeModifierV getModifierV();
+  List<JavaByteCodeFieldsDeclaration> getFieldsDeclarationList();
 
   @NotNull
-  JavaByteCodeType getType();
+  PsiElement getLbracket();
+
+  @NotNull
+  PsiElement getRbracket();
 
 }
