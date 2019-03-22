@@ -13,7 +13,7 @@ import scala.Function1;
  * Is responsible for creating and providing the three-address-code (TAC) representation of a class
  * file
  */
-public class TacProducer extends DecompiledTextProducer {
+class TacProducer extends DecompiledTextProducer {
 
   private Function1<Method, TACode<TACMethodParameter, DUVar<KnownTypedValue>>>
       methodTACodeFunction;

@@ -46,7 +46,6 @@ public class JavaByteCodeColorSettingPage implements ColorSettingsPage {
   @NotNull
   @Override
   public String getDemoText() {
-    // TODO: provide a better demo text which actually shows bytecode
     return "public class java.io.ObjectStreamField extends java.lang.Object implements java.lang.Comparable \n" +
             "// Source File: ObjectStreamField.java -- Version: (Java 8) -- Size: \n" +
             "\n" +
