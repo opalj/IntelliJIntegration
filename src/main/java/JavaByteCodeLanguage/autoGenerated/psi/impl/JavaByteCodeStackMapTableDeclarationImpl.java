@@ -35,18 +35,6 @@ public class JavaByteCodeStackMapTableDeclarationImpl extends ASTWrapperPsiEleme
 
   @Override
   @NotNull
-  public PsiElement getLbracket() {
-    return findNotNullChildByType(LBRACKET);
-  }
-
-  @Override
-  @NotNull
-  public PsiElement getRbracket() {
-    return findNotNullChildByType(RBRACKET);
-  }
-
-  @Override
-  @NotNull
   public PsiElement getTablename() {
     return findNotNullChildByType(TABLENAME);
   }

@@ -1100,7 +1100,10 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // NUMBER Type NUMBER NUMBER [("Locals:"? (Type COMMA?)*)? SEMICOLON? ("Stack:"? (Type COMMA?)*)?]
+  // NUMBER Type NUMBER NUMBER
+  //     [("Locals:"? (Type COMMA?)*)?
+  //      SEMICOLON?
+  //      ("Stack:"? ((((STRINGVAR LBRACKET NUMBER RBRACKET|Type)) COMMA?)*))?]
   static boolean StackMapTableBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "StackMapTableBody")) return false;
     if (!nextTokenIs(b, NUMBER)) return false;
@@ -1114,14 +1117,18 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // [("Locals:"? (Type COMMA?)*)? SEMICOLON? ("Stack:"? (Type COMMA?)*)?]
+  // [("Locals:"? (Type COMMA?)*)?
+  //      SEMICOLON?
+  //      ("Stack:"? ((((STRINGVAR LBRACKET NUMBER RBRACKET|Type)) COMMA?)*))?]
   private static boolean StackMapTableBody_4(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "StackMapTableBody_4")) return false;
     StackMapTableBody_4_0(b, l + 1);
     return true;
   }
 
-  // ("Locals:"? (Type COMMA?)*)? SEMICOLON? ("Stack:"? (Type COMMA?)*)?
+  // ("Locals:"? (Type COMMA?)*)?
+  //      SEMICOLON?
+  //      ("Stack:"? ((((STRINGVAR LBRACKET NUMBER RBRACKET|Type)) COMMA?)*))?
   private static boolean StackMapTableBody_4_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "StackMapTableBody_4_0")) return false;
     boolean r;
@@ -1194,14 +1201,14 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // ("Stack:"? (Type COMMA?)*)?
+  // ("Stack:"? ((((STRINGVAR LBRACKET NUMBER RBRACKET|Type)) COMMA?)*))?
   private static boolean StackMapTableBody_4_0_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "StackMapTableBody_4_0_2")) return false;
     StackMapTableBody_4_0_2_0(b, l + 1);
     return true;
   }
 
-  // "Stack:"? (Type COMMA?)*
+  // "Stack:"? ((((STRINGVAR LBRACKET NUMBER RBRACKET|Type)) COMMA?)*)
   private static boolean StackMapTableBody_4_0_2_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "StackMapTableBody_4_0_2_0")) return false;
     boolean r;
@@ -1219,7 +1226,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // (Type COMMA?)*
+  // (((STRINGVAR LBRACKET NUMBER RBRACKET|Type)) COMMA?)*
   private static boolean StackMapTableBody_4_0_2_0_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "StackMapTableBody_4_0_2_0_1")) return false;
     while (true) {
@@ -1230,13 +1237,24 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // Type COMMA?
+  // ((STRINGVAR LBRACKET NUMBER RBRACKET|Type)) COMMA?
   private static boolean StackMapTableBody_4_0_2_0_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "StackMapTableBody_4_0_2_0_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = Type(b, l + 1);
+    r = StackMapTableBody_4_0_2_0_1_0_0(b, l + 1);
     r = r && StackMapTableBody_4_0_2_0_1_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // STRINGVAR LBRACKET NUMBER RBRACKET|Type
+  private static boolean StackMapTableBody_4_0_2_0_1_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "StackMapTableBody_4_0_2_0_1_0_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = parseTokens(b, 0, STRINGVAR, LBRACKET, NUMBER, RBRACKET);
+    if (!r) r = Type(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
