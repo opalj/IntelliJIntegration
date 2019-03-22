@@ -1,6 +1,6 @@
 package opalintegration;
 
-import opalintegration.Visitor.Instruction.StackMapVisitorImpl;
+import opalintegration.Visitor.StackMap.StackMapVisitorImpl;
 import org.jetbrains.annotations.NotNull;
 import org.opalj.bi.AccessFlags;
 import org.opalj.br.*;

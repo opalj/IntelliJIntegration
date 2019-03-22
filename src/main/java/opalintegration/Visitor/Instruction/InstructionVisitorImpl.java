@@ -10,7 +10,7 @@ import org.opalj.br.instructions.*;
  * <p>This visitor does not handle all bytecode instructions. Instead, it visits those instructions
  * for which the default "toString()" method does not behave as wanted.
  *
- * <p>TODO: visit(TABLESWITCH)
+ * <p>
  */
 public class InstructionVisitorImpl extends ElementAcceptor<Instruction, String>
     implements InstructionVisitor {
@@ -75,44 +75,45 @@ public class InstructionVisitorImpl extends ElementAcceptor<Instruction, String>
   }
 
   public String visit(ANEWARRAY anewarray) {
-    return anewarray.mnemonic().toUpperCase() + " " + anewarray.componentType().toJava();
+    return anewarray.mnemonic().toUpperCase() + "(" + anewarray.componentType().toJava()+")";
   }
 
   public String visit(GETSTATIC getstatic) {
     return getstatic.mnemonic().toUpperCase()
-        + " "
+        + "("
         + getstatic.declaringClass().toJava()
         + "."
         + getstatic.name()
         + " : "
-        + getstatic.fieldType().toJava();
+        + getstatic.fieldType().toJava()
+            +")";
   }
 
   public String visit(GETFIELD getfield) {
-    return "GET "
+    return "GET("
         + getfield.declaringClass().toJava()
         + "."
         + getfield.name()
         + " : "
-        + getfield.fieldType().toJava();
+        + getfield.fieldType().toJava()+")";
   }
 
   public String visit(PUTFIELD putfield) {
-    return "PUT "
+    return "PUT("
         + putfield.declaringClass().toJava()
         + "."
         + putfield.name()
         + " : "
-        + putfield.fieldType().toJava();
+        + putfield.fieldType().toJava()+")";
   }
 
   public String visit(PUTSTATIC putstatic) {
-    return "PUTSTATIC "
+    return "PUTSTATIC("
         + putstatic.declaringClass().toJava()
         + "."
         + putstatic.name()
         + " : "
-        + putstatic.fieldType().toJava();
+        + putstatic.fieldType().toJava()+")";
   }
 
   @Override
