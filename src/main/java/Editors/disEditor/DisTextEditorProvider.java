@@ -10,6 +10,8 @@ import opalintegration.OpalUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class DisTextEditorProvider extends PsiAwareTextEditorProvider {
   @NonNls private static final String EDITOR_TYPE_ID = "OPAL-DIS";
 
@@ -25,7 +27,7 @@ public class DisTextEditorProvider extends PsiAwareTextEditorProvider {
   @NotNull
   @Override
   public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
-    if (!file.getExtension().equals(GlobalData.DISASSEMBLED_FILE_ENDING_JBC)) {
+    if (!Objects.equals(file.getExtension(), GlobalData.DISASSEMBLED_FILE_ENDING_JBC)) {
       file = OpalUtil.prepare(project, GlobalData.DISASSEMBLED_FILE_ENDING_JBC, file, null);
     }
     return new DisTextEditor(project, file, this);

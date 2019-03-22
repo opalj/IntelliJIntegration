@@ -43,32 +43,34 @@ public class JavaByteCodeStructureViewElement
   public ItemPresentation getPresentation() {
     return element.getPresentation() == null ? new PresentationData() : element.getPresentation();
   }
-
-  @NotNull
+@NotNull
   @Override
   public TreeElement[] getChildren() {
     if (element != null) {
-      PsiElement[] properties = PsiTreeUtil.getChildrenOfType(element, PsiElement.class);
-      List<TreeElement> treeElements = new ArrayList<>(properties.length);
-      for (PsiElement property : properties) {
-        if (property instanceof JavaByteCodeFieldsDeclaration) {
-          // TODO: iterate over fields
+      PsiElement[] jbcElements = PsiTreeUtil.getChildrenOfType(element, PsiElement.class);
+      if(jbcElements == null ){
+        return EMPTY_ARRAY;
+      }
+      List<TreeElement> treeElements = new ArrayList<>(jbcElements.length);
+      for (PsiElement jbcElement : jbcElements) {
+        if (jbcElement instanceof JavaByteCodeFieldsDeclaration) {
+          
           continue;
         }
 
-        if (property instanceof JavaByteCodeMethodArea) {
-          treeElements.addAll(iterateThroughMethods(property));
+        if (jbcElement instanceof JavaByteCodeMethodArea) {
+          treeElements.addAll(iterateThroughMethods(jbcElement));
           continue;
         }
 
         // tables
-        if (property instanceof JavaByteCodeLocVarTableDeclaration) {
+        if (jbcElement instanceof JavaByteCodeLocVarTableDeclaration) {
           treeElements.add(
               new JavaByteCodeStructureViewElement(
-                  (JavaByteCodeLocVarTableDeclarationImpl) property));
+                  (JavaByteCodeLocVarTableDeclarationImpl) jbcElement));
         }
       }
-      return treeElements.toArray(new TreeElement[treeElements.size()]);
+      return treeElements.toArray(new TreeElement[0]);
     } else {
       return EMPTY_ARRAY;
     }

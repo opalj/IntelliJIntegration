@@ -1,7 +1,6 @@
-package opalintegration.Visitor.Instruction;
+package opalintegration.Visitor.StackMap;
 
 import opalintegration.Visitor.ElementAcceptor;
-import opalintegration.Visitor.StackMapVisitor;
 import org.opalj.br.*;
 import org.opalj.collection.immutable.RefArray;
 
@@ -17,8 +16,8 @@ public class StackMapVisitorImpl extends ElementAcceptor<StackMapFrame,String> i
 
     @Override
     public String visit(SameLocals1StackItemFrame frame) {
-        String verfictionTypeInfoString = frame.verificationTypeInfoStackItem().isObjectVariableInfo()? frame.verificationTypeInfoStackItem().asObjectVariableInfo().clazz().toJava():"";
-        return String.format("\t\t%d %s %d %d %s\n",pc[0],frame.getClass().getSimpleName(),frame.frameType(),frame.offset(0)-1, verfictionTypeInfoString);
+        String verificationTypeInfoString = frame.verificationTypeInfoStackItem().isObjectVariableInfo()? frame.verificationTypeInfoStackItem().asObjectVariableInfo().clazz().toJava():"";
+        return String.format("\t\t%d %s %d %d %s\n",pc[0],frame.getClass().getSimpleName(),frame.frameType(),frame.offset(0)-1, verificationTypeInfoString);
     }
 
     @Override
@@ -28,12 +27,13 @@ public class StackMapVisitorImpl extends ElementAcceptor<StackMapFrame,String> i
 
     @Override
     public String visit(SameLocals1StackItemFrameExtended frame) {
-        String verfictionTypeInfoString = frame.verificationTypeInfoStackItem().isObjectVariableInfo()? frame.verificationTypeInfoStackItem().asObjectVariableInfo().clazz().toJava():"";
-        return String.format("\t\t%d %s %d %d %s\n",pc[0],frame.getClass().getSimpleName(),((StackMapFrame)frame).frameType(),frame.offsetDelta(),verfictionTypeInfoString);
+        String verificationTypeInfoString = frame.verificationTypeInfoStackItem().isObjectVariableInfo()? frame.verificationTypeInfoStackItem().asObjectVariableInfo().clazz().toJava():"";
+        return String.format("\t\t%d %s %d %d %s\n",pc[0],frame.getClass().getSimpleName(),frame.frameType(),frame.offsetDelta(),verificationTypeInfoString);
     }
 
     @Override
     public String visit(ChopFrame frame) {
+        //TODO StackFrame cast
         return String.format("\t\t%d %s %d %d \n",pc[0],frame.getClass().getSimpleName(),((StackMapFrame)frame).frameType(),frame.offsetDelta());
     }
 
@@ -44,14 +44,14 @@ public class StackMapVisitorImpl extends ElementAcceptor<StackMapFrame,String> i
 
     @Override
     public String visit(AppendFrame frame) {
-        return String.format("\t\t%d %s %d %d %s\n",pc[0],frame.getClass().getSimpleName(),frame.frameType(),frame.offsetDelta(),verficicationTypeInfoToString(frame.verificationTypeInfoLocals()));
+        return String.format("\t\t%d %s %d %d %s\n",pc[0],frame.getClass().getSimpleName(),frame.frameType(),frame.offsetDelta(),verificationTypeInfoToString(frame.verificationTypeInfoLocals()));
     }
 
     @Override
     public String visit(FullFrame frame) {
-        return String.format("\t\t%d %s %d %d Locals:%s; Stack:%s\n",pc[0],frame.getClass().getSimpleName(),frame.frameType(),frame.offsetDelta(),verficicationTypeInfoToString(frame.verificationTypeInfoLocals()), verficicationTypeInfoToString(frame.verificationTypeInfoStack()));
+        return String.format("\t\t%d %s %d %d Locals:%s; Stack:%s\n",pc[0],frame.getClass().getSimpleName(),frame.frameType(),frame.offsetDelta(),verificationTypeInfoToString(frame.verificationTypeInfoLocals()), verificationTypeInfoToString(frame.verificationTypeInfoStack()));
     }
-    private String verficicationTypeInfoToString(RefArray<VerificationTypeInfo> verificationTypeInfoRefArray){
+    private String verificationTypeInfoToString(RefArray<VerificationTypeInfo> verificationTypeInfoRefArray){
         VerificationTypeInfo[] verificationTypeInfos = new VerificationTypeInfo[verificationTypeInfoRefArray.size()];
         verificationTypeInfoRefArray.copyToArray(verificationTypeInfos);
         return Arrays.stream(verificationTypeInfos).map(s->s.isObjectVariableInfo()? s.asObjectVariableInfo().clazz().toJava():s.toString().replaceFirst("VariableInfo","")).collect(Collectors.joining(" , "));

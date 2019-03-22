@@ -2,7 +2,6 @@ package opalintegration.Visitor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -32,12 +31,6 @@ public abstract class ElementAcceptor<E, R> implements DefaultVistor<E, R> {
       }
     }
   }
-
-  public ElementAcceptor(Collection<Class<? extends E>> c) {
-    Elements = new HashSet<>();
-    Elements.addAll(c);
-  }
-
   /**
    * Visits each element type in the set, and if e's type 'E' is contained within it, a value of
    * type 'R' is computed
@@ -50,11 +43,11 @@ public abstract class ElementAcceptor<E, R> implements DefaultVistor<E, R> {
     for (Class<? extends E> in : Elements)
       if (in.isInstance(e)) {
         try {
-          Method visit = this.getClass().getMethod("visit", new Class[] {in});
+          Method visit = this.getClass().getMethod("visit", in);
           in.cast(e);
-          Object invoke = visit.invoke(this, new Object[] {e});
+          Object invoke = visit.invoke(this, e);
           return (R) invoke;
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e1) {
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassCastException e1) {
           LOGGER.log(Level.SEVERE, e1.toString(), e1);
         }
       }

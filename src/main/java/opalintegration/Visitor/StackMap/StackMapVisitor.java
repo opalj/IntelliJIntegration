@@ -1,4 +1,4 @@
-package opalintegration.Visitor;
+package opalintegration.Visitor.StackMap;
 
 import org.opalj.br.*;
 
