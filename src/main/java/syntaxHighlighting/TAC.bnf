@@ -70,7 +70,14 @@ private item_ ::= (JMethodHead|Type|COMMENT|CRLF|WHITE_SPACE|STRING|NUMBER|KEYWO
 
 Type ::= (JType | STRINGVAR | NUMBER)('[]')*
 
-JMethodHead ::= MODIFIER* BLOCK_COMMENT* (VOID | KEYWORDS | STRINGVAR) BLOCK_COMMENT* ((L_LACE_BRACE STRINGVAR R_LACE_BRACE) | Type) BLOCK_COMMENT* L_BRACKET (STRINGVAR | BLOCK_COMMENT | COMMA | JAVA_TYPE)* R_BRACKET BLOCK_COMMENT* (L_DOUBLE_LACE_BRACE (STRINGVAR | COMMA | BLOCK_COMMENT | JAVA_TYPE)* R_DOUBLE_LACE_BRACE)? BLOCK_COMMENT* COMMENT?
+JMethodHead ::= JModifier BLOCK_COMMENT* JReturnValue BLOCK_COMMENT* JMethodName BLOCK_COMMENT* L_BRACKET (STRINGVAR | BLOCK_COMMENT | COMMA | JAVA_TYPE)* R_BRACKET BLOCK_COMMENT* (L_DOUBLE_LACE_BRACE (STRINGVAR | COMMA | BLOCK_COMMENT | JAVA_TYPE)* R_DOUBLE_LACE_BRACE)? BLOCK_COMMENT* COMMENT?{mixin="syntaxHighlighting.psi.impl.TAC_namedElementImpl"
+                                                                                                                                                                                                                                                                                                                                                            implements="syntaxHighlighting.TAC_namedElement"
+                                                                                                                                                                                                                                                                                                                                   methods=[getName setName getPresentation navigate getNameIdentifier ]}
+JReturnValue ::= (VOID | JType | KEYWORDS | STRINGVAR)
+
+JMethodName ::= ((L_LACE_BRACE STRINGVAR R_LACE_BRACE) | Type)
+
+JModifier ::= MODIFIER*
 
 JType ::= JAVA_TYPE  {mixin="syntaxHighlighting.psi.impl.TAC_namedElementImpl"
                                                           implements="syntaxHighlighting.TAC_namedElement"

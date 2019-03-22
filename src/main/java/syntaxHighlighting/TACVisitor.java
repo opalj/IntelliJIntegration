@@ -8,6 +8,18 @@ import com.intellij.psi.PsiElement;
 public class TACVisitor extends PsiElementVisitor {
 
   public void visitJMethodHead(@NotNull TACJMethodHead o) {
+    visit_namedElement(o);
+  }
+
+  public void visitJMethodName(@NotNull TACJMethodName o) {
+    visitPsiElement(o);
+  }
+
+  public void visitJModifier(@NotNull TACJModifier o) {
+    visitPsiElement(o);
+  }
+
+  public void visitJReturnValue(@NotNull TACJReturnValue o) {
     visitPsiElement(o);
   }
 

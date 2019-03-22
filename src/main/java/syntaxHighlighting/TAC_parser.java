@@ -26,6 +26,15 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     if (t == J_METHOD_HEAD) {
       r = JMethodHead(b, 0);
     }
+    else if (t == J_METHOD_NAME) {
+      r = JMethodName(b, 0);
+    }
+    else if (t == J_MODIFIER) {
+      r = JModifier(b, 0);
+    }
+    else if (t == J_RETURN_VALUE) {
+      r = JReturnValue(b, 0);
+    }
     else if (t == J_TYPE) {
       r = JType(b, 0);
     }
@@ -43,16 +52,16 @@ public class TAC_parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // MODIFIER* BLOCK_COMMENT* (VOID | KEYWORDS | STRINGVAR) BLOCK_COMMENT* ((L_LACE_BRACE STRINGVAR R_LACE_BRACE) | Type) BLOCK_COMMENT* L_BRACKET (STRINGVAR | BLOCK_COMMENT | COMMA | JAVA_TYPE)* R_BRACKET BLOCK_COMMENT* (L_DOUBLE_LACE_BRACE (STRINGVAR | COMMA | BLOCK_COMMENT | JAVA_TYPE)* R_DOUBLE_LACE_BRACE)? BLOCK_COMMENT* COMMENT?
+  // JModifier BLOCK_COMMENT* JReturnValue BLOCK_COMMENT* JMethodName BLOCK_COMMENT* L_BRACKET (STRINGVAR | BLOCK_COMMENT | COMMA | JAVA_TYPE)* R_BRACKET BLOCK_COMMENT* (L_DOUBLE_LACE_BRACE (STRINGVAR | COMMA | BLOCK_COMMENT | JAVA_TYPE)* R_DOUBLE_LACE_BRACE)? BLOCK_COMMENT* COMMENT?
   public static boolean JMethodHead(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "JMethodHead")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, J_METHOD_HEAD, "<j method head>");
-    r = JMethodHead_0(b, l + 1);
+    r = JModifier(b, l + 1);
     r = r && JMethodHead_1(b, l + 1);
-    r = r && JMethodHead_2(b, l + 1);
+    r = r && JReturnValue(b, l + 1);
     r = r && JMethodHead_3(b, l + 1);
-    r = r && JMethodHead_4(b, l + 1);
+    r = r && JMethodName(b, l + 1);
     r = r && JMethodHead_5(b, l + 1);
     r = r && consumeToken(b, L_BRACKET);
     r = r && JMethodHead_7(b, l + 1);
@@ -63,17 +72,6 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     r = r && JMethodHead_12(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
-  }
-
-  // MODIFIER*
-  private static boolean JMethodHead_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "JMethodHead_0")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!consumeToken(b, MODIFIER)) break;
-      if (!empty_element_parsed_guard_(b, "JMethodHead_0", c)) break;
-    }
-    return true;
   }
 
   // BLOCK_COMMENT*
@@ -87,16 +85,6 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // VOID | KEYWORDS | STRINGVAR
-  private static boolean JMethodHead_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "JMethodHead_2")) return false;
-    boolean r;
-    r = consumeToken(b, VOID);
-    if (!r) r = consumeToken(b, KEYWORDS);
-    if (!r) r = consumeToken(b, STRINGVAR);
-    return r;
-  }
-
   // BLOCK_COMMENT*
   private static boolean JMethodHead_3(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "JMethodHead_3")) return false;
@@ -106,27 +94,6 @@ public class TAC_parser implements PsiParser, LightPsiParser {
       if (!empty_element_parsed_guard_(b, "JMethodHead_3", c)) break;
     }
     return true;
-  }
-
-  // (L_LACE_BRACE STRINGVAR R_LACE_BRACE) | Type
-  private static boolean JMethodHead_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "JMethodHead_4")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = JMethodHead_4_0(b, l + 1);
-    if (!r) r = Type(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // L_LACE_BRACE STRINGVAR R_LACE_BRACE
-  private static boolean JMethodHead_4_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "JMethodHead_4_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, L_LACE_BRACE, STRINGVAR, R_LACE_BRACE);
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   // BLOCK_COMMENT*
@@ -230,6 +197,56 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "JMethodHead_12")) return false;
     consumeToken(b, COMMENT);
     return true;
+  }
+
+  /* ********************************************************** */
+  // (L_LACE_BRACE STRINGVAR R_LACE_BRACE) | Type
+  public static boolean JMethodName(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodName")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, J_METHOD_NAME, "<j method name>");
+    r = JMethodName_0(b, l + 1);
+    if (!r) r = Type(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // L_LACE_BRACE STRINGVAR R_LACE_BRACE
+  private static boolean JMethodName_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JMethodName_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, L_LACE_BRACE, STRINGVAR, R_LACE_BRACE);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // MODIFIER*
+  public static boolean JModifier(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JModifier")) return false;
+    Marker m = enter_section_(b, l, _NONE_, J_MODIFIER, "<j modifier>");
+    while (true) {
+      int c = current_position_(b);
+      if (!consumeToken(b, MODIFIER)) break;
+      if (!empty_element_parsed_guard_(b, "JModifier", c)) break;
+    }
+    exit_section_(b, l, m, true, false, null);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // VOID | JType | KEYWORDS | STRINGVAR
+  public static boolean JReturnValue(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JReturnValue")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, J_RETURN_VALUE, "<j return value>");
+    r = consumeToken(b, VOID);
+    if (!r) r = JType(b, l + 1);
+    if (!r) r = consumeToken(b, KEYWORDS);
+    if (!r) r = consumeToken(b, STRINGVAR);
+    exit_section_(b, l, m, r, false, null);
+    return r;
   }
 
   /* ********************************************************** */

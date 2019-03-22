@@ -1,12 +1,10 @@
 package syntaxHighlighting;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.util.treeView.smartTree.SortableTreeElement;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -56,7 +54,7 @@ public class TAC_structureViewElement implements StructureViewTreeElement, Sorta
     public ItemPresentation getPresentation() {
         ItemPresentation presentation = element.getPresentation();
         // TODO create getPresentation for TACJMethodHead in PsiImplUtil
-        return presentation != null ? presentation : new PresentationData(element.getName(), "location",
+        return presentation != null ? presentation : new PresentationData("presentable", "location",
                 Icons.CLASS_ICON, null);
     }
 

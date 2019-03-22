@@ -79,6 +79,7 @@ public class TACPsiImplUtil {
         return element;
     }
 
+
     /*public static PsiElement setName(
             @NotNull JavaByteCodeLocVarTableDeclaration element, String newName) {
         ASTNode keyNode = element.getLocVarTableHead().getNode();
@@ -95,7 +96,6 @@ public class TACPsiImplUtil {
         }
         return element;
     }*/
-
     /** @see PsiNameIdentifierOwner#getNameIdentifier() */
     @Nullable
     public static PsiElement getNameIdentifier(@NotNull TACJType element) {
@@ -119,18 +119,9 @@ public class TACPsiImplUtil {
     }
 
     /** @see PsiNameIdentifierOwner#getNameIdentifier() */
+
     /*public static PsiElement getNameIdentifier(@NotNull JavaByteCodeLocVarTableDeclaration element) {
         ASTNode keyNode = element.getLocVarTableHead().getNode();
-        if (keyNode != null) {
-            return keyNode.getPsi();
-        } else {
-            return null;
-        }
-    }*/
-
-    /** @see PsiNameIdentifierOwner#getNameIdentifier() */
-    /*public static PsiElement getNameIdentifier(@NotNull JavaByteCodeMethodDeclaration element) {
-        ASTNode keyNode = element.getMethodHead().getNode();
         if (keyNode != null) {
             return keyNode.getPsi();
         } else {
@@ -160,6 +151,76 @@ public class TACPsiImplUtil {
     @NotNull
     public static PsiReference[] getReferences(TACJMethodHead element) {
         return ReferenceProvidersRegistry.getReferencesFromProviders(element);
+    }
+
+
+    /** @see PsiNameIdentifierOwner#getNameIdentifier() */
+    /*public static PsiElement getNameIdentifier(@NotNull JavaByteCodeMethodDeclaration element) {
+        ASTNode keyNode = element.getMethodHead().getNode();
+        if (keyNode != null) {
+            return keyNode.getPsi();
+        } else {
+            return null;
+        }
+    }*/
+
+    public static void navigate(TACJMethodHead element, boolean requestFocus) {
+        navigate((TAC_namedElement) element, requestFocus);
+    }
+
+    public static void navigate(TAC_namedElement element, boolean requestFocus) {
+        Navigatable descriptor = PsiNavigationSupport.getInstance().getDescriptor(element);
+        FileEditor editor = FileEditorManager.getInstance(element.getProject()).getSelectedEditor();
+        if (editor instanceof DisTextEditor) {
+            ((DisTextEditor) editor).navigateTo(descriptor);
+        } else {
+            ((Navigatable) element).navigate(requestFocus);
+        }
+    }
+    public static ItemPresentation getPresentation(TACJMethodHead element) {
+        ColoredItemPresentation coloredItemPresentation =
+                new ColoredItemPresentation() {
+                    private final TACJMethodHead methodHead = element;
+
+                    @Nullable
+                    @Override
+                    public String getPresentableText() {
+                        return methodHead.getJMethodName().getText() + ":" + methodHead.getJReturnValue().getText();
+                    }
+
+                    @Nullable
+                    @Override
+                    public String getLocationString() {
+                        return null;
+                    }
+
+                    @Nullable
+                    @Override
+                    public Icon getIcon(boolean unused) {
+                        int flags = Iconable.ICON_FLAG_READ_STATUS | Iconable.ICON_FLAG_VISIBILITY;
+                        try {
+                            String helpinger =
+                                    methodHead.getJModifier().getText().length() == 0
+                                            ? methodHead.getJReturnValue().getText()
+                                            : methodHead.getJModifier().getText() + " " + methodHead.getJReturnValue().getText();
+                            Icon icon =
+                                    PsiElementFactory.SERVICE
+                                            .getInstance(element.getProject())
+                                            .createMethodFromText(helpinger + " method()", null)
+                                            .getIcon(flags);
+                            return icon;
+                        } catch (Exception e) {
+                            return null;
+                        }
+                    }
+
+                    @Nullable
+                    @Override
+                    public TextAttributesKey getTextAttributesKey() {
+                        return null;
+                    }
+                };
+        return coloredItemPresentation;
     }
 
     /*public static ItemPresentation getPresentation(JavaByteCodeLocVarTableDeclaration element) {
@@ -237,7 +298,6 @@ public class TACPsiImplUtil {
                 };
         return coloredItemPresentation;
     }*/
-
     /*public static void navigate(JavaByteCodeMethodDeclaration element, boolean requestFocus) {
         navigate((JavaByteCodeNamedElement) element, requestFocus);
     }

@@ -11,6 +11,9 @@ import syntaxHighlighting.psi.impl.*;
 public interface TAC_elementTypeHolder {
 
   IElementType J_METHOD_HEAD = new TAC_elementType("J_METHOD_HEAD");
+  IElementType J_METHOD_NAME = new TAC_elementType("J_METHOD_NAME");
+  IElementType J_MODIFIER = new TAC_elementType("J_MODIFIER");
+  IElementType J_RETURN_VALUE = new TAC_elementType("J_RETURN_VALUE");
   IElementType J_TYPE = new TAC_elementType("J_TYPE");
   IElementType TYPE = new TAC_elementType("TYPE");
 
@@ -61,6 +64,15 @@ public interface TAC_elementTypeHolder {
       IElementType type = node.getElementType();
       if (type == J_METHOD_HEAD) {
         return new TACJMethodHeadImpl(node);
+      }
+      else if (type == J_METHOD_NAME) {
+        return new TACJMethodNameImpl(node);
+      }
+      else if (type == J_MODIFIER) {
+        return new TACJModifierImpl(node);
+      }
+      else if (type == J_RETURN_VALUE) {
+        return new TACJReturnValueImpl(node);
       }
       else if (type == J_TYPE) {
         return new TACJTypeImpl(node);
