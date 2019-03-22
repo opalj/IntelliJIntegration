@@ -8,6 +8,9 @@ import com.intellij.psi.PsiElement;
 public interface JavaByteCodeParams extends PsiElement {
 
   @NotNull
+  List<JavaByteCodeAnnotation> getAnnotationList();
+
+  @NotNull
   List<JavaByteCodeType> getTypeList();
 
   @Nullable

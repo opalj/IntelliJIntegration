@@ -49,7 +49,7 @@ public class StackMapVisitorImpl extends ElementAcceptor<StackMapFrame,String> i
 
     @Override
     public String visit(FullFrame frame) {
-        return String.format("\t\t%d %s %d %d Locals:%s Stack:%s\n",pc[0],frame.getClass().getSimpleName(),frame.frameType(),frame.offsetDelta(),verficicationTypeInfoToString(frame.verificationTypeInfoLocals()), verficicationTypeInfoToString(frame.verificationTypeInfoStack()));
+        return String.format("\t\t%d %s %d %d Locals:%s; Stack:%s\n",pc[0],frame.getClass().getSimpleName(),frame.frameType(),frame.offsetDelta(),verficicationTypeInfoToString(frame.verificationTypeInfoLocals()), verficicationTypeInfoToString(frame.verificationTypeInfoStack()));
     }
     private String verficicationTypeInfoToString(RefArray<VerificationTypeInfo> verificationTypeInfoRefArray){
         VerificationTypeInfo[] verificationTypeInfos = new VerificationTypeInfo[verificationTypeInfoRefArray.size()];

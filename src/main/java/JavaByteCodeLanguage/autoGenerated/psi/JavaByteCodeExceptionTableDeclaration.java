@@ -11,12 +11,6 @@ public interface JavaByteCodeExceptionTableDeclaration extends PsiElement {
   List<JavaByteCodeType> getTypeList();
 
   @NotNull
-  PsiElement getLbracket();
-
-  @NotNull
-  PsiElement getRbracket();
-
-  @NotNull
   PsiElement getTablename();
 
 }

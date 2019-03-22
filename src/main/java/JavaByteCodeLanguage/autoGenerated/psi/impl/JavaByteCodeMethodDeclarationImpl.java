@@ -53,6 +53,12 @@ public class JavaByteCodeMethodDeclarationImpl extends JavaByteCodeNamedElementI
 
   @Override
   @NotNull
+  public List<JavaByteCodeLocVarTypeTableDeclaration> getLocVarTypeTableDeclarationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeLocVarTypeTableDeclaration.class);
+  }
+
+  @Override
+  @NotNull
   public JavaByteCodeMethodHead getMethodHead() {
     return findNotNullChildByClass(JavaByteCodeMethodHead.class);
   }
