@@ -57,7 +57,11 @@ public class OpalUtil {
       @NotNull String prepareID,
       VirtualFile virtualFile,
       @Nullable VirtualFile olderFile) {
-    updateStateIfNewClassFile(virtualFile, project);
+    if(olderFile!=null){
+      updateStateIfNewClassFile(virtualFile,project,true);
+    }else {
+      updateStateIfNewClassFile(virtualFile, project,false);
+    }
     String fileName = virtualFile.getNameWithoutExtension();
     String representableForm = null;
     switch (prepareID) {
@@ -148,15 +152,14 @@ public class OpalUtil {
    * @param project The project the file belongs to
    */
   private static void updateStateIfNewClassFile(
-      @NotNull VirtualFile virtualClassFile, @NotNull Project project) {
+      @NotNull VirtualFile virtualClassFile, @NotNull Project project, boolean VFL) {
     if(virtualClassFile.getExtension() == null) {
       return;
     }
-
-    if (!virtualClassFile.equals(currentWorkingVF)
-        && virtualClassFile.getExtension().equals(StdFileTypes.CLASS.getDefaultExtension())) {
+    if (VFL||(!virtualClassFile.equals(currentWorkingVF)
+        && virtualClassFile.getExtension().equals(StdFileTypes.CLASS.getDefaultExtension()))) {
       currentWorkingVF = virtualClassFile;
-      Compiler.make(project);
+      if(!VFL)Compiler.make(project);
       if (virtualClassFile.getCanonicalPath() != null
               && !virtualClassFile.getCanonicalPath().contains("!")) {
         projectPath = virtualClassFile.getPath();

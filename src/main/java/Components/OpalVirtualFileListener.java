@@ -43,7 +43,7 @@ public class OpalVirtualFileListener implements ProjectComponent {
       if (event.getFile().getExtension().equals(StdFileTypes.CLASS.getDefaultExtension())) {
         Arrays.stream(FileEditorManager.getInstance(project).getEditors(event.getFile()))
             .filter(
-                (e) -> !Objects.requireNonNull(Objects.requireNonNull(e.getFile()).getExtension()).equals(StdFileTypes.CLASS.getDefaultExtension()))
+                (e) -> !Objects.equals(Objects.requireNonNull(e.getFile()).getExtension(),StdFileTypes.CLASS.getDefaultExtension()))
             .forEach(
                 e -> {
                   OpalUtil.prepare(

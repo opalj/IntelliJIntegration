@@ -33,7 +33,7 @@ public class JavaByteCodeVisitor extends PsiElementVisitor {
   }
 
   public void visitFieldsDeclaration(@NotNull JavaByteCodeFieldsDeclaration o) {
-    visitPsiElement(o);
+    visitNamedElement(o);
   }
 
   public void visitInnerTable(@NotNull JavaByteCodeInnerTable o) {
