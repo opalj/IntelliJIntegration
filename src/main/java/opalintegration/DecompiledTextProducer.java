@@ -1,7 +1,12 @@
 package opalintegration;
 
+import java.util.AbstractMap;
 import java.util.Arrays;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.jetbrains.annotations.NotNull;
 import org.opalj.bi.AccessFlags;
 import org.opalj.bi.AccessFlagsContexts;
@@ -26,11 +31,15 @@ abstract class DecompiledTextProducer {
 
     decompiledText += annotationsToJava(classFile.annotations(), "", "\n");
     decompiledText += classHeader(classFile);
-    // TODO: hooks for JbcProducer for class attributes
+    decompiledText += attributes(classFile);
     decompiledText += fields(classFile);
     decompiledText += methods(classFile); // contains the template method
 
     return decompiledText;
+  }
+
+  String attributes(ClassFile classFile) {
+    return "";
   }
 
   /**
@@ -73,7 +82,7 @@ abstract class DecompiledTextProducer {
         MethodTypeSignature methodTypeSignatureOption = method.methodTypeSignature().get();
         List<ThrowsSignature> throwsSignatureList = methodTypeSignatureOption.throwsSignature();
       }
-      methodText.append(annotationsToJava(method.annotations(), "\n/*", "*/\n"));
+      methodText.append(annotationsToJava(method.annotations(), "\n", "\n"));
       methodText
           .append(methodDescriptor(method))
           .append(thrownExceptions(method.exceptionTable()))
@@ -167,7 +176,7 @@ String methodDescriptor(Method method){
   // TODO: doesn't quite work yet (grammar, etc.)
   /** Converts a given list of annotations into a Java-like representation. */
   @NotNull
-  String annotationsToJava(@NotNull RefArray<Annotation> annotations, String before, String after) {
+  private String annotationsToJava(@NotNull RefArray<Annotation> annotations, String before, String after) {
     if (!annotations.isEmpty()) {
       Annotation[] annotationsCopy = new Annotation[annotations.size()];
       annotations.copyToArray(annotationsCopy);
@@ -203,7 +212,7 @@ String methodDescriptor(Method method){
    * @return a string which contains a throws clause
    */
   @NotNull
-  String thrownExceptions(@NotNull Option<ExceptionTable> exceptionTable) {
+  private String thrownExceptions(@NotNull Option<ExceptionTable> exceptionTable) {
     if (!exceptionTable.isDefined()) {
       return "";
     }
