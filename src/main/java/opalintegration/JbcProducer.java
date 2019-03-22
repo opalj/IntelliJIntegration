@@ -292,8 +292,7 @@ class JbcProducer extends DecompiledTextProducer {
                     localVariableType.startPC() + localVariableType.length(),
                     localVariableType.index(),
                     localVariableType.name(),
-                    localVariableType.signature().toJVMSignature().replaceAll(";>", ">"));
-              System.out.println("LLLL: " + localVariableType.signature());
+                    localVariableType.signature().toJVMSignature());
             localVariableTypeTable.append(localVariableTypeEntry);
           }
           return v1.toString();
