@@ -70,6 +70,7 @@ public class JavaByteCodeColorSettingPage implements ColorSettingsPage {
             "\t3      67     ICONST_0\n" +
             "\t4      67     INVOKESPECIAL(java.io.ObjectStreamField{ void <init>(java.lang.String,java.lang.Class,boolean) })\n" +
             "\t1      203    INVOKEVIRTUAL(java.io.ObjectStreamField{ boolean isPrimitive() })\n" +
+            "\t6      1482   LOOKUPSWITCH(default:34[(case:-127,31)(case:128,26)])\n" +
             "\t261    122    LDC(\"illegal signature\")\n" +
             "\t7      68     RETURN\n" +
             "}\n" +

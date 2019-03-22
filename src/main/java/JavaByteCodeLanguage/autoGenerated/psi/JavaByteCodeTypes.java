@@ -40,6 +40,7 @@ public interface JavaByteCodeTypes {
 
   IElementType AT = new JavaByteCodeTokenType("@");
   IElementType ATTRIBUTES = new JavaByteCodeTokenType("Attributes");
+  IElementType CASE = new JavaByteCodeTokenType("case");
   IElementType COLON = new JavaByteCodeTokenType(":");
   IElementType COMMA = new JavaByteCodeTokenType(",");
   IElementType COMMENT = new JavaByteCodeTokenType("COMMENT");

@@ -406,9 +406,16 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   //                           | LBRACKET NUMBER RBRACKET
   //                           | LBRACKET STRING RBRACKET
   //                           | LBRACKET ((JavaOP|NUMBER|STRING)COMMA?)* RBRACKET   // LDC("someString") or ALOAD(5) or ...
+  //                           // TABLESWITCH
   //                           | LBRACKET NUMBER TO NUMBER SEMICOLON
   //                                      (NUMBER SWITCH NUMBER COMMA?)* SEMICOLON?
   //                                      MODIFIER SWITCH NUMBER
+  //                             RBRACKET
+  //                             // LOOKUPSWITCH(default:34[(case:-127,31)(case:128,26)])
+  //                           | LBRACKET MODIFIER COLON NUMBER 
+  //                                 LBRACKET
+  //                                   (LBRACKET CASE COLON NUMBER COMMA NUMBER RBRACKET)*
+  //                                 RBRACKET
   //                             RBRACKET
   //                           | JavaOP)?
   public static boolean Instr(PsiBuilder b, int l) {
@@ -426,9 +433,16 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   //                           | LBRACKET NUMBER RBRACKET
   //                           | LBRACKET STRING RBRACKET
   //                           | LBRACKET ((JavaOP|NUMBER|STRING)COMMA?)* RBRACKET   // LDC("someString") or ALOAD(5) or ...
+  //                           // TABLESWITCH
   //                           | LBRACKET NUMBER TO NUMBER SEMICOLON
   //                                      (NUMBER SWITCH NUMBER COMMA?)* SEMICOLON?
   //                                      MODIFIER SWITCH NUMBER
+  //                             RBRACKET
+  //                             // LOOKUPSWITCH(default:34[(case:-127,31)(case:128,26)])
+  //                           | LBRACKET MODIFIER COLON NUMBER 
+  //                                 LBRACKET
+  //                                   (LBRACKET CASE COLON NUMBER COMMA NUMBER RBRACKET)*
+  //                                 RBRACKET
   //                             RBRACKET
   //                           | JavaOP)?
   private static boolean Instr_1(PsiBuilder b, int l) {
@@ -441,9 +455,16 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   //                           | LBRACKET NUMBER RBRACKET
   //                           | LBRACKET STRING RBRACKET
   //                           | LBRACKET ((JavaOP|NUMBER|STRING)COMMA?)* RBRACKET   // LDC("someString") or ALOAD(5) or ...
+  //                           // TABLESWITCH
   //                           | LBRACKET NUMBER TO NUMBER SEMICOLON
   //                                      (NUMBER SWITCH NUMBER COMMA?)* SEMICOLON?
   //                                      MODIFIER SWITCH NUMBER
+  //                             RBRACKET
+  //                             // LOOKUPSWITCH(default:34[(case:-127,31)(case:128,26)])
+  //                           | LBRACKET MODIFIER COLON NUMBER 
+  //                                 LBRACKET
+  //                                   (LBRACKET CASE COLON NUMBER COMMA NUMBER RBRACKET)*
+  //                                 RBRACKET
   //                             RBRACKET
   //                           | JavaOP
   private static boolean Instr_1_0(PsiBuilder b, int l) {
@@ -455,6 +476,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     if (!r) r = parseTokens(b, 0, LBRACKET, STRING, RBRACKET);
     if (!r) r = Instr_1_0_3(b, l + 1);
     if (!r) r = Instr_1_0_4(b, l + 1);
+    if (!r) r = Instr_1_0_5(b, l + 1);
     if (!r) r = JavaOP(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -575,6 +597,43 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "Instr_1_0_4_6")) return false;
     consumeToken(b, SEMICOLON);
     return true;
+  }
+
+  // LBRACKET MODIFIER COLON NUMBER 
+  //                                 LBRACKET
+  //                                   (LBRACKET CASE COLON NUMBER COMMA NUMBER RBRACKET)*
+  //                                 RBRACKET
+  //                             RBRACKET
+  private static boolean Instr_1_0_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "Instr_1_0_5")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, LBRACKET, MODIFIER, COLON, NUMBER, LBRACKET);
+    r = r && Instr_1_0_5_5(b, l + 1);
+    r = r && consumeTokens(b, 0, RBRACKET, RBRACKET);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (LBRACKET CASE COLON NUMBER COMMA NUMBER RBRACKET)*
+  private static boolean Instr_1_0_5_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "Instr_1_0_5_5")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!Instr_1_0_5_5_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "Instr_1_0_5_5", c)) break;
+    }
+    return true;
+  }
+
+  // LBRACKET CASE COLON NUMBER COMMA NUMBER RBRACKET
+  private static boolean Instr_1_0_5_5_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "Instr_1_0_5_5_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, LBRACKET, CASE, COLON, NUMBER, COMMA, NUMBER, RBRACKET);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */

@@ -78,6 +78,7 @@ EOL=\n
   "extends"              { return EXTENDS; }
   "implements"           { return IMPLEMENTS; }
   "throws"               { return THROWS; }
+  "case"                 { return CASE; }
   "Attributes"           { return ATTRIBUTES; }
   "Fields"               { return FIELDS; }
   "Methods"              { return METHODS; }

@@ -57,6 +57,7 @@
   EXTENDS='extends'
   IMPLEMENTS='implements'
   THROWS='throws'
+  CASE='case'
   ATTRIBUTES='Attributes'
   FIELDS='Fields'
   METHODS='Methods'
@@ -65,6 +66,7 @@
   TABLENAME='regexp:LocalVariableTable|StackMapTable|ExceptionTable|LocalVariableTypeTable'
   // TYPES
   PRIMITIVETYPE="regexp:void|boolean|byte|char|short|int|long|float|double"
+  // TODO: default out?
   MODIFIER="regexp:public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient"
  STRINGVAR = "regexp:<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?"
  EOL="regexp:\n"
@@ -156,9 +158,16 @@ left Instr ::= (MNEMONIC (LBRACKET JType COLON Type RBRACKET                    
                           | LBRACKET NUMBER RBRACKET
                           | LBRACKET STRING RBRACKET
                           | LBRACKET ((JavaOP|NUMBER|STRING)COMMA?)* RBRACKET   // LDC("someString") or ALOAD(5) or ...
+                          // TABLESWITCH
                           | LBRACKET NUMBER TO NUMBER SEMICOLON
                                      (NUMBER SWITCH NUMBER COMMA?)* SEMICOLON?
                                      MODIFIER SWITCH NUMBER
+                            RBRACKET
+                            // LOOKUPSWITCH(default:34[(case:-127,31)(case:128,26)])
+                          | LBRACKET MODIFIER COLON NUMBER
+                                LBRACKET
+                                  (LBRACKET CASE COLON NUMBER COMMA NUMBER RBRACKET)*
+                                RBRACKET
                             RBRACKET
                           | JavaOP)?)
                                                                 // INVOKEVIRTUAL(byte[] { java.lang.Object clone() })
