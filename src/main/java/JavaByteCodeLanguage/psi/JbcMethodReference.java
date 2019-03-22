@@ -134,7 +134,6 @@ public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
   }
 
   /**
-   * TODO: what about varargs and generics ? ... seems to work just fine?
    *
    * @param ourParams the parameter list that is found in our JavaByteCode-Editor
    * @param theirParams the parameter list of an overload of the reference we're looking for

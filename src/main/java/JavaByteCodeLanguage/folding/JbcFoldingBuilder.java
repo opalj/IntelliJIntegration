@@ -28,10 +28,10 @@ public class JbcFoldingBuilder extends FoldingBuilderEx {
           JavaByteCodeFieldsDeclaration.class,
           JavaByteCodeMethodArea.class,
           JavaByteCodeMethodDeclaration.class,
-          JavaByteCodeExceptionTableDeclaration
-              .class, // TODO: not used as a table anymore, speak with employer
+          JavaByteCodeExceptionTableDeclaration.class,
           JavaByteCodeLocVarTableDeclaration.class,
-          JavaByteCodeStackMapTableDeclaration.class);
+          JavaByteCodeStackMapTableDeclaration.class,
+          JavaByteCodeLocVarTypeTableDeclaration.class);
 
   @NotNull
   @Override
