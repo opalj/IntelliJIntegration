@@ -1,5 +1,6 @@
 package syntaxHighlighting.psi.impl;
 
+import Editors.FileEditor.TacTextEditor;
 import Editors.disEditor.DisTextEditor;
 import com.intellij.ide.util.PsiNavigationSupport;
 import com.intellij.lang.ASTNode;
@@ -171,8 +172,8 @@ public class TACPsiImplUtil {
     public static void navigate(TAC_namedElement element, boolean requestFocus) {
         Navigatable descriptor = PsiNavigationSupport.getInstance().getDescriptor(element);
         FileEditor editor = FileEditorManager.getInstance(element.getProject()).getSelectedEditor();
-        if (editor instanceof DisTextEditor) {
-            ((DisTextEditor) editor).navigateTo(descriptor);
+        if (editor instanceof TacTextEditor) {
+            ((TacTextEditor) editor).navigateTo(descriptor);
         } else {
             ((Navigatable) element).navigate(requestFocus);
         }
