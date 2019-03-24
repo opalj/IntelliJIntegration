@@ -11,9 +11,9 @@ public interface TACType extends PsiElement {
   TACJType getJType();
 
   @Nullable
-  PsiElement getNumber();
+  TACLambdaType getLambdaType();
 
   @Nullable
-  PsiElement getStringvar();
+  PsiElement getPrimitivetype();
 
 }

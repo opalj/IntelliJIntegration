@@ -39,8 +39,19 @@ public class TACPsiImplUtil {
      * @return the name of the method as a String (e.g. "println")
      */
     @Nullable
-    public static String getMethodName(@NotNull TACJMethodHead element) {
-        ASTNode stringVarNode = element.getNode().findChildByType(TAC_elementTypeHolder.J_METHOD_HEAD);
+    public static String getMethodName(@NotNull TACMethodName element) {
+        ASTNode stringVarNode = element.getNode().findChildByType(TAC_elementTypeHolder.METHOD_NAME);
+        if (stringVarNode != null) {
+            // IMPORTANT: Convert embedded escaped spaces to simple spaces
+            return stringVarNode.getText().replaceAll("\\\\", " ");
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static String getMethodHead(@NotNull TACMethodHead element) {
+        ASTNode stringVarNode = element.getNode().findChildByType(TAC_elementTypeHolder.METHOD_HEAD);
         if (stringVarNode != null) {
             // IMPORTANT: Convert embedded escaped spaces to simple spaces
             return stringVarNode.getText().replaceAll("\\\\", " ");
@@ -53,7 +64,11 @@ public class TACPsiImplUtil {
         return getJavaTypeString(element);
     }
 
-    public static String getName(TACJMethodHead element) {
+    public static String getName(TACMethodHead element) {
+        return getMethodHead(element);
+    }
+
+    public static String getName(TACMethodName element) {
         return getMethodName(element);
     }
 
@@ -69,10 +84,21 @@ public class TACPsiImplUtil {
     }
 
     /** @see PsiNamedElement#setName */
-    public static PsiElement setName(@NotNull TACJMethodHead element, String newName) {
-        ASTNode keyNode = element.getNode().findChildByType(TAC_elementTypeHolder.J_METHOD_HEAD);
+    public static PsiElement setName(@NotNull TACMethodHead element, String newName) {
+        ASTNode keyNode = element.getNode().findChildByType(TAC_elementTypeHolder.METHOD_HEAD);
         if (keyNode != null) {
-            TACJMethodHead property =
+            TACMethodHead property =
+                    TAC_elementFactory.createMethodHead(element.getProject(), newName);
+            ASTNode newKeyNode = property.getFirstChild().getNode();
+            element.getNode().replaceChild(keyNode, newKeyNode);
+        }
+        return element;
+    }
+
+    public static PsiElement setName(@NotNull TACMethodName element, String newName) {
+        ASTNode keyNode = element.getNode().findChildByType(TAC_elementTypeHolder.METHOD_NAME);
+        if (keyNode != null) {
+            TACMethodName property =
                     TAC_elementFactory.createMethodName(element.getProject(), newName);
             ASTNode newKeyNode = property.getFirstChild().getNode();
             element.getNode().replaceChild(keyNode, newKeyNode);
@@ -110,8 +136,19 @@ public class TACPsiImplUtil {
 
     /** @see PsiNameIdentifierOwner#getNameIdentifier() */
     @Nullable
-    public static PsiElement getNameIdentifier(@NotNull TACJMethodHead element) {
-        ASTNode keyNode = element.getNode().findChildByType(TAC_elementTypeHolder.J_METHOD_HEAD);
+    public static PsiElement getNameIdentifier(@NotNull TACMethodHead element) {
+        ASTNode keyNode = element.getNode().findChildByType(TAC_elementTypeHolder.METHOD_HEAD);
+        if (keyNode != null) {
+            return keyNode.getPsi();
+        } else {
+            return null;
+        }
+    }
+
+    /** @see PsiNameIdentifierOwner#getNameIdentifier() */
+    @Nullable
+    public static PsiElement getNameIdentifier(@NotNull TACMethodName element) {
+        ASTNode keyNode = element.getNode().findChildByType(TAC_elementTypeHolder.METHOD_NAME);
         if (keyNode != null) {
             return keyNode.getPsi();
         } else {
@@ -150,7 +187,7 @@ public class TACPsiImplUtil {
      * @return the Java-references to this method
      */
     @NotNull
-    public static PsiReference[] getReferences(TACJMethodHead element) {
+    public static PsiReference[] getReferences(TACMethodHead element) {
         return ReferenceProvidersRegistry.getReferencesFromProviders(element);
     }
 
@@ -165,7 +202,7 @@ public class TACPsiImplUtil {
         }
     }*/
 
-    public static void navigate(TACJMethodHead element, boolean requestFocus) {
+    public static void navigate(TACMethodHead element, boolean requestFocus) {
         navigate((TAC_namedElement) element, requestFocus);
     }
 
@@ -178,15 +215,15 @@ public class TACPsiImplUtil {
             ((Navigatable) element).navigate(requestFocus);
         }
     }
-    public static ItemPresentation getPresentation(TACJMethodHead element) {
+    public static ItemPresentation getPresentation(TACMethodHead element) {
         ColoredItemPresentation coloredItemPresentation =
                 new ColoredItemPresentation() {
-                    private final TACJMethodHead methodHead = element;
+                    private final TACMethodHead methodHead = element;
 
                     @Nullable
                     @Override
                     public String getPresentableText() {
-                        return methodHead.getJMethodName().getText() + ":" + methodHead.getJReturnValue().getText();
+                        return methodHead.getMethodName() + ":" + methodHead.getType().getText();
                     }
 
                     @Nullable
@@ -201,9 +238,9 @@ public class TACPsiImplUtil {
                         int flags = Iconable.ICON_FLAG_READ_STATUS | Iconable.ICON_FLAG_VISIBILITY;
                         try {
                             String helpinger =
-                                    methodHead.getJModifier().getText().length() == 0
-                                            ? methodHead.getJReturnValue().getText()
-                                            : methodHead.getJModifier().getText() + " " + methodHead.getJReturnValue().getText();
+                                    methodHead.getModifierV().getText().length() == 0
+                                            ? methodHead.getType().getText()
+                                            : methodHead.getModifierV().getText() + " " + methodHead.getType().getText();
                             Icon icon =
                                     PsiElementFactory.SERVICE
                                             .getInstance(element.getProject())

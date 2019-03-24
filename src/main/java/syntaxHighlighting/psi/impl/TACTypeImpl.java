@@ -34,14 +34,14 @@ public class TACTypeImpl extends ASTWrapperPsiElement implements TACType {
 
   @Override
   @Nullable
-  public PsiElement getNumber() {
-    return findChildByType(NUMBER);
+  public TACLambdaType getLambdaType() {
+    return findChildByClass(TACLambdaType.class);
   }
 
   @Override
   @Nullable
-  public PsiElement getStringvar() {
-    return findChildByType(STRINGVAR);
+  public PsiElement getPrimitivetype() {
+    return findChildByType(PRIMITIVETYPE);
   }
 
 }

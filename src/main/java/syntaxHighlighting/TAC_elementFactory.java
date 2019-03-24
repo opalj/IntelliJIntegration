@@ -17,8 +17,13 @@ public class TAC_elementFactory {
         return (TACJType) file.getFirstChild();
     }
 
-    public static TACJMethodHead createMethodName(Project project, String name) {
+    public static TACMethodName createMethodName(Project project, String name) {
         final TAC_file file = createFile(project, name);
-        return (TACJMethodHead) file.getFirstChild();
+        return (TACMethodName) file.getFirstChild();
+    }
+
+    public static TACMethodHead createMethodHead(Project project, String name) {
+        final TAC_file file = createFile(project, name);
+        return (TACMethodHead) file.getFirstChild();
     }
 }

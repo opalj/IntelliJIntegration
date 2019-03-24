@@ -10,7 +10,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Icons;
 import org.jetbrains.annotations.NotNull;
-import syntaxHighlighting.psi.impl.TACJMethodHeadImpl;
+import syntaxHighlighting.psi.impl.TACMethodHeadImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,10 +68,10 @@ public class TAC_structureViewElement implements StructureViewTreeElement, Sorta
             List<TreeElement> treeElements = new ArrayList<>(properties.length);
             for (PsiElement property : properties) {
                 System.out.println(property.getClass().getSimpleName());
-                    if (property instanceof TACJMethodHead) {
+                    if (property instanceof TACMethodHead) {
                         treeElements.add(
                                 new TAC_structureViewElement(
-                                        (TACJMethodHeadImpl) property));
+                                        (TACMethodHeadImpl) property));
                     }
             }
 
