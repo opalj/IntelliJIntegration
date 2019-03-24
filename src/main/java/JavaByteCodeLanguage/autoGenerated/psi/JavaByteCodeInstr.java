@@ -13,9 +13,6 @@ public interface JavaByteCodeInstr extends PsiElement {
   @NotNull
   List<JavaByteCodeJavaOP> getJavaOPList();
 
-  @NotNull
-  JavaByteCodeLineNumber getLineNumber();
-
   @Nullable
   JavaByteCodeType getType();
 

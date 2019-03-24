@@ -152,7 +152,7 @@ InstructionBody ::= PcNumber LineNumber Instr
 PcNumber ::= NUMBER
 LineNumber ::= NUMBER
 // TODO {recoverWhile=recoverTillNextInstr}
-left Instr ::= (MNEMONIC (LBRACKET JType COLON Type RBRACKET                       // put someFQN : someFQN
+Instr ::= (MNEMONIC (LBRACKET JType COLON Type RBRACKET                       // put someFQN : someFQN
                           | LBRACKET NUMBER RBRACKET
                           | LBRACKET STRING RBRACKET
                           | LBRACKET ((JavaOP|NUMBER|STRING)COMMA?)* RBRACKET   // LDC("someString") or ALOAD(5) or ...

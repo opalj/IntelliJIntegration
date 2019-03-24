@@ -10,4 +10,10 @@ public interface JavaByteCodeInstructionBody extends PsiElement {
   @NotNull
   JavaByteCodeInstr getInstr();
 
+  @NotNull
+  JavaByteCodeLineNumber getLineNumber();
+
+  @NotNull
+  JavaByteCodePcNumber getPcNumber();
+
 }

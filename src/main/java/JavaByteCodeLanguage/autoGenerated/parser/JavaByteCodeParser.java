@@ -415,10 +415,10 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "Instr")) return false;
     if (!nextTokenIs(b, MNEMONIC)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _LEFT_, INSTR, null);
+    Marker m = enter_section_(b);
     r = consumeToken(b, MNEMONIC);
     r = r && Instr_1(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
+    exit_section_(b, m, INSTR, r);
     return r;
   }
 
