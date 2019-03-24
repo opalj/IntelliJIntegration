@@ -76,7 +76,7 @@
         <action id="jumptoline" class="Actions.JumpToLine" text="Test">
             <keyboard-shortcut first-keystroke="control X" second-keystroke="control X" keymap="$default"/>
         </action>
-        <action id="jumptosource" class="Actions.JumpToSorce" text="Test">
+        <action id="jumptosource" class="Actions.JumpToSource" text="Test">
             <keyboard-shortcut first-keystroke="control Y" second-keystroke="control Y" keymap="$default"/>
         </action>
     </actions>
