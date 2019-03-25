@@ -7,8 +7,11 @@ import com.intellij.psi.PsiElement;
 
 public interface JavaByteCodeMethodName extends PsiElement {
 
-  @Nullable
+  @NotNull
   JavaByteCodeDefMethodName getDefMethodName();
+
+  @NotNull
+  List<JavaByteCodeJType> getJTypeList();
 
   @NotNull
   JavaByteCodeParams getParams();

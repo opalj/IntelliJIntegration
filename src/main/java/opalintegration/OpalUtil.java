@@ -41,6 +41,7 @@ public class OpalUtil {
   private static String fqClassName;
   private static File projectFile;
   private static VirtualFile currentWorkingVF;
+  private static File tempDirectory;
 
   private static final Logger LOGGER = Logger.getLogger(OpalUtil.class.getName());
 
@@ -56,7 +57,11 @@ public class OpalUtil {
       @NotNull String prepareID,
       VirtualFile virtualFile,
       @Nullable VirtualFile olderFile) {
-    isNewClassFile(virtualFile, project);
+    if(olderFile!=null){
+      updateStateIfNewClassFile(virtualFile,project,true);
+    }else {
+      updateStateIfNewClassFile(virtualFile, project,false);
+    }
     String fileName = virtualFile.getNameWithoutExtension();
     String representableForm = null;
     switch (prepareID) {
@@ -67,11 +72,13 @@ public class OpalUtil {
         break;
       case GlobalData.DISASSEMBLED_FILE_ENDING_TAC:
         fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_TAC);
-        representableForm = TacProducer.createTacString(classFile, virtualFile.getPath());
+        //        representableForm = TacProducer.createTacString(classFile, virtualFile.getPath());
+        representableForm = new TacProducer(virtualFile.getPath()).decompiledText(classFile);
         break;
       case GlobalData.DISASSEMBLED_FILE_ENDING_JBC:
         fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_JBC);
-        representableForm = JbcProducer.createBytecodeString(classFile);
+        //        representableForm = JbcProducer.createBytecodeString(classFile);
+        representableForm = new JbcProducer().decompiledText(classFile);
         break;
     }
 
@@ -80,48 +87,89 @@ public class OpalUtil {
     }
 
     File preparedFile =
-        writeContentToFile(fileName, representableForm, false, olderFile == null ? false : true);
+        writeContentToFile(fileName, representableForm, olderFile != null);
+
+    // if something went wrong during de-compilation, just return the passed in class file
+    if(preparedFile == null) {
+      return virtualFile;
+    }
+
     return LocalFileSystem.getInstance().refreshAndFindFileByIoFile(preparedFile);
   }
 
   /**
-   * an auxiliary method that writes 'content' to a 'file' (main purpose of this method is to
+   * TODO: currently fails to update the content on a change
+   *
+   * <p>an auxiliary method that writes 'content' to a 'file' (main purpose of this method is to
    * encapsulate the try/catch block)
    *
    * @param filename the Name of the temporal file
    * @param content content to write into the file
    */
-  private static File writeContentToFile(
-      String filename, String content, boolean append, boolean olderFile) {
+  private static File writeContentToFile(String filename, String content, boolean olderFile) {
     try {
-      File file = null;
-      if (!olderFile) {
-        String[] filenameArray = filename.split("\\.");
-        file = FileUtil.createTempFile(filenameArray[0], "." + filenameArray[1], true);
-      } else {
-        file = new File(filename);
+      File fileToWriteTo = null;
+
+      if (tempDirectory == null || !tempDirectory.exists()) {
+        tempDirectory = FileUtil.createTempDirectory("tempJbcDirectory", "", true);
       }
-      FileUtil.writeToFile(file, content, append);
-      return file;
+
+      if (!olderFile) {
+        boolean fileContained = false;
+
+        File[] filesInTempDirectory = tempDirectory.listFiles();
+        if(filesInTempDirectory != null) {
+          for (File fileInTemp : filesInTempDirectory) {
+            if (fileInTemp.getName().equals(filename)) {
+              fileContained = true;
+              fileToWriteTo = fileInTemp;
+              break;
+            }
+          }
+        }
+
+        if (!fileContained) {
+          fileToWriteTo = new File(tempDirectory.getAbsolutePath() + File.separator + filename);
+        }
+      } else {
+        fileToWriteTo = new File(filename);
+      }
+
+      FileUtil.writeToFile(fileToWriteTo, content, false);
+      return fileToWriteTo;
     } catch (IOException e) {
       LOGGER.log(Level.SEVERE, e.toString(), e);
     }
+
     // TODO not null
     return null;
   }
 
-  private static void isNewClassFile(
-      @NotNull VirtualFile virtualClassFile, @NotNull Project project) {
-    if (!virtualClassFile.equals(currentWorkingVF)
-        && virtualClassFile.getExtension().equals(StdFileTypes.CLASS.getDefaultExtension())) {
+  /**
+   * Updates the state when the (class) file has been changed (or is new)
+   *
+   * @param virtualClassFile The (class) file to check
+   * @param project The project the file belongs to
+   */
+  private static void updateStateIfNewClassFile(
+      @NotNull VirtualFile virtualClassFile, @NotNull Project project, boolean VFL) {
+    if(virtualClassFile.getExtension() == null) {
+      return;
+    }
+    if (VFL||(!virtualClassFile.equals(currentWorkingVF)
+        && virtualClassFile.getExtension().equals(StdFileTypes.CLASS.getDefaultExtension()))) {
       currentWorkingVF = virtualClassFile;
-      Compiler.make(project);
-      if (!virtualClassFile.getCanonicalPath().contains("!")) {
+      if(!VFL)Compiler.make(project);
+      if (virtualClassFile.getCanonicalPath() != null
+              && !virtualClassFile.getCanonicalPath().contains("!")) {
         projectPath = virtualClassFile.getPath();
         PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualClassFile);
-        PsiJavaFile psiJavaFile = (PsiJavaFile) psiFile;
-        final PsiClass[] classes = psiJavaFile.getClasses();
-        fqClassName = classes[0].getQualifiedName().replace('.', '/');
+        if(psiFile instanceof PsiJavaFile) {
+          PsiJavaFile psiJavaFile = (PsiJavaFile) psiFile;
+          final PsiClass[] classes = psiJavaFile.getClasses();
+          fqClassName = classes[0].getQualifiedName();
+          fqClassName = fqClassName != null ? fqClassName.replace('.', '/') : null;
+        }
       } else {
         String[] jarPath = getJarFileRootAndFileName(virtualClassFile);
         projectPath = jarPath[0];
@@ -137,7 +185,7 @@ public class OpalUtil {
    * Returns an OPAL ClassFile for a given class file. The ClassFile from OPAL contains necessary
    * information to produce the desired bytecode and TAC representations for a class file.
    *
-   * @param virtualClassFile
+   * @param virtualClassFile a standard java class file
    * @return an OPAL ClassFile
    */
   @Nullable
@@ -149,8 +197,10 @@ public class OpalUtil {
         return cf;
       }
     }
+
     // (might be) JAR
-    if (virtualClassFile.getCanonicalPath().contains("!")) {
+    if (virtualClassFile.getCanonicalPath() != null
+            && virtualClassFile.getCanonicalPath().contains("!")) {
       return createClassFileFromJar(projectPath, fqClassName);
     }
     // use the input stream instead
@@ -169,6 +219,7 @@ public class OpalUtil {
         LOGGER.log(Level.SEVERE, e.toString(), e);
       }
     }
+
     // TODO: what to do in this case?
     return null;
   }
@@ -182,8 +233,7 @@ public class OpalUtil {
         virtualClassFile.getParent().getPath() + File.separator + virtualClassFile.getName();
     // this\is\the\jarPath -> this/is/the/jarPath
     jarPathWithoutClassExtension = jarPathWithoutClassExtension.replaceAll("\\\\", "/");
-    String[] jarFileRoot = jarPathWithoutClassExtension.split("!/", 2);
-    return jarFileRoot;
+    return jarPathWithoutClassExtension.split("!/", 2);
   }
 
   /**
@@ -191,7 +241,6 @@ public class OpalUtil {
    * @param className the fully qualified class name with extension
    * @return ClassFile
    */
-  // TODO: this gets called for classes we haven't clicked on as well?
   private static ClassFile createClassFileFromJar(String jarFileRoot, String className) {
     ClassFile classFileFromJar = null;
     try {

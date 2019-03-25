@@ -29,8 +29,26 @@ public class JavaByteCodeParamsImpl extends ASTWrapperPsiElement implements Java
 
   @Override
   @NotNull
+  public List<JavaByteCodeAnnotation> getAnnotationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeAnnotation.class);
+  }
+
+  @Override
+  @NotNull
   public List<JavaByteCodeType> getTypeList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeType.class);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getLbracket() {
+    return findChildByType(LBRACKET);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getRbracket() {
+    return findChildByType(RBRACKET);
   }
 
 }

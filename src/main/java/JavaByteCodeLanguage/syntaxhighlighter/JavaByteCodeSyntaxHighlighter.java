@@ -16,34 +16,47 @@ import org.jetbrains.annotations.NotNull;
 
 /** @see SyntaxHighlighter */
 public class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
-  public static final TextAttributesKey TYPE =
+
+  // Java keywords
+  public static final TextAttributesKey MODIFIER =
+      createTextAttributesKey("JBC_MODIFIER", DefaultLanguageHighlighterColors.KEYWORD);
+  static final TextAttributesKey TYPE =
       createTextAttributesKey("JBC_TYPE", DefaultLanguageHighlighterColors.KEYWORD);
-  public static final TextAttributesKey NUMBER =
-      createTextAttributesKey("JBC_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
+  private static final TextAttributesKey JAVATYPEHEAD =
+      createTextAttributesKey("JBC_JAVATYPEHEAD", DefaultLanguageHighlighterColors.KEYWORD);
+  private static final TextAttributesKey EXTENDS =
+      createTextAttributesKey("JBC_EXTENDS", DefaultLanguageHighlighterColors.KEYWORD);
+  private static final TextAttributesKey IMPLEMENTS =
+      createTextAttributesKey("JBC_IMPLEMENTS", DefaultLanguageHighlighterColors.KEYWORD);
+  private static final TextAttributesKey THROWS =
+      createTextAttributesKey("JBC_THROWS", DefaultLanguageHighlighterColors.KEYWORD);
+
+  // comments (includes block comments)
   public static final TextAttributesKey COMMENT =
       createTextAttributesKey("JBC_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
-  public static final TextAttributesKey BAD_CHARACTER =
+
+  // misc
+  public static final TextAttributesKey NUMBER =
+      createTextAttributesKey("JBC_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
+  private static final TextAttributesKey BAD_CHARACTER =
       createTextAttributesKey("JBC_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
   public static final TextAttributesKey STRING =
       createTextAttributesKey("JBC_STRING", DefaultLanguageHighlighterColors.STRING);
-
   public static final TextAttributesKey MNEMONIC =
       createTextAttributesKey("JBC_MNEMONIC", DefaultLanguageHighlighterColors.CONSTANT);
-  public static final TextAttributesKey MODIFIER =
-      createTextAttributesKey("JBC_MODIFIER", DefaultLanguageHighlighterColors.KEYWORD);
-  public static final TextAttributesKey BLOCK_COMMENT =
-      createTextAttributesKey("JBC_BLOCK_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT);
+
+  static final TextAttributesKey ANNOTATION =
+      createTextAttributesKey("JBC_ANNOTATION", DefaultLanguageHighlighterColors.METADATA);
 
   private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[] {BAD_CHARACTER};
   private static final TextAttributesKey[] NUMBER_KEYS = new TextAttributesKey[] {NUMBER};
-  private static final TextAttributesKey[] TYPE_KEYS = new TextAttributesKey[] {TYPE};
   private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[] {COMMENT};
   private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[] {STRING};
-  private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
-
   private static final TextAttributesKey[] MNEMONIC_KEYS = new TextAttributesKey[] {MNEMONIC};
-  private static final TextAttributesKey[] MODIFIER_KEYS = new TextAttributesKey[] {MODIFIER};
-  private static final TextAttributesKey[] BLOCK_KEYS = new TextAttributesKey[] {BLOCK_COMMENT};
+  private static final TextAttributesKey[] JAVA_KEYWORD_KEYS =
+      new TextAttributesKey[] {TYPE, MODIFIER, JAVATYPEHEAD, EXTENDS, IMPLEMENTS, THROWS};
+  private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
+  private static final TextAttributesKey[] ANNOTATION_KEYS = new TextAttributesKey[] { ANNOTATION };
 
   @NotNull
   @Override
@@ -56,16 +69,10 @@ public class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
   public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
     if (tokenType.equals(JavaByteCodeTypes.COMMENT)) {
       return COMMENT_KEYS;
-    } else if (tokenType.equals(JavaByteCodeTypes.BLOCK_COMMENT)) {
-      return BLOCK_KEYS;
-    } else if (tokenType.equals(JavaByteCodeTypes.J_TYPE)
-        || tokenType.equals(
-            JavaByteCodeTypes.PRIMITIVETYPE)) { // tokenType.equals(JavaByteCodeTypes.JAVATYPE)
-      return TYPE_KEYS;
-    } else if (tokenType.equals(JavaByteCodeTypes.MODIFIER)) {
-      return MODIFIER_KEYS;
-    } else if (tokenType.equals(JavaByteCodeTypes.MNEMONIC)
-        || tokenType.equals(JavaByteCodeTypes.LOAD_INSTR)) {
+    } else if(tokenType.equals(JavaByteCodeTypes.ANNOTATION)) {
+      // TODO: only works for tokens
+      return ANNOTATION_KEYS;
+    } else if (tokenType.equals(JavaByteCodeTypes.MNEMONIC)) {
       return MNEMONIC_KEYS;
     } else if (tokenType.equals(JavaByteCodeTypes.NUMBER)) {
       return NUMBER_KEYS;
@@ -73,6 +80,13 @@ public class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
       return STRING_KEYS;
     } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {
       return BAD_CHAR_KEYS;
+    } else if (tokenType.equals(JavaByteCodeTypes.PRIMITIVETYPE)
+        || tokenType.equals(JavaByteCodeTypes.MODIFIER)
+        || tokenType.equals(JavaByteCodeTypes.JAVATYPEHEAD)
+        || tokenType.equals(JavaByteCodeTypes.EXTENDS)
+        || tokenType.equals(JavaByteCodeTypes.IMPLEMENTS)
+        || tokenType.equals(JavaByteCodeTypes.THROWS)) {
+      return JAVA_KEYWORD_KEYS;
     } else {
       return EMPTY_KEYS;
     }

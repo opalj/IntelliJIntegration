@@ -39,4 +39,10 @@ public class JavaByteCodeClassHeadImpl extends ASTWrapperPsiElement implements J
     return findChildByClass(JavaByteCodeModifierV.class);
   }
 
+  @Override
+  @NotNull
+  public PsiElement getJavatypehead() {
+    return findNotNullChildByType(JAVATYPEHEAD);
+  }
+
 }

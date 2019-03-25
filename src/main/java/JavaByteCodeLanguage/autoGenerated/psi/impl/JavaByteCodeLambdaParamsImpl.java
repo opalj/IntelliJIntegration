@@ -27,4 +27,16 @@ public class JavaByteCodeLambdaParamsImpl extends ASTWrapperPsiElement implement
     else super.accept(visitor);
   }
 
+  @Override
+  @NotNull
+  public PsiElement getLbracket() {
+    return findNotNullChildByType(LBRACKET);
+  }
+
+  @Override
+  @NotNull
+  public PsiElement getRbracket() {
+    return findNotNullChildByType(RBRACKET);
+  }
+
 }

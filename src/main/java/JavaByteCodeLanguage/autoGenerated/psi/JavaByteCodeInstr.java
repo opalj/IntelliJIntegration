@@ -17,9 +17,24 @@ public interface JavaByteCodeInstr extends PsiElement {
   JavaByteCodeType getType();
 
   @Nullable
-  PsiElement getLoadInstr();
+  PsiElement getLbracket();
+
+  @NotNull
+  PsiElement getMnemonic();
 
   @Nullable
-  PsiElement getMnemonic();
+  PsiElement getModifier();
+
+  @Nullable
+  PsiElement getNumber();
+
+  @Nullable
+  PsiElement getRbracket();
+
+  @Nullable
+  PsiElement getString();
+
+  @Nullable
+  PsiElement getTo();
 
 }

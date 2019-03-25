@@ -7,4 +7,10 @@ import com.intellij.psi.PsiElement;
 
 public interface JavaByteCodeLambdaParams extends PsiElement {
 
+  @NotNull
+  PsiElement getLbracket();
+
+  @NotNull
+  PsiElement getRbracket();
+
 }

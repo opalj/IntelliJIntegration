@@ -29,14 +29,14 @@ public class JavaByteCodeLocVarTableDeclarationImpl extends JavaByteCodeNamedEle
 
   @Override
   @NotNull
-  public JavaByteCodeLocVarTableHead getLocVarTableHead() {
-    return findNotNullChildByClass(JavaByteCodeLocVarTableHead.class);
+  public List<JavaByteCodeType> getTypeList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeType.class);
   }
 
   @Override
   @NotNull
-  public List<JavaByteCodeType> getTypeList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeType.class);
+  public PsiElement getTablename() {
+    return findNotNullChildByType(TABLENAME);
   }
 
   public String getName() {

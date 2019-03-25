@@ -13,4 +13,7 @@ public interface JavaByteCodeClassHead extends PsiElement {
   @Nullable
   JavaByteCodeModifierV getModifierV();
 
+  @NotNull
+  PsiElement getJavatypehead();
+
 }

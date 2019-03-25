@@ -28,9 +28,15 @@ public class JavaByteCodeMethodNameImpl extends ASTWrapperPsiElement implements 
   }
 
   @Override
-  @Nullable
+  @NotNull
   public JavaByteCodeDefMethodName getDefMethodName() {
-    return findChildByClass(JavaByteCodeDefMethodName.class);
+    return findNotNullChildByClass(JavaByteCodeDefMethodName.class);
+  }
+
+  @Override
+  @NotNull
+  public List<JavaByteCodeJType> getJTypeList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeJType.class);
   }
 
   @Override
