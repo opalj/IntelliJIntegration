@@ -4,7 +4,7 @@ import com.intellij.ide.structureView.*;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
-import syntaxHighlighting.psi.TAC_file;
+
 
 public class TAC_structureViewModel extends StructureViewModelBase implements
         StructureViewModel.ElementInfoProvider {

@@ -7,15 +7,31 @@ import com.intellij.psi.PsiElement;
 
 public class TACVisitor extends PsiElementVisitor {
 
+  public void visitAnnotation(@NotNull TACAnnotation o) {
+    visitPsiElement(o);
+  }
+
+  public void visitAttributesArea(@NotNull TACAttributesArea o) {
+    visitPsiElement(o);
+  }
+
   public void visitClassHead(@NotNull TACClassHead o) {
     visitPsiElement(o);
   }
 
   public void visitDefMethodName(@NotNull TACDefMethodName o) {
-    visit_namedElement(o);
+    visitNamedElement(o);
+  }
+
+  public void visitFieldArea(@NotNull TACFieldArea o) {
+    visitPsiElement(o);
   }
 
   public void visitFieldsDeclaration(@NotNull TACFieldsDeclaration o) {
+    visitNamedElement(o);
+  }
+
+  public void visitInnerTable(@NotNull TACInnerTable o) {
     visitPsiElement(o);
   }
 
@@ -24,23 +40,23 @@ public class TACVisitor extends PsiElementVisitor {
   }
 
   public void visitJType(@NotNull TACJType o) {
-    visit_namedElement(o);
-  }
-
-  public void visitJavaOP(@NotNull TACJavaOP o) {
-    visitPsiElement(o);
+    visitNamedElement(o);
   }
 
   public void visitLambdaType(@NotNull TACLambdaType o) {
     visitPsiElement(o);
   }
 
+  public void visitMethodArea(@NotNull TACMethodArea o) {
+    visitPsiElement(o);
+  }
+
   public void visitMethodDeclaration(@NotNull TACMethodDeclaration o) {
-    visit_namedElement(o);
+    visitNamedElement(o);
   }
 
   public void visitMethodHead(@NotNull TACMethodHead o) {
-    visit_namedElement(o);
+    visitPsiElement(o);
   }
 
   public void visitMethodName(@NotNull TACMethodName o) {
@@ -63,7 +79,11 @@ public class TACVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visit_namedElement(@NotNull TAC_namedElement o) {
+  public void visitSwitchInst(@NotNull TACSwitchInst o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNamedElement(@NotNull TACNamedElement o) {
     visitPsiElement(o);
   }
 

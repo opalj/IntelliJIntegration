@@ -6,13 +6,10 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 
-public interface TACJType extends TAC_namedElement {
-
-  @NotNull
-  PsiElement getJavaType();
+public interface TACJType extends TACNamedElement {
 
   @Nullable
-  String getJavaTypeString();
+  String getJavaType();
 
   String getName();
 

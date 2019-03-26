@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 public class TAC_syntaxHighlighterFactory extends SyntaxHighlighterFactory {
   @NotNull
   @Override
-  public SyntaxHighlighter getSyntaxHighlighter(Project project, VirtualFile virtualFile) {
-    return new SyntaxHighlighter();
+  public TAC_syntaxHighlighter getSyntaxHighlighter(Project project, VirtualFile virtualFile) {
+    return new TAC_syntaxHighlighter();
   }
 }

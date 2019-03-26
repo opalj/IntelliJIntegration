@@ -54,15 +54,11 @@
 
         <psi.referenceContributor implementation="JavaByteCodeLanguage.psi.JbcReferenceContributor"/>
 
-        <!--<codeInsight.lineMarkerProvider language="TAC" implementationClass="syntaxHighlighting.TAC_lineMarkerProvider"/>-->
-        <!--<annotator language="TAC" implementationClass="syntaxHighlighting.TAC_annotator"/>-->
-        <!--<lang.foldingBuilder language="TAC" implementationClass="syntaxHighlighting.TAC_foldingBuilder"/>-->
-
         <lang.psiStructureViewFactory language="jbc" implementationClass="JavaByteCodeLanguage.StructureView.JavaByteCodeStructureViewFactory"/>
         <lang.psiStructureViewFactory language="TAC" implementationClass="syntaxHighlighting.TAC_structureViewFactory"/>
         <lang.foldingBuilder language="jbc" implementationClass="JavaByteCodeLanguage.folding.JbcFoldingBuilder"/>
+        <lang.foldingBuilder language="TAC" implementationClass="syntaxHighlighting.TACFoldingBuilder"/>
         <lang.findUsagesProvider language="jbc" implementationClass="com.intellij.lang.java.JavaFindUsagesProvider"/>
-        <colorSettingsPage implementation="syntaxHighlighting.TAC_colorSettingsPage"/>
     </extensions>
 
     <actions>

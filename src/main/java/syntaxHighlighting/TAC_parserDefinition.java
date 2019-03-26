@@ -12,7 +12,6 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
-import syntaxHighlighting.psi.TAC_file;
 
 public class TAC_parserDefinition implements ParserDefinition {
 

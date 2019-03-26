@@ -10,7 +10,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Icons;
 import org.jetbrains.annotations.NotNull;
-import syntaxHighlighting.psi.impl.TACMethodHeadImpl;
+import syntaxHighlighting.impl.TACFieldsDeclarationImpl;
+import syntaxHighlighting.impl.TACMethodDeclarationImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,34 +53,54 @@ public class TAC_structureViewElement implements StructureViewTreeElement, Sorta
     @NotNull
     @Override
     public ItemPresentation getPresentation() {
-        ItemPresentation presentation = element.getPresentation();
-        // TODO create getPresentation for TACJMethodHead in PsiImplUtil
-        return presentation != null ? presentation : new PresentationData("presentable", "location",
-                Icons.CLASS_ICON, null);
+        return element.getPresentation() == null ? new PresentationData(element.getText(),null, Icons.ABSTRACT_CLASS_ICON,null) : element.getPresentation();
     }
-
+    @NotNull
     @Override
     public TreeElement[] getChildren() {
-        if (element instanceof PsiElement) {
-            PsiElement[] properties =
-                    PsiTreeUtil.getChildrenOfType(
-                            element, PsiElement.class); // PsiTreeUtil.getChildrenOfType(element,
-            // JavaByteCodeMethodDeclaration.class);
-            List<TreeElement> treeElements = new ArrayList<>(properties.length);
-            for (PsiElement property : properties) {
-                System.out.println(property.getClass().getSimpleName());
-                    if (property instanceof TACMethodHead) {
-                        treeElements.add(
-                                new TAC_structureViewElement(
-                                        (TACMethodHeadImpl) property));
-                    }
+        if (element != null) {
+            PsiElement[] jbcElements = PsiTreeUtil.getChildrenOfType(element, PsiElement.class);
+            if(jbcElements == null ){
+                return EMPTY_ARRAY;
             }
+            List<TreeElement> treeElements = new ArrayList<>(jbcElements.length);
+            for (PsiElement jbcElement : jbcElements) {
+                if (jbcElement instanceof TACFieldArea|| jbcElement instanceof TACMethodArea) {
+                    treeElements.addAll(iterateThroughMethods(jbcElement));
+                    continue;
+                }
 
-            return treeElements.toArray(new TreeElement[treeElements.size()]);
+            }
+            return treeElements.toArray(new TreeElement[0]);
         } else {
             return EMPTY_ARRAY;
         }
     }
+
+    /**
+     * iterates over all methods in the designated method area and creates an entry for the respective
+     * elements (methods and tables) in the structure view
+     *
+     * @param methodArea the region which contains all method definitions
+     * @return a list of elements which will be shown in the structure view
+     */
+    private List<TreeElement> iterateThroughMethods(@NotNull PsiElement methodArea) {
+        List<TreeElement> treeElements = new ArrayList<>();
+
+        for (PsiElement method : methodArea.getChildren()) {
+            if (method instanceof TACMethodDeclaration) {
+                treeElements.add(
+                        new TAC_structureViewElement((TACMethodDeclarationImpl) method));
+                continue;
+            }
+            if (method instanceof TACFieldsDeclaration) {
+                treeElements.add(new TAC_structureViewElement((TACFieldsDeclarationImpl)method));
+            }
+        }
+
+        return treeElements;
+    }
+
 
 
 }

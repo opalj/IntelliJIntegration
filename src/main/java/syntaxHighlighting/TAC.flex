@@ -9,82 +9,76 @@ import static syntaxHighlighting.TAC_elementTypeHolder.*;
 
 %%
 
-%{
-  public _TAC_parserLexer() {
-    this((java.io.Reader)null);
-  }
-%}
-
 %public
-%class _TAC_parserLexer
+%class TACLexer
 %implements FlexLexer
 %function advance
 %type IElementType
 %unicode
 
-EOL=\R
 WHITE_SPACE=\s+
 
-CRLF=\R
-WHITE_SPACE=[ \t\n\x0B\f\r]+
+COMMENT="//".*|"/"\*[^*/]*\*"/"
+NUMBER=[-]?[0-9]+(\.[0-9]*)?([Efdl][0-9]*)?
 STRING=('([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\")
-COMMENT="//".*
-BLOCK_COMMENT="/"\*[^\*/]*\*"/"
-NUMBER=(-)?[0-9]+
+SPACE=[ \t\n\x0B\f\r]+
+LBRACKET=\(|\{|\[|[«]
+RBRACKET=\)|\}|\]|[»]
+JAVATYPEHEAD=class|enum|interface
+INSTRUCTIONHEAD=PC[ \t\n\x0B\f\r]+Line[ \t\n\x0B\f\r]+Instruction
+PRIMITIVETYPE=void|boolean|byte|char|short|int|long|float|double
 KEYWORDS=new|goto|if|else|throw|throws|catch|caught|return
 MODIFIER=public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient
-LEVEL=lv+([A-Za-z0-9])*
-CONSTMETHODNAMES=<(cl)?init>
-NEW_LINE=\n
-JAVA_TYPE=((([A-Za-z])([A-Za-z0-9])*)\.)+(([A-Za-z])([A-Za-z0-9])*)
-STRINGVAR=[a-zA-Z$_][a-zA-Z0-9$_]*
+LEVEL=\{?((lv|param|exception(\[VM\])?@)([A-Za-z0-9])*(,[ \t\n\x0B\f\r])?)*\}?
+OPERATORS=\+|\-|\*|\&|\||\^|<<|>>
+COMPARATORS=<=|>=|==|\!=|<|>
+STRINGVAR=<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?
 
 %%
 <YYINITIAL> {
-  {WHITE_SPACE}           { return WHITE_SPACE; }
+  {WHITE_SPACE}          { return WHITE_SPACE; }
 
-  "class"                 { return CLASS; }
-  "extends"               { return EXTENDS; }
-  "implemenmts"           { return IMPLEMENTS; }
-  "throw"                 { return THROW; }
-  "throws"                { return THROWS; }
-  "void"                  { return VOID; }
-  "this"                  { return THIS; }
-  ","                     { return COMMA; }
-  "."                     { return DOT; }
-  ":"                     { return COLON; }
-  ";"                     { return SEMICOLON; }
-  "@"                     { return AT; }
-  "=>"                    { return R_ARROW; }
-  "<="                    { return L_ARROW; }
-  "«"                     { return L_DOUBLE_LACE_BRACE; }
-  "»"                     { return R_DOUBLE_LACE_BRACE; }
-  "<"                     { return L_LACE_BRACE; }
-  ">"                     { return R_LACE_BRACE; }
-  ")"                     { return R_BRACKET; }
-  "("                     { return L_BRACKET; }
-  "["                     { return L_SQUARE_BRACKET; }
-  "]"                     { return R_SQUARE_BRACKET; }
-  "{"                     { return L_CURVED_BRACKET; }
-  "}"                     { return R_CURVED_BRACKET; }
-  "+"                     { return PLUS; }
-  "-"                     { return MINUS; }
-  "="                     { return EQ; }
-  "!="                    { return UEQ; }
+  ","                    { return COMMA; }
+  "."                    { return DOT; }
+  ":"                    { return COLON; }
+  ";"                    { return SEMICOLON; }
+  "/"                    { return SLASH; }
+  "@"                    { return AT; }
+  "="                    { return EQ; }
+  "⤼"                    { return SWITCH; }
+  "extends"              { return EXTENDS; }
+  "implements"           { return IMPLEMENTS; }
+  "throws"               { return THROWS; }
+  "Attributes"           { return ATTRIBUTES; }
+  "Fields"               { return FIELDS; }
+  "Methods"              { return METHODS; }
+  "lvIndex="             { return LVLINDEXTOKEN; }
+  "CLASS"                { return CLASS; }
+  "THROW"                { return THROW; }
+  "VOID"                 { return VOID; }
+  "THIS"                 { return THIS; }
+  "R_ARROW"              { return R_ARROW; }
+  "L_ARROW"              { return L_ARROW; }
+  "CONSTMETHODNAMES"     { return CONSTMETHODNAMES; }
+  "UEQ"                  { return UEQ; }
+  "PLUS"                 { return PLUS; }
+  "MINUS"                { return MINUS; }
 
-  {CRLF}                  { return CRLF; }
-  {WHITE_SPACE}           { return WHITE_SPACE; }
-  {STRING}                { return STRING; }
-  {COMMENT}               { return COMMENT; }
-  {BLOCK_COMMENT}         { return BLOCK_COMMENT; }
-  {NUMBER}                { return NUMBER; }
-  {KEYWORDS}              { return KEYWORDS; }
-  {MODIFIER}              { return MODIFIER; }
-  {LEVEL}                 { return LEVEL; }
-  {CONSTMETHODNAMES}      { return CONSTMETHODNAMES; }
-  {NEW_LINE}              { return NEW_LINE; }
-  {JAVA_TYPE}             { return JAVA_TYPE; }
-  {STRINGVAR}             { return STRINGVAR; }
+  {COMMENT}              { return COMMENT; }
+  {NUMBER}               { return NUMBER; }
+  {STRING}               { return STRING; }
+  {SPACE}                { return SPACE; }
+  {LBRACKET}             { return LBRACKET; }
+  {RBRACKET}             { return RBRACKET; }
+  {JAVATYPEHEAD}         { return JAVATYPEHEAD; }
+  {INSTRUCTIONHEAD}      { return INSTRUCTIONHEAD; }
+  {PRIMITIVETYPE}        { return PRIMITIVETYPE; }
+  {KEYWORDS}             { return KEYWORDS; }
+  {MODIFIER}             { return MODIFIER; }
+  {LEVEL}                { return LEVEL; }
+  {OPERATORS}            { return OPERATORS; }
+  {COMPARATORS}          { return COMPARATORS; }
+  {STRINGVAR}            { return STRINGVAR; }
 
 }
 

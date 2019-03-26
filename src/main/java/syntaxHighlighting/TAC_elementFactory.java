@@ -2,7 +2,6 @@ package syntaxHighlighting;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
-import syntaxHighlighting.psi.TAC_file;
 
 public class TAC_elementFactory {
 

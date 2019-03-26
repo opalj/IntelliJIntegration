@@ -43,6 +43,7 @@ public class JumpToSource extends AnAction {
             }
         }
         if(ClassName != null){
+            //TODO resolve String -> .class & not to .java
             PsiElement resolve = ClassName.getReferences()[ClassName.getReferences().length - 1].resolve();
             Document document = PsiDocumentManager.getInstance(project).getDocument(Objects.requireNonNull(resolve).getContainingFile());
             int lineStartOffset = Objects.requireNonNull(document).getLineStartOffset(lineNumber-1);

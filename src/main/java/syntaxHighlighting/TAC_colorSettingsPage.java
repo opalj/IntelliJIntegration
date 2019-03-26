@@ -3,21 +3,21 @@ package syntaxHighlighting;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.options.colors.*;
-import java.util.Map;
-import javax.swing.*;
 import org.jetbrains.annotations.*;
+
+import javax.swing.*;
+import java.util.Map;
 
 public class TAC_colorSettingsPage implements ColorSettingsPage {
   private static final AttributesDescriptor[] DESCRIPTORS =
-      new AttributesDescriptor[] {
-        new AttributesDescriptor("Keywords", syntaxHighlighting.SyntaxHighlighter.KEYWORDS),
-        new AttributesDescriptor("Separator", syntaxHighlighting.SyntaxHighlighter.SEPARATOR),
-        new AttributesDescriptor("Number", syntaxHighlighting.SyntaxHighlighter.NUMBER),
-        new AttributesDescriptor("Comment", syntaxHighlighting.SyntaxHighlighter.COMMENT),
-        new AttributesDescriptor("Javatype", syntaxHighlighting.SyntaxHighlighter.JAVATYPE),
-        new AttributesDescriptor("String", syntaxHighlighting.SyntaxHighlighter.STRING),
-        new AttributesDescriptor("Level", syntaxHighlighting.SyntaxHighlighter.LEVEL)
-      };
+          new AttributesDescriptor[] {
+                  new AttributesDescriptor("Keyword", TAC_syntaxHighlighter.TYPE),
+                  new AttributesDescriptor("Number", TAC_syntaxHighlighter.NUMBER),
+                  new AttributesDescriptor("Instruction", TAC_syntaxHighlighter.LEVEL),
+                  new AttributesDescriptor("Comment", TAC_syntaxHighlighter.COMMENT),
+                  new AttributesDescriptor("String", TAC_syntaxHighlighter.STRING),
+                  new AttributesDescriptor("Annotation", TAC_syntaxHighlighter.ANNOTATION),
+          };
 
   @Nullable
   @Override
@@ -28,7 +28,7 @@ public class TAC_colorSettingsPage implements ColorSettingsPage {
   @NotNull
   @Override
   public SyntaxHighlighter getHighlighter() {
-    return new syntaxHighlighting.SyntaxHighlighter();
+    return new TAC_syntaxHighlighter();
   }
 
   @NotNull
@@ -45,7 +45,7 @@ public class TAC_colorSettingsPage implements ColorSettingsPage {
         + "// 3 →\n"
         + "6: {lv2}[{lv4}] = {lv5}\n"
         + "17: lv11 = java.lang.String.format({lv0}, {lv2})\n"
-        + "// ️ <uncaught exception  abnormal return>";
+        + "//\t<uncaught exception  abnormal return>";
   }
 
   @Nullable

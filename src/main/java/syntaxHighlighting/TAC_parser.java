@@ -4,7 +4,7 @@ package syntaxHighlighting;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
 import static syntaxHighlighting.TAC_elementTypeHolder.*;
-import static syntaxHighlighting.TAC_parserParserUtil.*;
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.tree.TokenSet;
@@ -23,14 +23,26 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     boolean r;
     b = adapt_builder_(t, b, this, null);
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
-    if (t == CLASS_HEAD) {
+    if (t == ANNOTATION) {
+      r = Annotation(b, 0);
+    }
+    else if (t == ATTRIBUTES_AREA) {
+      r = AttributesArea(b, 0);
+    }
+    else if (t == CLASS_HEAD) {
       r = ClassHead(b, 0);
     }
     else if (t == DEF_METHOD_NAME) {
       r = DefMethodName(b, 0);
     }
+    else if (t == FIELD_AREA) {
+      r = FieldArea(b, 0);
+    }
     else if (t == FIELDS_DECLARATION) {
       r = FieldsDeclaration(b, 0);
+    }
+    else if (t == INNER_TABLE) {
+      r = InnerTable(b, 0);
     }
     else if (t == INSTR) {
       r = Instr(b, 0);
@@ -38,11 +50,11 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     else if (t == J_TYPE) {
       r = JType(b, 0);
     }
-    else if (t == JAVA_OP) {
-      r = JavaOP(b, 0);
-    }
     else if (t == LAMBDA_TYPE) {
       r = LambdaType(b, 0);
+    }
+    else if (t == METHOD_AREA) {
+      r = MethodArea(b, 0);
     }
     else if (t == METHOD_DECLARATION) {
       r = MethodDeclaration(b, 0);
@@ -65,6 +77,9 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     else if (t == PARAMS) {
       r = params(b, 0);
     }
+    else if (t == SWITCH_INST) {
+      r = switchInst(b, 0);
+    }
     else {
       r = parse_root_(t, b, 0);
     }
@@ -72,22 +87,55 @@ public class TAC_parser implements PsiParser, LightPsiParser {
   }
 
   protected boolean parse_root_(IElementType t, PsiBuilder b, int l) {
-    return tacFile(b, l + 1);
+    return jbcFile(b, l + 1);
   }
 
   /* ********************************************************** */
-  // ModifierV? ("@"?)(class|enum|interface) BLOCK_COMMENT* JType (extends JType)? (implements (JType(",")?)+)?
+  // AT JType
+  public static boolean Annotation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "Annotation")) return false;
+    if (!nextTokenIs(b, AT)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, AT);
+    r = r && JType(b, l + 1);
+    exit_section_(b, m, ANNOTATION, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // ATTRIBUTES LBRACKET InnerTable? RBRACKET
+  public static boolean AttributesArea(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "AttributesArea")) return false;
+    if (!nextTokenIs(b, ATTRIBUTES)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, ATTRIBUTES, LBRACKET);
+    r = r && AttributesArea_2(b, l + 1);
+    r = r && consumeToken(b, RBRACKET);
+    exit_section_(b, m, ATTRIBUTES_AREA, r);
+    return r;
+  }
+
+  // InnerTable?
+  private static boolean AttributesArea_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "AttributesArea_2")) return false;
+    InnerTable(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // ModifierV? (AT?) JAVATYPEHEAD JType (EXTENDS JType)? (IMPLEMENTS (JType(COMMA)?)+)?
   public static boolean ClassHead(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ClassHead")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, CLASS_HEAD, "<class head>");
     r = ClassHead_0(b, l + 1);
     r = r && ClassHead_1(b, l + 1);
-    r = r && ClassHead_2(b, l + 1);
-    r = r && ClassHead_3(b, l + 1);
+    r = r && consumeToken(b, JAVATYPEHEAD);
     r = r && JType(b, l + 1);
+    r = r && ClassHead_4(b, l + 1);
     r = r && ClassHead_5(b, l + 1);
-    r = r && ClassHead_6(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -99,44 +147,23 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // "@"?
+  // AT?
   private static boolean ClassHead_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ClassHead_1")) return false;
     consumeToken(b, AT);
     return true;
   }
 
-  // class|enum|interface
-  private static boolean ClassHead_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "ClassHead_2")) return false;
-    boolean r;
-    r = consumeToken(b, CLASS);
-    if (!r) r = consumeToken(b, ENUM);
-    if (!r) r = consumeToken(b, INTERFACE);
-    return r;
-  }
-
-  // BLOCK_COMMENT*
-  private static boolean ClassHead_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "ClassHead_3")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!consumeToken(b, BLOCK_COMMENT)) break;
-      if (!empty_element_parsed_guard_(b, "ClassHead_3", c)) break;
-    }
+  // (EXTENDS JType)?
+  private static boolean ClassHead_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ClassHead_4")) return false;
+    ClassHead_4_0(b, l + 1);
     return true;
   }
 
-  // (extends JType)?
-  private static boolean ClassHead_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "ClassHead_5")) return false;
-    ClassHead_5_0(b, l + 1);
-    return true;
-  }
-
-  // extends JType
-  private static boolean ClassHead_5_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "ClassHead_5_0")) return false;
+  // EXTENDS JType
+  private static boolean ClassHead_4_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ClassHead_4_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, EXTENDS);
@@ -145,53 +172,53 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // (implements (JType(",")?)+)?
-  private static boolean ClassHead_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "ClassHead_6")) return false;
-    ClassHead_6_0(b, l + 1);
+  // (IMPLEMENTS (JType(COMMA)?)+)?
+  private static boolean ClassHead_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ClassHead_5")) return false;
+    ClassHead_5_0(b, l + 1);
     return true;
   }
 
-  // implements (JType(",")?)+
-  private static boolean ClassHead_6_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "ClassHead_6_0")) return false;
+  // IMPLEMENTS (JType(COMMA)?)+
+  private static boolean ClassHead_5_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ClassHead_5_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, IMPLEMENTS);
-    r = r && ClassHead_6_0_1(b, l + 1);
+    r = r && ClassHead_5_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // (JType(",")?)+
-  private static boolean ClassHead_6_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "ClassHead_6_0_1")) return false;
+  // (JType(COMMA)?)+
+  private static boolean ClassHead_5_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ClassHead_5_0_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = ClassHead_6_0_1_0(b, l + 1);
+    r = ClassHead_5_0_1_0(b, l + 1);
     while (r) {
       int c = current_position_(b);
-      if (!ClassHead_6_0_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "ClassHead_6_0_1", c)) break;
+      if (!ClassHead_5_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "ClassHead_5_0_1", c)) break;
     }
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // JType(",")?
-  private static boolean ClassHead_6_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "ClassHead_6_0_1_0")) return false;
+  // JType(COMMA)?
+  private static boolean ClassHead_5_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ClassHead_5_0_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = JType(b, l + 1);
-    r = r && ClassHead_6_0_1_0_1(b, l + 1);
+    r = r && ClassHead_5_0_1_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // (",")?
-  private static boolean ClassHead_6_0_1_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "ClassHead_6_0_1_0_1")) return false;
+  // (COMMA)?
+  private static boolean ClassHead_5_0_1_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "ClassHead_5_0_1_0_1")) return false;
     consumeToken(b, COMMA);
     return true;
   }
@@ -209,168 +236,154 @@ public class TAC_parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // Fields (ModifierV? BLOCK_COMMENT* Type DefMethodName)*
-  public static boolean FieldsDeclaration(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "FieldsDeclaration")) return false;
+  // FIELDS LBRACKET FieldsDeclaration* RBRACKET
+  public static boolean FieldArea(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "FieldArea")) return false;
     if (!nextTokenIs(b, FIELDS)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, FIELDS);
-    r = r && FieldsDeclaration_1(b, l + 1);
-    exit_section_(b, m, FIELDS_DECLARATION, r);
+    r = consumeTokens(b, 0, FIELDS, LBRACKET);
+    r = r && FieldArea_2(b, l + 1);
+    r = r && consumeToken(b, RBRACKET);
+    exit_section_(b, m, FIELD_AREA, r);
     return r;
   }
 
-  // (ModifierV? BLOCK_COMMENT* Type DefMethodName)*
-  private static boolean FieldsDeclaration_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "FieldsDeclaration_1")) return false;
+  // FieldsDeclaration*
+  private static boolean FieldArea_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "FieldArea_2")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!FieldsDeclaration_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "FieldsDeclaration_1", c)) break;
-    }
-    return true;
-  }
-
-  // ModifierV? BLOCK_COMMENT* Type DefMethodName
-  private static boolean FieldsDeclaration_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "FieldsDeclaration_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = FieldsDeclaration_1_0_0(b, l + 1);
-    r = r && FieldsDeclaration_1_0_1(b, l + 1);
-    r = r && Type(b, l + 1);
-    r = r && DefMethodName(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // ModifierV?
-  private static boolean FieldsDeclaration_1_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "FieldsDeclaration_1_0_0")) return false;
-    ModifierV(b, l + 1);
-    return true;
-  }
-
-  // BLOCK_COMMENT*
-  private static boolean FieldsDeclaration_1_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "FieldsDeclaration_1_0_1")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!consumeToken(b, BLOCK_COMMENT)) break;
-      if (!empty_element_parsed_guard_(b, "FieldsDeclaration_1_0_1", c)) break;
+      if (!FieldsDeclaration(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "FieldArea_2", c)) break;
     }
     return true;
   }
 
   /* ********************************************************** */
-  // (MNEMONIC|LOAD_INSTR) (JType ":" Type                            // put someFQN : someFQN
-  //                                     | "("((JavaOP|NUMBER|STRING)','?)*")"   // LoadString("someString") or ALOAD(5) or ...
-  //                                     | JavaOP)?
-  public static boolean Instr(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Instr")) return false;
-    if (!nextTokenIs(b, "<instr>", LOAD_INSTR, MNEMONIC)) return false;
+  // ModifierV? Type DefMethodName
+  public static boolean FieldsDeclaration(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "FieldsDeclaration")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, INSTR, "<instr>");
-    r = Instr_0(b, l + 1);
-    r = r && Instr_1(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, FIELDS_DECLARATION, "<fields declaration>");
+    r = FieldsDeclaration_0(b, l + 1);
+    r = r && Type(b, l + 1);
+    r = r && DefMethodName(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // MNEMONIC|LOAD_INSTR
-  private static boolean Instr_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Instr_0")) return false;
-    boolean r;
-    r = consumeToken(b, MNEMONIC);
-    if (!r) r = consumeToken(b, LOAD_INSTR);
-    return r;
-  }
-
-  // (JType ":" Type                            // put someFQN : someFQN
-  //                                     | "("((JavaOP|NUMBER|STRING)','?)*")"   // LoadString("someString") or ALOAD(5) or ...
-  //                                     | JavaOP)?
-  private static boolean Instr_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Instr_1")) return false;
-    Instr_1_0(b, l + 1);
+  // ModifierV?
+  private static boolean FieldsDeclaration_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "FieldsDeclaration_0")) return false;
+    ModifierV(b, l + 1);
     return true;
   }
 
-  // JType ":" Type                            // put someFQN : someFQN
-  //                                     | "("((JavaOP|NUMBER|STRING)','?)*")"   // LoadString("someString") or ALOAD(5) or ...
-  //                                     | JavaOP
-  private static boolean Instr_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Instr_1_0")) return false;
+  /* ********************************************************** */
+  // STRINGVAR LBRACKET
+  //                     (Type LBRACKET ModifierV JAVATYPEHEAD? STRINGVAR RBRACKET)*
+  //                RBRACKET
+  public static boolean InnerTable(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "InnerTable")) return false;
+    if (!nextTokenIs(b, STRINGVAR)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = Instr_1_0_0(b, l + 1);
-    if (!r) r = Instr_1_0_1(b, l + 1);
-    if (!r) r = JavaOP(b, l + 1);
-    exit_section_(b, m, null, r);
+    r = consumeTokens(b, 0, STRINGVAR, LBRACKET);
+    r = r && InnerTable_2(b, l + 1);
+    r = r && consumeToken(b, RBRACKET);
+    exit_section_(b, m, INNER_TABLE, r);
     return r;
   }
 
-  // JType ":" Type
-  private static boolean Instr_1_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Instr_1_0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = JType(b, l + 1);
-    r = r && consumeToken(b, COLON);
-    r = r && Type(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // "("((JavaOP|NUMBER|STRING)','?)*")"
-  private static boolean Instr_1_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Instr_1_0_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, L_BRACKET);
-    r = r && Instr_1_0_1_1(b, l + 1);
-    r = r && consumeToken(b, R_BRACKET);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // ((JavaOP|NUMBER|STRING)','?)*
-  private static boolean Instr_1_0_1_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Instr_1_0_1_1")) return false;
+  // (Type LBRACKET ModifierV JAVATYPEHEAD? STRINGVAR RBRACKET)*
+  private static boolean InnerTable_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "InnerTable_2")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!Instr_1_0_1_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "Instr_1_0_1_1", c)) break;
+      if (!InnerTable_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "InnerTable_2", c)) break;
     }
     return true;
   }
 
-  // (JavaOP|NUMBER|STRING)','?
-  private static boolean Instr_1_0_1_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Instr_1_0_1_1_0")) return false;
+  // Type LBRACKET ModifierV JAVATYPEHEAD? STRINGVAR RBRACKET
+  private static boolean InnerTable_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "InnerTable_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = Instr_1_0_1_1_0_0(b, l + 1);
-    r = r && Instr_1_0_1_1_0_1(b, l + 1);
+    r = Type(b, l + 1);
+    r = r && consumeToken(b, LBRACKET);
+    r = r && ModifierV(b, l + 1);
+    r = r && InnerTable_2_0_3(b, l + 1);
+    r = r && consumeTokens(b, 0, STRINGVAR, RBRACKET);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // JavaOP|NUMBER|STRING
-  private static boolean Instr_1_0_1_1_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Instr_1_0_1_1_0_0")) return false;
-    boolean r;
-    r = JavaOP(b, l + 1);
-    if (!r) r = consumeToken(b, NUMBER);
-    if (!r) r = consumeToken(b, STRING);
-    return r;
+  // JAVATYPEHEAD?
+  private static boolean InnerTable_2_0_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "InnerTable_2_0_3")) return false;
+    consumeToken(b, JAVATYPEHEAD);
+    return true;
   }
 
-  // ','?
-  private static boolean Instr_1_0_1_1_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Instr_1_0_1_1_0_1")) return false;
-    consumeToken(b, COMMA);
+  /* ********************************************************** */
+  // (STRING|NUMBER|switchInst|KEYWORDS|PRIMITIVETYPE|MODIFIER|EXTENDS|IMPLEMENTS|CLASS|THROW|THROWS|VOID|THIS|LEVEL|COMMA|DOT|SEMICOLON|COLON|AT|R_ARROW|L_ARROW|"("|")"|"["|"]"|COMPARATORS|"/"|COMPARATORS|OPERATORS|CONSTMETHODNAMES|EQ|UEQ|STRINGVAR|PLUS|MINUS)*
+  public static boolean Instr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "Instr")) return false;
+    Marker m = enter_section_(b, l, _NONE_, INSTR, "<instr>");
+    while (true) {
+      int c = current_position_(b);
+      if (!Instr_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "Instr", c)) break;
+    }
+    exit_section_(b, l, m, true, false, null);
     return true;
+  }
+
+  // STRING|NUMBER|switchInst|KEYWORDS|PRIMITIVETYPE|MODIFIER|EXTENDS|IMPLEMENTS|CLASS|THROW|THROWS|VOID|THIS|LEVEL|COMMA|DOT|SEMICOLON|COLON|AT|R_ARROW|L_ARROW|"("|")"|"["|"]"|COMPARATORS|"/"|COMPARATORS|OPERATORS|CONSTMETHODNAMES|EQ|UEQ|STRINGVAR|PLUS|MINUS
+  private static boolean Instr_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "Instr_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, STRING);
+    if (!r) r = consumeToken(b, NUMBER);
+    if (!r) r = switchInst(b, l + 1);
+    if (!r) r = consumeToken(b, KEYWORDS);
+    if (!r) r = consumeToken(b, PRIMITIVETYPE);
+    if (!r) r = consumeToken(b, MODIFIER);
+    if (!r) r = consumeToken(b, EXTENDS);
+    if (!r) r = consumeToken(b, IMPLEMENTS);
+    if (!r) r = consumeToken(b, CLASS);
+    if (!r) r = consumeToken(b, THROW);
+    if (!r) r = consumeToken(b, THROWS);
+    if (!r) r = consumeToken(b, VOID);
+    if (!r) r = consumeToken(b, THIS);
+    if (!r) r = consumeToken(b, LEVEL);
+    if (!r) r = consumeToken(b, COMMA);
+    if (!r) r = consumeToken(b, DOT);
+    if (!r) r = consumeToken(b, SEMICOLON);
+    if (!r) r = consumeToken(b, COLON);
+    if (!r) r = consumeToken(b, AT);
+    if (!r) r = consumeToken(b, R_ARROW);
+    if (!r) r = consumeToken(b, L_ARROW);
+    if (!r) r = consumeToken(b, "(");
+    if (!r) r = consumeToken(b, ")");
+    if (!r) r = consumeToken(b, "[");
+    if (!r) r = consumeToken(b, "]");
+    if (!r) r = consumeToken(b, COMPARATORS);
+    if (!r) r = consumeToken(b, SLASH);
+    if (!r) r = consumeToken(b, COMPARATORS);
+    if (!r) r = consumeToken(b, OPERATORS);
+    if (!r) r = consumeToken(b, CONSTMETHODNAMES);
+    if (!r) r = consumeToken(b, EQ);
+    if (!r) r = consumeToken(b, UEQ);
+    if (!r) r = consumeToken(b, STRINGVAR);
+    if (!r) r = consumeToken(b, PLUS);
+    if (!r) r = consumeToken(b, MINUS);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -387,109 +400,41 @@ public class TAC_parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // PC Line Instruction
-  static boolean InstructionHead(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "InstructionHead")) return false;
-    if (!nextTokenIs(b, PC)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, PC, LINE, INSTRUCTION);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // JAVA_TYPE
+  // (STRINGVAR DOT)*STRINGVAR
   public static boolean JType(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "JType")) return false;
-    if (!nextTokenIs(b, JAVA_TYPE)) return false;
+    if (!nextTokenIs(b, STRINGVAR)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, JAVA_TYPE);
+    r = JType_0(b, l + 1);
+    r = r && consumeToken(b, STRINGVAR);
     exit_section_(b, m, J_TYPE, r);
     return r;
   }
 
-  /* ********************************************************** */
-  // "lvIndex=" NUMBER|((Type|STRINGVAR)('{'Type MethodName'}')?)+
-  public static boolean JavaOP(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "JavaOP")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, JAVA_OP, "<java op>");
-    r = JavaOP_0(b, l + 1);
-    if (!r) r = JavaOP_1(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // "lvIndex=" NUMBER
-  private static boolean JavaOP_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "JavaOP_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, "lvIndex=");
-    r = r && consumeToken(b, NUMBER);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // ((Type|STRINGVAR)('{'Type MethodName'}')?)+
-  private static boolean JavaOP_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "JavaOP_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = JavaOP_1_0(b, l + 1);
-    while (r) {
+  // (STRINGVAR DOT)*
+  private static boolean JType_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JType_0")) return false;
+    while (true) {
       int c = current_position_(b);
-      if (!JavaOP_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "JavaOP_1", c)) break;
+      if (!JType_0_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "JType_0", c)) break;
     }
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // (Type|STRINGVAR)('{'Type MethodName'}')?
-  private static boolean JavaOP_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "JavaOP_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = JavaOP_1_0_0(b, l + 1);
-    r = r && JavaOP_1_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // Type|STRINGVAR
-  private static boolean JavaOP_1_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "JavaOP_1_0_0")) return false;
-    boolean r;
-    r = Type(b, l + 1);
-    if (!r) r = consumeToken(b, STRINGVAR);
-    return r;
-  }
-
-  // ('{'Type MethodName'}')?
-  private static boolean JavaOP_1_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "JavaOP_1_0_1")) return false;
-    JavaOP_1_0_1_0(b, l + 1);
     return true;
   }
 
-  // '{'Type MethodName'}'
-  private static boolean JavaOP_1_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "JavaOP_1_0_1_0")) return false;
+  // STRINGVAR DOT
+  private static boolean JType_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JType_0_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, L_CURVED_BRACKET);
-    r = r && Type(b, l + 1);
-    r = r && MethodName(b, l + 1);
-    r = r && consumeToken(b, R_CURVED_BRACKET);
+    r = consumeTokens(b, 0, STRINGVAR, DOT);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // (STRINGVAR'.')*STRINGVAR lambdaParams STRINGVAR ":" NUMBER STRINGVAR
+  // (STRINGVAR DOT)*STRINGVAR lambdaParams STRINGVAR COLON* NUMBER STRINGVAR
   public static boolean LambdaType(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "LambdaType")) return false;
     if (!nextTokenIs(b, STRINGVAR)) return false;
@@ -498,12 +443,14 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     r = LambdaType_0(b, l + 1);
     r = r && consumeToken(b, STRINGVAR);
     r = r && lambdaParams(b, l + 1);
-    r = r && consumeTokens(b, 0, STRINGVAR, COLON, NUMBER, STRINGVAR);
+    r = r && consumeToken(b, STRINGVAR);
+    r = r && LambdaType_4(b, l + 1);
+    r = r && consumeTokens(b, 0, NUMBER, STRINGVAR);
     exit_section_(b, m, LAMBDA_TYPE, r);
     return r;
   }
 
-  // (STRINGVAR'.')*
+  // (STRINGVAR DOT)*
   private static boolean LambdaType_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "LambdaType_0")) return false;
     while (true) {
@@ -514,7 +461,7 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // STRINGVAR'.'
+  // STRINGVAR DOT
   private static boolean LambdaType_0_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "LambdaType_0_0")) return false;
     boolean r;
@@ -524,19 +471,68 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     return r;
   }
 
+  // COLON*
+  private static boolean LambdaType_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "LambdaType_4")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!consumeToken(b, COLON)) break;
+      if (!empty_element_parsed_guard_(b, "LambdaType_4", c)) break;
+    }
+    return true;
+  }
+
   /* ********************************************************** */
-  // MethodHead LBRACKET InstructionHead InstructionBody* RBRACKET
+  // METHODS LBRACKET MethodDeclaration* RBRACKET
+  public static boolean MethodArea(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "MethodArea")) return false;
+    if (!nextTokenIs(b, METHODS)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, METHODS, LBRACKET);
+    r = r && MethodArea_2(b, l + 1);
+    r = r && consumeToken(b, RBRACKET);
+    exit_section_(b, m, METHOD_AREA, r);
+    return r;
+  }
+
+  // MethodDeclaration*
+  private static boolean MethodArea_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "MethodArea_2")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!MethodDeclaration(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "MethodArea_2", c)) break;
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // Annotation* MethodHead LBRACKET
+  //          InstructionBody*
+  //         RBRACKET
   public static boolean MethodDeclaration(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "MethodDeclaration")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, METHOD_DECLARATION, "<method declaration>");
-    r = MethodHead(b, l + 1);
+    r = MethodDeclaration_0(b, l + 1);
+    r = r && MethodHead(b, l + 1);
     r = r && consumeToken(b, LBRACKET);
-    r = r && InstructionHead(b, l + 1);
     r = r && MethodDeclaration_3(b, l + 1);
     r = r && consumeToken(b, RBRACKET);
     exit_section_(b, l, m, r, false, null);
     return r;
+  }
+
+  // Annotation*
+  private static boolean MethodDeclaration_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "MethodDeclaration_0")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!Annotation(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "MethodDeclaration_0", c)) break;
+    }
+    return true;
   }
 
   // InstructionBody*
@@ -551,16 +547,14 @@ public class TAC_parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ModifierV? BLOCK_COMMENT* Type MethodName ("«" (STRINGVAR ","?)* "»")?
+  // ModifierV? Type MethodName
   public static boolean MethodHead(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "MethodHead")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, METHOD_HEAD, "<method head>");
     r = MethodHead_0(b, l + 1);
-    r = r && MethodHead_1(b, l + 1);
     r = r && Type(b, l + 1);
     r = r && MethodName(b, l + 1);
-    r = r && MethodHead_4(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -572,87 +566,29 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // BLOCK_COMMENT*
-  private static boolean MethodHead_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "MethodHead_1")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!consumeToken(b, BLOCK_COMMENT)) break;
-      if (!empty_element_parsed_guard_(b, "MethodHead_1", c)) break;
-    }
-    return true;
-  }
-
-  // ("«" (STRINGVAR ","?)* "»")?
-  private static boolean MethodHead_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "MethodHead_4")) return false;
-    MethodHead_4_0(b, l + 1);
-    return true;
-  }
-
-  // "«" (STRINGVAR ","?)* "»"
-  private static boolean MethodHead_4_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "MethodHead_4_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, L_DOUBLE_LACE_BRACE);
-    r = r && MethodHead_4_0_1(b, l + 1);
-    r = r && consumeToken(b, R_DOUBLE_LACE_BRACE);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // (STRINGVAR ","?)*
-  private static boolean MethodHead_4_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "MethodHead_4_0_1")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!MethodHead_4_0_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "MethodHead_4_0_1", c)) break;
-    }
-    return true;
-  }
-
-  // STRINGVAR ","?
-  private static boolean MethodHead_4_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "MethodHead_4_0_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, STRINGVAR);
-    r = r && MethodHead_4_0_1_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // ","?
-  private static boolean MethodHead_4_0_1_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "MethodHead_4_0_1_0_1")) return false;
-    consumeToken(b, COMMA);
-    return true;
-  }
-
   /* ********************************************************** */
-  // ('<init>'|'<clinit>'|DefMethodName) params
+  // DefMethodName params exceptionList*
   public static boolean MethodName(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "MethodName")) return false;
+    if (!nextTokenIs(b, STRINGVAR)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, METHOD_NAME, "<method name>");
-    r = MethodName_0(b, l + 1);
+    Marker m = enter_section_(b);
+    r = DefMethodName(b, l + 1);
     r = r && params(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
+    r = r && MethodName_2(b, l + 1);
+    exit_section_(b, m, METHOD_NAME, r);
     return r;
   }
 
-  // '<init>'|'<clinit>'|DefMethodName
-  private static boolean MethodName_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "MethodName_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, "<init>");
-    if (!r) r = consumeToken(b, "<clinit>");
-    if (!r) r = DefMethodName(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
+  // exceptionList*
+  private static boolean MethodName_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "MethodName_2")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!exceptionList(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "MethodName_2", c)) break;
+    }
+    return true;
   }
 
   /* ********************************************************** */
@@ -670,9 +606,10 @@ public class TAC_parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (LambdaType | JType | PRIMITIVETYPE | VOID)('[]')*
+  // (LambdaType | JType | PRIMITIVETYPE)('[]')*
   public static boolean Type(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "Type")) return false;
+    if (!nextTokenIs(b, "<type>", PRIMITIVETYPE, STRINGVAR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, TYPE, "<type>");
     r = Type_0(b, l + 1);
@@ -681,14 +618,13 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // LambdaType | JType | PRIMITIVETYPE | VOID
+  // LambdaType | JType | PRIMITIVETYPE
   private static boolean Type_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "Type_0")) return false;
     boolean r;
     r = LambdaType(b, l + 1);
     if (!r) r = JType(b, l + 1);
     if (!r) r = consumeToken(b, PRIMITIVETYPE);
-    if (!r) r = consumeToken(b, VOID);
     return r;
   }
 
@@ -714,45 +650,115 @@ public class TAC_parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ClassHead FieldsDeclaration Methods MethodDeclaration*
-  static boolean item_(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item_")) return false;
+  // THROWS (JType COMMA?)*
+  static boolean exceptionList(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "exceptionList")) return false;
+    if (!nextTokenIs(b, THROWS)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = ClassHead(b, l + 1);
-    r = r && FieldsDeclaration(b, l + 1);
-    r = r && consumeToken(b, METHODS);
-    r = r && item__3(b, l + 1);
+    r = consumeToken(b, THROWS);
+    r = r && exceptionList_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // MethodDeclaration*
-  private static boolean item__3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item__3")) return false;
+  // (JType COMMA?)*
+  private static boolean exceptionList_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "exceptionList_1")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!MethodDeclaration(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "item__3", c)) break;
+      if (!exceptionList_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "exceptionList_1", c)) break;
     }
     return true;
   }
 
-  /* ********************************************************** */
-  // '('( ("]")* STRINGVAR ':'?)*')'
-  public static boolean lambdaParams(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "lambdaParams")) return false;
-    if (!nextTokenIs(b, L_BRACKET)) return false;
+  // JType COMMA?
+  private static boolean exceptionList_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "exceptionList_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, L_BRACKET);
+    r = JType(b, l + 1);
+    r = r && exceptionList_1_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // COMMA?
+  private static boolean exceptionList_1_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "exceptionList_1_0_1")) return false;
+    consumeToken(b, COMMA);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // Annotation* ClassHead AttributesArea? FieldArea? MethodArea?
+  static boolean item_(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item_")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = item__0(b, l + 1);
+    r = r && ClassHead(b, l + 1);
+    r = r && item__2(b, l + 1);
+    r = r && item__3(b, l + 1);
+    r = r && item__4(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // Annotation*
+  private static boolean item__0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item__0")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!Annotation(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "item__0", c)) break;
+    }
+    return true;
+  }
+
+  // AttributesArea?
+  private static boolean item__2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item__2")) return false;
+    AttributesArea(b, l + 1);
+    return true;
+  }
+
+  // FieldArea?
+  private static boolean item__3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item__3")) return false;
+    FieldArea(b, l + 1);
+    return true;
+  }
+
+  // MethodArea?
+  private static boolean item__4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item__4")) return false;
+    MethodArea(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // item_
+  static boolean jbcFile(PsiBuilder b, int l) {
+    return item_(b, l + 1);
+  }
+
+  /* ********************************************************** */
+  // LBRACKET( ("]")* STRINGVAR COLON*)*RBRACKET
+  public static boolean lambdaParams(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lambdaParams")) return false;
+    if (!nextTokenIs(b, LBRACKET)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, LBRACKET);
     r = r && lambdaParams_1(b, l + 1);
-    r = r && consumeToken(b, R_BRACKET);
+    r = r && consumeToken(b, RBRACKET);
     exit_section_(b, m, LAMBDA_PARAMS, r);
     return r;
   }
 
-  // ( ("]")* STRINGVAR ':'?)*
+  // ( ("]")* STRINGVAR COLON*)*
   private static boolean lambdaParams_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "lambdaParams_1")) return false;
     while (true) {
@@ -763,7 +769,7 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // ("]")* STRINGVAR ':'?
+  // ("]")* STRINGVAR COLON*
   private static boolean lambdaParams_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "lambdaParams_1_0")) return false;
     boolean r;
@@ -780,21 +786,35 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "lambdaParams_1_0_0")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!consumeToken(b, R_SQUARE_BRACKET)) break;
+      if (!lambdaParams_1_0_0_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "lambdaParams_1_0_0", c)) break;
     }
     return true;
   }
 
-  // ':'?
+  // ("]")
+  private static boolean lambdaParams_1_0_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lambdaParams_1_0_0_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, "]");
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // COLON*
   private static boolean lambdaParams_1_0_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "lambdaParams_1_0_2")) return false;
-    consumeToken(b, COLON);
+    while (true) {
+      int c = current_position_(b);
+      if (!consumeToken(b, COLON)) break;
+      if (!empty_element_parsed_guard_(b, "lambdaParams_1_0_2", c)) break;
+    }
     return true;
   }
 
   /* ********************************************************** */
-  // ('('(Type ','?)*')')?
+  // (LBRACKET((Annotation? Type | LEVEL ) COMMA?)*RBRACKET)?
   public static boolean params(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "params")) return false;
     Marker m = enter_section_(b, l, _NONE_, PARAMS, "<params>");
@@ -803,19 +823,19 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // '('(Type ','?)*')'
+  // LBRACKET((Annotation? Type | LEVEL ) COMMA?)*RBRACKET
   private static boolean params_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "params_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, L_BRACKET);
+    r = consumeToken(b, LBRACKET);
     r = r && params_0_1(b, l + 1);
-    r = r && consumeToken(b, R_BRACKET);
+    r = r && consumeToken(b, RBRACKET);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // (Type ','?)*
+  // ((Annotation? Type | LEVEL ) COMMA?)*
   private static boolean params_0_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "params_0_1")) return false;
     while (true) {
@@ -826,18 +846,47 @@ public class TAC_parser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // Type ','?
+  // (Annotation? Type | LEVEL ) COMMA?
   private static boolean params_0_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "params_0_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = Type(b, l + 1);
+    r = params_0_1_0_0(b, l + 1);
     r = r && params_0_1_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // ','?
+  // Annotation? Type | LEVEL
+  private static boolean params_0_1_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "params_0_1_0_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = params_0_1_0_0_0(b, l + 1);
+    if (!r) r = consumeToken(b, LEVEL);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // Annotation? Type
+  private static boolean params_0_1_0_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "params_0_1_0_0_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = params_0_1_0_0_0_0(b, l + 1);
+    r = r && Type(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // Annotation?
+  private static boolean params_0_1_0_0_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "params_0_1_0_0_0_0")) return false;
+    Annotation(b, l + 1);
+    return true;
+  }
+
+  // COMMA?
   private static boolean params_0_1_0_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "params_0_1_0_1")) return false;
     consumeToken(b, COMMA);
@@ -845,14 +894,59 @@ public class TAC_parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // item_*
-  static boolean tacFile(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "tacFile")) return false;
+  // "switch" LBRACKET LEVEL RBRACKET LBRACKET((NUMBER|"default") COLON "goto" NUMBER SEMICOLON?)* RBRACKET
+  public static boolean switchInst(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "switchInst")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, SWITCH_INST, "<switch inst>");
+    r = consumeToken(b, "switch");
+    r = r && consumeTokens(b, 0, LBRACKET, LEVEL, RBRACKET, LBRACKET);
+    r = r && switchInst_5(b, l + 1);
+    r = r && consumeToken(b, RBRACKET);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // ((NUMBER|"default") COLON "goto" NUMBER SEMICOLON?)*
+  private static boolean switchInst_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "switchInst_5")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!item_(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "tacFile", c)) break;
+      if (!switchInst_5_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "switchInst_5", c)) break;
     }
+    return true;
+  }
+
+  // (NUMBER|"default") COLON "goto" NUMBER SEMICOLON?
+  private static boolean switchInst_5_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "switchInst_5_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = switchInst_5_0_0(b, l + 1);
+    r = r && consumeToken(b, COLON);
+    r = r && consumeToken(b, "goto");
+    r = r && consumeToken(b, NUMBER);
+    r = r && switchInst_5_0_4(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // NUMBER|"default"
+  private static boolean switchInst_5_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "switchInst_5_0_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, NUMBER);
+    if (!r) r = consumeToken(b, "default");
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // SEMICOLON?
+  private static boolean switchInst_5_0_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "switchInst_5_0_4")) return false;
+    consumeToken(b, SEMICOLON);
     return true;
   }
 
