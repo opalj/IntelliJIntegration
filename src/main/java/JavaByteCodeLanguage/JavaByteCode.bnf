@@ -39,7 +39,7 @@
                        |RETURN|RET|SALOAD|SASTORE|SIPUSH|SWAP|TABLESWITCH|WIDE|\
                        |GETFIELD|GETSTATIC|GET|PUTFIELD|PUTSTATIC|PUT"
   // CONST
-  SPACE='regexp:\s+'
+  WHITE_SPACE="regexp:\s+"
   COMMA=","
   DOT="."
   COLON=":"
@@ -61,6 +61,7 @@
   ATTRIBUTES='Attributes'
   FIELDS='Fields'
   METHODS='Methods'
+  TABLES='Tables'
   INSTRUCTIONHEAD="regexp:PC\s+Line\s+Instruction"
   LVINDEX = "lvIndex="
   TABLENAME='regexp:LocalVariableTable|StackMapTable|ExceptionTable|LocalVariableTypeTable'
@@ -68,8 +69,7 @@
   PRIMITIVETYPE="regexp:void|boolean|byte|char|short|int|long|float|double"
   // TODO: default out?
   MODIFIER="regexp:public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient"
- STRINGVAR = "regexp:<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?"
- EOL="regexp:\n"
+  STRINGVAR = "regexp:<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?"
   ]
 
   psiImplUtilClass="JavaByteCodeLanguage.psi.impl.JavaByteCodePsiImplUtil"
@@ -87,7 +87,7 @@ Annotation ::= AT JType
 ModifierV ::= MODIFIER*
 
 Type ::= (LambdaType | JType | PRIMITIVETYPE)('[]')*
-JType ::= (STRINGVAR DOT)*STRINGVAR
+JType ::= (STRINGVAR DOT)*(STRINGVAR | JAVATYPEHEAD | TABLENAME | MNEMONIC)
 {
  mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
  implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
@@ -125,10 +125,7 @@ MethodArea ::= METHODS LBRACKET MethodDeclaration* RBRACKET
 MethodDeclaration ::= Annotation* MethodHead LBRACKET
         (INSTRUCTIONHEAD
          InstructionBody*
-         ExceptionTableDeclaration?
-         LocVarTableDeclaration?
-         LocVarTypeTableDeclaration?
-         StackMapTableDeclaration?)*
+         TableArea?)*
         RBRACKET
 {
  mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
@@ -175,6 +172,13 @@ JavaOP ::= "lvIndex=" NUMBER|((Type|STRINGVAR)(LBRACKET Type MethodName RBRACKET
 
 
 // tables
+
+TableArea ::= TABLES LBRACKET
+                  ExceptionTableDeclaration?
+                  LocVarTableDeclaration?
+                  LocVarTypeTableDeclaration?
+                  StackMapTableDeclaration?
+              RBRACKET
 
 ExceptionTableDeclaration ::= TABLENAME LBRACKET ExceptionTableBody* RBRACKET
 private ExceptionTableBody ::= "try" LBRACKET NUMBER COMMA NUMBER RBRACKET "catch" NUMBER (Type|STRINGVAR)

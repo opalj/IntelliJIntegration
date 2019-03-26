@@ -104,6 +104,10 @@ public class JavaByteCodeVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitTableArea(@NotNull JavaByteCodeTableArea o) {
+    visitPsiElement(o);
+  }
+
   public void visitType(@NotNull JavaByteCodeType o) {
     visitPsiElement(o);
   }

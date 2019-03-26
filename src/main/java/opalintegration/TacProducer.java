@@ -30,12 +30,9 @@ class TacProducer extends DecompiledTextProducer {
 
     if (method.body().isDefined()) {
       methodBody.append("\n");
-      //      methodBody.append(method.toString()).append(" {\n");
       TACode<TACMethodParameter, DUVar<KnownTypedValue>> TacCode =
           methodTACodeFunction.apply(method);
       methodBody.append(ToTxt.apply(TacCode).mkString("\n"));
-      methodBody.append("\n}");
-      methodBody.append("\n\n\n");
     }
 
     return methodBody.toString();

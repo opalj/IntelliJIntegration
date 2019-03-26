@@ -28,6 +28,7 @@ public class JbcFoldingBuilder extends FoldingBuilderEx {
           JavaByteCodeFieldArea.class,
           JavaByteCodeMethodArea.class,
           JavaByteCodeMethodDeclaration.class,
+          JavaByteCodeTableArea.class,
           JavaByteCodeExceptionTableDeclaration.class,
           JavaByteCodeLocVarTableDeclaration.class,
           JavaByteCodeStackMapTableDeclaration.class,

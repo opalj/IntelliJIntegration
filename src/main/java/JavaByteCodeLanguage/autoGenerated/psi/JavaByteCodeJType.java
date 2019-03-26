@@ -10,6 +10,15 @@ import com.intellij.psi.PsiReference;
 public interface JavaByteCodeJType extends JavaByteCodeNamedElement {
 
   @Nullable
+  PsiElement getJavatypehead();
+
+  @Nullable
+  PsiElement getMnemonic();
+
+  @Nullable
+  PsiElement getTablename();
+
+  @Nullable
   String getJavaType();
 
   String getName();

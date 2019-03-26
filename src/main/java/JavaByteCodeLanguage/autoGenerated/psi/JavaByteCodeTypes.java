@@ -36,6 +36,7 @@ public interface JavaByteCodeTypes {
   IElementType PARAMS = new JavaByteCodeElementType("PARAMS");
   IElementType PC_NUMBER = new JavaByteCodeElementType("PC_NUMBER");
   IElementType STACK_MAP_TABLE_DECLARATION = new JavaByteCodeElementType("STACK_MAP_TABLE_DECLARATION");
+  IElementType TABLE_AREA = new JavaByteCodeElementType("TABLE_AREA");
   IElementType TYPE = new JavaByteCodeElementType("TYPE");
 
   IElementType AT = new JavaByteCodeTokenType("@");
@@ -65,6 +66,7 @@ public interface JavaByteCodeTypes {
   IElementType STRINGVAR = new JavaByteCodeTokenType("STRINGVAR");
   IElementType SWITCH = new JavaByteCodeTokenType("?");
   IElementType TABLENAME = new JavaByteCodeTokenType("TABLENAME");
+  IElementType TABLES = new JavaByteCodeTokenType("Tables");
   IElementType THIS = new JavaByteCodeTokenType("this");
   IElementType THROWS = new JavaByteCodeTokenType("throws");
   IElementType TO = new JavaByteCodeTokenType("TO");
@@ -149,6 +151,9 @@ public interface JavaByteCodeTypes {
       }
       else if (type == STACK_MAP_TABLE_DECLARATION) {
         return new JavaByteCodeStackMapTableDeclarationImpl(node);
+      }
+      else if (type == TABLE_AREA) {
+        return new JavaByteCodeTableAreaImpl(node);
       }
       else if (type == TYPE) {
         return new JavaByteCodeTypeImpl(node);

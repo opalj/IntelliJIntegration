@@ -21,15 +21,39 @@ final class Tables {
     private Tables() {}
 
 
+    static boolean hasTables(@NotNull Method method) {
+        if(!method.methodTypeSignature().isEmpty()) {
+            return true;
+        }
+
+        if(method.body().isDefined()) {
+            Code methodBody = method.body().get();
+
+            return  methodBody.localVariableTable().isDefined()
+                    || methodBody.stackMapTable().isDefined()
+                    || !methodBody.localVariableTypeTable().isEmpty();
+        }
+
+        return false;
+    }
+
+
     /** Converts a given list of annotations into a Java-like representation. */
     @NotNull
     static String annotationsToJava(@NotNull RefArray<Annotation> annotations, String before, String after) {
         if (!annotations.isEmpty()) {
             Annotation[] annotationsCopy = new Annotation[annotations.size()];
             annotations.copyToArray(annotationsCopy);
-            String javaStyle =
+            // e.g. @java.lang.Deprecated
+            String annotationInJavaStyle =
                     Arrays.stream(annotationsCopy).map(Annotation::toJava).collect(Collectors.joining("\n"));
-            return before + javaStyle + after;
+
+            // scala annotations don't work for some
+            if(annotationInJavaStyle.startsWith("@scala")) {
+                return "";
+            }
+
+            return before + annotationInJavaStyle + after;
         } else {
             return "";
         }
