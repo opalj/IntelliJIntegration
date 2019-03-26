@@ -47,7 +47,7 @@ public class JavaByteCodeStructureViewElement
   public ItemPresentation getPresentation() {
     return element.getPresentation() == null ? new PresentationData(element.getText(),null, Icons.ABSTRACT_CLASS_ICON,null) : element.getPresentation();
   }
-@NotNull
+  @NotNull
   @Override
   public TreeElement[] getChildren() {
     if (element != null) {
@@ -70,8 +70,8 @@ public class JavaByteCodeStructureViewElement
         // tables
         if (jbcElement instanceof JavaByteCodeLocVarTableDeclaration) {
           treeElements.add(
-              new JavaByteCodeStructureViewElement(
-                  (JavaByteCodeLocVarTableDeclarationImpl) jbcElement));
+                  new JavaByteCodeStructureViewElement(
+                          (JavaByteCodeLocVarTableDeclarationImpl) jbcElement));
         }
       }
       return treeElements.toArray(new TreeElement[0]);
