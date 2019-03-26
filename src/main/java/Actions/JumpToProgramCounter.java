@@ -11,14 +11,14 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 
 /**
- * TODO: rename to JumpToPC or JumpToProgramCounter (not doing it now because previously refactoring
+ *
  * had caused severe issues)
  *
  * <p>This action performs on jump statements in the bytecode. It puts the caret on the line with
  * the matching PC, e.g. GOTO(523) will put the caret on the line where the program counter equals
  * 523.
  */
-public class JumpToLine extends AnAction {
+public class JumpToProgramCounter extends AnAction {
 
   @Override
   public void actionPerformed(AnActionEvent e) {

@@ -10,7 +10,7 @@ import org.opalj.br.instructions.*;
  * <p>(The methods seem to be grayed out since they are invoked like this: getMethod("visit",...),
  *
  * @see opalintegration.Visitor.ElementAcceptor#accept(Object, int...) )
- *     <p>TODO: TABLESWITCH
+ *
  */
 public interface InstructionVisitor {
   String visit(ANEWARRAY anewarray);

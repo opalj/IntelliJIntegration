@@ -19,7 +19,6 @@
   NUMBER ='regexp:[-]?\d+(\.\d*)?([Efdl]\d*)?'
   STRING="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\")"
   // CONST
-  SPACE='regexp:\s+'
   COMMA=","
   DOT="."
   COLON=":"
@@ -41,7 +40,7 @@
   FIELDS='Fields'
   METHODS='Methods'
   INSTRUCTIONHEAD="regexp:PC\s+Line\s+Instruction"
-  LVLINDEXTOKEN = "lvIndex=" // TODO better rename =D
+  LVLINDEX = "lvIndex="
   // TYPES
   PRIMITIVETYPE="regexp:void|boolean|byte|char|short|int|long|float|double"
   KEYWORDS="regexp:new|goto|if|else|throw|throws|catch|caught|return"
@@ -71,7 +70,7 @@ JType ::= (STRINGVAR DOT)*STRINGVAR
 {
  mixin="taclanguage.psi.impl.TACNamedElementImpl"
  implements="taclanguage.psi.TACNamedElement"
- methods=[getJavaType getName setName getNameIdentifier getReferences]
+ methods=[getJavaType getName getNameIdentifier getReferences]
 }
 
 // lambda.InnerVsLambdaThis$<init>()V:5$Lambda{ lambda.InnerVsLambdaThis$<init>()V:5$Lambda $newInstance(lambda.InnerVsLambdaThis) }
@@ -94,7 +93,7 @@ FieldsDeclaration ::= ModifierV? Type DefMethodName
 {
  mixin="taclanguage.psi.impl.TACNamedElementImpl"
  implements="taclanguage.psi.TACNamedElement"
- methods=[getName setName getNameIdentifier getPresentation navigate]
+ methods=[getName getNameIdentifier getPresentation navigate]
 }
 
 // methods
@@ -108,7 +107,7 @@ MethodDeclaration ::= Annotation* MethodHead LBRACKET
 {
  mixin="taclanguage.psi.impl.TACNamedElementImpl"
  implements="taclanguage.psi.TACNamedElement"
- methods=[getName setName getNameIdentifier getPresentation navigate]
+ methods=[getName getNameIdentifier getPresentation navigate]
 }
 
 MethodHead ::= ModifierV? Type MethodName  // JAVA
@@ -118,7 +117,7 @@ DefMethodName ::= STRINGVAR
 {
  mixin="taclanguage.psi.impl.TACNamedElementImpl"
  implements="taclanguage.psi.TACNamedElement"
- methods=[getStringVar getName setName getNameIdentifier getReferences]
+ methods=[getStringVar getName getNameIdentifier getReferences]
 }
 params ::= (LBRACKET((Annotation? Type | LEVEL ) COMMA?)*RBRACKET)?
 private exceptionList ::= THROWS (JType COMMA?)*

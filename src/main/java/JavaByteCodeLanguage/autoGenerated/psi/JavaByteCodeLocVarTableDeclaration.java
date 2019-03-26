@@ -17,8 +17,6 @@ public interface JavaByteCodeLocVarTableDeclaration extends JavaByteCodeNamedEle
 
   String getName();
 
-  PsiElement setName(String newName);
-
   PsiElement getNameIdentifier();
 
   ItemPresentation getPresentation();

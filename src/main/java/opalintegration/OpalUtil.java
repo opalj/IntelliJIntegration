@@ -62,6 +62,10 @@ public class OpalUtil {
     }else {
       updateStateIfNewClassFile(virtualFile, project,false);
     }
+    // if something went wrong during the opal project creation, just return the passed in class file
+    if(classFile== null){
+      return  virtualFile;
+    }
     String fileName = virtualFile.getNameWithoutExtension();
     String representableForm = null;
     switch (prepareID) {
@@ -98,7 +102,7 @@ public class OpalUtil {
   }
 
   /**
-   * TODO: currently fails to update the content on a change
+   *
    *
    * <p>an auxiliary method that writes 'content' to a 'file' (main purpose of this method is to
    * encapsulate the try/catch block)
@@ -140,8 +144,6 @@ public class OpalUtil {
     } catch (IOException e) {
       LOGGER.log(Level.SEVERE, e.toString(), e);
     }
-
-    // TODO not null
     return null;
   }
 
@@ -219,8 +221,6 @@ public class OpalUtil {
         LOGGER.log(Level.SEVERE, e.toString(), e);
       }
     }
-
-    // TODO: what to do in this case?
     return null;
   }
 

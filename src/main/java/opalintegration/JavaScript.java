@@ -32,7 +32,7 @@ public class JavaScript {
 
     //    String highlightColor = JBColor.isBright() ? lightThemeHighlight : darkThemeHighlight;
     String highlightColor = lightThemeHighlight;
-    String originalColor = "\"#FFFFFF\""; // TODO: need one for dark theme as well
+    String originalColor = "\"#FFFFFF\"";
 
     // orig (e.g. get it from CSS)?
     String script =
@@ -67,7 +67,7 @@ public class JavaScript {
 
     //    String highlightColor = JBColor.isBright() ? lightThemeHighlight : darkThemeHighlight;
     String highlightColor = lightThemeHighlight;
-    String originalColor = "\"#F7F7F7\""; // TODO: need one for dark theme as well
+    String originalColor = "\"#F7F7F7\"";
 
     // orig (e.g. get it from CSS)?
     String script =

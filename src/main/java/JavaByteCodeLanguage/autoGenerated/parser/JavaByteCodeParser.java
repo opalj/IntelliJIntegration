@@ -412,7 +412,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   //                                      MODIFIER SWITCH NUMBER
   //                             RBRACKET
   //                             // LOOKUPSWITCH(default:34[(case:-127,31)(case:128,26)])
-  //                           | LBRACKET MODIFIER COLON NUMBER 
+  //                           | LBRACKET MODIFIER COLON NUMBER
   //                                 LBRACKET
   //                                   (LBRACKET CASE COLON NUMBER COMMA NUMBER RBRACKET)*
   //                                 RBRACKET
@@ -439,7 +439,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   //                                      MODIFIER SWITCH NUMBER
   //                             RBRACKET
   //                             // LOOKUPSWITCH(default:34[(case:-127,31)(case:128,26)])
-  //                           | LBRACKET MODIFIER COLON NUMBER 
+  //                           | LBRACKET MODIFIER COLON NUMBER
   //                                 LBRACKET
   //                                   (LBRACKET CASE COLON NUMBER COMMA NUMBER RBRACKET)*
   //                                 RBRACKET
@@ -461,7 +461,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   //                                      MODIFIER SWITCH NUMBER
   //                             RBRACKET
   //                             // LOOKUPSWITCH(default:34[(case:-127,31)(case:128,26)])
-  //                           | LBRACKET MODIFIER COLON NUMBER 
+  //                           | LBRACKET MODIFIER COLON NUMBER
   //                                 LBRACKET
   //                                   (LBRACKET CASE COLON NUMBER COMMA NUMBER RBRACKET)*
   //                                 RBRACKET
@@ -599,7 +599,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // LBRACKET MODIFIER COLON NUMBER 
+  // LBRACKET MODIFIER COLON NUMBER
   //                                 LBRACKET
   //                                   (LBRACKET CASE COLON NUMBER COMMA NUMBER RBRACKET)*
   //                                 RBRACKET
@@ -690,7 +690,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "JavaOP")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, JAVA_OP, "<java op>");
-    r = parseTokens(b, 0, FUCKINGTOKEN, NUMBER);
+    r = parseTokens(b, 0, LVINDEX, NUMBER);
     if (!r) r = JavaOP_1(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;

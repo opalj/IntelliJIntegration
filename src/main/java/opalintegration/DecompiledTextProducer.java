@@ -137,12 +137,6 @@ abstract class DecompiledTextProducer {
     methodText.append(beginArea("Methods")).append("\n");
     while (methods.hasNext()) {
       Method method = methods.next();
-      if (method.methodTypeSignature().isDefined()) {
-        // TODO "diamond operator"
-        MethodTypeSignature methodTypeSignatureOption = method.methodTypeSignature().get();
-        List<ThrowsSignature> throwsSignatureList = methodTypeSignatureOption.throwsSignature();
-        System.out.println(throwsSignatureList);
-      }
       methodText.append(Tables.annotationsToJava(method.annotations(), "\n", "\n"));
       methodText
           .append(methodDescriptor(method))

@@ -37,10 +37,6 @@ public class TACJTypeImpl extends TACNamedElementImpl implements TACJType {
     return TAC_parserParserUtil.getName(this);
   }
 
-  public PsiElement setName(String newName) {
-    return TAC_parserParserUtil.setName(this, newName);
-  }
-
   @Nullable
   public PsiElement getNameIdentifier() {
     return TAC_parserParserUtil.getNameIdentifier(this);

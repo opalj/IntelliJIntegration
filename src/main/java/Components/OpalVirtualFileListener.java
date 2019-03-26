@@ -36,7 +36,6 @@ public class OpalVirtualFileListener implements ProjectComponent {
      */
     @Override
     public void contentsChanged(@NotNull VirtualFileEvent event) {
-      // TODO: does this take care of the NullPointerException ?
       if ( event.getFile().getExtension() == null) {
         return;
       }

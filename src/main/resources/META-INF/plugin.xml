@@ -73,7 +73,7 @@
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             <mouse-shortcut keymap="$default" keystroke="control alt button3"/>
         </action>
-        <action id="jumptoline" class="Actions.JumpToLine" text="Test">
+        <action id="jumptoline" class="Actions.JumpToProgramCounter" text="Test">
             <keyboard-shortcut first-keystroke="control X" second-keystroke="control X" keymap="$default"/>
         </action>
         <action id="jumptosource" class="Actions.JumpToSource" text="Test">

@@ -38,8 +38,6 @@ public interface JavaByteCodeMethodDeclaration extends JavaByteCodeNamedElement 
 
   String getName();
 
-  PsiElement setName(String newName);
-
   PsiElement getNameIdentifier();
 
   ItemPresentation getPresentation();

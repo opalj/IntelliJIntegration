@@ -3,6 +3,7 @@ package taclanguage.psi.impl;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
+import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import taclanguage.psi.TACNamedElement;
@@ -11,10 +12,10 @@ public abstract class TACNamedElementImpl extends ASTWrapperPsiElement implement
     public TACNamedElementImpl(@NotNull ASTNode node) {
         super(node);
     }
-
-    @Nullable
     @Override
-    public PsiElement getNameIdentifier() {
+    public PsiElement setName(@NotNull String name) throws IncorrectOperationException {
+        //not needed because no refactoring/renaming
         return null;
     }
+
 }

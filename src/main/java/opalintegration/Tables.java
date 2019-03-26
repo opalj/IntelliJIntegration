@@ -170,7 +170,7 @@ final class Tables {
                 .append(body.localVariableTypeTable().size()) // TODO: not always correct? see Cl.ManyMethods#genericMethod
                 .append(" item(s)]\n");
 
-        // TODO: currently text written as a side-effect, and return value is ignored ... improve?
+        //write the text for the localVarTypeTable
         body.localVariableTypeTable().foreach(locVarTypeRefArray -> {
             for(int i=0; i < locVarTypeRefArray.length(); ++i) {
                 LocalVariableType localVariableType = locVarTypeRefArray.apply(i);
@@ -210,7 +210,7 @@ final class Tables {
 
     /**
      * E.g. if the exception table contains two exceptions, say IOException and RuntimeException, then
-     * the output will be: generate in a Table TODO
+     * the output will be: generate in a Table
      *
      * @param body The table which contains the exceptions that the method throws
      * @return a string which contains a throws clause

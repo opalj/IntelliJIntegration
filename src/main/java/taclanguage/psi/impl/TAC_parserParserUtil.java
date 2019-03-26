@@ -72,42 +72,13 @@ public class TAC_parserParserUtil extends GeneratedParserUtilBase {
         public static String getName(TACMethodDeclaration element) {
             return element.getMethodHead().getText();
         }
-    public static String getName(TACFieldsDeclaration element) {
+
+        public static String getName(TACFieldsDeclaration element) {
         return element.getDefMethodName().getText();
     }
-        /** @see PsiNamedElement#setName */
-        public static PsiElement setName(@NotNull TACJType element, String newName) {
-            ASTNode keyNode = element.getNode();
-            if (keyNode != null) {
-
-            }
-            return element;
-        }
-
-        /** @see PsiNamedElement#setName */
-        public static PsiElement setName(@NotNull TACDefMethodName element, String newName) {
-            ASTNode keyNode = element.getNode().findChildByType(TAC_elementTypeHolder.STRINGVAR);
-            if (keyNode != null) {
-            }
-            return element;
-        }
 
 
 
-        public static PsiElement setName(@NotNull TACMethodDeclaration element, String newName) {
-            ASTNode keyNode = element.getMethodHead().getNode();
-            if (keyNode != null) {
-                // SEE ABOVE
-            }
-            return element;
-        }
-    public static PsiElement setName(@NotNull TACFieldsDeclaration element, String newName) {
-        ASTNode keyNode = element.getDefMethodName().getNode();
-        if (keyNode != null) {
-            // SEE ABOVE
-        }
-        return element;
-    }
 
         /** @see PsiNameIdentifierOwner#getNameIdentifier() */
         @Nullable

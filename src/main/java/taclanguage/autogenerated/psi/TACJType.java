@@ -14,8 +14,6 @@ public interface TACJType extends TACNamedElement {
 
   String getName();
 
-  PsiElement setName(String newName);
-
   @Nullable
   PsiElement getNameIdentifier();
 

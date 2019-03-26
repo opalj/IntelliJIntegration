@@ -48,11 +48,11 @@ public interface JavaByteCodeTypes {
   IElementType EQ = new JavaByteCodeTokenType("=");
   IElementType EXTENDS = new JavaByteCodeTokenType("extends");
   IElementType FIELDS = new JavaByteCodeTokenType("Fields");
-  IElementType FUCKINGTOKEN = new JavaByteCodeTokenType("lvIndex=");
   IElementType IMPLEMENTS = new JavaByteCodeTokenType("implements");
   IElementType INSTRUCTIONHEAD = new JavaByteCodeTokenType("INSTRUCTIONHEAD");
   IElementType JAVATYPEHEAD = new JavaByteCodeTokenType("JAVATYPEHEAD");
   IElementType LBRACKET = new JavaByteCodeTokenType("LBRACKET");
+  IElementType LVINDEX = new JavaByteCodeTokenType("lvIndex=");
   IElementType METHODS = new JavaByteCodeTokenType("Methods");
   IElementType MNEMONIC = new JavaByteCodeTokenType("MNEMONIC");
   IElementType MODIFIER = new JavaByteCodeTokenType("MODIFIER");

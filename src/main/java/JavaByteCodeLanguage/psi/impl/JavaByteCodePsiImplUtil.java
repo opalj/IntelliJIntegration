@@ -77,17 +77,6 @@ public class JavaByteCodePsiImplUtil {
     return null;
   }
 
-  /** @see PsiNamedElement#setName */
-  public static PsiElement setName(@NotNull JavaByteCodeDefMethodName element, String newName) {
-    ASTNode keyNode = element.getNode().findChildByType(JavaByteCodeTypes.STRINGVAR);
-    if (keyNode != null) {
-      JavaByteCodeMethodName property =
-          JavaByteCodeElementFactory.createMethodName(element.getProject(), newName);
-      ASTNode newKeyNode = property.getFirstChild().getNode();
-      element.getNode().replaceChild(keyNode, newKeyNode);
-    }
-    return element;
-  }
 
   /** @see PsiNameIdentifierOwner#getNameIdentifier() */
   @Nullable
@@ -114,8 +103,11 @@ public class JavaByteCodePsiImplUtil {
     try {
       return provider.getReferencesByString(element.getName(), element, 0);
     } catch (Exception e) {
-      // TODO: this can cause StackOverFlowError
-      return element.getReferences();
+      try{ return element.getReferences();}
+      catch(StackOverflowError soe){
+        LOGGER.log(Level.SEVERE,soe.toString(),soe);
+        return null;
+      }
     }
   }
 
@@ -138,17 +130,6 @@ public class JavaByteCodePsiImplUtil {
     return null;
   }
 
-  /** @see PsiNamedElement#setName */
-  public static PsiElement setName(@NotNull JavaByteCodeJType element, String newName) {
-    ASTNode keyNode = element.getNode();
-    if (keyNode != null) {
-      JavaByteCodeType type = JavaByteCodeElementFactory.createType(element.getProject(), newName);
-      ASTNode newKeyNode = type.getFirstChild().getNode();
-      element.getNode().replaceChild(keyNode, newKeyNode);
-    }
-    return element;
-  }
-
   /** @see PsiNameIdentifierOwner#getNameIdentifier() */
   @Nullable
   public static PsiElement getNameIdentifier(@NotNull JavaByteCodeJType element) {
@@ -166,14 +147,6 @@ public class JavaByteCodePsiImplUtil {
 
   public static String getName(JavaByteCodeMethodDeclaration element) {
     return element.getMethodHead().getText();
-  }
-
-  public static PsiElement setName(@NotNull JavaByteCodeMethodDeclaration element, String newName) {
-    ASTNode keyNode = element.getMethodHead().getNode();
-    if (keyNode != null) {
-      // SEE ABOVE
-    }
-    return element;
   }
 
   /** @see PsiNameIdentifierOwner#getNameIdentifier() */
@@ -248,22 +221,6 @@ public class JavaByteCodePsiImplUtil {
     return element.getDefMethodName().getText();
   }
 
-  public static PsiElement setName(
-      @NotNull JavaByteCodeLocVarTableDeclaration element, String newName) {
-    ASTNode keyNode = element.getTablename().getNode();
-    if (keyNode != null) {
-      // SEE ABOVE
-    }
-    return element;
-  }
-  public static PsiElement setName(
-          @NotNull JavaByteCodeFieldsDeclaration element, String newName) {
-    ASTNode keyNode = element.getDefMethodName().getNode();
-    if (keyNode != null) {
-      // SEE ABOVE
-    }
-    return element;
-  }
 
   /** @see PsiNameIdentifierOwner#getNameIdentifier() */
   public static PsiElement getNameIdentifier(@NotNull JavaByteCodeLocVarTableDeclaration element) {

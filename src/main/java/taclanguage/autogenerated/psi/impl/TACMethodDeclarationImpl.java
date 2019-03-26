@@ -62,10 +62,6 @@ public class TACMethodDeclarationImpl extends TACNamedElementImpl implements TAC
     return TAC_parserParserUtil.getName(this);
   }
 
-  public PsiElement setName(String newName) {
-    return TAC_parserParserUtil.setName(this, newName);
-  }
-
   public PsiElement getNameIdentifier() {
     return TAC_parserParserUtil.getNameIdentifier(this);
   }

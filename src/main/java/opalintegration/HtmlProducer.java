@@ -32,7 +32,6 @@ public class HtmlProducer {
   protected static String JavaClassToHTMLForm(String classPath) {
     Path path = Paths.get(classPath);
     File file = path.toFile();
-    // TODO scala.collection.immutable.List<Object> classFileList;
     String toHtmlAsString;
     try (FileInputStream fis = new FileInputStream(file);
         DataInputStream dis = new DataInputStream(fis)) {
@@ -51,7 +50,6 @@ public class HtmlProducer {
               + cf.classFileToXHTML(new Some(classPath)).toString()
               + "\n</body>\n</html>";
 
-      // TODO: is this ok? (talk to M. Eichberg?)
       toHtmlAsString = fixInitSymbols(toHtmlAsString);
     } catch (IOException e) {
       toHtmlAsString =
