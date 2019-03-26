@@ -66,18 +66,18 @@
         <action id="JumpToJBCEID" class="Actions.OpenClassFileJBCAction" text="Show Bytecode" icon="/icons/jar-gray.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
-            <keyboard-shortcut first-keystroke="control alt shift ." keymap="$default"/>
+            <mouse-shortcut keymap="$default" keystroke="control button3"/>
         </action>
         <action id="JumpToTACFromRMB" class="Actions.OpenClassFileTACAction" text="Show Three-Address-Code" icon="/icons/jar-gray.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
-            <keyboard-shortcut first-keystroke="control alt shift -" keymap="$default"/>
+            <mouse-shortcut keymap="$default" keystroke="control alt button3"/>
         </action>
         <action id="jumptoline" class="Actions.JumpToLine" text="Test">
             <keyboard-shortcut first-keystroke="control X" second-keystroke="control X" keymap="$default"/>
         </action>
         <action id="jumptosource" class="Actions.JumpToSource" text="Test">
-            <keyboard-shortcut first-keystroke="control Y" second-keystroke="control Y" keymap="$default"/>
+            <keyboard-shortcut first-keystroke="control alt X" second-keystroke="control alt X" keymap="$default"/>
         </action>
     </actions>
 

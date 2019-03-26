@@ -10,15 +10,29 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 
 import java.util.Objects;
 
 /**
- * Jumps from a given Instruction to the Sourcefile and set the Caret to given Linenumber
+ * Jumps from a given Instruction to the source file and set the caret to given line number
  */
 public class JumpToSource extends AnAction {
+
+    @Override
+    public void update(AnActionEvent e) {
+        super.update(e);
+
+        Project project = e.getProject();
+        VirtualFile jbcFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
+
+        // this action should only work for bytecode
+        e.getPresentation().setEnabledAndVisible(project != null && jbcFile != null && jbcFile.getExtension() != null
+            && jbcFile.getExtension().equals("jbc"));
+    }
+
     @Override
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
@@ -27,23 +41,24 @@ public class JumpToSource extends AnAction {
         if(editor == null || psiFile == null || project == null){
             return ;
         }
-        PsiElement elementAt =psiFile.findElementAt(editor.getCaretModel().getOffset());
+        PsiElement elementAt = psiFile.findElementAt(editor.getCaretModel().getOffset());
         JavaByteCodeInstructionBody parent =
                 PsiTreeUtil.getParentOfType(elementAt, JavaByteCodeInstructionBody.class);
         if(parent == null){
             return;
         }
         int lineNumber = Integer.parseInt(parent.getLineNumber().getNumber().getText());
-        PsiElement ClassName = null;
+        PsiElement fullyQualifiedClass = null;
         for (PsiElement child : psiFile.getChildren()) {
             if(child instanceof  JavaByteCodeClassHead){
-                if(((JavaByteCodeClassHead)child).getJTypeList().size()>0)
-                ClassName = ((JavaByteCodeClassHead)child).getJTypeList().get(0);
+                if(((JavaByteCodeClassHead)child).getJTypeList().size() > 0)
+                fullyQualifiedClass = ((JavaByteCodeClassHead)child).getJTypeList().get(0);
                 break;
             }
         }
-        if(ClassName != null){
-            PsiElement resolve = ClassName.getReferences()[ClassName.getReferences().length - 1].resolve();
+        if(fullyQualifiedClass != null){
+            // e.g. java.lang.String -> resolve = String
+            PsiElement resolve = fullyQualifiedClass.getReferences()[fullyQualifiedClass.getReferences().length - 1].resolve();
             Document document = PsiDocumentManager.getInstance(project).getDocument(Objects.requireNonNull(resolve).getContainingFile());
             int lineStartOffset = Objects.requireNonNull(document).getLineStartOffset(lineNumber-1);
             FileEditorManager.getInstance(project).openTextEditor(
