@@ -33,4 +33,16 @@ public class JavaByteCodeInstructionBodyImpl extends ASTWrapperPsiElement implem
     return findNotNullChildByClass(JavaByteCodeInstr.class);
   }
 
+  @Override
+  @NotNull
+  public JavaByteCodeLineNumber getLineNumber() {
+    return findNotNullChildByClass(JavaByteCodeLineNumber.class);
+  }
+
+  @Override
+  @NotNull
+  public JavaByteCodePcNumber getPcNumber() {
+    return findNotNullChildByClass(JavaByteCodePcNumber.class);
+  }
+
 }

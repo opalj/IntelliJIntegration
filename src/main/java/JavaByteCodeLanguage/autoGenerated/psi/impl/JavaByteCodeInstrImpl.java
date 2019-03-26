@@ -40,12 +40,6 @@ public class JavaByteCodeInstrImpl extends ASTWrapperPsiElement implements JavaB
   }
 
   @Override
-  @NotNull
-  public JavaByteCodeLineNumber getLineNumber() {
-    return findNotNullChildByClass(JavaByteCodeLineNumber.class);
-  }
-
-  @Override
   @Nullable
   public JavaByteCodeType getType() {
     return findChildByClass(JavaByteCodeType.class);
