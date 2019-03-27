@@ -15,7 +15,7 @@ import scala.Function1;
  */
 class TacProducer extends DecompiledTextProducer {
 
-  private Function1<Method, TACode<TACMethodParameter, DUVar<KnownTypedValue>>>
+  private final Function1<Method, TACode<TACMethodParameter, DUVar<KnownTypedValue>>>
       methodTACodeFunction;
 
   TacProducer(String filepath) {

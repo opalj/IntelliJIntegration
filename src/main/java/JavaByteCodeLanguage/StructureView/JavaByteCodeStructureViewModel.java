@@ -10,7 +10,7 @@ import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 
 /** @see TextEditorBasedStructureViewModel */
-public class JavaByteCodeStructureViewModel extends StructureViewModelBase
+class JavaByteCodeStructureViewModel extends StructureViewModelBase
     implements StructureViewModel.ElementInfoProvider {
 
   public JavaByteCodeStructureViewModel(@NotNull PsiFile psiFile) {

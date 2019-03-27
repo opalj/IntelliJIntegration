@@ -7,7 +7,6 @@ import org.opalj.bi.AccessFlagsContexts;
 import org.opalj.br.*;
 import org.opalj.collection.RefIterator;
 import org.opalj.collection.immutable.RefArray;
-import scala.collection.immutable.List;
 
 /**
  * A class that is responsible for creating the skeleton of the decompiled text for both Java

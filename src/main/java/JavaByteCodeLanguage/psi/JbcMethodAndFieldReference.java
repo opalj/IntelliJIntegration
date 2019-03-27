@@ -20,10 +20,10 @@ import org.jetbrains.annotations.Nullable;
  *
  * <p>the methods/fields may or may not be members of the current class
  */
-public class JbcMethodAndFieldReference extends PsiReferenceBase<PsiElement> {
+class JbcMethodAndFieldReference extends PsiReferenceBase<PsiElement> {
 
   // the FQN of the class the method belongs to
-  private String fqn;
+  private final String fqn;
   // the name of method or field we're looking for
   private String memberName;
   private boolean isConstructor;

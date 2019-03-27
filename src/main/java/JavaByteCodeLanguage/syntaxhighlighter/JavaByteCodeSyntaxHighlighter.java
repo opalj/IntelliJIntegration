@@ -15,10 +15,10 @@ import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 
 /** @see SyntaxHighlighter */
-public class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
+class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
 
   // Java keywords
-  public static final TextAttributesKey MODIFIER =
+  private static final TextAttributesKey MODIFIER =
       createTextAttributesKey("JBC_MODIFIER", DefaultLanguageHighlighterColors.KEYWORD);
   static final TextAttributesKey TYPE =
       createTextAttributesKey("JBC_TYPE", DefaultLanguageHighlighterColors.KEYWORD);

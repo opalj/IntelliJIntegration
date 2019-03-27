@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 /** The type Open class file action performs to open a specified editor (tac/bytecode) */
 class OpenClassFileAction extends AnAction {
-  private String editorName;
+  private final String editorName;
 
   /**
    * Instantiates a new Open class file action.
@@ -86,12 +86,6 @@ class OpenClassFileAction extends AnAction {
       classFile = virtualFile;
     }
     if (classFile != null) {
-      //      Notifications.Bus.notify(
-      //          new Notification(
-      //              "OpalPlugin",
-      //              "OpalPlugin",
-      //              "decompiling : " + classFile.getName(),
-      //              NotificationType.INFORMATION));
       Notifications.Bus.notify(
           new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
               .createNotification()
@@ -99,12 +93,7 @@ class OpenClassFileAction extends AnAction {
       FileEditorManager.getInstance(project).openFile(classFile, true);
       FileEditorManager.getInstance(project).setSelectedEditor(classFile, editorName);
     } else {
-      //      Notifications.Bus.notify(
-      //          new Notification(
-      //              "OpalPlugin",
-      //              "OpalPlugin",
-      //              "can't find or create a class file for : " + virtualFile.getName(),
-      //              NotificationType.INFORMATION));
+
       Notifications.Bus.notify(
           new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
               .createNotification()

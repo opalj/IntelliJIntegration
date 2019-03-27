@@ -12,7 +12,7 @@ import org.opalj.br.instructions.*;
  * @see opalintegration.Visitor.ElementAcceptor#accept(Object, int...) )
  *
  */
-public interface InstructionVisitor {
+interface InstructionVisitor {
   String visit(ANEWARRAY anewarray);
 
   String visit(GETSTATIC getstatic);

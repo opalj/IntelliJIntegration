@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  */
 public class JavaByteCodePsiImplUtil {
   private static final Logger LOGGER = Logger.getLogger(JavaByteCodePsiImplUtil.class.getName());
-  public static void navigate(JavaByteCodeNamedElement element, boolean requestFocus) {
+  private static void navigate(JavaByteCodeNamedElement element, boolean requestFocus) {
     Navigatable descriptor = PsiNavigationSupport.getInstance().getDescriptor(element);
     FileEditor editor = FileEditorManager.getInstance(element.getProject()).getSelectedEditor();
     if (editor instanceof DisTextEditor && descriptor != null) {
@@ -98,6 +98,7 @@ public class JavaByteCodePsiImplUtil {
    * @param element a class type (as FQN, e.g. java.lang.String)
    * @return the references to each element in the FQN (e.g. ["java", "lang", "String"])
    */
+  @NotNull
   public static PsiReference[] getReferences(JavaByteCodeJType element) {
     JavaClassReferenceProvider provider = new JavaClassReferenceProvider();
     try {
@@ -106,7 +107,7 @@ public class JavaByteCodePsiImplUtil {
       try{ return element.getReferences();}
       catch(StackOverflowError soe){
         LOGGER.log(Level.SEVERE,soe.toString(),soe);
-        return null;
+        return PsiReference.EMPTY_ARRAY;
       }
     }
   }

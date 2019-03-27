@@ -3,7 +3,6 @@ package opalintegration.Visitor.Instruction;
 import opalintegration.Visitor.ElementAcceptor;
 import org.opalj.br.instructions.*;
 import org.opalj.collection.immutable.IntIntPair;
-import org.opalj.collection.immutable.RefArray;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;

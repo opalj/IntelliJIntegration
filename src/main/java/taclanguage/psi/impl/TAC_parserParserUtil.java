@@ -149,49 +149,44 @@ public class TAC_parserParserUtil extends GeneratedParserUtilBase {
 
 
         public static ItemPresentation getPresentation(TACMethodDeclaration element) {
-            ColoredItemPresentation coloredItemPresentation =
-                    new ColoredItemPresentation() {
-                        private final TACMethodHead methodHead = element.getMethodHead();
+            return new ColoredItemPresentation() {
+                private final TACMethodHead methodHead = element.getMethodHead();
 
-                        @Nullable
-                        @Override
-                        public String getPresentableText() {
-                            return methodHead.getMethodName().getText() + ":" + methodHead.getType().getText();
-                        }
+                @Override
+                public String getPresentableText() {
+                    return methodHead.getMethodName().getText() + ":" + methodHead.getType().getText();
+                }
 
-                        @Nullable
-                        @Override
-                        public String getLocationString() {
-                            return null;
-                        }
+                @Nullable
+                @Override
+                public String getLocationString() {
+                    return null;
+                }
 
-                        @Nullable
-                        @Override
-                        public Icon getIcon(boolean unused) {
-                            int flags = Iconable.ICON_FLAG_READ_STATUS | Iconable.ICON_FLAG_VISIBILITY;
-                            try {
-                                String helpinger =
-                                        methodHead.getModifierV().getText().length() == 0
-                                                ? methodHead.getType().getText()
-                                                : methodHead.getModifierV().getText() + " " + methodHead.getType().getText();
-                                Icon icon =
-                                        PsiElementFactory.SERVICE
-                                                .getInstance(element.getProject())
-                                                .createMethodFromText(helpinger + " method()", null)
-                                                .getIcon(flags);
-                                return icon;
-                            } catch (Exception e) {
-                                return null;
-                            }
-                        }
+                @Override
+                public Icon getIcon(boolean unused) {
+                    int flags = Iconable.ICON_FLAG_READ_STATUS | Iconable.ICON_FLAG_VISIBILITY;
+                    try {
+                        String helpinger =
+                                methodHead.getModifierV().getText().length() == 0
+                                        ? methodHead.getType().getText()
+                                        : methodHead.getModifierV().getText() + " " + methodHead.getType().getText();
+                        return
+                                PsiElementFactory.SERVICE
+                                        .getInstance(element.getProject())
+                                        .createMethodFromText(helpinger + " method()", null)
+                                        .getIcon(flags);
+                    } catch (Exception e) {
+                        return null;
+                    }
+                }
 
-                        @Nullable
-                        @Override
-                        public TextAttributesKey getTextAttributesKey() {
-                            return null;
-                        }
-                    };
-            return coloredItemPresentation;
+                @Nullable
+                @Override
+                public TextAttributesKey getTextAttributesKey() {
+                    return null;
+                }
+            };
         }
 
     public static ItemPresentation getPresentation(TACFieldsDeclaration element) {
@@ -239,10 +234,10 @@ public class TAC_parserParserUtil extends GeneratedParserUtilBase {
         navigate((TACNamedElement) element, requestFocus);
     }
 
-        public static void navigate(TACNamedElement element, boolean requestFocus) {
+        private static void navigate(TACNamedElement element, boolean requestFocus) {
             Navigatable descriptor = PsiNavigationSupport.getInstance().getDescriptor(element);
             FileEditor editor = FileEditorManager.getInstance(element.getProject()).getSelectedEditor();
-            if (editor instanceof TacTextEditor) {
+            if (editor instanceof TacTextEditor || descriptor != null) {
                 ((TacTextEditor) editor).navigateTo(descriptor);
             } else {
                 ((Navigatable) element).navigate(requestFocus);

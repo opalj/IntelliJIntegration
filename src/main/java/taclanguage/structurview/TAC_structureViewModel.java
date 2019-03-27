@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import taclanguage.psi.TAC_file;
 
 
-public class TAC_structureViewModel extends StructureViewModelBase implements
+class TAC_structureViewModel extends StructureViewModelBase implements
         StructureViewModel.ElementInfoProvider {
     public TAC_structureViewModel(PsiFile psiFile) {
         super(psiFile, new TAC_structureViewElement(psiFile));

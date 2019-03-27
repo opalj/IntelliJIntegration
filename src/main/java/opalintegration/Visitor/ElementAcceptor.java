@@ -17,11 +17,11 @@ import java.util.logging.Logger;
  * @param <R> type of value computed on a visit
  */
 public abstract class ElementAcceptor<E, R> implements DefaultVistor<E, R> {
-  private Set<Class<? extends E>> Elements;
+  private final Set<Class<? extends E>> Elements;
   protected int[] pc;
   private static final Logger LOGGER = Logger.getLogger(ElementAcceptor.class.getName());
 
-  public ElementAcceptor() {
+  protected ElementAcceptor() {
     Elements = new HashSet<>();
     for (Class<?> inter : this.getClass().getInterfaces()) {
       for (Method method : inter.getMethods()) {

@@ -2,7 +2,7 @@ package opalintegration.Visitor.StackMap;
 
 import org.opalj.br.*;
 
-public interface StackMapVisitor {
+interface StackMapVisitor {
     String visit(SameLocals1StackItemFrame frame);
     String visit(SameFrame frame);
     String visit(SameLocals1StackItemFrameExtended frame);

@@ -5,7 +5,6 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import taclanguage.psi.TACNamedElement;
 
 public abstract class TACNamedElementImpl extends ASTWrapperPsiElement implements TACNamedElement {

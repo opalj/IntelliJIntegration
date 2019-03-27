@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFileFactory;
 import org.jetbrains.annotations.NotNull;
 
-public class JavaByteCodeElementFactory {
+class JavaByteCodeElementFactory {
   public static JavaByteCodeType createType(Project project, String name) {
     final JavaByteCodeFile file = createFile(project, name);
     return (JavaByteCodeType) file.getFirstChild();
