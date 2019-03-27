@@ -9,63 +9,62 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
+import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+class ExceptionTableDeclarationImplUtil {
 
-public class ExceptionTableDeclarationImplUtil {
+  /** @see NavigationUtil#navigate(JavaByteCodeNamedElement, boolean) */
+  public static void navigate(JavaByteCodeExceptionTableDeclaration element, boolean requestFocus) {
+    NavigationUtil.navigate(element, requestFocus);
+  }
 
-    /** @see NavigationUtil#navigate(JavaByteCodeNamedElement, boolean)*/
-    public static void navigate(JavaByteCodeExceptionTableDeclaration element, boolean requestFocus) {
-        NavigationUtil.navigate(element, requestFocus);
+  public static String getName(JavaByteCodeExceptionTableDeclaration element) {
+    return element.getTablename().getText();
+  }
+
+  /** @see PsiNameIdentifierOwner#getNameIdentifier() */
+  public static PsiElement getNameIdentifier(
+      @NotNull JavaByteCodeExceptionTableDeclaration element) {
+    ASTNode keyNode = element.getTablename().getNode();
+    if (keyNode != null) {
+      return keyNode.getPsi();
+    } else {
+      return null;
     }
+  }
 
-    public static String getName(JavaByteCodeExceptionTableDeclaration element) {
-        return element.getTablename().getText();
-    }
+  /**
+   * Returns the presentation of the tree element.
+   *
+   * @see ColoredItemPresentation
+   * @return the element presentation.
+   */
+  public static ItemPresentation getPresentation(JavaByteCodeExceptionTableDeclaration element) {
+    return new ColoredItemPresentation() {
+      @Override
+      public String getPresentableText() {
+        return element.getName();
+      }
 
-    /** @see PsiNameIdentifierOwner#getNameIdentifier() */
-    public static PsiElement getNameIdentifier(@NotNull JavaByteCodeExceptionTableDeclaration element) {
-        ASTNode keyNode = element.getTablename().getNode();
-        if (keyNode != null) {
-            return keyNode.getPsi();
-        } else {
-            return null;
-        }
-    }
+      @Nullable
+      @Override
+      public String getLocationString() {
+        return null;
+      }
 
-    /**
-     * Returns the presentation of the tree element.
-     *
-     * @see ColoredItemPresentation
-     *
-     * @return the element presentation.
-     */
-    public static ItemPresentation getPresentation(JavaByteCodeExceptionTableDeclaration element) {
-        return new ColoredItemPresentation() {
-            @Override
-            public String getPresentableText() {
-                return element.getName();
-            }
+      @Nullable
+      @Override
+      public Icon getIcon(boolean unused) {
+        return null;
+      }
 
-            @Nullable
-            @Override
-            public String getLocationString() {
-                return null;
-            }
-
-            @Nullable
-            @Override
-            public Icon getIcon(boolean unused) {
-                return null;
-            }
-
-            @Nullable
-            @Override
-            public TextAttributesKey getTextAttributesKey() {
-                return null;
-            }
-        };
-    }
+      @Nullable
+      @Override
+      public TextAttributesKey getTextAttributesKey() {
+        return null;
+      }
+    };
+  }
 }

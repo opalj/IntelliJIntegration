@@ -15,11 +15,17 @@ import org.opalj.br.*;
 // unused because there is no accepting methods for given element
 // unused warning happens because method call looks like this (passed as string): this.getClass().getMethod("visit", in);
 interface StackMapVisitor {
-    String visit(SameLocals1StackItemFrame frame);
-    String visit(SameFrame frame);
-    String visit(SameLocals1StackItemFrameExtended frame);
-    String visit(ChopFrame frame);
-    String visit(SameFrameExtended frame);
-    String visit(AppendFrame frame);
-    String visit(FullFrame frame);
+  String visit(SameLocals1StackItemFrame frame);
+
+  String visit(SameFrame frame);
+
+  String visit(SameLocals1StackItemFrameExtended frame);
+
+  String visit(ChopFrame frame);
+
+  String visit(SameFrameExtended frame);
+
+  String visit(AppendFrame frame);
+
+  String visit(FullFrame frame);
 }

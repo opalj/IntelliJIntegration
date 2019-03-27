@@ -6,11 +6,10 @@ import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
+import java.util.Objects;
 import opalintegration.OpalUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
 
 public class DisTextEditorProvider extends PsiAwareTextEditorProvider {
   @NonNls private static final String EDITOR_TYPE_ID = "OPAL-DIS";

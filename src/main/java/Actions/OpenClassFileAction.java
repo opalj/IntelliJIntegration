@@ -15,11 +15,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-
-
 import opalintegration.OpalUtil;
 import org.jetbrains.annotations.NotNull;
-
 
 /** The type Open class file action performs to open a specified editor (tac/bytecode) */
 class OpenClassFileAction extends AnAction {
@@ -60,10 +57,10 @@ class OpenClassFileAction extends AnAction {
     Project project = event.getData(CommonDataKeys.PROJECT);
     // currently selected file in the project view
     VirtualFile virtualFile = event.getData(CommonDataKeys.VIRTUAL_FILE);
-    if(virtualFile == null || project == null){
+    if (virtualFile == null || project == null) {
       return;
     }
-    String extension = virtualFile.getExtension() ;
+    String extension = virtualFile.getExtension();
     VirtualFile classFile = null;
     if (!StdFileTypes.CLASS.getDefaultExtension().equals(extension)) {
       if (Compiler.make(project, virtualFile)) {
@@ -115,8 +112,10 @@ class OpenClassFileAction extends AnAction {
     Module module = projectFileIndex.getModuleForFile(javaFile);
     // get the output directory
     if (module != null) {
-      VirtualFile outputPath = Objects.requireNonNull(CompilerModuleExtension.getInstance(module)).getCompilerOutputPath();
-      if(outputPath == null){
+      VirtualFile outputPath =
+          Objects.requireNonNull(CompilerModuleExtension.getInstance(module))
+              .getCompilerOutputPath();
+      if (outputPath == null) {
         return null;
       }
       outputPath.refresh(false, true);
@@ -132,7 +131,7 @@ class OpenClassFileAction extends AnAction {
             public Result visitFileEx(@NotNull VirtualFile file) {
               if (!file.isDirectory() && file.getName().equals(classFileName)) {
                 classFiles.add(file);
-                //VirtualFileVisitor.limit(0);
+                // VirtualFileVisitor.limit(0);
                 return VirtualFileVisitor.SKIP_CHILDREN;
               }
               return CONTINUE;

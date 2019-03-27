@@ -65,7 +65,7 @@ abstract class DecompiledTextProducer {
   private String attributes(@NotNull ClassFile classFile) {
     StringBuilder classAttributes = new StringBuilder();
 
-    if(classFile.innerClasses().isEmpty() && classFile.bootstrapMethodTable().isEmpty()) {
+    if (classFile.innerClasses().isEmpty() && classFile.bootstrapMethodTable().isEmpty()) {
       return "";
     }
 
@@ -98,13 +98,13 @@ abstract class DecompiledTextProducer {
       Field field = fields.apply(j);
       String accessFlags = AccessFlags.toString(field.accessFlags(), AccessFlagsContexts.FIELD());
       fieldsText
-              .append("\t")
-              .append(accessFlags)
-              .append(accessFlags.isEmpty() ? "" : " ")
-              .append(field.fieldType().toJava())
-              .append(" ")
-              .append(field.name())
-              .append("\n");
+          .append("\t")
+          .append(accessFlags)
+          .append(accessFlags.isEmpty() ? "" : " ")
+          .append(field.fieldType().toJava())
+          .append(" ")
+          .append(field.name())
+          .append("\n");
     }
     fieldsText.append(endArea("Fields"));
 
@@ -151,31 +151,38 @@ abstract class DecompiledTextProducer {
     return methodText.toString();
   }
 
-
   @NotNull
-  private String methodDescriptor(@NotNull Method method){
+  private String methodDescriptor(@NotNull Method method) {
     MethodDescriptor descriptor = method.descriptor();
     StringBuilder methodDescriptorBuilder = new StringBuilder();
-    String flag = AccessFlags.toString(method.accessFlags(), AccessFlagsContexts.METHOD())+" ";
-    if(flag.length() > 0)
-    methodDescriptorBuilder.append(flag);
-    methodDescriptorBuilder.append(descriptor.returnType().toJava()).append(" ")
-            .append(method.name()).append("(");
+    String flag = AccessFlags.toString(method.accessFlags(), AccessFlagsContexts.METHOD()) + " ";
+    if (flag.length() > 0) methodDescriptorBuilder.append(flag);
+    methodDescriptorBuilder
+        .append(descriptor.returnType().toJava())
+        .append(" ")
+        .append(method.name())
+        .append("(");
     FieldType[] parameters = new FieldType[descriptor.parametersCount()];
     descriptor.parameterTypes().copyToArray(parameters);
-    RefArray<RefArray<Annotation>> invisibleParameterAnnotations = method.runtimeInvisibleParameterAnnotations();
-    RefArray<RefArray<Annotation>> visibleParameterAnnotations = method.runtimeVisibleParameterAnnotations();
+    RefArray<RefArray<Annotation>> invisibleParameterAnnotations =
+        method.runtimeInvisibleParameterAnnotations();
+    RefArray<RefArray<Annotation>> visibleParameterAnnotations =
+        method.runtimeVisibleParameterAnnotations();
     for (int i = 0; i < parameters.length; i++) {
-      if(i < invisibleParameterAnnotations.size() && invisibleParameterAnnotations.apply(i).size() > 0)
-        methodDescriptorBuilder.append(Tables.annotationsToJava(invisibleParameterAnnotations.apply(i),""," "));
-      if(i < visibleParameterAnnotations.size() && visibleParameterAnnotations.apply(i).size() > 0)
-        methodDescriptorBuilder.append(Tables.annotationsToJava(visibleParameterAnnotations.apply(i),""," "));
+      if (i < invisibleParameterAnnotations.size()
+          && invisibleParameterAnnotations.apply(i).size() > 0)
+        methodDescriptorBuilder.append(
+            Tables.annotationsToJava(invisibleParameterAnnotations.apply(i), "", " "));
+      if (i < visibleParameterAnnotations.size() && visibleParameterAnnotations.apply(i).size() > 0)
+        methodDescriptorBuilder.append(
+            Tables.annotationsToJava(visibleParameterAnnotations.apply(i), "", " "));
       methodDescriptorBuilder.append(parameters[i].toJava()).append(",");
     }
-    //delete last comma
-    if(methodDescriptorBuilder.charAt(methodDescriptorBuilder.length()-1) == ',')
-    methodDescriptorBuilder.deleteCharAt(methodDescriptorBuilder.length()-1);
-    //methodDescriptorBuilder.append(Arrays.stream(parameters).map(p-> p.toJava()).collect(Collectors.joining(",")));
+    // delete last comma
+    if (methodDescriptorBuilder.charAt(methodDescriptorBuilder.length() - 1) == ',')
+      methodDescriptorBuilder.deleteCharAt(methodDescriptorBuilder.length() - 1);
+    // methodDescriptorBuilder.append(Arrays.stream(parameters).map(p->
+    // p.toJava()).collect(Collectors.joining(",")));
     methodDescriptorBuilder.append(")");
     return methodDescriptorBuilder.toString();
   }
@@ -183,14 +190,45 @@ abstract class DecompiledTextProducer {
   @NotNull
   @Contract(pure = true)
   private String beginArea(String areaName) {
-    return areaName  + " {\n";
+    return areaName + " {\n";
   }
-
 
   @NotNull
   @Contract(pure = true)
   private String endArea(String areaName) {
     return "} //" + areaName + "\n\n\n";
   }
-}
 
+  /**
+   * This is a temporary method that is used to fix a bug that comes from OPAL where an escaping
+   * backslash will be removed, e.g. '(id=\")' becomes '(id="|)' which causes errors, so we add an
+   * escape \ in front of every \ -> '(id=\\")' becomes '(id=\"|)'
+   *
+   * @param instructionLine The current line to fix
+   * @return The line with fixed escape characters, if contained any
+   */
+  String opalStringBugFixer(String instructionLine) {
+    if (!instructionLine.matches(".*\"(.|\n|\r|\t|\b)*\".*")) {
+      return instructionLine;
+    }
+
+    // replaces a \ with a \\ -> needed because e.g. LDC("s\") would escape the last " and
+    // thus break the syntax
+    instructionLine = instructionLine.replaceAll("\\\\", "\\\\\\\\");
+
+    int firstDoubleQuote = instructionLine.indexOf('"');
+    int lastDoubleQuote = instructionLine.lastIndexOf('"');
+    String stringContent = instructionLine.substring(firstDoubleQuote + 1, lastDoubleQuote);
+    stringContent = stringContent.replace("\"", "\\\"");
+    stringContent = stringContent.replace("\n", "\\n");
+    stringContent = stringContent.replace("\t", "\\t");
+    stringContent = stringContent.replace("\r", "\\r");
+    stringContent = stringContent.replace("\b", "\\b");
+    instructionLine =
+        instructionLine.substring(0, firstDoubleQuote + 1)
+            + stringContent
+            + instructionLine.substring(lastDoubleQuote);
+
+    return instructionLine;
+  }
+}

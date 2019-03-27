@@ -31,7 +31,7 @@ class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
   private static final TextAttributesKey THROWS =
       createTextAttributesKey("JBC_THROWS", DefaultLanguageHighlighterColors.KEYWORD);
   private static final TextAttributesKey CASE =
-          createTextAttributesKey("JBC_CASE", DefaultLanguageHighlighterColors.KEYWORD);
+      createTextAttributesKey("JBC_CASE", DefaultLanguageHighlighterColors.KEYWORD);
 
   // comments (includes block comments)
   public static final TextAttributesKey COMMENT =
@@ -58,7 +58,7 @@ class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
   private static final TextAttributesKey[] JAVA_KEYWORD_KEYS =
       new TextAttributesKey[] {TYPE, MODIFIER, JAVATYPEHEAD, EXTENDS, IMPLEMENTS, THROWS, CASE};
   private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
-  private static final TextAttributesKey[] ANNOTATION_KEYS = new TextAttributesKey[] { ANNOTATION };
+  private static final TextAttributesKey[] ANNOTATION_KEYS = new TextAttributesKey[] {ANNOTATION};
 
   @NotNull
   @Override
@@ -71,7 +71,7 @@ class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
   public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
     if (tokenType.equals(JavaByteCodeTypes.COMMENT)) {
       return COMMENT_KEYS;
-    } else if(tokenType.equals(JavaByteCodeTypes.ANNOTATION)) {
+    } else if (tokenType.equals(JavaByteCodeTypes.ANNOTATION)) {
       // TODO: only works for tokens
       return ANNOTATION_KEYS;
     } else if (tokenType.equals(JavaByteCodeTypes.MNEMONIC)) {

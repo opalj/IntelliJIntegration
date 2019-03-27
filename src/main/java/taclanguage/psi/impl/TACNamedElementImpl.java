@@ -8,13 +8,13 @@ import org.jetbrains.annotations.NotNull;
 import taclanguage.psi.TACNamedElement;
 
 public abstract class TACNamedElementImpl extends ASTWrapperPsiElement implements TACNamedElement {
-    public TACNamedElementImpl(@NotNull ASTNode node) {
-        super(node);
-    }
-    @Override
-    public PsiElement setName(@NotNull String name) throws IncorrectOperationException {
-        //not needed because no refactoring/renaming
-        return null;
-    }
+  public TACNamedElementImpl(@NotNull ASTNode node) {
+    super(node);
+  }
 
+  @Override
+  public PsiElement setName(@NotNull String name) throws IncorrectOperationException {
+    // not needed because no refactoring/renaming
+    return null;
+  }
 }

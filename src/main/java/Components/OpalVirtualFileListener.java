@@ -8,7 +8,6 @@ import com.intellij.openapi.vfs.*;
 import globalData.GlobalData;
 import java.util.Arrays;
 import java.util.Objects;
-
 import opalintegration.OpalUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,17 +35,23 @@ public class OpalVirtualFileListener implements ProjectComponent {
      */
     @Override
     public void contentsChanged(@NotNull VirtualFileEvent event) {
-      if ( event.getFile().getExtension() == null) {
+      if (event.getFile().getExtension() == null) {
         return;
       }
       if (event.getFile().getExtension().equals(StdFileTypes.CLASS.getDefaultExtension())) {
         Arrays.stream(FileEditorManager.getInstance(project).getEditors(event.getFile()))
             .filter(
-                (e) -> !Objects.equals(Objects.requireNonNull(e.getFile()).getExtension(),StdFileTypes.CLASS.getDefaultExtension()))
+                (e) ->
+                    !Objects.equals(
+                        Objects.requireNonNull(e.getFile()).getExtension(),
+                        StdFileTypes.CLASS.getDefaultExtension()))
             .forEach(
                 e -> {
                   OpalUtil.prepare(
-                      project, Objects.requireNonNull(e.getFile().getExtension()), event.getFile(), e.getFile());
+                      project,
+                      Objects.requireNonNull(e.getFile().getExtension()),
+                      event.getFile(),
+                      e.getFile());
                   e.getFile().refresh(false, false);
                 });
       } else if (GlobalData.DISASSEMBLED_FILE_ENDING_JBC.equals(event.getFile().getExtension())

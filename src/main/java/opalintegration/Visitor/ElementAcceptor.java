@@ -47,7 +47,10 @@ public abstract class ElementAcceptor<E, R> implements DefaultVistor<E, R> {
           in.cast(e);
           Object invoke = visit.invoke(this, e);
           return (R) invoke;
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassCastException e1) {
+        } catch (NoSuchMethodException
+            | IllegalAccessException
+            | InvocationTargetException
+            | ClassCastException e1) {
           LOGGER.log(Level.SEVERE, e1.toString(), e1);
         }
       }

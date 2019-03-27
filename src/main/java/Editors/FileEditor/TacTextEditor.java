@@ -7,8 +7,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 public class TacTextEditor extends PsiAwareTextEditorImpl {
-  TacTextEditor(
-      @NotNull Project project, @NotNull VirtualFile file, TextEditorProvider provider) {
+  TacTextEditor(@NotNull Project project, @NotNull VirtualFile file, TextEditorProvider provider) {
     super(project, file, provider);
   }
 

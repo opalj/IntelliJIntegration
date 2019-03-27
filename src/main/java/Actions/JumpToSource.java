@@ -17,72 +17,73 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
-
 import java.util.Objects;
 
-/**
- * Jumps from a given Instruction to the source file and set the caret to given line number
- */
+/** Jumps from a given Instruction to the source file and set the caret to given line number */
 public class JumpToSource extends AnAction {
 
-    @Override
-    public void update(AnActionEvent e) {
-        super.update(e);
+  @Override
+  public void update(AnActionEvent e) {
+    super.update(e);
 
-        Project project = e.getProject();
-        VirtualFile jbcFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
+    Project project = e.getProject();
+    VirtualFile jbcFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
 
-        // this action should only work for bytecode
-        e.getPresentation().setEnabledAndVisible(project != null && jbcFile != null && jbcFile.getExtension() != null
-            && jbcFile.getExtension().equals("jbc"));
+    // this action should only work for bytecode
+    e.getPresentation()
+        .setEnabledAndVisible(
+            project != null
+                && jbcFile != null
+                && jbcFile.getExtension() != null
+                && jbcFile.getExtension().equals("jbc"));
+  }
+
+  @Override
+  public void actionPerformed(AnActionEvent e) {
+    Project project = e.getProject();
+    Editor editor = e.getData(CommonDataKeys.EDITOR);
+    PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
+    if (editor == null || psiFile == null || project == null) {
+      return;
     }
-
-    @Override
-    public void actionPerformed(AnActionEvent e) {
-        Project project = e.getProject();
-        Editor editor = e.getData(CommonDataKeys.EDITOR);
-        PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
-        if(editor == null || psiFile == null || project == null){
-            return ;
-        }
-        PsiElement elementAt = psiFile.findElementAt(editor.getCaretModel().getOffset());
-        JavaByteCodeInstructionBody parent =
-                PsiTreeUtil.getParentOfType(elementAt, JavaByteCodeInstructionBody.class);
-        if(parent == null){
-            return;
-        }
-        int lineNumber = Integer.parseInt(parent.getLineNumber().getNumber().getText());
-        if(lineNumber==0){
-            return;
-        }
-        JavaByteCodeJType fullyQualifiedClass = null;
-        for (PsiElement child : psiFile.getChildren()) {
-            if(child instanceof  JavaByteCodeClassHead){
-                if(((JavaByteCodeClassHead)child).getJTypeList().size() > 0)
-                fullyQualifiedClass = ((JavaByteCodeClassHead)child).getJTypeList().get(0);
-                break;
-            }
-        }
-        if(fullyQualifiedClass != null){
-            // e.g. java.lang.String -> resolve = String
-            PsiElement resolve = fullyQualifiedClass.getReferences()[fullyQualifiedClass.getReferences().length - 1].resolve();
-            resolve = resolve != null ? resolve.getNavigationElement() : null;
-            if(resolve!= null) {
-                PsiFile resolvePsiFile = Objects.requireNonNull(resolve).getContainingFile();
-                VirtualFile resolvedVirtualFile = resolvePsiFile.getVirtualFile();
-                Document document = PsiDocumentManager.getInstance(project).getDocument(resolvePsiFile);
-                int lineStartOffset = Objects.requireNonNull(document).getLineStartOffset(lineNumber - 1);
-                FileEditorManager.getInstance(project).openTextEditor(
-                        new OpenFileDescriptor(project,
-                                resolvedVirtualFile,
-                                lineStartOffset
-                        ), true);
-                return;
-            }
-        }
-            Notifications.Bus.notify(
-                    new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
-                            .createNotification()
-                            .setContent("can't find navigation path"));
+    PsiElement elementAt = psiFile.findElementAt(editor.getCaretModel().getOffset());
+    JavaByteCodeInstructionBody parent =
+        PsiTreeUtil.getParentOfType(elementAt, JavaByteCodeInstructionBody.class);
+    if (parent == null) {
+      return;
     }
+    int lineNumber = Integer.parseInt(parent.getLineNumber().getNumber().getText());
+    if (lineNumber == 0) {
+      return;
+    }
+    JavaByteCodeJType fullyQualifiedClass = null;
+    for (PsiElement child : psiFile.getChildren()) {
+      if (child instanceof JavaByteCodeClassHead) {
+        if (((JavaByteCodeClassHead) child).getJTypeList().size() > 0)
+          fullyQualifiedClass = ((JavaByteCodeClassHead) child).getJTypeList().get(0);
+        break;
+      }
+    }
+    if (fullyQualifiedClass != null) {
+      // e.g. java.lang.String -> resolve = String
+      PsiElement resolve =
+          fullyQualifiedClass.getReferences()[fullyQualifiedClass.getReferences().length - 1]
+              .resolve();
+      resolve = resolve != null ? resolve.getNavigationElement() : null;
+      if (resolve != null) {
+        PsiFile resolvePsiFile = Objects.requireNonNull(resolve).getContainingFile();
+        VirtualFile resolvedVirtualFile = resolvePsiFile.getVirtualFile();
+        Document document = PsiDocumentManager.getInstance(project).getDocument(resolvePsiFile);
+        int lineStartOffset = Objects.requireNonNull(document).getLineStartOffset(lineNumber - 1);
+        FileEditorManager.getInstance(project)
+            .openTextEditor(
+                new OpenFileDescriptor(project, resolvedVirtualFile, lineStartOffset), true);
+        return;
+      }
+    }
+    Notifications.Bus.notify(
+        new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
+            .createNotification()
+            .setContent("can't find navigation path"));
+  }
 }

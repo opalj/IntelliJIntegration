@@ -1,11 +1,10 @@
 package opalintegration.Visitor.Instruction;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import opalintegration.Visitor.ElementAcceptor;
 import org.opalj.br.instructions.*;
 import org.opalj.collection.immutable.IntIntPair;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 /**
  * Visits specific bytecode instructions which are defined in the list, and for each of them it
@@ -25,9 +24,16 @@ public class InstructionVisitorImpl extends ElementAcceptor<Instruction, String>
 
   @Override
   public String visit(LOOKUPSWITCH s) {
-    IntIntPair[] intIntPairs =new IntIntPair[s.npairs().size()];
+    IntIntPair[] intIntPairs = new IntIntPair[s.npairs().size()];
     s.npairs().copyToArray(intIntPairs);
-    return s.mnemonic().toUpperCase()+"(default:"+(s.defaultOffset()+pc[0])+"["+ Arrays.stream(intIntPairs).map(p->"(case:"+p._1()+","+(p._2()+pc[0])+")").collect(Collectors.joining(""))+"])";
+    return s.mnemonic().toUpperCase()
+        + "(default:"
+        + (s.defaultOffset() + pc[0])
+        + "["
+        + Arrays.stream(intIntPairs)
+            .map(p -> "(case:" + p._1() + "," + (p._2() + pc[0]) + ")")
+            .collect(Collectors.joining(""))
+        + "])";
   }
 
   @Override
@@ -86,7 +92,7 @@ public class InstructionVisitorImpl extends ElementAcceptor<Instruction, String>
   }
 
   public String visit(ANEWARRAY anewarray) {
-    return anewarray.mnemonic().toUpperCase() + "(" + anewarray.componentType().toJava()+")";
+    return anewarray.mnemonic().toUpperCase() + "(" + anewarray.componentType().toJava() + ")";
   }
 
   public String visit(GETSTATIC getstatic) {
@@ -97,7 +103,7 @@ public class InstructionVisitorImpl extends ElementAcceptor<Instruction, String>
         + getstatic.name()
         + " : "
         + getstatic.fieldType().toJava()
-            +")";
+        + ")";
   }
 
   public String visit(GETFIELD getfield) {
@@ -106,7 +112,8 @@ public class InstructionVisitorImpl extends ElementAcceptor<Instruction, String>
         + "."
         + getfield.name()
         + " : "
-        + getfield.fieldType().toJava()+")";
+        + getfield.fieldType().toJava()
+        + ")";
   }
 
   public String visit(PUTFIELD putfield) {
@@ -115,7 +122,8 @@ public class InstructionVisitorImpl extends ElementAcceptor<Instruction, String>
         + "."
         + putfield.name()
         + " : "
-        + putfield.fieldType().toJava()+")";
+        + putfield.fieldType().toJava()
+        + ")";
   }
 
   public String visit(PUTSTATIC putstatic) {
@@ -124,7 +132,8 @@ public class InstructionVisitorImpl extends ElementAcceptor<Instruction, String>
         + "."
         + putstatic.name()
         + " : "
-        + putstatic.fieldType().toJava()+")";
+        + putstatic.fieldType().toJava()
+        + ")";
   }
 
   @Override
