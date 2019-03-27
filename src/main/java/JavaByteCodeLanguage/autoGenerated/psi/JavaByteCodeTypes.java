@@ -65,6 +65,7 @@ public interface JavaByteCodeTypes {
   IElementType STRING = new JavaByteCodeTokenType("STRING");
   IElementType STRINGVAR = new JavaByteCodeTokenType("STRINGVAR");
   IElementType SWITCH = new JavaByteCodeTokenType("?");
+  IElementType TAB = new JavaByteCodeTokenType("TAB");
   IElementType TABLENAME = new JavaByteCodeTokenType("TABLENAME");
   IElementType TABLES = new JavaByteCodeTokenType("Tables");
   IElementType THIS = new JavaByteCodeTokenType("this");
