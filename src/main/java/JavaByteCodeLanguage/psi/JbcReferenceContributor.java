@@ -21,7 +21,7 @@ public class JbcReferenceContributor extends PsiReferenceContributor {
           @Override
           public PsiReference[] getReferencesByElement(
               @NotNull PsiElement element, @NotNull ProcessingContext context) {
-            JbcMethodReference methodReference;
+            JbcMethodAndFieldReference methodReference;
 
             // the element is guaranteed to be of type JavaByteCodeDefMethodName (see below)
             TextRange range = new TextRange(0, element.getTextLength());
@@ -32,7 +32,7 @@ public class JbcReferenceContributor extends PsiReferenceContributor {
             if (grandparent instanceof JavaByteCodeJavaOP) {
               // example: type = java.io.PrintStream (<- the FQN)
               PsiElement type = grandparent.getFirstChild();
-              methodReference = new JbcMethodReference(element, range, type.getText());
+              methodReference = new JbcMethodAndFieldReference(element, range, type.getText());
             }
             // or be part of "this" file (for which the bytecode has been generated)
             else {
@@ -51,7 +51,7 @@ public class JbcReferenceContributor extends PsiReferenceContributor {
                           .findFirst()
                           .orElse(null);
                   if (typeOfClass != null) {
-                      methodReference = new JbcMethodReference(element, range, typeOfClass.getText());
+                      methodReference = new JbcMethodAndFieldReference(element, range, typeOfClass.getText());
                   }else return null;
               }else return null;
             }

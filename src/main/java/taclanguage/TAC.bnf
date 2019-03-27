@@ -15,6 +15,7 @@
 
 
   tokens=[
+  WHITE_SPACE="regexp:\s"
   COMMENT='regexp://.*|/\*[^*/]*\*/'
   NUMBER ='regexp:[-]?\d+(\.\d*)?([Efdl]\d*)?'
   STRING="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\")"
@@ -47,6 +48,7 @@
   MODIFIER="regexp:public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient"
   LEVEL="regexp:\{?((lv|param|exception(\[VM\])?@)([A-Za-z0-9])*(,\s)?)*\}?"
   OPERATORS="regexp:\+|\-|\*|\&|\||\^|<<|>>"
+  DIVID="/"
   COMPARATORS="regexp:<=|>=|==|\!=|<|>"
   STRINGVAR = "regexp:<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?"
   ]
@@ -124,8 +126,7 @@ private exceptionList ::= THROWS (JType COMMA?)*
 
 // instructions (part of method body)
 private InstructionBody ::= NUMBER COLON Instr
-//TODO "/" cant be tokenized
-Instr ::=(STRING|NUMBER|switchInst|KEYWORDS|PRIMITIVETYPE|MODIFIER|EXTENDS|IMPLEMENTS|CLASS|THROW|THROWS|VOID|THIS|LEVEL|COMMA|DOT|SEMICOLON|COLON|AT|R_ARROW|L_ARROW|"("|")"|"["|"]"|COMPARATORS|"/"|COMPARATORS|OPERATORS|CONSTMETHODNAMES|EQ|UEQ|STRINGVAR|PLUS|MINUS)*
+Instr ::=(STRING|NUMBER|switchInst|KEYWORDS|PRIMITIVETYPE|MODIFIER|EXTENDS|IMPLEMENTS|JAVATYPEHEAD|THROW|THROWS|VOID|THIS|LEVEL|COMMA|DOT|SEMICOLON|COLON|AT|R_ARROW|L_ARROW|"("|")"|"["|"]"|COMPARATORS|DIVID|OPERATORS|CONSTMETHODNAMES|EQ|UEQ|STRINGVAR|PLUS|MINUS)*
 switchInst ::= "switch" LBRACKET LEVEL RBRACKET LBRACKET((NUMBER|"default") COLON "goto" NUMBER SEMICOLON?)* RBRACKET
 //Instr ::= ifInst| gotoInst|LBRACKET LeftSideInstr RBRACKET RightSideInstr |SEMICOLON|LeftSideInstr (EQ  RightSideInstr)? |
 //ifInst ::= "if" LBRACKET LEVEL ("<="|">="|"<"|">"|"=="|"!=") (NUMBER|LEVEL) RBRACKET gotoInst

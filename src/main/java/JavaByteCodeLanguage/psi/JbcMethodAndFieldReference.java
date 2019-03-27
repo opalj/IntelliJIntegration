@@ -14,14 +14,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * TODO: improve name (?), as it covers both member/non-member methods and fields
  *
  * <p>a class that resolves references for methods and fields in the JavaByteCode-Editor (e.g. for
  * println(java.lang.String) it finds the println(String) method in PrintStream.java)
  *
  * <p>the methods/fields may or may not be members of the current class
  */
-public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
+public class JbcMethodAndFieldReference extends PsiReferenceBase<PsiElement> {
 
   // the FQN of the class the method belongs to
   private String fqn;
@@ -29,9 +28,9 @@ public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
   private String memberName;
   private boolean isConstructor;
 
-  private static final Logger LOGGER = Logger.getLogger(JbcMethodReference.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(JbcMethodAndFieldReference.class.getName());
 
-  JbcMethodReference(@NotNull PsiElement element, TextRange textRange, String fqn) {
+  JbcMethodAndFieldReference(@NotNull PsiElement element, TextRange textRange, String fqn) {
     super(element, textRange);
 
     this.fqn = fqnIsPrimitiveArray(fqn) ? "java.lang.Object" : fqn;
@@ -60,7 +59,7 @@ public class JbcMethodReference extends PsiReferenceBase<PsiElement> {
       // this should not happen (@see JbcReferenceContributor), so log it if it does
       LOGGER.log(
           Level.WARNING,
-          "JbcMethodReference has been called for a type that is"
+          "JbcMethodAndFieldReference has been called for a type that is"
               + " not an instance of JavaByteCodeDefMethodName");
       return null;
     }

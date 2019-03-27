@@ -28,8 +28,7 @@ public class InstructionVisitorImpl extends ElementAcceptor<Instruction, String>
   public String visit(LOOKUPSWITCH s) {
     IntIntPair[] intIntPairs =new IntIntPair[s.npairs().size()];
     s.npairs().copyToArray(intIntPairs);
-    //TODO defaultOffset
-    return s.mnemonic().toUpperCase()+"(default:"+s.defaultOffset()+"["+ Arrays.stream(intIntPairs).map(p->"(case:"+p._1()+","+p._2()+")").collect(Collectors.joining(""))+"])";
+    return s.mnemonic().toUpperCase()+"(default:"+(s.defaultOffset()+pc[0])+"["+ Arrays.stream(intIntPairs).map(p->"(case:"+p._1()+","+(p._2()+pc[0])+")").collect(Collectors.joining(""))+"])";
   }
 
   @Override
