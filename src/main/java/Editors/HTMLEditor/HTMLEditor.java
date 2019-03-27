@@ -16,11 +16,12 @@ import com.intellij.pom.Navigatable;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
+import globalData.GlobalData;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import javafx.scene.web.WebEngine;
 import javax.swing.*;
-import opalintegration.HtmlProducer;
+import opalintegration.OpalUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,7 +41,8 @@ public class HTMLEditor extends UserDataHolderBase implements NavigatableFileEdi
   public HTMLEditor(@NotNull Project project, @NotNull VirtualFile virtualFile) {
     this.project = project;
     this.virtualFile = virtualFile;
-    htmlFile = HtmlProducer.prepareHtml(project, virtualFile);
+    htmlFile =
+        OpalUtil.prepare(project, GlobalData.DISASSEMBLED_FILE_ENDING_HTML, virtualFile, null);
     editorUI = new HTMLEditorComponent(htmlFile, this, project);
 
     Disposer.register(this, editorUI);

@@ -1,12 +1,8 @@
 package opalintegration;
 
-import com.intellij.openapi.vfs.VirtualFile;
-import globalData.GlobalData;
-import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import opalintegration.Visitor.Instruction.InstructionVisitorImpl;
 import org.jetbrains.annotations.NotNull;
 import org.opalj.bi.AccessFlags;
@@ -14,61 +10,77 @@ import org.opalj.bi.AccessFlagsContexts;
 import org.opalj.br.*;
 import org.opalj.br.instructions.Instruction;
 import org.opalj.collection.IntIterator;
-import org.opalj.collection.RefIterator;
 import org.opalj.collection.immutable.RefArray;
-import scala.Option;
-import scala.collection.immutable.List;
 
 /** Is responsible for creating and providing the bytecode representation of a class file */
-public class JbcProducer {
+class JbcProducer extends DecompiledTextProducer {
 
   private static final Logger LOGGER = Logger.getLogger(JbcProducer.class.getName());
 
-  /**
-   * @param project the project the file belongs to
-   * @param virtualFile the class file of which we want the bytecode representation
-   * @return the file containing the bytecode representation of the passed in class file
-   */
-  public static VirtualFile prepareJBC(
-      @NotNull com.intellij.openapi.project.Project project, @NotNull VirtualFile virtualFile) {
-    return OpalUtil.prepare(project, GlobalData.DISASSEMBLED_FILE_ENDING_JBC, virtualFile, null);
+  @Override
+  String fields(ClassFile classFile) {
+    return byteCodeFieldToString(classFile);
   }
 
-  /**
-   * create the bytecode representation (of OPAL) for a given class file
-   *
-   * @param classFile the classfile of which we want the bytecode
-   * @return the bytecode representation as a String
-   */
-  @NotNull
-  static String createBytecodeString(@NotNull ClassFile classFile) {
-    StringBuilder byteCodeString = new StringBuilder();
-    byteCodeString
-        .append(AccessFlags.classFlagsToJava(classFile.accessFlags()))
-        .append(" ")
-        .append(classFile.fqn().replace("/", "."));
-    if (classFile.superclassType().isDefined()) {
-      byteCodeString.append(" extends ").append(classFile.superclassType().get().toJava());
-    }
-    if (classFile.interfaceTypes().length() > 0) {
-      byteCodeString.append(" implements ");
-      for (int j = 0; j < classFile.interfaceTypes().length(); j++) {
-        byteCodeString.append(classFile.interfaceTypes().apply(j).toJava()).append(" ");
-      }
-    }
-    byteCodeString
-        .append("\n// Source File: ")
-        .append(classFile.sourceFile().isDefined() ? classFile.sourceFile().get() : "")
-        .append(" -- Version: (")
-        .append(classFile.jdkVersion())
-        .append(") -- size: \n");
+  @Override
+  String beginMethodArea() {
+    return "Methods {\n\n";
+  }
 
-    byteCodeString.append(attributesToJava(classFile.attributes(), "\n///*", "*/\n"));
-    byteCodeString.append(annotationsToJava(classFile.annotations(), "\n///*", "*/\n"));
-    byteCodeString.append(byteCodeFieldToString(classFile));
-    byteCodeString.append(byteCodeMethodsToString(classFile));
+  @Override
+  String endMethodArea() {
+    return "} // Methods";
+  }
 
-    return byteCodeString.toString();
+  @Override
+  String methodBody(Method method) {
+    StringBuilder methodBody = new StringBuilder();
+    InstructionVisitorImpl instructionVisitorImpl = new InstructionVisitorImpl();
+
+    if (method.body().isDefined()) {
+      Code body = method.body().get();
+      Instruction[] instructions = body.instructions();
+      methodBody
+          .append("// [size :")
+          .append(body.codeSize())
+          .append(" bytes, max stack: ")
+          .append(body.maxStack())
+          .append(" bytes, max locals: ")
+          .append(body.maxLocals())
+          .append("] \n");
+
+      String pcLineInstr = String.format("\t%-6s %-6s %s\n", "PC", "Line", "Instruction");
+      methodBody.append(pcLineInstr);
+      for (int k = 0; k < instructions.length; k++) {
+        if (instructions[k] != null) {
+          try {
+            String instruction;
+            instruction = instructionVisitorImpl.accept(instructions[k], k);
+            // TODO replace \n (and \t...??) and the likes with spaces
+            instruction = instruction.replaceAll("\n", " ");
+            instruction = instruction.replaceAll("\t", " ");
+            // replaces a \ with a \\ -> needed because e.g. LDC("s\") would escape the last " and
+            // thus break the syntax
+            instruction = instruction.replaceAll("\\\\", "\\\\\\\\");
+
+            String formattedInstrLine =
+                String.format(
+                    "\t%-6d %-6s %s\n",
+                    k, body.lineNumber(k).isDefined() ? body.lineNumber(k).get() : 0, instruction);
+            methodBody.append(formattedInstrLine);
+          } catch (NoSuchElementException e) {
+            LOGGER.log(Level.SEVERE, e.toString(), e);
+          }
+        }
+      } // for(instructions)
+
+      methodBody.append(attributesToJava(method.attributes(), "\n///*", "*/\n"));
+      methodBody.append(localVariableTable(body));
+      methodBody.append(stackMapTable(body));
+    } // if(body.defined)
+    methodBody.append("}").append("\n\n\n");
+
+    return methodBody.toString();
   }
 
   /**
@@ -78,7 +90,7 @@ public class JbcProducer {
    * @return the fields' bytecode representation as a String
    */
   @NotNull
-  private static String byteCodeFieldToString(@NotNull ClassFile classFile) {
+  private String byteCodeFieldToString(@NotNull ClassFile classFile) {
     StringBuilder byteCodeString = new StringBuilder();
     RefArray<Field> fields = classFile.fields();
 
@@ -105,106 +117,11 @@ public class JbcProducer {
   }
 
   /**
-   * creates a bytecode representation of the implemented methods of the passed classfile
-   *
-   * @param classFile the classfile of which we want the bytecode
-   * @return the methods' bytecode representation as a String
-   */
-  @NotNull
-  private static String byteCodeMethodsToString(@NotNull ClassFile classFile) {
-    StringBuilder byteCodeString = new StringBuilder();
-    InstructionVisitorImpl instructionVisitorImpl = new InstructionVisitorImpl();
-    RefIterator<Method> methods = classFile.methods().iterator();
-    byteCodeString.append("Methods {\n\n");
-    while (methods.hasNext()) {
-      Method method = methods.next();
-      if (method.methodTypeSignature().isDefined()) {
-        // TODO "diamond operator"
-        MethodTypeSignature methodTypeSignatureOption = method.methodTypeSignature().get();
-        List<ThrowsSignature> throwsSignatureList = methodTypeSignatureOption.throwsSignature();
-      }
-      byteCodeString.append(annotationsToJava(method.annotations(), "\n///*", "*/\n"));
-      byteCodeString
-          .append(method.toString().replaceFirst("\\).*", ")"))
-          .append(thrownExceptions(method.exceptionTable()))
-          .append(" { ");
-      if (method.body().isDefined()) {
-        Code body = method.body().get();
-        Instruction[] instructions = body.instructions();
-        byteCodeString
-            .append("// [size :")
-            .append(body.codeSize())
-            .append(" bytes, max stack: ")
-            .append(body.maxStack())
-            .append(" bytes, max locals: ")
-            .append(body.maxLocals())
-            .append("] \n");
-
-        String pcLineInstr = String.format("\t%-6s %-6s %s\n", "PC", "Line", "Instruction");
-        byteCodeString.append(pcLineInstr);
-        for (int k = 0; k < instructions.length; k++) {
-          if (instructions[k] != null) {
-            try {
-              String instruction;
-              instruction = instructionVisitorImpl.accept(instructions[k], k);
-              // TODO replace \n (and \t...??) and the likes with spaces
-              instruction = instruction.replaceAll("\n", " ");
-              instruction = instruction.replaceAll("\t", " ");
-              // replaces a \ with a \\ -> needed because e.g. LDC("s\") would escape the last " and
-              // thus breaking the syntax
-              instruction = instruction.replaceAll("\\\\", "\\\\\\\\");
-
-              String formattedInstrLine =
-                  String.format(
-                      "\t%-6d %-6s %s\n",
-                      k,
-                      body.lineNumber(k).isDefined() ? body.lineNumber(k).get() : 0,
-                      instruction);
-              byteCodeString.append(formattedInstrLine);
-            } catch (NoSuchElementException e) {
-              LOGGER.log(Level.SEVERE, e.toString(), e);
-            }
-          }
-        }
-        byteCodeString.append(attributesToJava(method.attributes(), "\n///*", "*/\n"));
-
-        byteCodeString.append(localVariableTable(body));
-        byteCodeString.append(stackMapTable(body));
-      }
-      byteCodeString.append("}").append("\n\n\n");
-    }
-
-    byteCodeString.append("} // Methods");
-    return byteCodeString.toString();
-  }
-
-  /**
-   * E.g. if the exception table contains two exceptions, say IOException and RuntimeException, then
-   * the output will be: throws java.io.IOException, java.lang.RuntimeException
-   *
-   * @param exceptionTable The table which contains the exceptions that the method throws
-   * @return a string which contains a throws clause
-   */
-  @NotNull
-  private static String thrownExceptions(@NotNull Option<ExceptionTable> exceptionTable) {
-    if (!exceptionTable.isDefined()) {
-      return "";
-    }
-    StringBuilder exceptionTableString = new StringBuilder();
-    exceptionTableString.append(" throws ");
-    ObjectType[] exceptions = new ObjectType[exceptionTable.get().exceptions().size()];
-    exceptionTable.get().exceptions().copyToArray(exceptions);
-    exceptionTableString.append(
-        Arrays.stream(exceptions).map(ObjectType::toJava).collect(Collectors.joining(", ")));
-    return exceptionTableString.toString();
-  }
-
-  /**
    * @param body the method body of which we want the local variable table
    * @return the local variable table of a method as a string, if it exists, empty string otherwise
    */
   @NotNull
-  private static String localVariableTable(@NotNull Code body) {
+  private String localVariableTable(@NotNull Code body) {
     // if there is no local variable table, return an empty string
     if (!body.localVariableTable().isDefined()) {
       return "";
@@ -240,7 +157,7 @@ public class JbcProducer {
    * @return the stack map table of a method as a string, if it exists, empty string otherwise
    */
   @NotNull
-  private static String stackMapTable(@NotNull Code body) {
+  private String stackMapTable(@NotNull Code body) {
     if (!body.stackMapTable().isDefined()) {
       return "";
     }
@@ -252,7 +169,7 @@ public class JbcProducer {
     stackMapTableString
         .append("\n\n\tStackMapTable {")
         .append("\n")
-        .append("//PC\tName\tframeType\toffsetDelta\n");
+        .append("\t\t//PC\tKind\tFrame Type\tOffset Delta\n");
     IntIterator pcIterator = stackMapTable.pcs().iterator();
     for (int i = 0; i < stackMapFrameRefArray.length(); i++) {
       StackMapFrame stackMapFrame = stackMapFrameRefArray.apply(i);
@@ -262,7 +179,7 @@ public class JbcProducer {
           .append("\t\t")
           .append(pc)
           .append(" ")
-          .append(frameClass.getName())
+          .append(frameClass.getSimpleName())
           .append(" ")
           .append(stackMapFrame.frameType())
           .append(" ")
@@ -274,34 +191,24 @@ public class JbcProducer {
     return stackMapTableString.toString();
   }
 
-  // TODO: doesn't quite work yet (grammar, etc.)
-  /** Converts a given list of annotations into a Java-like representation. */
-  @NotNull
-  private static String annotationsToJava(
-      @NotNull RefArray<Annotation> annotations, String before, String after) {
-    if (!annotations.isEmpty()) {
-      Annotation[] annotationsCopy = new Annotation[annotations.size()];
-      annotations.copyToArray(annotationsCopy);
-      String annotationsString =
-          Arrays.stream(annotationsCopy).map(Annotation::toString).collect(Collectors.joining(" "));
-      return before + annotationsString + after;
-    } else {
-      return "";
-    }
-  }
-
-  // TODO: doesn't quite work yet (grammar, etc.)
-  /** Converts a given list of attributes into a Java-like representation. */
-  private static String attributesToJava(
-      RefArray<Attribute> attributes, String before, String after) {
-    if (!attributes.isEmpty()) {
-      Attribute[] attributesCopy = new Attribute[attributes.size()];
-      attributes.copyToArray(attributesCopy);
-      String attributeString =
-          Arrays.stream(attributesCopy).map(Attribute::toString).collect(Collectors.joining(" "));
-      return before + attributeString + after;
-    } else {
-      return "";
-    }
-  }
+  //  private static String localVariableTypeTable(Code body) {
+  //    StringBuilder localVariableTypeTable = new StringBuilder();
+  //
+  //    Function1 function1 = new Function1<RefArray<LocalVariableTypeTable>, String>() {
+  //      @Override
+  //      public String apply(RefArray<LocalVariableTypeTable> v1) {
+  //        LocalVariableTypeTable[] temp = new LocalVariableTypeTable[v1.size()];
+  //        v1.copyToArray(temp);
+  //        String result =
+  //
+  // Arrays.stream(temp).map(LocalVariableTypeTable::toString).collect(Collectors.joining("\n"));
+  //        localVariableTypeTable.append(result);
+  //        return result;
+  //      }
+  //    };
+  //
+  //    body.localVariableTypeTable().foreach(function1);
+  //
+  //    return localVariableTypeTable.toString();
+  //  }
 }
