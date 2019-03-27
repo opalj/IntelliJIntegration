@@ -21,6 +21,12 @@ final class Tables {
     private Tables() {}
 
 
+    /**
+     * Checks whether a given method has tables
+     *
+     * @param method The method in question
+     * @return true if the method contains tables, false otherwise
+     */
     static boolean hasTables(@NotNull Method method) {
         if(!method.methodTypeSignature().isEmpty()) {
             return true;
