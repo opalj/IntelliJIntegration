@@ -1,3 +1,6 @@
+import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
+import com.github.spotbugs.SpotBugsTask
+
 plugins {
     id 'java'
     id 'org.jetbrains.intellij' version '0.3.12'
@@ -5,12 +8,16 @@ plugins {
     id 'pmd'
     id "com.github.spotbugs" version "1.6.6"
     id 'com.github.sherter.google-java-format' version '0.8'
-    //https://openjfx.io/openjfx-docs/#gradle
-//    id 'application'
-//    id 'org.openjfx.javafxplugin' version '0.0.7'
+    id 'com.github.johnrengelman.shadow' version '4.0.3'
 }
-group '23'
-version '1.0-SNAPSHOT'
+
+shadowJar {
+    transform(AppendingTransformer) {
+        resource = 'reference.conf'
+    }
+}
+group 'Kollektiv 23'
+version '0.2.0'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -18,22 +25,26 @@ targetCompatibility = 1.8
 repositories {
     mavenCentral()
     maven { url = 'http://maven.teamdev.com/repository/products' }
+    maven { url = 'http://perfectjpattern.sourceforge.net/m2repo'}
 }
 
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile 'de.opal-project:abstract-interpretation-framework_2.12:2.0.1'
-    compile 'de.opal-project:bytecode-disassembler_2.12:2.0.1'
+    // https://mvnrepository.com/artifact/de.opal-project/*
+    compile group: 'de.opal-project', name: 'abstract-interpretation-framework_2.12', version: '2.0.1'
+    compile group: 'de.opal-project', name:'bytecode-disassembler_2.12', version: '2.0.1'
+    compile group: 'de.opal-project', name: 'bytecode-representation_2.12', version: '2.0.1'
+
 }
 
 intellij {
-    version '2018.2.2'
+    version '2018.2.2' // maybe need to be changed to latest eap snapshot
+    intellij.updateSinceUntilBuild false //Disables updating since-build attribute in plugin.xml
 }
 patchPluginXml {
     changeNotes """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
+      Lots of added functionality. See Readme."""
 }
 
 // ================
@@ -51,12 +62,12 @@ check {
     tasks.findByName('spotbugsMain').mustRunAfter('pmdMain')
 }
 
-tasks.withType(com.github.spotbugs.SpotBugsTask) {
+
+tasks.withType(SpotBugsTask) {
     reports {
         xml.enabled = false
         html.enabled = true
     }
-    // TODO: remove later
     ignoreFailures = true
 }
 tasks.withType(Pmd){
@@ -74,17 +85,9 @@ checkstyle {
 pmd{
     toolVersion = "6.11.0"
     ignoreFailures = true
-    //ConsoleOutput = true
-//    ruleSetFiles = files("config/pmd/myRuleSets.xml")
-    //ruleSets = ['category/java/errorprone.xml'
-    //'java-basic',
-    //'java-CyclomaticComplexityRule'
-    // schaut noch ob Javadoc geschrieben sind
-    //'java-comments',
-    //]
-}
+    ruleSetFiles = files("config/pmd/myRuleSets.xml")
 
-// need to be java 11?
-//javafx {
-//    modules = [ 'javafx.controls', 'javafx.fxml','javafx.web', 'javafx.swing' ]
-//}
+}
+runIde {
+    maxHeapSize = "2g"
+}
