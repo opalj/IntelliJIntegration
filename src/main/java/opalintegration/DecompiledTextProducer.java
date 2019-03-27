@@ -192,5 +192,26 @@ abstract class DecompiledTextProducer {
   private String endArea(String areaName) {
     return "} //" + areaName + "\n\n\n";
   }
+
+
+  String opalStringBugFixer(String instructionLine) {
+    // replaces a \ with a \\ -> needed because e.g. LDC("s\") would escape the last " and
+    // thus break the syntax
+    instructionLine = instructionLine.replaceAll("\\\\", "\\\\\\\\");
+
+    int firstDoubleQuote = instructionLine.indexOf('"');
+    int lastDoubleQuote = instructionLine.lastIndexOf('"');
+    String stringContent = instructionLine.substring(firstDoubleQuote + 1, lastDoubleQuote);
+    stringContent = stringContent.replace("\"", "\\\"");
+    stringContent = stringContent.replace("\n", "\\n");
+    stringContent = stringContent.replace("\t", "\\t");
+    stringContent = stringContent.replace("\r", "\\r");
+    stringContent = stringContent.replace("\b", "\\b");
+    instructionLine = instructionLine.substring(0, firstDoubleQuote + 1)
+            + stringContent
+            + instructionLine.substring(lastDoubleQuote);
+
+    return instructionLine;
+  }
 }
 
