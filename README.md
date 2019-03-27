@@ -54,12 +54,12 @@ It, however, does not work for <clinit>().
 
 You can also jump between instructions within the bytecode editor. This is possible for the if and goto instructions, 
 e.g. *GOTO*, *IFGT*, and *IFNULL*. These take the jump destination (a program counter value) as input, 
-thus the caret will be placed at that program counter value. To do this, press [Ctrl + Alt + 1] on one such instruction.
+thus the caret will be placed at that program counter value. To do this, press [Alt + Shift + 1] on one such instruction.
 
 ![Insert GIF, if possible](path/to/your/img.png)
 
 Furthermore it's possible to directly jump to a line in the source code that corresponds to an instruction. To do this,
-press [Ctrl + Alt + 2] on an instruction. IntelliJ will then navigate to the source file, if available, and place the caret
+press [Alt + Shift + 2] on an instruction. IntelliJ will then navigate to the source file, if available, and place the caret
 at the line number of the instruction.
 
 ![Insert GIF, if possible](path/to/your/img.png)
