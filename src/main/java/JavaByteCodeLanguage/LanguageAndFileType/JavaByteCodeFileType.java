@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 public class JavaByteCodeFileType extends LanguageFileType {
   public static final JavaByteCodeFileType INSTANCE = new JavaByteCodeFileType();
 
-  protected JavaByteCodeFileType() {
+  private JavaByteCodeFileType() {
     super(JavaByteCode.INSTANCE);
   }
 

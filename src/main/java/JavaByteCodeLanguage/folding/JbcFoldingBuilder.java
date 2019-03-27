@@ -23,13 +23,16 @@ public class JbcFoldingBuilder extends FoldingBuilderEx {
 
   private static final List<Class<? extends PsiElement>> psiTypesWithFoldingSupport =
       Arrays.asList(
-          JavaByteCodeFieldsDeclaration.class,
+          JavaByteCodeAttributesArea.class,
+          JavaByteCodeInnerTable.class,
+          JavaByteCodeFieldArea.class,
           JavaByteCodeMethodArea.class,
           JavaByteCodeMethodDeclaration.class,
-          JavaByteCodeExceptionTableDeclaration
-              .class, // TODO: not used as a table anymore, speak with employer
+          JavaByteCodeTableArea.class,
+          JavaByteCodeExceptionTableDeclaration.class,
           JavaByteCodeLocVarTableDeclaration.class,
-          JavaByteCodeStackMapTableDeclaration.class);
+          JavaByteCodeStackMapTableDeclaration.class,
+          JavaByteCodeLocVarTypeTableDeclaration.class);
 
   @NotNull
   @Override

@@ -18,11 +18,10 @@ public class JbcReferenceContributor extends PsiReferenceContributor {
   public void registerReferenceProviders(@NotNull PsiReferenceRegistrar registrar) {
     PsiReferenceProvider psiReferenceProvider =
         new PsiReferenceProvider() {
-          @NotNull
           @Override
           public PsiReference[] getReferencesByElement(
               @NotNull PsiElement element, @NotNull ProcessingContext context) {
-            JbcMethodReference methodReference;
+            JbcMethodAndFieldReference methodReference;
 
             // the element is guaranteed to be of type JavaByteCodeDefMethodName (see below)
             TextRange range = new TextRange(0, element.getTextLength());
@@ -33,25 +32,31 @@ public class JbcReferenceContributor extends PsiReferenceContributor {
             if (grandparent instanceof JavaByteCodeJavaOP) {
               // example: type = java.io.PrintStream (<- the FQN)
               PsiElement type = grandparent.getFirstChild();
-              methodReference = new JbcMethodReference(element, range, type.getText());
+              methodReference = new JbcMethodAndFieldReference(element, range, type.getText());
             }
             // or be part of "this" file (for which the bytecode has been generated)
             else {
               PsiElement file = element.getContainingFile();
               // example: classHead = public class io.ChainedReader extends java.lang.Object
-              PsiElement classHead =
+              PsiElement classHead;
+              classHead =
                   Arrays.stream(file.getChildren())
                       .filter(psiElement -> psiElement instanceof JavaByteCodeClassHead)
                       .findFirst()
-                      .get();
+                      .orElse(null); // get()orElse(null)
               // example: typeOfClass = io.ChainedReader
-              PsiElement typeOfClass =
-                  Arrays.stream(classHead.getChildren())
-                      .filter(psiElement -> psiElement instanceof JavaByteCodeJType)
-                      .findFirst()
-                      .get();
 
-              methodReference = new JbcMethodReference(element, range, typeOfClass.getText());
+              if (classHead != null) {
+                PsiElement typeOfClass =
+                    Arrays.stream(classHead.getChildren())
+                        .filter(psiElement -> psiElement instanceof JavaByteCodeJType)
+                        .findFirst()
+                        .orElse(null);
+                if (typeOfClass != null) {
+                  methodReference =
+                      new JbcMethodAndFieldReference(element, range, typeOfClass.getText());
+                } else return null;
+              } else return null;
             }
 
             return new PsiReference[] {methodReference};

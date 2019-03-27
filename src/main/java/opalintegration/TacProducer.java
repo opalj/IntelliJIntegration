@@ -13,9 +13,9 @@ import scala.Function1;
  * Is responsible for creating and providing the three-address-code (TAC) representation of a class
  * file
  */
-public class TacProducer extends DecompiledTextProducer {
+class TacProducer extends DecompiledTextProducer {
 
-  private Function1<Method, TACode<TACMethodParameter, DUVar<KnownTypedValue>>>
+  private final Function1<Method, TACode<TACMethodParameter, DUVar<KnownTypedValue>>>
       methodTACodeFunction;
 
   TacProducer(String filepath) {
@@ -30,12 +30,17 @@ public class TacProducer extends DecompiledTextProducer {
 
     if (method.body().isDefined()) {
       methodBody.append("\n");
-      //      methodBody.append(method.toString()).append(" {\n");
       TACode<TACMethodParameter, DUVar<KnownTypedValue>> TacCode =
           methodTACodeFunction.apply(method);
-      methodBody.append(ToTxt.apply(TacCode).mkString("\n"));
-      methodBody.append("\n}");
-      methodBody.append("\n\n\n");
+
+      String[] body = ToTxt.apply(TacCode).mkString("#newline#").split("#newline#");
+      for (String line : body) {
+        line = opalStringBugFixer(line);
+        methodBody.append(line).append("\n");
+      }
+
+      // methodBody.append(ToTxt.apply(TacCode).mkString("\n"));
+      methodBody.append("\n");
     }
 
     return methodBody.toString();

@@ -31,7 +31,7 @@ public class HtmlTagTreeElement extends PsiTreeElementBase<XmlTag> implements Lo
   // xxx#someMethod(possiblySomeParams)retType.xxx
   private final String simpleDefaultPresentableTextRegex = "(.*)#.+[(].*[)](.*)\\.(.*)";
 
-  // TODO: move this to some utility class (maybe Opal)?
+  // _TODO: move this to some utility class (maybe Opal)?
   private static final Map<String, String> primitiveTypesMap =
       Stream.of(
               new SimpleEntry<>("Z", "boolean"),

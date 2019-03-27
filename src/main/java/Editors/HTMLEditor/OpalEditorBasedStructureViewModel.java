@@ -11,7 +11,7 @@ import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-// TODO: currently many methods unimplemented, how much of them is needed ?
+// _TODO: currently many methods unimplemented, how much of them is needed ?
 @Deprecated
 public class OpalEditorBasedStructureViewModel implements StructureViewModel {
   private final HTMLEditor myEditor;
@@ -37,28 +37,28 @@ public class OpalEditorBasedStructureViewModel implements StructureViewModel {
 
   @Override
   public void addEditorPositionListener(@NotNull FileEditorPositionListener listener) {
-    // TODO - FileEditorPositionListener (might not need since read-only !!)
+    // _TODO - FileEditorPositionListener (might not need since read-only !!)
     // The listener interface which allows the structure view to receive notifications about
     // * changes to the editor selection.
   }
 
   @Override
   public void removeEditorPositionListener(@NotNull FileEditorPositionListener listener) {
-    // TODO - FileEditorPositionListener (might not need since read-only !!)
+    // _TODO - FileEditorPositionListener (might not need since read-only !!)
     // The listener interface which allows the structure view to receive notifications about
     // * changes to the editor selection.
   }
 
   @Override
   public void addModelListener(@NotNull ModelListener modelListener) {
-    // TODO - ModelListener:
+    // _TODO - ModelListener:
     // The listener interface which allows the structure view to receive notification about
     // * changes to data shown in the structure view.
   }
 
   @Override
   public void removeModelListener(@NotNull ModelListener modelListener) {
-    // TODO - ModelListener:
+    // _TODO - ModelListener:
     // The listener interface which allows the structure view to receive notification about
     // * changes to data shown in the structure view.
   }

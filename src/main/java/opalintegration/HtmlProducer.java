@@ -23,16 +23,15 @@ public class HtmlProducer {
     return OpalUtil.prepare(project, GlobalData.DISASSEMBLED_FILE_ENDING_HTML, virtualFile, null);
   }
 
-  protected static String JavaClassToHtmlForm(VirtualFile virtualClassFile) {
+  static String JavaClassToHtmlForm(VirtualFile virtualClassFile) {
     classPath = virtualClassFile.getPath();
     String JavaHTMLClass = JavaClassToHTMLForm(classPath);
     return JavaHTMLClass;
   }
 
-  protected static String JavaClassToHTMLForm(String classPath) {
+  private static String JavaClassToHTMLForm(String classPath) {
     Path path = Paths.get(classPath);
     File file = path.toFile();
-    // TODO scala.collection.immutable.List<Object> classFileList;
     String toHtmlAsString;
     try (FileInputStream fis = new FileInputStream(file);
         DataInputStream dis = new DataInputStream(fis)) {
@@ -51,7 +50,6 @@ public class HtmlProducer {
               + cf.classFileToXHTML(new Some(classPath)).toString()
               + "\n</body>\n</html>";
 
-      // TODO: is this ok? (talk to M. Eichberg?)
       toHtmlAsString = fixInitSymbols(toHtmlAsString);
     } catch (IOException e) {
       toHtmlAsString =
@@ -60,7 +58,7 @@ public class HtmlProducer {
     return toHtmlAsString;
   }
 
-  protected static String fixInitSymbols(String htmlString) {
+  private static String fixInitSymbols(String htmlString) {
     // e.g. id="&lt;clinit&gt;()V" should become id="<clinit>()V"
     final String regex = "(id=\"|data-name=\")(&lt;)(\\w+)(&gt;)([^\"]*\")";
     final Pattern p = Pattern.compile(regex);

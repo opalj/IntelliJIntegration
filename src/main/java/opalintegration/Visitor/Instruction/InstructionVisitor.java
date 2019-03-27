@@ -10,9 +10,11 @@ import org.opalj.br.instructions.*;
  * <p>(The methods seem to be grayed out since they are invoked like this: getMethod("visit",...),
  *
  * @see opalintegration.Visitor.ElementAcceptor#accept(Object, int...) )
- *     <p>TODO: TABLESWITCH
  */
-public interface InstructionVisitor {
+@SuppressWarnings("unused")
+// unused because there is no accepting methods for given element
+// unused warning happens because method call looks like this (passed as string): this.getClass().getMethod("visit", in);
+interface InstructionVisitor {
   String visit(ANEWARRAY anewarray);
 
   String visit(GETSTATIC getstatic);
@@ -52,4 +54,6 @@ public interface InstructionVisitor {
   String visit(LoadMethodType_W l);
 
   String visit(SimpleBranchInstruction sbi);
+
+  String visit(LOOKUPSWITCH s);
 }

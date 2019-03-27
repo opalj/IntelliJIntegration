@@ -62,6 +62,6 @@ public class MyStructureView implements StructureView {
 
   @Override
   public void dispose() {
-    // TODO
+    // _TODO
   }
 }

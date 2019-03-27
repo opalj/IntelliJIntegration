@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  */
 @Deprecated
 public class HTMLEditorProvider implements FileEditorProvider {
-  // TODO: should this class implement "DumbAware" ?
+  // _TODO: should this class implement "DumbAware" ?
 
   @NonNls private static final String EDITOR_TYPE_ID = "OPAL-HTML";
 

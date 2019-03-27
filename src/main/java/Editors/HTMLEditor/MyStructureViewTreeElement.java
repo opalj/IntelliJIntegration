@@ -79,7 +79,7 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
       List<StructureViewTreeElement> result = createMemberTree(members);
       return result;
     }
-    // TODO: this case covers multiple roots and is probably not needed
+    // _TODO: this case covers multiple roots and is probably not needed
     else {
       final Collection<StructureViewTreeElement> result = new ArrayList<>(rootTags.size());
       for (XmlTag tag : rootTags) {
@@ -89,7 +89,7 @@ public class MyStructureViewTreeElement extends PsiTreeElementBase<XmlFile> {
     }
   }
 
-  // TODO: Hardcoded at the moment, can improve this somehow?
+  // _TODO: Hardcoded at the moment, can improve this somehow?
   private XmlTag getChildrenBaseForMembers(@NotNull XmlTag rootTag) {
     int length = rootTag.getSubTags().length;
     XmlTag body = rootTag.getSubTags()[length - 1];

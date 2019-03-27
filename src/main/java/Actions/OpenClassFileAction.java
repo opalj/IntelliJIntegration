@@ -14,19 +14,20 @@ import com.intellij.psi.search.GlobalSearchScope;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import opalintegration.OpalUtil;
 import org.jetbrains.annotations.NotNull;
 
 /** The type Open class file action performs to open a specified editor (tac/bytecode) */
 class OpenClassFileAction extends AnAction {
-  private String editorName;
+  private final String editorName;
 
   /**
    * Instantiates a new Open class file action.
    *
    * @param editorName the editor name witch will be opened
    */
-  public OpenClassFileAction(String editorName) {
+  OpenClassFileAction(String editorName) {
     super();
     this.editorName = editorName;
   }
@@ -41,7 +42,7 @@ class OpenClassFileAction extends AnAction {
         .setEnabledAndVisible(
             project != null
                 && ("java".equals(extension)
-                    // || "scala".equals(extension) // TODO: check how it works for scala files
+                    || "scala".equals(extension)
                     || "class".equals(extension)));
   }
 
@@ -56,9 +57,12 @@ class OpenClassFileAction extends AnAction {
     Project project = event.getData(CommonDataKeys.PROJECT);
     // currently selected file in the project view
     VirtualFile virtualFile = event.getData(CommonDataKeys.VIRTUAL_FILE);
-    String extension = virtualFile != null ? virtualFile.getExtension() : "";
+    if (virtualFile == null || project == null) {
+      return;
+    }
+    String extension = virtualFile.getExtension();
     VirtualFile classFile = null;
-    if (project != null && !extension.equals(StdFileTypes.CLASS.getDefaultExtension())) {
+    if (!StdFileTypes.CLASS.getDefaultExtension().equals(extension)) {
       if (Compiler.make(project, virtualFile)) {
         classFile = getCorrespondingClassFile(project, virtualFile);
       } else if (ProjectFileIndex.getInstance(project).isInLibrary(virtualFile)) {
@@ -79,12 +83,6 @@ class OpenClassFileAction extends AnAction {
       classFile = virtualFile;
     }
     if (classFile != null) {
-      //      Notifications.Bus.notify(
-      //          new Notification(
-      //              "OpalPlugin",
-      //              "OpalPlugin",
-      //              "decompiling : " + classFile.getName(),
-      //              NotificationType.INFORMATION));
       Notifications.Bus.notify(
           new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
               .createNotification()
@@ -92,12 +90,7 @@ class OpenClassFileAction extends AnAction {
       FileEditorManager.getInstance(project).openFile(classFile, true);
       FileEditorManager.getInstance(project).setSelectedEditor(classFile, editorName);
     } else {
-      //      Notifications.Bus.notify(
-      //          new Notification(
-      //              "OpalPlugin",
-      //              "OpalPlugin",
-      //              "can't find or create a class file for : " + virtualFile.getName(),
-      //              NotificationType.INFORMATION));
+
       Notifications.Bus.notify(
           new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
               .createNotification()
@@ -119,7 +112,12 @@ class OpenClassFileAction extends AnAction {
     Module module = projectFileIndex.getModuleForFile(javaFile);
     // get the output directory
     if (module != null) {
-      VirtualFile outputPath = CompilerModuleExtension.getInstance(module).getCompilerOutputPath();
+      VirtualFile outputPath =
+          Objects.requireNonNull(CompilerModuleExtension.getInstance(module))
+              .getCompilerOutputPath();
+      if (outputPath == null) {
+        return null;
+      }
       outputPath.refresh(false, true);
       // the name of the class file we are looking for
       String classFileName = javaFile.getNameWithoutExtension() + ".class";
@@ -133,7 +131,7 @@ class OpenClassFileAction extends AnAction {
             public Result visitFileEx(@NotNull VirtualFile file) {
               if (!file.isDirectory() && file.getName().equals(classFileName)) {
                 classFiles.add(file);
-                VirtualFileVisitor.limit(-1);
+                // VirtualFileVisitor.limit(0);
                 return VirtualFileVisitor.SKIP_CHILDREN;
               }
               return CONTINUE;
@@ -146,5 +144,5 @@ class OpenClassFileAction extends AnAction {
       return classFile;
     }
     return null;
-  }
+  } // getCorrespondingClassFile()
 }

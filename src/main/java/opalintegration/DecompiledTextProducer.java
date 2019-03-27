@@ -1,14 +1,12 @@
 package opalintegration;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.opalj.bi.AccessFlags;
+import org.opalj.bi.AccessFlagsContexts;
 import org.opalj.br.*;
 import org.opalj.collection.RefIterator;
 import org.opalj.collection.immutable.RefArray;
-import scala.Option;
-import scala.collection.immutable.List;
 
 /**
  * A class that is responsible for creating the skeleton of the decompiled text for both Java
@@ -22,87 +20,13 @@ abstract class DecompiledTextProducer {
   String decompiledText(ClassFile classFile) {
     String decompiledText = "";
 
-    decompiledText += annotationsToJava(classFile.annotations(), "", "\n");
+    decompiledText += Tables.annotationsToJava(classFile.annotations(), "", "\n");
     decompiledText += classHeader(classFile);
-    // TODO: hooks for JbcProducer for class attributes
+    decompiledText += attributes(classFile);
     decompiledText += fields(classFile);
     decompiledText += methods(classFile); // contains the template method
 
     return decompiledText;
-  }
-
-  /**
-   * A hook which can be used to produce text that contains field information. It returns an empty
-   * string by default.
-   *
-   * @param classFile The class file which contains the fields
-   * @return Information about the fields as a String
-   */
-  String fields(ClassFile classFile) {
-    return "";
-  }
-
-  /**
-   * A template method which can be used to produce text that contains information about the method
-   * bodies.
-   *
-   * @param method The method in question
-   * @return A String that displays information about the method body
-   */
-  abstract String methodBody(Method method);
-
-  /**
-   * Creates text output for all methods. It delegates the creation of method bodies to its
-   * subclasses via a call to a template method and handles everything else (i.e. the method head)
-   * by itself.
-   *
-   * @param classFile The class file which contains the methods
-   * @return A string of the decompiled methods
-   */
-  private String methods(ClassFile classFile) {
-    StringBuilder methodText = new StringBuilder();
-    RefIterator<Method> methods = classFile.methods().iterator();
-
-    methodText.append(beginMethodArea());
-    while (methods.hasNext()) {
-      Method method = methods.next();
-      if (method.methodTypeSignature().isDefined()) {
-        // TODO "diamond operator"
-        MethodTypeSignature methodTypeSignatureOption = method.methodTypeSignature().get();
-        List<ThrowsSignature> throwsSignatureList = methodTypeSignatureOption.throwsSignature();
-      }
-      methodText.append(annotationsToJava(method.annotations(), "\n/*", "*/\n"));
-      methodText
-          .append(method.toString().replaceFirst("\\).*", ")"))
-          .append(thrownExceptions(method.exceptionTable()))
-          .append(" { ");
-
-      // call to template method
-      methodText.append(methodBody(method));
-    }
-    methodText.append(endMethodArea());
-
-    return methodText.toString();
-  }
-
-  /**
-   * A hook that may be used to mark the beginning of a method region. It returns an empty String by
-   * default.
-   *
-   * @return A String that marks the beginning of a method region
-   */
-  String beginMethodArea() {
-    return "";
-  }
-
-  /**
-   * A hook that may be used to mark the end of a method region. It returns an empty String by
-   * default.
-   *
-   * @return A String that marks the end of a method region
-   */
-  String endMethodArea() {
-    return "";
   }
 
   /**
@@ -134,76 +58,177 @@ abstract class DecompiledTextProducer {
         .append(classFile.jdkVersion())
         .append(") -- Size: \n\n");
 
-    // TODO: bootstrap and innerclass as hooks (only needed for JBC)
-    //        if(classFile.bootstrapMethodTable().isDefined()) {
-    //            System.out.println("bootstrap");
-    //            System.out.println(classFile.bootstrapMethodTable().get().toString());
-    //        }
-
-    //    InnerClass[] innerClassesCopy = new InnerClass[1024];
-    //    classFile.innerClasses().get().copyToArray(innerClassesCopy);
-    //    if(innerClassesCopy[0] != null) {
-    //      byteCodeString.append(Arrays.stream(innerClassesCopy)
-    //              .map(innerClass -> innerClass.outerClassType().get().toJava()
-    //                      + " { " +
-    // AccessFlags.classFlagsToJava(innerClass.innerClassAccessFlags())
-    //                      + " " + innerClass.innerClassType().toJava() + " }")
-    //              .collect(Collectors.joining("\n")));
-    //    }
-
     return classHeader.toString();
   }
 
-  // TODO: doesn't quite work yet (grammar, etc.)
-  /** Converts a given list of annotations into a Java-like representation. */
   @NotNull
-  String annotationsToJava(@NotNull RefArray<Annotation> annotations, String before, String after) {
-    if (!annotations.isEmpty()) {
-      Annotation[] annotationsCopy = new Annotation[annotations.size()];
-      annotations.copyToArray(annotationsCopy);
+  private String attributes(@NotNull ClassFile classFile) {
+    StringBuilder classAttributes = new StringBuilder();
 
-      String javaStyle =
-          Arrays.stream(annotationsCopy).map(Annotation::toJava).collect(Collectors.joining("\n"));
-      return before + javaStyle + after;
-    } else {
+    if (classFile.innerClasses().isEmpty() && classFile.bootstrapMethodTable().isEmpty()) {
       return "";
     }
-  }
 
-  // TODO: doesn't quite work yet (grammar, etc.)
-  /** Converts a given list of attributes into a Java-like representation. */
-  @NotNull
-  String attributesToJava(@NotNull RefArray<Attribute> attributes, String before, String after) {
-    if (!attributes.isEmpty()) {
-      Attribute[] attributesCopy = new Attribute[attributes.size()];
-      attributes.copyToArray(attributesCopy);
-      String attributeString =
-          Arrays.stream(attributesCopy).map(Attribute::toString).collect(Collectors.joining(" "));
+    classAttributes.append(beginArea("Attributes"));
+    classAttributes.append(Tables.innerClassTable(classFile));
+    classAttributes.append(endArea("Attributes"));
 
-      return before + attributeString + after;
-    } else {
-      return "";
-    }
+    return classAttributes.toString();
   }
 
   /**
-   * E.g. if the exception table contains two exceptions, say IOException and RuntimeException, then
-   * the output will be: throws java.io.IOException, java.lang.RuntimeException
+   * A hook which can be used to produce text that contains field information. It returns an empty
+   * string by default.
    *
-   * @param exceptionTable The table which contains the exceptions that the method throws
-   * @return a string which contains a throws clause
+   * @param classFile The class file which contains the fields
+   * @return Information about the fields as a String
    */
   @NotNull
-  String thrownExceptions(@NotNull Option<ExceptionTable> exceptionTable) {
-    if (!exceptionTable.isDefined()) {
+  private String fields(@NotNull ClassFile classFile) {
+    StringBuilder fieldsText = new StringBuilder();
+    RefArray<Field> fields = classFile.fields();
+
+    // don't show fields if there are none
+    if (fields.length() == 0) {
       return "";
     }
-    StringBuilder exceptionTableString = new StringBuilder();
-    exceptionTableString.append(" throws ");
-    ObjectType[] exceptions = new ObjectType[exceptionTable.get().exceptions().size()];
-    exceptionTable.get().exceptions().copyToArray(exceptions);
-    exceptionTableString.append(
-        Arrays.stream(exceptions).map(ObjectType::toJava).collect(Collectors.joining(", ")));
-    return exceptionTableString.toString();
+
+    fieldsText.append(beginArea("Fields"));
+    for (int j = 0; j < fields.length(); j++) {
+      Field field = fields.apply(j);
+      String accessFlags = AccessFlags.toString(field.accessFlags(), AccessFlagsContexts.FIELD());
+      fieldsText
+          .append("\t")
+          .append(accessFlags)
+          .append(accessFlags.isEmpty() ? "" : " ")
+          .append(field.fieldType().toJava())
+          .append(" ")
+          .append(field.name())
+          .append("\n");
+    }
+    fieldsText.append(endArea("Fields"));
+
+    return fieldsText.toString();
+  }
+
+  /**
+   * A template method which can be used to produce text that contains information about the method
+   * bodies.
+   *
+   * @param method The method in question
+   * @return A String that displays information about the method body
+   */
+  abstract String methodBody(Method method);
+
+  /**
+   * Creates text output for all methods. It delegates the creation of method bodies to its
+   * subclasses via a call to a template method and handles everything else (i.e. the method head)
+   * by itself.
+   *
+   * @param classFile The class file which contains the methods
+   * @return A string of the decompiled methods
+   */
+  @NotNull
+  private String methods(@NotNull ClassFile classFile) {
+    StringBuilder methodText = new StringBuilder();
+    RefIterator<Method> methods = classFile.methods().iterator();
+
+    methodText.append(beginArea("Methods")).append("\n");
+    while (methods.hasNext()) {
+      Method method = methods.next();
+      methodText.append(Tables.annotationsToJava(method.annotations(), "\n", "\n"));
+      methodText
+          .append(methodDescriptor(method))
+          .append(Tables.thrownExceptions(method.exceptionTable()))
+          .append(" { ");
+
+      // call to template method
+      methodText.append(methodBody(method));
+      methodText.append("}").append("\n\n\n");
+    }
+    methodText.append(endArea("Methods"));
+
+    return methodText.toString();
+  }
+
+  @NotNull
+  private String methodDescriptor(@NotNull Method method) {
+    MethodDescriptor descriptor = method.descriptor();
+    StringBuilder methodDescriptorBuilder = new StringBuilder();
+    String flag = AccessFlags.toString(method.accessFlags(), AccessFlagsContexts.METHOD()) + " ";
+    if (flag.length() > 0) methodDescriptorBuilder.append(flag);
+    methodDescriptorBuilder
+        .append(descriptor.returnType().toJava())
+        .append(" ")
+        .append(method.name())
+        .append("(");
+    FieldType[] parameters = new FieldType[descriptor.parametersCount()];
+    descriptor.parameterTypes().copyToArray(parameters);
+    RefArray<RefArray<Annotation>> invisibleParameterAnnotations =
+        method.runtimeInvisibleParameterAnnotations();
+    RefArray<RefArray<Annotation>> visibleParameterAnnotations =
+        method.runtimeVisibleParameterAnnotations();
+    for (int i = 0; i < parameters.length; i++) {
+      if (i < invisibleParameterAnnotations.size()
+          && invisibleParameterAnnotations.apply(i).size() > 0)
+        methodDescriptorBuilder.append(
+            Tables.annotationsToJava(invisibleParameterAnnotations.apply(i), "", " "));
+      if (i < visibleParameterAnnotations.size() && visibleParameterAnnotations.apply(i).size() > 0)
+        methodDescriptorBuilder.append(
+            Tables.annotationsToJava(visibleParameterAnnotations.apply(i), "", " "));
+      methodDescriptorBuilder.append(parameters[i].toJava()).append(",");
+    }
+    // delete last comma
+    if (methodDescriptorBuilder.charAt(methodDescriptorBuilder.length() - 1) == ',')
+      methodDescriptorBuilder.deleteCharAt(methodDescriptorBuilder.length() - 1);
+    // methodDescriptorBuilder.append(Arrays.stream(parameters).map(p->
+    // p.toJava()).collect(Collectors.joining(",")));
+    methodDescriptorBuilder.append(")");
+    return methodDescriptorBuilder.toString();
+  }
+
+  @NotNull
+  @Contract(pure = true)
+  private String beginArea(String areaName) {
+    return areaName + " {\n";
+  }
+
+  @NotNull
+  @Contract(pure = true)
+  private String endArea(String areaName) {
+    return "} //" + areaName + "\n\n\n";
+  }
+
+  /**
+   * This is a temporary method that is used to fix a bug that comes from OPAL where an escaping
+   * backslash will be removed, e.g. '(id=\")' becomes '(id="|)' which causes errors, so we add an
+   * escape \ in front of every \ -> '(id=\\")' becomes '(id=\"|)'
+   *
+   * @param instructionLine The current line to fix
+   * @return The line with fixed escape characters, if contained any
+   */
+  String opalStringBugFixer(String instructionLine) {
+    if (!instructionLine.matches(".*\"(.|\n|\r|\t|\b)*\".*")) {
+      return instructionLine;
+    }
+
+    // replaces a \ with a \\ -> needed because e.g. LDC("s\") would escape the last " and
+    // thus break the syntax
+    instructionLine = instructionLine.replaceAll("\\\\", "\\\\\\\\");
+
+    int firstDoubleQuote = instructionLine.indexOf('"');
+    int lastDoubleQuote = instructionLine.lastIndexOf('"');
+    String stringContent = instructionLine.substring(firstDoubleQuote + 1, lastDoubleQuote);
+    stringContent = stringContent.replace("\"", "\\\"");
+    stringContent = stringContent.replace("\n", "\\n");
+    stringContent = stringContent.replace("\t", "\\t");
+    stringContent = stringContent.replace("\r", "\\r");
+    stringContent = stringContent.replace("\b", "\\b");
+    instructionLine =
+        instructionLine.substring(0, firstDoubleQuote + 1)
+            + stringContent
+            + instructionLine.substring(lastDoubleQuote);
+
+    return instructionLine;
   }
 }

@@ -1,7 +1,10 @@
 package opalintegration.Visitor.Instruction;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import opalintegration.Visitor.ElementAcceptor;
 import org.opalj.br.instructions.*;
+import org.opalj.collection.immutable.IntIntPair;
 
 /**
  * Visits specific bytecode instructions which are defined in the list, and for each of them it
@@ -10,13 +13,27 @@ import org.opalj.br.instructions.*;
  * <p>This visitor does not handle all bytecode instructions. Instead, it visits those instructions
  * for which the default "toString()" method does not behave as wanted.
  *
- * <p>TODO: visit(TABLESWITCH)
+ * <p>
  */
 public class InstructionVisitorImpl extends ElementAcceptor<Instruction, String>
     implements InstructionVisitor {
   @Override
   public String visit(LoadInt l) {
     return l.mnemonic().toUpperCase() + "(" + l.value() + ")";
+  }
+
+  @Override
+  public String visit(LOOKUPSWITCH s) {
+    IntIntPair[] intIntPairs = new IntIntPair[s.npairs().size()];
+    s.npairs().copyToArray(intIntPairs);
+    return s.mnemonic().toUpperCase()
+        + "(default:"
+        + (s.defaultOffset() + pc[0])
+        + "["
+        + Arrays.stream(intIntPairs)
+            .map(p -> "(case:" + p._1() + "," + (p._2() + pc[0]) + ")")
+            .collect(Collectors.joining(""))
+        + "])";
   }
 
   @Override
@@ -75,44 +92,48 @@ public class InstructionVisitorImpl extends ElementAcceptor<Instruction, String>
   }
 
   public String visit(ANEWARRAY anewarray) {
-    return anewarray.mnemonic().toUpperCase() + " " + anewarray.componentType().toJava();
+    return anewarray.mnemonic().toUpperCase() + "(" + anewarray.componentType().toJava() + ")";
   }
 
   public String visit(GETSTATIC getstatic) {
     return getstatic.mnemonic().toUpperCase()
-        + " "
+        + "("
         + getstatic.declaringClass().toJava()
         + "."
         + getstatic.name()
         + " : "
-        + getstatic.fieldType().toJava();
+        + getstatic.fieldType().toJava()
+        + ")";
   }
 
   public String visit(GETFIELD getfield) {
-    return "GET "
+    return "GET("
         + getfield.declaringClass().toJava()
         + "."
         + getfield.name()
         + " : "
-        + getfield.fieldType().toJava();
+        + getfield.fieldType().toJava()
+        + ")";
   }
 
   public String visit(PUTFIELD putfield) {
-    return "PUT "
+    return "PUT("
         + putfield.declaringClass().toJava()
         + "."
         + putfield.name()
         + " : "
-        + putfield.fieldType().toJava();
+        + putfield.fieldType().toJava()
+        + ")";
   }
 
   public String visit(PUTSTATIC putstatic) {
-    return "PUTSTATIC "
+    return "PUTSTATIC("
         + putstatic.declaringClass().toJava()
         + "."
         + putstatic.name()
         + " : "
-        + putstatic.fieldType().toJava();
+        + putstatic.fieldType().toJava()
+        + ")";
   }
 
   @Override

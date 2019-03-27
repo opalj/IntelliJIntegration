@@ -1,3 +1,6 @@
+import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
+import com.github.spotbugs.SpotBugsTask
+
 plugins {
     id 'java'
     id 'org.jetbrains.intellij' version '0.3.12'
@@ -9,7 +12,7 @@ plugins {
 }
 
 shadowJar {
-    transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
+    transform(AppendingTransformer) {
         resource = 'reference.conf'
     }
 }
@@ -60,7 +63,7 @@ check {
 }
 
 
-tasks.withType(com.github.spotbugs.SpotBugsTask) {
+tasks.withType(SpotBugsTask) {
     reports {
         xml.enabled = false
         html.enabled = true
