@@ -14,8 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- *
- * <p>a class that resolves references for methods and fields in the JavaByteCode-Editor (e.g. for
+ * a class that resolves references for methods and fields in the JavaByteCode-Editor (e.g. for
  * println(java.lang.String) it finds the println(String) method in PrintStream.java)
  *
  * <p>the methods/fields may or may not be members of the current class
@@ -133,7 +132,6 @@ class JbcMethodAndFieldReference extends PsiReferenceBase<PsiElement> {
   }
 
   /**
-   *
    * @param ourParams the parameter list that is found in our JavaByteCode-Editor
    * @param theirParams the parameter list of an overload of the reference we're looking for
    * @return true, if the parameter lists match

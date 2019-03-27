@@ -11,7 +11,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 
 /**
- *
  * had caused severe issues)
  *
  * <p>This action performs on jump statements in the bytecode. It puts the caret on the line with
@@ -24,10 +23,10 @@ public class JumpToProgramCounter extends AnAction {
   public void actionPerformed(AnActionEvent e) {
     Editor editor = e.getData(CommonDataKeys.EDITOR);
     PsiFile element = e.getData(CommonDataKeys.PSI_FILE);
-    if(editor == null || element == null){
-      return ;
+    if (editor == null || element == null) {
+      return;
     }
-    PsiElement elementAt =element.findElementAt(editor.getCaretModel().getOffset());
+    PsiElement elementAt = element.findElementAt(editor.getCaretModel().getOffset());
 
     // the parent is the current instruction line, e.g. 40 223 GOTO(523),
     // where 40 is the PC and 223 is the Line

@@ -39,21 +39,24 @@ public class JbcReferenceContributor extends PsiReferenceContributor {
               PsiElement file = element.getContainingFile();
               // example: classHead = public class io.ChainedReader extends java.lang.Object
               PsiElement classHead;
-                classHead = Arrays.stream(file.getChildren())
-                    .filter(psiElement -> psiElement instanceof JavaByteCodeClassHead)
-                    .findFirst()
-                    .orElse(null); //get()orElse(null)
-                // example: typeOfClass = io.ChainedReader
+              classHead =
+                  Arrays.stream(file.getChildren())
+                      .filter(psiElement -> psiElement instanceof JavaByteCodeClassHead)
+                      .findFirst()
+                      .orElse(null); // get()orElse(null)
+              // example: typeOfClass = io.ChainedReader
 
-              if(classHead!=null) {
-                  PsiElement typeOfClass = Arrays.stream(classHead.getChildren())
-                          .filter(psiElement -> psiElement instanceof JavaByteCodeJType)
-                          .findFirst()
-                          .orElse(null);
-                  if (typeOfClass != null) {
-                      methodReference = new JbcMethodAndFieldReference(element, range, typeOfClass.getText());
-                  }else return null;
-              }else return null;
+              if (classHead != null) {
+                PsiElement typeOfClass =
+                    Arrays.stream(classHead.getChildren())
+                        .filter(psiElement -> psiElement instanceof JavaByteCodeJType)
+                        .findFirst()
+                        .orElse(null);
+                if (typeOfClass != null) {
+                  methodReference =
+                      new JbcMethodAndFieldReference(element, range, typeOfClass.getText());
+                } else return null;
+              } else return null;
             }
 
             return new PsiReference[] {methodReference};

@@ -43,7 +43,6 @@ public class JavaByteCodePsiImplUtil {
     return DefMethodNameImplUtil.getStringVar(element);
   }
 
-
   /** @see PsiNameIdentifierOwner#getNameIdentifier() */
   @Nullable
   public static PsiElement getNameIdentifier(@NotNull JavaByteCodeDefMethodName element) {
@@ -132,7 +131,8 @@ public class JavaByteCodePsiImplUtil {
   }
 
   /** @see PsiNameIdentifierOwner#getNameIdentifier() */
-  public static PsiElement getNameIdentifier(@NotNull JavaByteCodeExceptionTableDeclaration element) {
+  public static PsiElement getNameIdentifier(
+      @NotNull JavaByteCodeExceptionTableDeclaration element) {
     return ExceptionTableDeclarationImplUtil.getNameIdentifier(element);
   }
 
@@ -174,7 +174,8 @@ public class JavaByteCodePsiImplUtil {
   }
 
   /** @see PsiNameIdentifierOwner#getNameIdentifier() */
-  public static PsiElement getNameIdentifier(@NotNull JavaByteCodeStackMapTableDeclaration element) {
+  public static PsiElement getNameIdentifier(
+      @NotNull JavaByteCodeStackMapTableDeclaration element) {
     return StackMapTableDeclarationImplUtil.getNameIdentifier(element);
   }
 
@@ -195,7 +196,8 @@ public class JavaByteCodePsiImplUtil {
   }
 
   /** @see PsiNameIdentifierOwner#getNameIdentifier() */
-  public static PsiElement getNameIdentifier(@NotNull JavaByteCodeLocVarTypeTableDeclaration element) {
+  public static PsiElement getNameIdentifier(
+      @NotNull JavaByteCodeLocVarTypeTableDeclaration element) {
     return LocVarTypeTableDeclarationImplUtil.getNameIdentifier(element);
   }
 
@@ -203,7 +205,8 @@ public class JavaByteCodePsiImplUtil {
     return LocVarTypeTableDeclarationImplUtil.getPresentation(element);
   }
 
-  public static void navigate(JavaByteCodeLocVarTypeTableDeclaration element, boolean requestFocus) {
+  public static void navigate(
+      JavaByteCodeLocVarTypeTableDeclaration element, boolean requestFocus) {
     LocVarTypeTableDeclarationImplUtil.navigate(element, requestFocus);
   }
 }

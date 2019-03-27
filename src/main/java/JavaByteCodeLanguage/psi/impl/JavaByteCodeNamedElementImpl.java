@@ -15,7 +15,7 @@ public abstract class JavaByteCodeNamedElementImpl extends ASTWrapperPsiElement
 
   @Override
   public PsiElement setName(@NotNull String name) throws IncorrectOperationException {
-    //not needed because no refactoring/renaming
+    // not needed because no refactoring/renaming
     return null;
   }
 }

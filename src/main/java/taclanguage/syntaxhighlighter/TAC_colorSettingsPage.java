@@ -3,22 +3,21 @@ package taclanguage.syntaxhighlighter;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.options.colors.*;
+import java.util.Map;
+import javax.swing.*;
 import org.jetbrains.annotations.*;
 import taclanguage.languageandfiletype.TAC_filetype;
 
-import javax.swing.*;
-import java.util.Map;
-
 public class TAC_colorSettingsPage implements ColorSettingsPage {
   private static final AttributesDescriptor[] DESCRIPTORS =
-          new AttributesDescriptor[] {
-                  new AttributesDescriptor("Keyword", TAC_syntaxHighlighter.TYPE),
-                  new AttributesDescriptor("Number", TAC_syntaxHighlighter.NUMBER),
-                  new AttributesDescriptor("Instruction", TAC_syntaxHighlighter.LEVEL),
-                  new AttributesDescriptor("Comment", TAC_syntaxHighlighter.COMMENT),
-                  new AttributesDescriptor("String", TAC_syntaxHighlighter.STRING),
-                  new AttributesDescriptor("Annotation", TAC_syntaxHighlighter.ANNOTATION),
-          };
+      new AttributesDescriptor[] {
+        new AttributesDescriptor("Keyword", TAC_syntaxHighlighter.TYPE),
+        new AttributesDescriptor("Number", TAC_syntaxHighlighter.NUMBER),
+        new AttributesDescriptor("Instruction", TAC_syntaxHighlighter.LEVEL),
+        new AttributesDescriptor("Comment", TAC_syntaxHighlighter.COMMENT),
+        new AttributesDescriptor("String", TAC_syntaxHighlighter.STRING),
+        new AttributesDescriptor("Annotation", TAC_syntaxHighlighter.ANNOTATION),
+      };
 
   @Nullable
   @Override

@@ -57,14 +57,15 @@ public class OpalUtil {
       @NotNull String prepareID,
       VirtualFile virtualFile,
       @Nullable VirtualFile olderFile) {
-    if(olderFile!=null){
-      updateStateIfNewClassFile(virtualFile,project,true);
-    }else {
-      updateStateIfNewClassFile(virtualFile, project,false);
+    if (olderFile != null) {
+      updateStateIfNewClassFile(virtualFile, project, true);
+    } else {
+      updateStateIfNewClassFile(virtualFile, project, false);
     }
-    // if something went wrong during the opal project creation, just return the passed in class file
-    if(classFile== null){
-      return  virtualFile;
+    // if something went wrong during the opal project creation, just return the passed in class
+    // file
+    if (classFile == null) {
+      return virtualFile;
     }
     String fileName = virtualFile.getNameWithoutExtension();
     String representableForm = null;
@@ -90,11 +91,10 @@ public class OpalUtil {
       fileName = olderFile.getPath();
     }
 
-    File preparedFile =
-        writeContentToFile(fileName, representableForm, olderFile != null);
+    File preparedFile = writeContentToFile(fileName, representableForm, olderFile != null);
 
     // if something went wrong during de-compilation, just return the passed in class file
-    if(preparedFile == null) {
+    if (preparedFile == null) {
       return virtualFile;
     }
 
@@ -102,9 +102,7 @@ public class OpalUtil {
   }
 
   /**
-   *
-   *
-   * <p>an auxiliary method that writes 'content' to a 'file' (main purpose of this method is to
+   * an auxiliary method that writes 'content' to a 'file' (main purpose of this method is to
    * encapsulate the try/catch block)
    *
    * @param filename the Name of the temporal file
@@ -122,7 +120,7 @@ public class OpalUtil {
         boolean fileContained = false;
 
         File[] filesInTempDirectory = tempDirectory.listFiles();
-        if(filesInTempDirectory != null) {
+        if (filesInTempDirectory != null) {
           for (File fileInTemp : filesInTempDirectory) {
             if (fileInTemp.getName().equals(filename)) {
               fileContained = true;
@@ -155,18 +153,19 @@ public class OpalUtil {
    */
   private static void updateStateIfNewClassFile(
       @NotNull VirtualFile virtualClassFile, @NotNull Project project, boolean VFL) {
-    if(virtualClassFile.getExtension() == null) {
+    if (virtualClassFile.getExtension() == null) {
       return;
     }
-    if (VFL||(!virtualClassFile.equals(currentWorkingVF)
-        && virtualClassFile.getExtension().equals(StdFileTypes.CLASS.getDefaultExtension()))) {
+    if (VFL
+        || (!virtualClassFile.equals(currentWorkingVF)
+            && virtualClassFile.getExtension().equals(StdFileTypes.CLASS.getDefaultExtension()))) {
       currentWorkingVF = virtualClassFile;
-      if(!VFL)Compiler.make(project);
+      if (!VFL) Compiler.make(project);
       if (virtualClassFile.getCanonicalPath() != null
-              && !virtualClassFile.getCanonicalPath().contains("!")) {
+          && !virtualClassFile.getCanonicalPath().contains("!")) {
         projectPath = virtualClassFile.getPath();
         PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualClassFile);
-        if(psiFile instanceof PsiJavaFile) {
+        if (psiFile instanceof PsiJavaFile) {
           PsiJavaFile psiJavaFile = (PsiJavaFile) psiFile;
           final PsiClass[] classes = psiJavaFile.getClasses();
           fqClassName = classes[0].getQualifiedName();
@@ -202,7 +201,7 @@ public class OpalUtil {
 
     // (might be) JAR
     if (virtualClassFile.getCanonicalPath() != null
-            && virtualClassFile.getCanonicalPath().contains("!")) {
+        && virtualClassFile.getCanonicalPath().contains("!")) {
       return createClassFileFromJar(projectPath, fqClassName);
     }
     // use the input stream instead

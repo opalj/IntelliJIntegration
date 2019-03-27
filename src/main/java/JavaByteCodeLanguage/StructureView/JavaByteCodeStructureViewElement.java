@@ -11,15 +11,13 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jetbrains.annotations.NotNull;
 
 /**
  * @see StructureViewTreeElement
  * @see SortableTreeElement
  */
-class JavaByteCodeStructureViewElement
-    implements StructureViewTreeElement, SortableTreeElement {
+class JavaByteCodeStructureViewElement implements StructureViewTreeElement, SortableTreeElement {
   private final NavigatablePsiElement element;
 
   JavaByteCodeStructureViewElement(NavigatablePsiElement element) {
@@ -41,14 +39,17 @@ class JavaByteCodeStructureViewElement
   @NotNull
   @Override
   public ItemPresentation getPresentation() {
-    return element.getPresentation() == null ? new PresentationData(element.getText(),null, null,null) : element.getPresentation();
+    return element.getPresentation() == null
+        ? new PresentationData(element.getText(), null, null, null)
+        : element.getPresentation();
   }
+
   @NotNull
   @Override
   public TreeElement[] getChildren() {
     if (element != null) {
       PsiElement[] jbcElements = PsiTreeUtil.getChildrenOfType(element, PsiElement.class);
-      if(jbcElements == null ){
+      if (jbcElements == null) {
         return EMPTY_ARRAY;
       }
       List<TreeElement> treeElements = new ArrayList<>(jbcElements.length);
@@ -64,7 +65,7 @@ class JavaByteCodeStructureViewElement
         }
 
         // tables
-        if(jbcElement instanceof JavaByteCodeTableArea) {
+        if (jbcElement instanceof JavaByteCodeTableArea) {
           treeElements.addAll(iterateThroughArea(jbcElement));
         }
       }
@@ -88,32 +89,39 @@ class JavaByteCodeStructureViewElement
       if (jbcElement instanceof JavaByteCodeMethodDeclaration) {
         treeElements.add(
             new JavaByteCodeStructureViewElement((JavaByteCodeMethodDeclarationImpl) jbcElement));
-            continue;
+        continue;
       }
       if (jbcElement instanceof JavaByteCodeFieldsDeclaration) {
-        treeElements.add(new JavaByteCodeStructureViewElement((JavaByteCodeFieldsDeclarationImpl)jbcElement));
+        treeElements.add(
+            new JavaByteCodeStructureViewElement((JavaByteCodeFieldsDeclarationImpl) jbcElement));
         continue;
       }
 
       if (jbcElement instanceof JavaByteCodeLocVarTableDeclaration) {
         treeElements.add(
-                new JavaByteCodeStructureViewElement(
-                        (JavaByteCodeLocVarTableDeclarationImpl) jbcElement));
+            new JavaByteCodeStructureViewElement(
+                (JavaByteCodeLocVarTableDeclarationImpl) jbcElement));
         continue;
       }
 
-      if(jbcElement instanceof JavaByteCodeExceptionTableDeclaration) {
-        treeElements.add(new JavaByteCodeStructureViewElement((JavaByteCodeExceptionTableDeclarationImpl)jbcElement));
+      if (jbcElement instanceof JavaByteCodeExceptionTableDeclaration) {
+        treeElements.add(
+            new JavaByteCodeStructureViewElement(
+                (JavaByteCodeExceptionTableDeclarationImpl) jbcElement));
         continue;
       }
 
-      if(jbcElement instanceof JavaByteCodeStackMapTableDeclaration) {
-        treeElements.add(new JavaByteCodeStructureViewElement((JavaByteCodeStackMapTableDeclarationImpl)jbcElement));
+      if (jbcElement instanceof JavaByteCodeStackMapTableDeclaration) {
+        treeElements.add(
+            new JavaByteCodeStructureViewElement(
+                (JavaByteCodeStackMapTableDeclarationImpl) jbcElement));
         continue;
       }
 
-      if(jbcElement instanceof JavaByteCodeLocVarTypeTableDeclaration) {
-        treeElements.add(new JavaByteCodeStructureViewElement((JavaByteCodeLocVarTypeTableDeclarationImpl)jbcElement));
+      if (jbcElement instanceof JavaByteCodeLocVarTypeTableDeclaration) {
+        treeElements.add(
+            new JavaByteCodeStructureViewElement(
+                (JavaByteCodeLocVarTypeTableDeclarationImpl) jbcElement));
       }
     }
 
