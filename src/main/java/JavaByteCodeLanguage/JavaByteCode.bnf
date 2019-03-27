@@ -46,7 +46,7 @@
   SEMICOLON=";"
   SLASH="/"
   AT="@"
-  TO="regexp:>|=>|->"
+  TO="regexp:=>|->"
   EQ="="
   SWITCH="⤼"
   LBRACKET="regexp:\(|\{|\[|[«]"
@@ -147,7 +147,7 @@ private exceptionList ::= THROWS (JType COMMA?)*
 
 // instructions (part of method body)
 
-InstructionBody ::= PcNumber LineNumber Instr
+InstructionBody ::= TAB* PcNumber LineNumber Instr
 PcNumber ::= NUMBER
 LineNumber ::= NUMBER
 Instr ::= (MNEMONIC (LBRACKET JType COLON Type RBRACKET                       // put someFQN : someFQN
@@ -181,6 +181,11 @@ TableArea ::= TABLES LBRACKET
               RBRACKET
 
 ExceptionTableDeclaration ::= TABLENAME LBRACKET ExceptionTableBody* RBRACKET
+{
+ mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
+ implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
+ methods=[getName getNameIdentifier getPresentation navigate]
+}
 private ExceptionTableBody ::= "try" LBRACKET NUMBER COMMA NUMBER RBRACKET "catch" NUMBER (Type|STRINGVAR)
 
 
@@ -194,6 +199,11 @@ private LocVarTableBody ::= "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET SLASH "lv
 
 
 StackMapTableDeclaration ::= TABLENAME LBRACKET StackMapTableBody* RBRACKET
+{
+ mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
+ implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
+ methods=[getName getNameIdentifier getPresentation navigate]
+}
 private StackMapTableBody ::= NUMBER Type NUMBER NUMBER
     [("Locals:"? (Type COMMA?)*)?
      SEMICOLON?
@@ -201,5 +211,10 @@ private StackMapTableBody ::= NUMBER Type NUMBER NUMBER
 
 
 LocVarTypeTableDeclaration ::= TABLENAME LBRACKET LocVarTypeTableBody* RBRACKET
+{
+ mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
+ implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
+ methods=[getName getNameIdentifier getPresentation navigate]
+}
 LocVarTypeTableBody ::= "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET SLASH "lv" EQ NUMBER TO STRINGVAR COLON
         ((STRINGVAR SLASH?)* SEMICOLON)*

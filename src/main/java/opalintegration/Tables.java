@@ -137,7 +137,7 @@ final class Tables {
         for (int k = 0; k < refArrayOption.length(); k++) {
             LocalVariable localVariable = refArrayOption.apply(k);
             String localVariableEntry = String.format(
-                    "\t\tpc=[%d > %d) / lv=%d => %s %s\n",
+                    "\t\tpc=[%d => %d) / lv=%d => %s %s\n",
                     localVariable.startPC(),
                     localVariable.length(),
                     localVariable.index(),

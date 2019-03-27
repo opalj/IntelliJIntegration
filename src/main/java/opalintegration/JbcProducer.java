@@ -39,6 +39,7 @@ class JbcProducer extends DecompiledTextProducer {
             instruction = instructionVisitorImpl.accept(instructions[k], k);
             instruction = instruction.replaceAll("\n", " ");
             instruction = instruction.replaceAll("\t", " ");
+            instruction = instruction.replaceAll("\r", " ");
             // replaces a \ with a \\ -> needed because e.g. LDC("s\") would escape the last " and
             // thus break the syntax
              instruction = instruction.replaceAll("\\\\", "\\\\\\\\");
@@ -75,7 +76,6 @@ class JbcProducer extends DecompiledTextProducer {
         methodBodyText.append(Tables.stackMapTable(methodBody));
         methodBodyText.append("  } // Tables\n");
       }
-
     } // if(body.defined)
 
     return methodBodyText.toString();

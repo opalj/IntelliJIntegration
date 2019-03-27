@@ -25,7 +25,7 @@ public class JavaByteCodeVisitor extends PsiElementVisitor {
   }
 
   public void visitExceptionTableDeclaration(@NotNull JavaByteCodeExceptionTableDeclaration o) {
-    visitPsiElement(o);
+    visitNamedElement(o);
   }
 
   public void visitFieldArea(@NotNull JavaByteCodeFieldArea o) {
@@ -73,7 +73,7 @@ public class JavaByteCodeVisitor extends PsiElementVisitor {
   }
 
   public void visitLocVarTypeTableDeclaration(@NotNull JavaByteCodeLocVarTypeTableDeclaration o) {
-    visitPsiElement(o);
+    visitNamedElement(o);
   }
 
   public void visitMethodArea(@NotNull JavaByteCodeMethodArea o) {
@@ -101,7 +101,7 @@ public class JavaByteCodeVisitor extends PsiElementVisitor {
   }
 
   public void visitStackMapTableDeclaration(@NotNull JavaByteCodeStackMapTableDeclaration o) {
-    visitPsiElement(o);
+    visitNamedElement(o);
   }
 
   public void visitTableArea(@NotNull JavaByteCodeTableArea o) {
