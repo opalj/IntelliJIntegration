@@ -12,6 +12,9 @@ import org.opalj.br.instructions.*;
  * @see opalintegration.Visitor.ElementAcceptor#accept(Object, int...) )
  *
  */
+@SuppressWarnings("unused")
+// unused because there is no accepting methods for given element
+// unused warning happens because method call looks like this (passed as string): this.getClass().getMethod("visit", in);
 interface InstructionVisitor {
   String visit(ANEWARRAY anewarray);
 
