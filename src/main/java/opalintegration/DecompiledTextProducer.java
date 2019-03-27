@@ -144,6 +144,7 @@ abstract class DecompiledTextProducer {
 
       // call to template method
       methodText.append(methodBody(method));
+      methodText.append("}").append("\n\n\n");
     }
     methodText.append(endArea("Methods"));
 

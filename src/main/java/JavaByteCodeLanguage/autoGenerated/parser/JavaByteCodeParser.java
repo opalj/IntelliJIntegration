@@ -94,6 +94,9 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     else if (t == STACK_MAP_TABLE_DECLARATION) {
       r = StackMapTableDeclaration(b, 0);
     }
+    else if (t == TABLE_AREA) {
+      r = TableArea(b, 0);
+    }
     else if (t == TYPE) {
       r = Type(b, 0);
     }
@@ -650,15 +653,14 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (STRINGVAR DOT)*STRINGVAR
+  // (STRINGVAR DOT)*(STRINGVAR | JAVATYPEHEAD | TABLENAME | MNEMONIC)
   public static boolean JType(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "JType")) return false;
-    if (!nextTokenIs(b, STRINGVAR)) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, J_TYPE, "<j type>");
     r = JType_0(b, l + 1);
-    r = r && consumeToken(b, STRINGVAR);
-    exit_section_(b, m, J_TYPE, r);
+    r = r && JType_1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -680,6 +682,17 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeTokens(b, 0, STRINGVAR, DOT);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // STRINGVAR | JAVATYPEHEAD | TABLENAME | MNEMONIC
+  private static boolean JType_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "JType_1")) return false;
+    boolean r;
+    r = consumeToken(b, STRINGVAR);
+    if (!r) r = consumeToken(b, JAVATYPEHEAD);
+    if (!r) r = consumeToken(b, TABLENAME);
+    if (!r) r = consumeToken(b, MNEMONIC);
     return r;
   }
 
@@ -982,10 +995,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   // Annotation* MethodHead LBRACKET
   //         (INSTRUCTIONHEAD
   //          InstructionBody*
-  //          ExceptionTableDeclaration?
-  //          LocVarTableDeclaration?
-  //          LocVarTypeTableDeclaration?
-  //          StackMapTableDeclaration?)*
+  //          TableArea?)*
   //         RBRACKET
   public static boolean MethodDeclaration(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "MethodDeclaration")) return false;
@@ -1013,10 +1023,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
 
   // (INSTRUCTIONHEAD
   //          InstructionBody*
-  //          ExceptionTableDeclaration?
-  //          LocVarTableDeclaration?
-  //          LocVarTypeTableDeclaration?
-  //          StackMapTableDeclaration?)*
+  //          TableArea?)*
   private static boolean MethodDeclaration_3(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "MethodDeclaration_3")) return false;
     while (true) {
@@ -1029,10 +1036,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
 
   // INSTRUCTIONHEAD
   //          InstructionBody*
-  //          ExceptionTableDeclaration?
-  //          LocVarTableDeclaration?
-  //          LocVarTypeTableDeclaration?
-  //          StackMapTableDeclaration?
+  //          TableArea?
   private static boolean MethodDeclaration_3_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "MethodDeclaration_3_0")) return false;
     boolean r;
@@ -1040,9 +1044,6 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, INSTRUCTIONHEAD);
     r = r && MethodDeclaration_3_0_1(b, l + 1);
     r = r && MethodDeclaration_3_0_2(b, l + 1);
-    r = r && MethodDeclaration_3_0_3(b, l + 1);
-    r = r && MethodDeclaration_3_0_4(b, l + 1);
-    r = r && MethodDeclaration_3_0_5(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1058,31 +1059,10 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // ExceptionTableDeclaration?
+  // TableArea?
   private static boolean MethodDeclaration_3_0_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "MethodDeclaration_3_0_2")) return false;
-    ExceptionTableDeclaration(b, l + 1);
-    return true;
-  }
-
-  // LocVarTableDeclaration?
-  private static boolean MethodDeclaration_3_0_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "MethodDeclaration_3_0_3")) return false;
-    LocVarTableDeclaration(b, l + 1);
-    return true;
-  }
-
-  // LocVarTypeTableDeclaration?
-  private static boolean MethodDeclaration_3_0_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "MethodDeclaration_3_0_4")) return false;
-    LocVarTypeTableDeclaration(b, l + 1);
-    return true;
-  }
-
-  // StackMapTableDeclaration?
-  private static boolean MethodDeclaration_3_0_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "MethodDeclaration_3_0_5")) return false;
-    StackMapTableDeclaration(b, l + 1);
+    TableArea(b, l + 1);
     return true;
   }
 
@@ -1350,10 +1330,59 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // TABLES LBRACKET
+  //                   ExceptionTableDeclaration?
+  //                   LocVarTableDeclaration?
+  //                   LocVarTypeTableDeclaration?
+  //                   StackMapTableDeclaration?
+  //               RBRACKET
+  public static boolean TableArea(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "TableArea")) return false;
+    if (!nextTokenIs(b, TABLES)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, TABLES, LBRACKET);
+    r = r && TableArea_2(b, l + 1);
+    r = r && TableArea_3(b, l + 1);
+    r = r && TableArea_4(b, l + 1);
+    r = r && TableArea_5(b, l + 1);
+    r = r && consumeToken(b, RBRACKET);
+    exit_section_(b, m, TABLE_AREA, r);
+    return r;
+  }
+
+  // ExceptionTableDeclaration?
+  private static boolean TableArea_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "TableArea_2")) return false;
+    ExceptionTableDeclaration(b, l + 1);
+    return true;
+  }
+
+  // LocVarTableDeclaration?
+  private static boolean TableArea_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "TableArea_3")) return false;
+    LocVarTableDeclaration(b, l + 1);
+    return true;
+  }
+
+  // LocVarTypeTableDeclaration?
+  private static boolean TableArea_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "TableArea_4")) return false;
+    LocVarTypeTableDeclaration(b, l + 1);
+    return true;
+  }
+
+  // StackMapTableDeclaration?
+  private static boolean TableArea_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "TableArea_5")) return false;
+    StackMapTableDeclaration(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
   // (LambdaType | JType | PRIMITIVETYPE)('[]')*
   public static boolean Type(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "Type")) return false;
-    if (!nextTokenIs(b, "<type>", PRIMITIVETYPE, STRINGVAR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, TYPE, "<type>");
     r = Type_0(b, l + 1);

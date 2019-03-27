@@ -37,12 +37,25 @@ class JbcProducer extends DecompiledTextProducer {
           try {
             String instruction;
             instruction = instructionVisitorImpl.accept(instructions[k], k);
-            // TODO replace \n (and \t...??) and the likes with spaces
             instruction = instruction.replaceAll("\n", " ");
             instruction = instruction.replaceAll("\t", " ");
+            instruction = instruction.replaceAll("\r", " ");
             // replaces a \ with a \\ -> needed because e.g. LDC("s\") would escape the last " and
             // thus break the syntax
-            instruction = instruction.replaceAll("\\\\", "\\\\\\\\");
+             instruction = instruction.replaceAll("\\\\", "\\\\\\\\");
+
+             // OPAL bug? '(id=\")' becomes '(id="|)' which causes errors, because OPAL removes escaping \
+             // so we add an escape \ in front of every \ -> '(id=\\")' becomes '(id=\"|)'
+             if(instruction.matches(".*\\(\".*\"\\).*")) {
+               int firstDoubleQuote = instruction.indexOf('"');
+               int lastDoubleQuote = instruction.lastIndexOf('"');
+               String stringContent = instruction.substring(firstDoubleQuote + 1, lastDoubleQuote);
+               stringContent = stringContent.replace("\"", "\\\"");
+               instruction = instruction.substring(0, firstDoubleQuote + 1)
+                       + stringContent
+                       + instruction.substring(lastDoubleQuote);
+             }
+
 
             String formattedInstrLine =
                 String.format(
@@ -55,13 +68,15 @@ class JbcProducer extends DecompiledTextProducer {
         }
       } // for(instructions)
 
-      methodBodyText.append(Tables.exceptionTable(method.body()));
-      methodBodyText.append(Tables.localVariableTable(methodBody));
-      methodBodyText.append(Tables.localVariableTypeTable(methodBody));
-      methodBodyText.append(Tables.stackMapTable(methodBody));
-
+      if(Tables.hasTables(method)) {
+        methodBodyText.append("\n  Tables {");
+        methodBodyText.append(Tables.exceptionTable(method.body()));
+        methodBodyText.append(Tables.localVariableTable(methodBody));
+        methodBodyText.append(Tables.localVariableTypeTable(methodBody));
+        methodBodyText.append(Tables.stackMapTable(methodBody));
+        methodBodyText.append("  } // Tables\n");
+      }
     } // if(body.defined)
-    methodBodyText.append("}").append("\n\n\n");
 
     return methodBodyText.toString();
   }

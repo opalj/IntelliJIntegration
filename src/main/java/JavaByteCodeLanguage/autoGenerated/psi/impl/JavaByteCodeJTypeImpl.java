@@ -25,6 +25,24 @@ public class JavaByteCodeJTypeImpl extends JavaByteCodeNamedElementImpl implemen
     else super.accept(visitor);
   }
 
+  @Override
+  @Nullable
+  public PsiElement getJavatypehead() {
+    return findChildByType(JAVATYPEHEAD);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getMnemonic() {
+    return findChildByType(MNEMONIC);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getTablename() {
+    return findChildByType(TABLENAME);
+  }
+
   @Nullable
   public String getJavaType() {
     return JavaByteCodePsiImplUtil.getJavaType(this);

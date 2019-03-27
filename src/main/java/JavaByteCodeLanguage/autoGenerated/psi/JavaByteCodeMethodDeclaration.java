@@ -13,22 +13,13 @@ public interface JavaByteCodeMethodDeclaration extends JavaByteCodeNamedElement 
   List<JavaByteCodeAnnotation> getAnnotationList();
 
   @NotNull
-  List<JavaByteCodeExceptionTableDeclaration> getExceptionTableDeclarationList();
-
-  @NotNull
   List<JavaByteCodeInstructionBody> getInstructionBodyList();
-
-  @NotNull
-  List<JavaByteCodeLocVarTableDeclaration> getLocVarTableDeclarationList();
-
-  @NotNull
-  List<JavaByteCodeLocVarTypeTableDeclaration> getLocVarTypeTableDeclarationList();
 
   @NotNull
   JavaByteCodeMethodHead getMethodHead();
 
   @NotNull
-  List<JavaByteCodeStackMapTableDeclaration> getStackMapTableDeclarationList();
+  List<JavaByteCodeTableArea> getTableAreaList();
 
   @NotNull
   PsiElement getLbracket();
