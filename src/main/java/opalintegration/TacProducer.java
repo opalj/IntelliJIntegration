@@ -2,6 +2,8 @@ package opalintegration;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Scanner;
+
 import org.opalj.br.Method;
 import org.opalj.br.analyses.JavaProject;
 import org.opalj.br.analyses.Project;
@@ -32,7 +34,24 @@ class TacProducer extends DecompiledTextProducer {
       methodBody.append("\n");
       TACode<TACMethodParameter, DUVar<KnownTypedValue>> TacCode =
           methodTACodeFunction.apply(method);
-      methodBody.append(ToTxt.apply(TacCode).mkString("\n"));
+      // Opal String error
+      Scanner scanner = new Scanner(ToTxt.apply(TacCode).mkString("\n"));
+      while(scanner.hasNextLine()){
+        String line = scanner.nextLine();
+        if(line.matches(".*\".*\".*")) {
+          line = line.replaceAll("\\\\","\\\\\\\\");
+          System.out.println(line);
+          int firstDoubleQuote = line.indexOf('"');
+          int lastDoubleQuote = line.lastIndexOf('"');
+          String stringContent = line.substring(firstDoubleQuote + 1, lastDoubleQuote);
+          stringContent = stringContent.replace("\"", "\\\"");
+          line = line.substring(0, firstDoubleQuote + 1)
+                  + stringContent
+                  + line.substring(lastDoubleQuote);
+        }
+        methodBody.append(line).append("\n");
+      }
+      //methodBody.append(ToTxt.apply(TacCode).mkString("\n"));
       methodBody.append("\n");
     }
 
