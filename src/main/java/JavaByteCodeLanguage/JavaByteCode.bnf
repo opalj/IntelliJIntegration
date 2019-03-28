@@ -43,6 +43,7 @@
   INSTRUCTIONHEAD="regexp:PC\s+Line\s+Instruction"
   LVINDEX = "lvIndex="
   TABLENAME='regexp:LocalVariableTable|StackMapTable|ExceptionTable|LocalVariableTypeTable'
+  BOOLS='regexp:true|false'
   // TYPES
   PRIMITIVETYPE="regexp:void|boolean|byte|char|short|int|long|float|double"
   // TODO: default out?
@@ -60,7 +61,16 @@ ClassHead ::= ModifierV? (AT?) JAVATYPEHEAD JType (EXTENDS JType)? (IMPLEMENTS (
 
 // generic stuff
 
-Annotation ::= AT JType
+Annotation ::= AT JType [LBRACKET
+                            (
+                                STRINGVAR EQ STRING COMMA?
+                              | STRINGVAR EQ BOOLS COMMA?
+                              | STRINGVAR EQ JType COMMA?
+                              | STRINGVAR EQ NUMBER COMMA?
+                              | STRINGVAR EQ LBRACKET ((STRING | BOOLS | JType | NUMBER) COMMA?)* RBRACKET COMMA?
+                              | LBRACKET? Annotation RBRACKET? COMMA?
+                            )*
+                         RBRACKET]
 
 ModifierV ::= MODIFIER*
 
