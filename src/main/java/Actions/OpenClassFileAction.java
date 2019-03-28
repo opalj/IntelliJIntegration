@@ -3,12 +3,14 @@ package Actions;
 import Compile.Compiler;
 import com.intellij.notification.*;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.*;
 import com.intellij.openapi.vfs.*;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import opalintegration.OpalUtil;
 import org.jetbrains.annotations.NotNull;
+import org.opalj.da.ClassFile;
 
 /** The type Open class file action performs to open a specified editor (tac/bytecode) */
 class OpenClassFileAction extends AnAction {
@@ -39,26 +42,30 @@ class OpenClassFileAction extends AnAction {
     final String extension = virtualFile != null ? virtualFile.getExtension() : "";
     // show Action only for java,class & scala files
     e.getPresentation()
-        .setEnabledAndVisible(
-            project != null
-                && ("java".equals(extension)
-                    || "scala".equals(extension)
-                    || "class".equals(extension)));
+            .setEnabledAndVisible(
+                    project != null
+                            && ("java".equals(extension)
+                            || "scala".equals(extension)
+                            || "class".equals(extension)));
   }
 
   /**
    * performed after a clickevent to open a the specified editor
    *
-   * @param event the event fired if action is peformed
+   * @param e the event fired if action is peformed
    */
   @Override
-  public void actionPerformed(AnActionEvent event) {
+  public void actionPerformed(AnActionEvent e) {
     // Load the file
-    Project project = event.getData(CommonDataKeys.PROJECT);
+    Project project = e.getData(CommonDataKeys.PROJECT);
+    final PsiElement element = e.getData(CommonDataKeys.PSI_ELEMENT);
     // currently selected file in the project view
-    VirtualFile virtualFile = event.getData(CommonDataKeys.VIRTUAL_FILE);
-    if (virtualFile == null || project == null) {
+    VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
+    if (virtualFile == null || project == null ) {
       return;
+    }
+    if(element!=null) {
+      virtualFile = element.getNavigationElement().getContainingFile().getVirtualFile();
     }
     String extension = virtualFile.getExtension();
     VirtualFile classFile = null;
@@ -68,10 +75,10 @@ class OpenClassFileAction extends AnAction {
       } else if (ProjectFileIndex.getInstance(project).isInLibrary(virtualFile)) {
         String FileName = OpalUtil.getJarFileRootAndFileName(virtualFile.getParent())[1];
         Collection<VirtualFile> virtualFilesByName =
-            FilenameIndex.getVirtualFilesByName(
-                project,
-                virtualFile.getNameWithoutExtension() + ".class",
-                GlobalSearchScope.allScope(project));
+                FilenameIndex.getVirtualFilesByName(
+                        project,
+                        virtualFile.getNameWithoutExtension() + ".class",
+                        GlobalSearchScope.allScope(project));
         for (VirtualFile vf : virtualFilesByName) {
           if (vf.getPath().contains(FileName)) {
             classFile = vf;
@@ -84,17 +91,17 @@ class OpenClassFileAction extends AnAction {
     }
     if (classFile != null) {
       Notifications.Bus.notify(
-          new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
-              .createNotification()
-              .setContent("decompiling : " + classFile.getName()));
+              new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
+                      .createNotification()
+                      .setContent("decompiling : " + classFile.getName()));
       FileEditorManager.getInstance(project).openFile(classFile, true);
       FileEditorManager.getInstance(project).setSelectedEditor(classFile, editorName);
     } else {
 
       Notifications.Bus.notify(
-          new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
-              .createNotification()
-              .setContent("can't find or create a class file for : " + virtualFile.getName()));
+              new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
+                      .createNotification()
+                      .setContent("can't find or create a class file for : " + virtualFile.getName()));
     }
   } // actionPerformed
 
@@ -113,8 +120,8 @@ class OpenClassFileAction extends AnAction {
     // get the output directory
     if (module != null) {
       VirtualFile outputPath =
-          Objects.requireNonNull(CompilerModuleExtension.getInstance(module))
-              .getCompilerOutputPath();
+              Objects.requireNonNull(CompilerModuleExtension.getInstance(module))
+                      .getCompilerOutputPath();
       if (outputPath == null) {
         return null;
       }
@@ -124,19 +131,19 @@ class OpenClassFileAction extends AnAction {
       // collect all classFiles in the output directory
       List<VirtualFile> classFiles = new ArrayList<>();
       VfsUtilCore.visitChildrenRecursively(
-          outputPath,
-          new VirtualFileVisitor<VirtualFile>() {
-            @NotNull
-            @Override
-            public Result visitFileEx(@NotNull VirtualFile file) {
-              if (!file.isDirectory() && file.getName().equals(classFileName)) {
-                classFiles.add(file);
-                // VirtualFileVisitor.limit(0);
-                return VirtualFileVisitor.SKIP_CHILDREN;
-              }
-              return CONTINUE;
-            }
-          });
+              outputPath,
+              new VirtualFileVisitor<VirtualFile>() {
+                @NotNull
+                @Override
+                public Result visitFileEx(@NotNull VirtualFile file) {
+                  if (!file.isDirectory() && file.getName().equals(classFileName)) {
+                    classFiles.add(file);
+                    // VirtualFileVisitor.limit(0);
+                    return VirtualFileVisitor.SKIP_CHILDREN;
+                  }
+                  return CONTINUE;
+                }
+              });
       VirtualFile classFile = null;
       if (!classFiles.isEmpty()) {
         classFile = classFiles.get(0);
