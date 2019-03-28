@@ -53,12 +53,14 @@
         <colorSettingsPage implementation="JavaByteCodeLanguage.syntaxhighlighter.JavaByteCodeColorSettingPage"/>
 
         <psi.referenceContributor implementation="JavaByteCodeLanguage.psi.JbcReferenceContributor"/>
+        <psi.referenceContributor implementation="taclanguage.psi.TacReferenceContributor"/>
 
         <lang.psiStructureViewFactory language="jbc" implementationClass="JavaByteCodeLanguage.StructureView.JavaByteCodeStructureViewFactory"/>
         <lang.psiStructureViewFactory language="TAC" implementationClass="taclanguage.structurview.TAC_structureViewFactory"/>
         <lang.foldingBuilder language="jbc" implementationClass="JavaByteCodeLanguage.folding.JbcFoldingBuilder"/>
         <lang.foldingBuilder language="TAC" implementationClass="taclanguage.folding.TACFoldingBuilder"/>
         <lang.findUsagesProvider language="jbc" implementationClass="com.intellij.lang.java.JavaFindUsagesProvider"/>
+        <lang.findUsagesProvider language="TAC" implementationClass="com.intellij.lang.java.JavaFindUsagesProvider"/>
     </extensions>
 
     <actions>
