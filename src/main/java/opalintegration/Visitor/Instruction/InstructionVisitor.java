@@ -13,7 +13,8 @@ import org.opalj.br.instructions.*;
  */
 @SuppressWarnings("unused")
 // unused because there is no accepting methods for given element
-// unused warning happens because method call looks like this (passed as string): this.getClass().getMethod("visit", in);
+// unused warning happens because method call looks like this (passed as string):
+// this.getClass().getMethod("visit", in);
 interface InstructionVisitor {
   String visit(ANEWARRAY anewarray);
 
