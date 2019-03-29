@@ -1,19 +1,21 @@
 package opalintegration;
 
-import java.util.Arrays;
-import java.util.NoSuchElementException;
+import java.awt.Point;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
 import opalintegration.Visitor.StackMap.StackMapVisitorImpl;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.opalj.bi.AccessFlags;
 import org.opalj.br.*;
 import org.opalj.collection.IntIterator;
 import org.opalj.collection.immutable.RefArray;
 import scala.Option;
 
-final class Tables {
+public final class Tables {
 
   private static final Logger LOGGER = Logger.getLogger(Tables.class.getName());
 
@@ -280,5 +282,27 @@ final class Tables {
             .collect(Collectors.joining("\n")));
     exceptionHandlerBuilder.append("\n\t}\n");
     return exceptionHandlerBuilder.toString();
+  }
+
+  public static boolean hasExceptionTable(@NotNull Option<Code> body) {
+    return body.isDefined() && !body.get().exceptionHandlers().isEmpty();
+  }
+
+  @Nullable
+  public static Point[] getPCRangeForException(@NotNull Option<Code> body) {
+    if(!hasExceptionTable(body)) {
+      return new Point[0];
+    }
+
+    ExceptionHandler[] exceptionHandlers =
+            new ExceptionHandler[body.get().exceptionHandlers().size()];
+
+    List<Point> points = new ArrayList<>();
+    for(ExceptionHandler handler : exceptionHandlers) {
+      Point p = new Point(handler.startPC(), handler.endPC());
+      points.add(p);
+    }
+
+    return points.toArray(new Point[0]);
   }
 }

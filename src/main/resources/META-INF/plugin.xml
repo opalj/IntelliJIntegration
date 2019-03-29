@@ -90,6 +90,10 @@
         <action class="Actions.TacToBytecode" id="tactobytecode" text="Jump To JBC">
             <mouse-shortcut keymap="$default" keystroke="control alt button2"/>
         </action>
+
+        <action class="Actions.ExceptionMarkerAction" id="myexcid">
+            <keyboard-shortcut first-keystroke="control X" second-keystroke="control X" keymap="$default"/>
+        </action>
     </actions>
 
     <application-components>

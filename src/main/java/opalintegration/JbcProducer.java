@@ -1,8 +1,23 @@
 package opalintegration;
 
+import java.awt.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.markup.HighlighterLayer;
+import com.intellij.openapi.editor.markup.HighlighterTargetArea;
+import com.intellij.openapi.editor.markup.LineMarkerRenderer;
+import com.intellij.openapi.editor.markup.RangeHighlighter;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import opalintegration.Visitor.Instruction.InstructionVisitorImpl;
 import org.opalj.br.*;
 import org.opalj.br.instructions.Instruction;
@@ -59,8 +74,67 @@ class JbcProducer extends DecompiledTextProducer {
         methodBodyText.append(Tables.stackMapTable(methodBody));
         methodBodyText.append("  } // Tables\n");
       }
+
+      // render exceptions
+      if(Tables.hasExceptionTable(method.body()) && false) {
+        LineMarkerRenderer exceptionLineMarkerRenderer = new ExceptionLineMarkerRenderer(Color.RED);
+
+        DataContext dataContext = DataManager.getInstance().getDataContext();
+        Project project = DataKeys.PROJECT.getData(dataContext);
+        System.out.println("project: " + project.getName());
+
+        if(project != null) {
+          FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+          Editor selectedEditor = fileEditorManager.getSelectedTextEditor();
+          VirtualFile openFile = FileDocumentManager.getInstance().getFile(selectedEditor.getDocument());
+
+          VirtualFile classFile = null;
+          for (VirtualFile vf : fileEditorManager.getOpenFiles()) {
+            if (vf.getNameWithoutExtension().equals(openFile.getNameWithoutExtension())) {
+              classFile = vf;
+              break;
+            }
+          }
+          fileEditorManager.openFile(classFile, false);
+          fileEditorManager.setSelectedEditor(classFile, "OPAL-DIS");
+          selectedEditor = fileEditorManager.getSelectedTextEditor();
+
+          System.out.println(selectedEditor.getDocument().getLineCount());
+          selectedEditor.getMarkupModel().addRangeHighlighter(0, selectedEditor.getLineHeight(), HighlighterLayer.FIRST, null,
+                  HighlighterTargetArea.LINES_IN_RANGE);
+          RangeHighlighter rangeHighlighter = selectedEditor.getMarkupModel().getAllHighlighters()[0];
+          rangeHighlighter.setLineMarkerRenderer(exceptionLineMarkerRenderer);
+          selectedEditor.getMarkupModel().addLineHighlighter(1, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(2, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(3, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(4, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(5, HighlighterLayer.WARNING, null);
+        }
+        else {
+          System.out.println("PROJECT NULL??");
+        }
+      }
     } // if(body.defined)
 
     return methodBodyText.toString();
+  }
+
+  class ExceptionLineMarkerRenderer implements LineMarkerRenderer {
+    private static final int DEEPNESS = 0;
+    private static final int THICKNESS = 1;
+    private final Color myColor;
+
+    public ExceptionLineMarkerRenderer(Color color) {
+      myColor = color;
+    }
+
+    @Override
+    public void paint(Editor editor, Graphics g, Rectangle r) {
+      int height = r.height + editor.getLineHeight();
+      g.setColor(myColor);
+      g.fillRect(r.x, r.y, THICKNESS, height);
+      g.fillRect(r.x + THICKNESS, r.y, DEEPNESS, THICKNESS);
+      g.fillRect(r.x + THICKNESS, r.y + height - THICKNESS, DEEPNESS, THICKNESS);
+    }
   }
 }
