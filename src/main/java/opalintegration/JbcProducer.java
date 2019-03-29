@@ -75,70 +75,29 @@ class JbcProducer extends DecompiledTextProducer {
         methodBodyText.append("  } // Tables\n");
       }
 
-      // render exceptions
-      if(Tables.hasExceptionTable(method.body())) {
-        LineMarkerRenderer exceptionLineMarkerRenderer = new ExceptionLineMarkerRenderer(Color.RED);
-
-        DataContext dataContext = DataManager.getInstance().getDataContext();
-        Project project = DataKeys.PROJECT.getData(dataContext);
-        System.out.println("project: " + project.getName());
-
-        if(project != null) {
-          FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-          Editor selectedEditor = fileEditorManager.getSelectedTextEditor();
-//          VirtualFile openFile = FileDocumentManager.getInstance().getFile(selectedEditor.getDocument());
+//      // render exceptions
+//      if(Tables.hasExceptionTable(method.body())) {
+//        LineMarkerRenderer exceptionLineMarkerRenderer = new ExceptionLineMarkerRenderer(Color.BLUE);
 //
-//          VirtualFile classFile = null;
-//          for (VirtualFile vf : fileEditorManager.getOpenFiles()) {
-//            if (vf.getNameWithoutExtension().equals(openFile.getNameWithoutExtension())) {
-//              classFile = vf;
-//              break;
-//            }
-//          }
-//          fileEditorManager.openFile(classFile, false);
-//          fileEditorManager.setSelectedEditor(classFile, "OPAL-DIS");
-          selectedEditor = fileEditorManager.getSelectedTextEditor();
-
-          System.out.println(selectedEditor.getDocument().getLineCount());
-          selectedEditor.getMarkupModel().addRangeHighlighter(0, selectedEditor.getLineHeight(), HighlighterLayer.FIRST, null,
-                  HighlighterTargetArea.LINES_IN_RANGE);
-          RangeHighlighter rangeHighlighter = selectedEditor.getMarkupModel().getAllHighlighters()[0];
-          rangeHighlighter.setLineMarkerRenderer(exceptionLineMarkerRenderer);
-          selectedEditor.getMarkupModel().addLineHighlighter(1, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(2, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(3, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(4, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(5, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(6, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(7, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(8, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(9, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(10, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(11, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(12, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(13, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(14, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(15, HighlighterLayer.WARNING, null);
-          for(int i=10; i < 100; ++i) {
-            selectedEditor.getMarkupModel().addLineHighlighter(i, HighlighterLayer.ERROR, null);
-          }
-          selectedEditor.getMarkupModel().addRangeHighlighter(105, 200, HighlighterLayer.SELECTION,
-                  null, HighlighterTargetArea.EXACT_RANGE);
-
-          for(int i=300; i < 600; ++i) {
-            selectedEditor.getMarkupModel().addLineHighlighter(i, HighlighterLayer.WARNING, null);
-          }
-          selectedEditor.getMarkupModel().addLineHighlighter(50, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(51, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(52, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(53, HighlighterLayer.WARNING, null);
-          selectedEditor.getMarkupModel().addLineHighlighter(54, HighlighterLayer.WARNING, null);
-
-        }
-        else {
-          System.out.println("PROJECT NULL??");
-        }
-      }
+//        DataContext dataContext = DataManager.getInstance().getDataContext();
+//        Project project = DataKeys.PROJECT.getData(dataContext);
+//
+//        if(project != null) {
+//          FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+//          Editor selectedEditor = fileEditorManager.getSelectedTextEditor();
+//
+//          System.out.println(selectedEditor.getDocument().getLineCount());
+//          System.out.println("lineheight: " + selectedEditor.getLineHeight());
+//          selectedEditor.getMarkupModel().addRangeHighlighter(0, 200, HighlighterLayer.FIRST, null,
+//                  HighlighterTargetArea.LINES_IN_RANGE);
+//          RangeHighlighter rangeHighlighter = selectedEditor.getMarkupModel().getAllHighlighters()[0];
+//          rangeHighlighter.setLineMarkerRenderer(exceptionLineMarkerRenderer);
+//
+//        }
+//        else {
+//          System.out.println("PROJECT NULL??");
+//        }
+//      }
     } // if(body.defined)
 
     return methodBodyText.toString();
@@ -146,7 +105,7 @@ class JbcProducer extends DecompiledTextProducer {
 
   class ExceptionLineMarkerRenderer implements LineMarkerRenderer {
     private static final int DEEPNESS = 0;
-    private static final int THICKNESS = 1;
+    private static final int THICKNESS = 5;
     private final Color myColor;
 
     public ExceptionLineMarkerRenderer(Color color) {
@@ -155,7 +114,7 @@ class JbcProducer extends DecompiledTextProducer {
 
     @Override
     public void paint(Editor editor, Graphics g, Rectangle r) {
-      int height = r.height + editor.getLineHeight();
+      int height = r.height + editor.getLineHeight() + 30;
       g.setColor(myColor);
       g.fillRect(r.x, r.y, THICKNESS, height);
       g.fillRect(r.x + THICKNESS, r.y, DEEPNESS, THICKNESS);

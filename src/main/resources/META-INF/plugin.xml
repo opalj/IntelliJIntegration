@@ -60,7 +60,7 @@
         <lang.foldingBuilder language="TAC" implementationClass="taclanguage.folding.TACFoldingBuilder"/>
         <lang.findUsagesProvider language="jbc" implementationClass="com.intellij.lang.java.JavaFindUsagesProvider"/>
 
-        <codeInsight.lineMarkerProvider language="jbc" implementationClass="JavaByteCodeLanguage.psi.JbcLineMarkerProvider"/>
+        <!--<codeInsight.lineMarkerProvider language="jbc" implementationClass="JavaByteCodeLanguage.psi.JbcLineMarkerProvider"/>-->
     </extensions>
 
     <actions>
@@ -91,10 +91,6 @@
 
         <action class="Actions.TacToBytecode" id="tactobytecode" text="Jump To JBC">
             <mouse-shortcut keymap="$default" keystroke="control alt button2"/>
-        </action>
-
-        <action class="Actions.ExceptionMarkerAction" id="myexcid">
-            <keyboard-shortcut first-keystroke="control X" second-keystroke="control X" keymap="$default"/>
         </action>
     </actions>
 

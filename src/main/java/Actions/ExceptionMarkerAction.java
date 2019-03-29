@@ -52,7 +52,7 @@ public class ExceptionMarkerAction extends AnAction {
 
     class ExceptionLineMarkerRenderer implements LineMarkerRenderer {
         private static final int DEEPNESS = 0;
-        private static final int THICKNESS = 1;
+        private static final int THICKNESS = 5;
         private final Color myColor;
 
         public ExceptionLineMarkerRenderer(Color color) {
