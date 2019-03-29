@@ -76,7 +76,7 @@ class JbcProducer extends DecompiledTextProducer {
       }
 
       // render exceptions
-      if(Tables.hasExceptionTable(method.body()) && false) {
+      if(Tables.hasExceptionTable(method.body())) {
         LineMarkerRenderer exceptionLineMarkerRenderer = new ExceptionLineMarkerRenderer(Color.RED);
 
         DataContext dataContext = DataManager.getInstance().getDataContext();
@@ -86,17 +86,17 @@ class JbcProducer extends DecompiledTextProducer {
         if(project != null) {
           FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
           Editor selectedEditor = fileEditorManager.getSelectedTextEditor();
-          VirtualFile openFile = FileDocumentManager.getInstance().getFile(selectedEditor.getDocument());
-
-          VirtualFile classFile = null;
-          for (VirtualFile vf : fileEditorManager.getOpenFiles()) {
-            if (vf.getNameWithoutExtension().equals(openFile.getNameWithoutExtension())) {
-              classFile = vf;
-              break;
-            }
-          }
-          fileEditorManager.openFile(classFile, false);
-          fileEditorManager.setSelectedEditor(classFile, "OPAL-DIS");
+//          VirtualFile openFile = FileDocumentManager.getInstance().getFile(selectedEditor.getDocument());
+//
+//          VirtualFile classFile = null;
+//          for (VirtualFile vf : fileEditorManager.getOpenFiles()) {
+//            if (vf.getNameWithoutExtension().equals(openFile.getNameWithoutExtension())) {
+//              classFile = vf;
+//              break;
+//            }
+//          }
+//          fileEditorManager.openFile(classFile, false);
+//          fileEditorManager.setSelectedEditor(classFile, "OPAL-DIS");
           selectedEditor = fileEditorManager.getSelectedTextEditor();
 
           System.out.println(selectedEditor.getDocument().getLineCount());
@@ -109,6 +109,31 @@ class JbcProducer extends DecompiledTextProducer {
           selectedEditor.getMarkupModel().addLineHighlighter(3, HighlighterLayer.WARNING, null);
           selectedEditor.getMarkupModel().addLineHighlighter(4, HighlighterLayer.WARNING, null);
           selectedEditor.getMarkupModel().addLineHighlighter(5, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(6, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(7, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(8, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(9, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(10, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(11, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(12, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(13, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(14, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(15, HighlighterLayer.WARNING, null);
+          for(int i=10; i < 100; ++i) {
+            selectedEditor.getMarkupModel().addLineHighlighter(i, HighlighterLayer.ERROR, null);
+          }
+          selectedEditor.getMarkupModel().addRangeHighlighter(105, 200, HighlighterLayer.SELECTION,
+                  null, HighlighterTargetArea.EXACT_RANGE);
+
+          for(int i=300; i < 600; ++i) {
+            selectedEditor.getMarkupModel().addLineHighlighter(i, HighlighterLayer.WARNING, null);
+          }
+          selectedEditor.getMarkupModel().addLineHighlighter(50, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(51, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(52, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(53, HighlighterLayer.WARNING, null);
+          selectedEditor.getMarkupModel().addLineHighlighter(54, HighlighterLayer.WARNING, null);
+
         }
         else {
           System.out.println("PROJECT NULL??");

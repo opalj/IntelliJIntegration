@@ -59,6 +59,8 @@
         <lang.foldingBuilder language="jbc" implementationClass="JavaByteCodeLanguage.folding.JbcFoldingBuilder"/>
         <lang.foldingBuilder language="TAC" implementationClass="taclanguage.folding.TACFoldingBuilder"/>
         <lang.findUsagesProvider language="jbc" implementationClass="com.intellij.lang.java.JavaFindUsagesProvider"/>
+
+        <codeInsight.lineMarkerProvider language="jbc" implementationClass="JavaByteCodeLanguage.psi.JbcLineMarkerProvider"/>
     </extensions>
 
     <actions>
