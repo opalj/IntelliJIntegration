@@ -1,4 +1,5 @@
-# OPAL Integration Plugin for IntelliJ
+OPAL Integration Plugin for IntelliJ
+======
 
 This plugin integrates OPAL into IntelliJ to ease the analysis of Java bytecode. In particular, 
 if offers two new views (bytecode and three-address code) for a class file alongside the standard view which IntelliJ provides.
@@ -7,7 +8,7 @@ if offers two new views (bytecode and three-address code) for a class file along
 
 OPAL is an extensible, Java bytecode processing, engineering, manipulation and analysis library written in Scala 2.12.x. 
 OPAL supports Java 10 Bytecode and has preliminary support for Java 11; OPAL in particular provides support to facilitate 
-the analysis of Java 8 lambda expressions (Invokedynamic instructions). See http://www.opal-project.de/ for further details.
+the analysis of Java 8 lambda expressions (Invokedynamic instructions). See [OPAL Project](http://www.opal-project.de/) for further details.
 
 ## Install
 
@@ -35,7 +36,7 @@ you can open a specific view
 
 You can also view class files that are contained within an external library simply by opening them:
 
-![A class file that is contained within an external library](path/to/your/img.png)
+![A class file that is contained within an external library](images_readme/external_libs.png)
 
 ### Going To A Declaration
 
@@ -64,13 +65,13 @@ You can also jump between instructions within the bytecode editor. This is possi
 e.g. *GOTO*, *IFGT*, and *IFNULL*. These take the jump destination (a program counter value) as input, 
 thus the caret will be placed at that program counter value. To do this, press [Alt + Shift + 1] on one such instruction.
 
-![Jump to program counter.](images_readme/jump_to_program_counter.gif)
+![Jump to program counter.](images_readme/jump_program_counter.gif)
 
 Furthermore it's possible to directly jump to a line in the source code that corresponds to an instruction. To do this,
 press [Alt + Shift + 2] on an instruction. IntelliJ will then navigate to the source file, if available, and place the caret
 at the line number of the instruction.
 
-![Jump to source line.](images_readme/jump_to_line_number.gif)
+![Jump to source line.](images_readme/jump_line_number.gif)
 
 
 ### Structure View (Bytecode Editor)
@@ -84,8 +85,8 @@ it's possible to jump to the various tables (e.g. the local variable table) in t
 
 - Navigation through the structure view requires pressing enter, or alternatively double clicking if an element has no children
 - The "Go To Declaration" [Ctrl + B] cannot switch from (e.g.) "Bytecode" to "Text" if the source file is not present. Instead, it will randomly position the caret in the bytecode editor
-- TODO [...] e.g. TAC issues
+- [...]
 
 ## Miscellaneous
 
-- 
+- [...]
