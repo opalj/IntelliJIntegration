@@ -3,7 +3,7 @@
 This plugin integrates OPAL into IntelliJ to ease the analysis of Java bytecode. In particular, 
 if offers two new views (bytecode and three-address code) for a class file alongside the standard view which IntelliJ provides.
 
-![The bytecode of a class file](path/to/your/img.png)
+![The bytecode of a class file](images_readme/editor_bytecode.png)
 
 OPAL is an extensible, Java bytecode processing, engineering, manipulation and analysis library written in Scala 2.12.x. 
 OPAL supports Java 10 Bytecode and has preliminary support for Java 11; OPAL in particular provides support to facilitate 
@@ -21,15 +21,15 @@ https://www.jetbrains.com/help/idea/managing-plugins.html
 To view the bytecode or three-address code (TAC), you need to open a class file. Once opened, you can change between the views 
 by navigating through the tabs at the bottom of the editor.
 
-![The different editor tabs for a class file](path/to/your/img.png)
+![The different editor tabs for a class file](images_readme/editor_tabs_2.png)
 
 To ease the navigation to a class file, we have provided a couple of shortcuts via context menus and hotkeys. In particular,
 you can open a specific view
 
 - via the context menu of a class file (right click on a class file)
 - via the context menu of a java file (right click on a java file)
-- via the context menu of an editor, with an opened java file
-- via the hotkeys [Ctrl + Right Click] for bytecode and [Ctrl + Alt + Right Click] for three-address code
+- via the context menu of an editor, with an opened java file (right click in the editor)
+- via the hotkeys [Ctrl + Right Click] for bytecode and [Ctrl + Alt + Right Click] for three-address code (in the editor)
 
 ![Context menu to get to a specific view](path/to/your/img.png)
 
@@ -48,7 +48,15 @@ This works for
 
 It, however, does not work for <clinit>().
 
-![Everything that is marked can be jumped to](path/to/your/img.png)
+![Everything that is marked can be jumped to. The red arrow shows to which class the method belongs to.](images_readme/jumping_methods.png)
+![You can also jump to the fields of "this" class file.](images_readme/jumping_fields.png)
+
+### Jump Between The Editors
+
+It's possible to jump back and forth between methods in the "Bytecode" and "TAC" editors. This can be done by pressing
+the key combination [Ctrl + Middle Mouse Button] on a method name.
+
+![Insert GIF](images_readme/...png)
 
 ### Even More Jumps (Bytecode Editor)
 
