@@ -83,12 +83,16 @@
             <keyboard-shortcut first-keystroke="alt shift 2"  keymap="$default"/>
         </action>
 
-        <action class="Actions.JumpToTac" id="jumptotac" text="Jump To TAC">
-            <mouse-shortcut keymap="$default" keystroke="control button2"/>
-        </action>
+        <!--<action class="Actions.JumpToTac" id="jumptotac" text="Jump To TAC">-->
+            <!--<mouse-shortcut keymap="$default" keystroke="control button2"/>-->
+        <!--</action>-->
 
-        <action class="Actions.TacToBytecode" id="tactobytecode" text="Jump To JBC">
-            <mouse-shortcut keymap="$default" keystroke="control alt button2"/>
+        <!--<action class="Actions.TacToBytecode" id="tactobytecode" text="Jump To JBC">-->
+            <!--<mouse-shortcut keymap="$default" keystroke="control alt button2"/>-->
+        <!--</action>-->
+
+        <action class="Actions.JumpBetweenEditors" id="BetweenTacAndJbc">
+            <mouse-shortcut keymap="$default" keystroke="control button2"/>
         </action>
     </actions>
 
