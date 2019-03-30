@@ -48,6 +48,7 @@
   // TODO: default out?
   MODIFIER="regexp:public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient"
   STRINGVAR = "regexp:<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?"
+  ANNOTATION="regexp:@[a-zA-Z$_][a-zA-Z0-9$_]*"
   ]
 
   psiImplUtilClass="JavaByteCodeLanguage.psi.impl.JavaByteCodePsiImplUtil"
