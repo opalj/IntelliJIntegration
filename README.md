@@ -56,7 +56,7 @@ It, however, does not work for <clinit>().
 It's possible to jump back and forth between methods in the "Bytecode" and "TAC" editors. This can be done by pressing
 the key combination [Ctrl + Middle Mouse Button] on a method name.
 
-![Insert GIF](images_readme/...png)
+![Jump between methods in the "Bytecode" and "TAC" editor](images_readme/jump_between_tac_bytecode.gif)
 
 ### Even More Jumps (Bytecode Editor)
 
@@ -64,13 +64,13 @@ You can also jump between instructions within the bytecode editor. This is possi
 e.g. *GOTO*, *IFGT*, and *IFNULL*. These take the jump destination (a program counter value) as input, 
 thus the caret will be placed at that program counter value. To do this, press [Alt + Shift + 1] on one such instruction.
 
-![Insert GIF, if possible](path/to/your/img.png)
+![Jump to program counter.](images_readme/jump_to_program_counter.gif)
 
 Furthermore it's possible to directly jump to a line in the source code that corresponds to an instruction. To do this,
 press [Alt + Shift + 2] on an instruction. IntelliJ will then navigate to the source file, if available, and place the caret
 at the line number of the instruction.
 
-![Insert GIF, if possible](path/to/your/img.png)
+![Jump to source line.](images_readme/jump_to_line_number.gif)
 
 
 ### Structure View (Bytecode Editor)
@@ -78,7 +78,7 @@ at the line number of the instruction.
 The structure view has, for the most part, the same look and feel as a normal java file. Additionally though, 
 it's possible to jump to the various tables (e.g. the local variable table) in the bytecode editor, if present:
 
-![Insert image of structure view with tables highlighted](path/to/your/img.png)
+![Some tables that can be navigated to.](images_readme/structure_view_tables.png)
 
 ## Known Issues
 
@@ -88,4 +88,4 @@ it's possible to jump to the various tables (e.g. the local variable table) in t
 
 ## Miscellaneous
 
-- Mention OPAL bug with "\" escape here?
+- 
