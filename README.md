@@ -30,7 +30,7 @@ you can open a specific view
 
 - via the context menu of a class file (right click on a class file)
 - via the context menu of a java file (right click on a java file)
-- via the context menu of a PsiClass (right click on a class name in a java or jbc editor, see GIF below. Alternatively you can use the hotkeys [Ctrl + Right Click] for bytecode and [Ctrl + Alt + Right Click] for three-address code.[Ctrl + Right Click] for bytecode and [Ctrl + Alt + Right Click] for three-address code.
+- via the context menu of a PsiClass (right click on a class name in a java or jbc editor, see GIF below. Alternatively you can use the hotkeys **[Ctrl + Right Click]** for bytecode and **[Ctrl + Alt + Right Click]** for three-address code.
 
 ![Context menu to get to a specific view](images_readme/show_bytecode_tac.gif "Context menu to get to a specific view")
 
@@ -40,7 +40,7 @@ You can also view class files that are contained within an external library simp
 
 ### Going To A Declaration
 
-The editors provide functionality to jump to a declaration via [Ctrl + B] or [Ctrl + Left Click], as is standard in IntelliJ.
+The editors provide functionality to jump to a declaration via **[Ctrl + B]** or **[Ctrl + Left Click]**, as is standard in IntelliJ.
 This works for
 
 - any fully qualified name apart from lambdas
@@ -58,7 +58,7 @@ You can also jump to the fields of "this" class file.
 ### Jump Between The Editors
 
 It's possible to jump back and forth between methods in the "Bytecode" and "TAC" editors. This can be done by pressing
-the key combination [Ctrl + Middle Mouse Button] on a method name, or via the context menu.
+the key combination **[Ctrl + Middle Mouse Button]** on a method name, or via the context menu.
 
 ![Jump between methods in the "Bytecode" and "TAC" editor](images_readme/jump_between_tac_bytecode_v2.gif "Jump between methods in the "Bytecode" and "TAC" editor")
 
@@ -66,12 +66,12 @@ the key combination [Ctrl + Middle Mouse Button] on a method name, or via the co
 
 You can also jump between instructions within the bytecode editor. This is possible for the if and goto instructions,
 e.g. *GOTO*, *IFGT*, and *IFNULL*. These take the jump destination (a program counter value) as input,
-thus the caret will be placed at that program counter value. To do this, press [Alt + Shift + 1] on one such instruction.
+thus the caret will be placed at that program counter value. To do this, press **[Alt + Shift + 1]** on one such instruction.
 
 ![Jump to program counter.](images_readme/jump_program_counter_v2.gif "Jump to program counter")
 
 Furthermore it's possible to directly jump to a line in the source code that corresponds to an instruction. To do this,
-press [Alt + Shift + 2] on an instruction, or use the context menu. IntelliJ will then navigate to the source file, if available, and place the caret
+press **[Alt + Shift + 2]** on an instruction, or use the context menu. IntelliJ will then navigate to the source file, if available, and place the caret
 at the line number of the instruction.
 
 ![Jump to source line.](images_readme/jump_line_number_v2.gif "Jump to source line")
@@ -79,7 +79,7 @@ at the line number of the instruction.
 ### Highlighting Exceptions (Bytecode Editor)
 
 You can highlight exception areas in the bytecode editor. Open the exception table, if it exists, and place the caret on one of the exceptions.
-Then, the key combination [Alt Shift 3] will create a highlighted range in the gutter and jump to the beginning of it. The range
+Then, the key combination **[Alt Shift 3]** will create a highlighted range in the gutter and jump to the beginning of it. The range
 covers all instructions in a try (red) and catch (green) block. Hovering over the highlighted area will display the name of the exception.
 Pressing on the highlighted area will bring you back to the exception table. A context menu entry is also provided.
 
@@ -96,7 +96,7 @@ it's possible to jump to the various tables (e.g. the local variable table) in t
 ## Known Issues
 
 - Navigation through the structure view requires pressing enter, or alternatively double clicking if an element has no children
-- The "Go To Declaration" [Ctrl + B] cannot switch from (e.g.) "Bytecode" to "Text" if the source file is not present. Instead, it will randomly position the caret in the bytecode editor
+- The "Go To Declaration" **[Ctrl + B]** cannot switch from (e.g.) "Bytecode" to "Text" if the source file is not present. Instead, it will randomly position the caret in the bytecode editor
 
 ## Miscellaneous
 
