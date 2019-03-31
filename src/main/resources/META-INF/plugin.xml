@@ -70,16 +70,31 @@
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             <mouse-shortcut keymap="$default" keystroke="control button3"/>
         </action>
+
         <action id="JumpToTACFromRMB" class="Actions.OpenClassFileTACAction" text="Show Three-Address-Code" icon="/icons/jar-gray.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             <mouse-shortcut keymap="$default" keystroke="control alt button3"/>
         </action>
+
         <action id="jumptoline" class="Actions.JumpToProgramCounter" text="Test">
             <keyboard-shortcut first-keystroke="alt shift 1"  keymap="$default"/>
         </action>
+
         <action id="jumptosource" class="Actions.JumpToSource" text="Test">
             <keyboard-shortcut first-keystroke="alt shift 2"  keymap="$default"/>
+        </action>
+
+        <!--<action class="Actions.JumpToTac" id="jumptotac" text="Jump To TAC">-->
+            <!--<mouse-shortcut keymap="$default" keystroke="control button2"/>-->
+        <!--</action>-->
+
+        <!--<action class="Actions.TacToBytecode" id="tactobytecode" text="Jump To JBC">-->
+            <!--<mouse-shortcut keymap="$default" keystroke="control alt button2"/>-->
+        <!--</action>-->
+
+        <action class="Actions.JumpBetweenEditors" id="BetweenTacAndJbc">
+            <mouse-shortcut keymap="$default" keystroke="control button2"/>
         </action>
     </actions>
 
