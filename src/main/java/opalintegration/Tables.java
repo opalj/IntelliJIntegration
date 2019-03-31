@@ -284,25 +284,4 @@ public final class Tables {
     return exceptionHandlerBuilder.toString();
   }
 
-  public static boolean hasExceptionTable(@NotNull Option<Code> body) {
-    return body.isDefined() && !body.get().exceptionHandlers().isEmpty();
-  }
-
-  @Nullable
-  public static Point[] getPCRangeForException(@NotNull Option<Code> body) {
-    if(!hasExceptionTable(body)) {
-      return new Point[0];
-    }
-
-    ExceptionHandler[] exceptionHandlers =
-            new ExceptionHandler[body.get().exceptionHandlers().size()];
-
-    List<Point> points = new ArrayList<>();
-    for(ExceptionHandler handler : exceptionHandlers) {
-      Point p = new Point(handler.startPC(), handler.endPC());
-      points.add(p);
-    }
-
-    return points.toArray(new Point[0]);
-  }
 }

@@ -190,7 +190,7 @@ public class OpalUtil {
    * @return an OPAL ClassFile
    */
   @Nullable
-  public static ClassFile getClassFile(@NotNull VirtualFile virtualClassFile) {
+  private static ClassFile getClassFile(@NotNull VirtualFile virtualClassFile) {
     ConstArray<ClassFile> classFileConstArray = uriProject.allProjectClassFiles();
     for (int i = 0; i < classFileConstArray.length(); i++) {
       ClassFile cf = classFileConstArray.apply(i);

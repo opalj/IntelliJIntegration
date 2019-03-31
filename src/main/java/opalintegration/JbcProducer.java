@@ -75,50 +75,8 @@ class JbcProducer extends DecompiledTextProducer {
         methodBodyText.append("  } // Tables\n");
       }
 
-//      // render exceptions
-//      if(Tables.hasExceptionTable(method.body())) {
-//        LineMarkerRenderer exceptionLineMarkerRenderer = new ExceptionLineMarkerRenderer(Color.BLUE);
-//
-//        DataContext dataContext = DataManager.getInstance().getDataContext();
-//        Project project = DataKeys.PROJECT.getData(dataContext);
-//
-//        if(project != null) {
-//          FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-//          Editor selectedEditor = fileEditorManager.getSelectedTextEditor();
-//
-//          System.out.println(selectedEditor.getDocument().getLineCount());
-//          System.out.println("lineheight: " + selectedEditor.getLineHeight());
-//          selectedEditor.getMarkupModel().addRangeHighlighter(0, 200, HighlighterLayer.FIRST, null,
-//                  HighlighterTargetArea.LINES_IN_RANGE);
-//          RangeHighlighter rangeHighlighter = selectedEditor.getMarkupModel().getAllHighlighters()[0];
-//          rangeHighlighter.setLineMarkerRenderer(exceptionLineMarkerRenderer);
-//
-//        }
-//        else {
-//          System.out.println("PROJECT NULL??");
-//        }
-//      }
     } // if(body.defined)
-
     return methodBodyText.toString();
   }
 
-  class ExceptionLineMarkerRenderer implements LineMarkerRenderer {
-    private static final int DEEPNESS = 0;
-    private static final int THICKNESS = 5;
-    private final Color myColor;
-
-    public ExceptionLineMarkerRenderer(Color color) {
-      myColor = color;
-    }
-
-    @Override
-    public void paint(Editor editor, Graphics g, Rectangle r) {
-      int height = r.height + editor.getLineHeight() + 30;
-      g.setColor(myColor);
-      g.fillRect(r.x, r.y, THICKNESS, height);
-      g.fillRect(r.x + THICKNESS, r.y, DEEPNESS, THICKNESS);
-      g.fillRect(r.x + THICKNESS, r.y + height - THICKNESS, DEEPNESS, THICKNESS);
-    }
-  }
 }

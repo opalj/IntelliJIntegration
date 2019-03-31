@@ -88,9 +88,8 @@
         <action class="Actions.JumpToTac" id="jumptotac" text="Jump To TAC">
             <mouse-shortcut keymap="$default" keystroke="control button2"/>
         </action>
-
-        <action class="Actions.TacToBytecode" id="tactobytecode" text="Jump To JBC">
-            <mouse-shortcut keymap="$default" keystroke="control alt button2"/>
+        <action class="Actions.ExceptionMarkerAction" id="exceptionmarker" text="Exception">
+            <keyboard-shortcut keymap="$default" first-keystroke="X"/>
         </action>
     </actions>
 
