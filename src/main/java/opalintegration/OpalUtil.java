@@ -20,9 +20,9 @@ import org.opalj.br.*;
 import org.opalj.collection.immutable.ConstArray;
 
 /**
- * A utility class that serves a couple of purposes
+ * A utility class that serves a couple of purposes:
  *
- * <p>1. it is a gathering point for the output preparation of each editor (includes creating the
+ * <p>1. it is a gathering point for the output preparation of each editor (includes creation of the
  * file) 2. it handles updates (e.g. re-compiles if needed) 3. it provides a way to access files in
  * a JAR, as well as the JAR itself
  */
@@ -37,17 +37,19 @@ public class OpalUtil {
    */
   private static ClassFile classFile;
 
-  private static String projectPath;
-  private static String fqClassName;
-  private static File projectFile;
-  private static VirtualFile currentWorkingVF;
-  private static File tempDirectory;
+  private static String projectPath;              //
+  private static String fqClassName;              // the qualified name of the class that is to be decompiled
+  private static File projectFile;                //
+  private static VirtualFile currentWorkingVF;    //
+  private static File tempDirectory;              // The (temporary) directory in which our files are to be stored in
 
   private static final Logger LOGGER = Logger.getLogger(OpalUtil.class.getName());
 
   /**
+   * Creates the decompiled file
+   *
    * @param prepareID indicates what type the output is going to be (e.g. JBC or TAC)
-   * @param virtualFile the underlying class file
+   * @param virtualFile the underlying class file that is to be decompiled
    * @param olderFile if not null, then use this instead of creating a new file (content is still
    *     updated)
    * @return a VirtualFile which contains the desired content (the bytecode or TAC representation)
@@ -57,17 +59,20 @@ public class OpalUtil {
       @NotNull String prepareID,
       VirtualFile virtualFile,
       @Nullable VirtualFile olderFile) {
-    if (olderFile != null) {
-      updateStateIfNewClassFile(virtualFile, project, true);
-    } else {
-      updateStateIfNewClassFile(virtualFile, project, false);
-    }
+
+    // if a file exists already, use it to write to instead of creating a new file
+    updateStateIfNewClassFile(virtualFile, project, olderFile != null);
+
     // if something went wrong during the opal project creation, just return the passed in class
     // file
     if (classFile == null) {
       return virtualFile;
     }
+
+    // name of file to write to
     String fileName = virtualFile.getNameWithoutExtension();
+
+    // create the output string
     String representableForm = null;
     switch (prepareID) {
         // note: HTML editor is deprecated and currently not displayed
@@ -77,12 +82,10 @@ public class OpalUtil {
         break;
       case GlobalData.DISASSEMBLED_FILE_ENDING_TAC:
         fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_TAC);
-        //        representableForm = TacProducer.createTacString(classFile, virtualFile.getPath());
         representableForm = new TacProducer(virtualFile.getPath()).decompiledText(classFile);
         break;
       case GlobalData.DISASSEMBLED_FILE_ENDING_JBC:
         fileName = fileName.concat(".").concat(GlobalData.DISASSEMBLED_FILE_ENDING_JBC);
-        //        representableForm = JbcProducer.createBytecodeString(classFile);
         representableForm = new JbcProducer().decompiledText(classFile);
         break;
     }
@@ -102,7 +105,7 @@ public class OpalUtil {
   }
 
   /**
-   * an auxiliary method that writes 'content' to a 'file' (main purpose of this method is to
+   * An auxiliary method that writes 'content' to a 'file' (main purpose of this method is to
    * encapsulate the try/catch block)
    *
    * @param filename the Name of the temporal file
@@ -112,11 +115,13 @@ public class OpalUtil {
     try {
       File fileToWriteTo = null;
 
+      // create the temporary directory to store files in, if non-existent
       if (tempDirectory == null || !tempDirectory.exists()) {
         tempDirectory = FileUtil.createTempDirectory("tempJbcDirectory", "", true);
       }
 
       if (!olderFile) {
+        // to check if the temporary directory already contains a file with the same name
         boolean fileContained = false;
 
         File[] filesInTempDirectory = tempDirectory.listFiles();
@@ -134,6 +139,7 @@ public class OpalUtil {
           fileToWriteTo = new File(tempDirectory.getAbsolutePath() + File.separator + filename);
         }
       } else {
+        // if a file already exists, just take it
         fileToWriteTo = new File(filename);
       }
 
@@ -186,12 +192,14 @@ public class OpalUtil {
    * Returns an OPAL ClassFile for a given class file. The ClassFile from OPAL contains necessary
    * information to produce the desired bytecode and TAC representations for a class file.
    *
-   * @param virtualClassFile a standard java class file
+   * @param virtualClassFile a standard ("java") class file
    * @return an OPAL ClassFile
    */
   @Nullable
   private static ClassFile getClassFile(@NotNull VirtualFile virtualClassFile) {
     ConstArray<ClassFile> classFileConstArray = uriProject.allProjectClassFiles();
+
+    // first check the current project
     for (int i = 0; i < classFileConstArray.length(); i++) {
       ClassFile cf = classFileConstArray.apply(i);
       if (cf.fqn().equals(fqClassName.replace(".class", ""))) {
@@ -199,7 +207,7 @@ public class OpalUtil {
       }
     }
 
-    // (might be) JAR
+    // (might be) a JAR
     if (virtualClassFile.getCanonicalPath() != null
         && virtualClassFile.getCanonicalPath().contains("!")) {
       return createClassFileFromJar(projectPath, fqClassName);
@@ -220,12 +228,16 @@ public class OpalUtil {
         LOGGER.log(Level.SEVERE, e.toString(), e);
       }
     }
+
     return null;
   }
 
   /**
+   * Retrieves the necessary path information of a class from within a JAR,
+   * so that we can create an OPAL ClassFile from it.
+   *
    * @param virtualClassFile - a class file (assumed to be located in a JAR)
-   * @return a string array with a jar/zip path & full qualified class name
+   * @return a 2D String array with a jar/zip path & a fully qualified class name
    */
   public static String[] getJarFileRootAndFileName(VirtualFile virtualClassFile) {
     String jarPathWithoutClassExtension =
@@ -236,9 +248,11 @@ public class OpalUtil {
   }
 
   /**
+   * Creates an OPAL ClassFile from a class that is contained in a JAR
+   *
    * @param jarFileRoot - path to a JAR
    * @param className the fully qualified class name with extension
-   * @return ClassFile
+   * @return OPAL ClassFile that is used to retrieve information about bytecode/TAC
    */
   private static ClassFile createClassFileFromJar(String jarFileRoot, String className) {
     ClassFile classFileFromJar = null;

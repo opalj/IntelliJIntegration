@@ -30,9 +30,11 @@ abstract class DecompiledTextProducer {
   }
 
   /**
+   * Creates the class header.
+   *
    * @param classFile The class in question
    * @return A String that contains information about the class (e.g. annotations, class name, super
-   *     types, Java version, etc.)
+   *     types, interface types, Java version, etc.)
    */
   @NotNull
   private String classHeader(@NotNull ClassFile classFile) {
@@ -56,11 +58,18 @@ abstract class DecompiledTextProducer {
         .append(classFile.sourceFile().isDefined() ? classFile.sourceFile().get() : "")
         .append(" -- Version: (")
         .append(classFile.jdkVersion())
-        .append(") -- Size: \n\n");
+        .append(")\n\n");
 
     return classHeader.toString();
   }
 
+  /**
+   * Creates the string representation of the attributes area of a class.
+   * The attributes area contains the table of the inner classes.
+   *
+   * @param classFile The class file which contains the attributes
+   * @return Information about the attributes as a String, contained within an area: Attributes { ... }
+   */
   @NotNull
   private String attributes(@NotNull ClassFile classFile) {
     StringBuilder classAttributes = new StringBuilder();
@@ -77,11 +86,10 @@ abstract class DecompiledTextProducer {
   }
 
   /**
-   * A hook which can be used to produce text that contains field information. It returns an empty
-   * string by default.
+   * Creates the text output for all the fields (including access flags and type) of a class
    *
    * @param classFile The class file which contains the fields
-   * @return Information about the fields as a String
+   * @return Information about the fields as a String, contained within an area: Fields { ... }
    */
   @NotNull
   private String fields(@NotNull ClassFile classFile) {
@@ -126,7 +134,7 @@ abstract class DecompiledTextProducer {
    * by itself.
    *
    * @param classFile The class file which contains the methods
-   * @return A string of the decompiled methods
+   * @return Information about the methods as a String, contained within an area: Methods { ... }
    */
   @NotNull
   private String methods(@NotNull ClassFile classFile) {
@@ -151,10 +159,19 @@ abstract class DecompiledTextProducer {
     return methodText.toString();
   }
 
+  /**
+   * Creates the string representation of the method head (apart from exceptions), by linking together
+   * all necessary pieces (e.g. modifiers, return type, parameter list, etc.)
+   *
+   * @param method The method for which the method head should be created
+   * @return The method head as a string, e.g.: public static void someMethod(int, @NotNull java.lang.String)
+   */
   @NotNull
   private String methodDescriptor(@NotNull Method method) {
     MethodDescriptor descriptor = method.descriptor();
     StringBuilder methodDescriptorBuilder = new StringBuilder();
+
+    // access flags contain access modifiers such as public and static
     String flag = AccessFlags.toString(method.accessFlags(), AccessFlagsContexts.METHOD()) + " ";
     if (flag.length() > 0) methodDescriptorBuilder.append(flag);
     methodDescriptorBuilder
@@ -162,6 +179,8 @@ abstract class DecompiledTextProducer {
         .append(" ")
         .append(method.name())
         .append("(");
+
+    // parameter list (including annotations for parameters)
     FieldType[] parameters = new FieldType[descriptor.parametersCount()];
     descriptor.parameterTypes().copyToArray(parameters);
     RefArray<RefArray<Annotation>> invisibleParameterAnnotations =
@@ -181,18 +200,29 @@ abstract class DecompiledTextProducer {
     // delete last comma
     if (methodDescriptorBuilder.charAt(methodDescriptorBuilder.length() - 1) == ',')
       methodDescriptorBuilder.deleteCharAt(methodDescriptorBuilder.length() - 1);
-    // methodDescriptorBuilder.append(Arrays.stream(parameters).map(p->
-    // p.toJava()).collect(Collectors.joining(",")));
+
     methodDescriptorBuilder.append(")");
     return methodDescriptorBuilder.toString();
   }
 
+  /**
+   * Marks the beginning of an area
+   *
+   * @param areaName The name of the area
+   * @return The string of beginning of the area, e.g.: Methods {
+   */
   @NotNull
   @Contract(pure = true)
   private String beginArea(String areaName) {
     return areaName + " {\n";
   }
 
+  /**
+   * Marks the end of an area
+   *
+   * @param areaName The name of the area
+   * @return The string of the end of an area, e.g.: } // Methods
+   */
   @NotNull
   @Contract(pure = true)
   private String endArea(String areaName) {
@@ -208,6 +238,7 @@ abstract class DecompiledTextProducer {
    * @return The line with fixed escape characters, if contained any
    */
   String opalStringBugFixer(String instructionLine) {
+    // if the line does not have escaping backslashes there is nothing to do
     if (!instructionLine.matches(".*\"(.|\n|\r|\t|\b)*\".*")) {
       return instructionLine;
     }
@@ -216,6 +247,7 @@ abstract class DecompiledTextProducer {
     // thus break the syntax
     instructionLine = instructionLine.replaceAll("\\\\", "\\\\\\\\");
 
+    // take care of every other occurrence of a \, e.g. in OPAL \" becomes ", but should stay \"
     int firstDoubleQuote = instructionLine.indexOf('"');
     int lastDoubleQuote = instructionLine.lastIndexOf('"');
     String stringContent = instructionLine.substring(firstDoubleQuote + 1, lastDoubleQuote);
@@ -224,6 +256,7 @@ abstract class DecompiledTextProducer {
     stringContent = stringContent.replace("\t", "\\t");
     stringContent = stringContent.replace("\r", "\\r");
     stringContent = stringContent.replace("\b", "\\b");
+
     instructionLine =
         instructionLine.substring(0, firstDoubleQuote + 1)
             + stringContent
