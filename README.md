@@ -4,7 +4,8 @@ Bytecode Disassembler Plugin for IntelliJ
 This plugin integrates OPAL into IntelliJ to ease the analysis of Java bytecode. In particular, 
 if offers two new views (bytecode and three-address code) for a class file alongside the standard view which IntelliJ provides.
 
-![The bytecode of a class file](images_readme/editor_bytecode.png)
+![The bytecode of a class file](images_readme/editor_bytecode_scaled.png "The bytecode of a class file")
+![The three-address code of a class file](images_readme/editor_tac_scaled.png "The three-address code of a class file")
 
 OPAL is an extensible, Java bytecode processing, engineering, manipulation and analysis library written in Scala 2.12.x. 
 OPAL supports Java 10 Bytecode and has preliminary support for Java 11; OPAL in particular provides support to facilitate 
@@ -74,6 +75,15 @@ at the line number of the instruction.
 
 ![Jump to source line.](images_readme/jump_line_number_v2.gif "Jump to source line")
 
+### Highlighting Exceptions (Bytecode Editor)
+
+You can highlight exception areas in the bytecode editor. Open the exception table, if it exists, and place the caret on one of the exceptions.
+Then, the key combination [Alt Shift 3] will create a highlighted range in the gutter and jump to the beginning of it. The range
+covers all instructions in a try (red) and catch (green) block. Hovering over the highlighted area will display the name of the exception.
+Pressing on the highlighted area will bring you back to the exception table. A context menu entry is also provided.
+
+[!Exception Area.](images_readme/exception_marker.gif "Mark Exception Area")
+
 
 ### Structure View (Bytecode Editor)
 
@@ -89,4 +99,4 @@ it's possible to jump to the various tables (e.g. the local variable table) in t
 
 ## Miscellaneous
 
-- At the moment the TAC editor lacks some of the functionality. In particular, method bodies are mostly just highlighted text. 
+- At the moment the TAC editor lacks some of the functionality. In particular, method bodies are mostly just highlighted text.
