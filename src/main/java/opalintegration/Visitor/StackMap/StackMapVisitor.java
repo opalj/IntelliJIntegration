@@ -1,6 +1,7 @@
 package opalintegration.Visitor.StackMap;
 
 import org.opalj.br.*;
+
 /**
  * An interface for the visitor pattern which lists all instructions that should be visited.
  *
@@ -9,11 +10,11 @@ import org.opalj.br.*;
  * <p>(The methods seem to be grayed out since they are invoked like this: getMethod("visit",...),
  *
  * @see opalintegration.Visitor.ElementAcceptor#accept(Object, int...) )
- *
  */
 @SuppressWarnings("unused")
 // unused because there is no accepting methods for given element
-// unused warning happens because method call looks like this (passed as string): this.getClass().getMethod("visit", in);
+// unused warning happens because method call looks like this (passed as string):
+// this.getClass().getMethod("visit", in);
 interface StackMapVisitor {
   String visit(SameLocals1StackItemFrame frame);
 

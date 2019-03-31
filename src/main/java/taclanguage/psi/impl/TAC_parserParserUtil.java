@@ -15,6 +15,8 @@ import com.intellij.pom.Navigatable;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.impl.source.resolve.reference.impl.providers.JavaClassReferenceProvider;
+
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
@@ -171,8 +173,9 @@ public class TAC_parserParserUtil extends GeneratedParserUtilBase {
       public Icon getIcon(boolean unused) {
         int flags = Iconable.ICON_FLAG_READ_STATUS | Iconable.ICON_FLAG_VISIBILITY;
         try {
+
           String helpinger =
-              methodHead.getModifierV().getText().length() == 0
+              Objects.requireNonNull(methodHead.getModifierV()).getText().length() == 0
                   ? methodHead.getType().getText()
                   : methodHead.getModifierV().getText() + " " + methodHead.getType().getText();
           return PsiElementFactory.SERVICE
@@ -194,7 +197,6 @@ public class TAC_parserParserUtil extends GeneratedParserUtilBase {
 
   public static ItemPresentation getPresentation(TACFieldsDeclaration element) {
     return new ColoredItemPresentation() {
-      @Nullable
       @Override
       public String getPresentableText() {
         return element.getDefMethodName().getText() + " : " + element.getType().getText();
@@ -206,7 +208,6 @@ public class TAC_parserParserUtil extends GeneratedParserUtilBase {
         return null;
       }
 
-      @Nullable
       @Override
       public Icon getIcon(boolean unused) {
         int flags = Iconable.ICON_FLAG_READ_STATUS | Iconable.ICON_FLAG_VISIBILITY;
@@ -241,7 +242,7 @@ public class TAC_parserParserUtil extends GeneratedParserUtilBase {
   private static void navigate(TACNamedElement element, boolean requestFocus) {
     Navigatable descriptor = PsiNavigationSupport.getInstance().getDescriptor(element);
     FileEditor editor = FileEditorManager.getInstance(element.getProject()).getSelectedEditor();
-    if (editor instanceof TacTextEditor || descriptor != null) {
+    if (editor instanceof TacTextEditor && descriptor != null) {
       ((TacTextEditor) editor).navigateTo(descriptor);
     } else {
       ((Navigatable) element).navigate(requestFocus);

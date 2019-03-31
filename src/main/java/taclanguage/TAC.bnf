@@ -26,13 +26,10 @@
   SEMICOLON=";"
   SLASH="/"
   AT="@"
-  //Todo Merge ">" right
-  //TO="regexp:>|=>|->"
   EQ="="
   SWITCH="⤼"
   LBRACKET="regexp:\(|\{|\[|[«]"
   RBRACKET="regexp:\)|\}|\]|[»]"
-  //JAVACONST
   JAVATYPEHEAD='regexp:class|enum|interface'
   EXTENDS='extends'
   IMPLEMENTS='implements'
@@ -42,7 +39,6 @@
   METHODS='Methods'
   INSTRUCTIONHEAD="regexp:PC\s+Line\s+Instruction"
   LVLINDEX = "lvIndex="
-  // TYPES
   PRIMITIVETYPE="regexp:void|boolean|byte|char|short|int|long|float|double"
   KEYWORDS="regexp:new|goto|if|else|throw|throws|catch|caught|return"
   MODIFIER="regexp:public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient"
@@ -63,12 +59,26 @@ ClassHead ::= ModifierV? (AT?) JAVATYPEHEAD JType (EXTENDS JType)? (IMPLEMENTS (
 
 // generic stuff
 
-Annotation ::= AT JType
+// not as critical as for JBC
+private TacTokens ::= MNEMONIC | TABLES | ATTRIBUTES | METHODS | FIELDS | JAVATYPEHEAD | INSTRUCTIONHEAD | TABLENAME
+
+// e.g. @Contract (pure = true) or @Contract ("_, null -> null")
+Annotation ::= AT JType [LBRACKET
+                            (
+                                STRING COMMA?
+                              | STRINGVAR EQ STRING COMMA?
+                              | STRINGVAR EQ BOOLS COMMA?
+                              | STRINGVAR EQ JType COMMA?
+                              | STRINGVAR EQ NUMBER COMMA?
+                              | STRINGVAR EQ LBRACKET ((STRING | BOOLS | JType | NUMBER) COMMA?)* RBRACKET COMMA?
+                              | LBRACKET? Annotation RBRACKET? COMMA?
+                            )*
+                         RBRACKET]
 
 ModifierV ::= MODIFIER*
 
 Type ::= (LambdaType | JType | PRIMITIVETYPE)('[]')*
-JType ::= (STRINGVAR DOT)*STRINGVAR
+JType ::= ((STRINGVAR | TacTokens) DOT)*(STRINGVAR | TacTokens)
 {
  mixin="taclanguage.psi.impl.TACNamedElementImpl"
  implements="taclanguage.psi.TACNamedElement"
@@ -76,15 +86,15 @@ JType ::= (STRINGVAR DOT)*STRINGVAR
 }
 
 // lambda.InnerVsLambdaThis$<init>()V:5$Lambda{ lambda.InnerVsLambdaThis$<init>()V:5$Lambda $newInstance(lambda.InnerVsLambdaThis) }
-LambdaType ::= (STRINGVAR DOT)*STRINGVAR lambdaParams STRINGVAR COLON* NUMBER STRINGVAR
-lambdaParams ::= (LBRACKET( ("]")* STRINGVAR COLON*)*RBRACKET)
+LambdaType ::= ((STRINGVAR | TacTokens) DOT)*(STRINGVAR | TacTokens) lambdaParams (STRINGVAR | TacTokens) COLON* NUMBER (STRINGVAR | TacTokens)
+lambdaParams ::= (LBRACKET( ("]")* (STRINGVAR | TacTokens) COLON*)*RBRACKET)
 
 // attributes
 
 AttributesArea ::= ATTRIBUTES LBRACKET InnerTable? RBRACKET
 
 InnerTable ::= STRINGVAR LBRACKET
-                    (Type LBRACKET ModifierV JAVATYPEHEAD? STRINGVAR RBRACKET)*
+                    (Type LBRACKET ModifierV (AT?) JAVATYPEHEAD? STRINGVAR RBRACKET)*
                RBRACKET
 
 // fields

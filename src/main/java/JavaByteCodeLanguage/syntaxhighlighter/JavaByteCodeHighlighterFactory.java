@@ -16,6 +16,7 @@ public class JavaByteCodeHighlighterFactory extends SyntaxHighlighterFactory {
   @Override
   public SyntaxHighlighter getSyntaxHighlighter(
       @Nullable Project project, @Nullable VirtualFile virtualFile) {
-    return new JavaByteCodeSyntaxHighlighter();
+    //    return new JavaByteCodeSyntaxHighlighter();
+    return new JbcSyntaxHighlighter();
   }
 }

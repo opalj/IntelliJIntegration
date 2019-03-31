@@ -15,8 +15,7 @@
   COMMENT='regexp://.*|/\*[^*/]*\*/'
   NUMBER ='regexp:[-]?\d+(\.\d*)?([Elfd]\d*)?|[-]?Infinity'
   STRING="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\")"
-  MNEMONIC="regexp:AALOAD|AASTORE|ACONST_NULL|ALOAD_0|ALOAD_1|ALOAD_2|ALOAD_3|ALOAD|ANEWARRAY|ARETURN|ARRAYLENGTH|ASTORE_0|ASTORE_1|ASTORE_2|ASTORE_3|ASTORE|ATHROW|BALOAD|BASTORE|BIPUSH|BREAKPOINT|CALOAD|CASTORE|CHECKCAST|D2F|D2I|D2L|DADD|DALOAD|DASTORE|DCMPG|DCMPL|DCONST_0|DCONST_1|DDIV|DLOAD_0|DLOAD_1|DLOAD_2|DLOAD_3|DLOAD|DMUL|DNEG|DREM|DRETURN|DSTORE_0|DSTORE_1|DSTORE_2|DSTORE_3|DSTORE|DSUB|DUP|DUP_X1|DUP_X2|DUP2|DUP2_X1|DUP2_X2|F2D|F2I|F2L|FADD|FALOAD|FASTORE|FCMPG|FCMPL|FCONST_0|FCONST_1|FCONST_2|FDIV|FLOAD_0|FLOAD_1|FLOAD_2|FLOAD_3|FLOAD|FMUL|FNEG|FREM|FRETURN|FSTORE_0|FSTORE_1|FSTORE_2|FSTORE_3|FSTORE|FSUB|GOTO|GOTO_W|I2B|I2C|I2D|I2F|I2L|I2S|IADD|IALOAD|IAND|IASTORE|ICONST_M1|ICONST_0|ICONST_1|ICONST_2|ICONST_3|ICONST_4|ICONST_5|IDIV|IF_ACMPEQ|IF_ACMPNE|IF_ICMPEQ|IF_ICMPGE|IF_ICMPGT|IF_ICMPLE|IF_ICMPLT|IF_ICMPNE|IFEQ|IFGE|IFGT|IFLE|IFLT|IFNE|IFNONNULL|IFNULL|IINC|ILOAD_0|ILOAD_1|ILOAD_2|ILOAD_3|ILOAD|IMPDEP1|IMPDEP2|IMUL|INEG|INSTANCEOF|INVOKEDYNAMIC|INVOKEINTERFACE|INVOKESPECIAL|INVOKESTATIC|INVOKEVIRTUAL|IOR|IREM|IRETURN|ISHL|ISHR|ISTORE_0|ISTORE_1|ISTORE_2|ISTORE_3|ISTORE|ISUB|IUSHR|IXOR|JSR|JSR_W|L2D|L2F|L2I|LADD|LALOAD|LAND|LASTORE|LCMP|LCONST_0|LCONST_1|LDC|LDC_W|LDC2_W|LDIV|LLOAD_0|LLOAD_1|LLOAD_2|LLOAD_3|LLOAD|LMUL|LNEG|LOOKUPSWITCH|LOR|LREM|LRETURN|LSHL|LSHR|LSTORE_0|LSTORE_1|LSTORE_2|LSTORE_3|LSTORE|LSUB|LUSHR|LXOR|MONITORENTER|MONITOREXIT|MULTIANEWARRAY|NEW|NEWARRAY|NOP|POP|POP2|RETURN|RET|SALOAD|SASTORE|SIPUSH|SWAP|TABLESWITCH|WIDE|GETFIELD|GETSTATIC|GET|PUTFIELD|PUTSTATIC|PUT"
-  // CONST
+  MNEMONIC="regexp:AALOAD|AASTORE|ACONST_NULL|ALOAD_0|ALOAD_1|ALOAD_2|ALOAD_3|ALOAD|ANEWARRAY|ARETURN|ARRAYLENGTH|ASTORE_0|ASTORE_1|ASTORE_2|ASTORE_3|ASTORE|ATHROW|BALOAD|BASTORE|BIPUSH|BREAKPOINT|CALOAD|CASTORE|CHECKCAST|D2F|D2I|D2L|DADD|DALOAD|DASTORE|DCMPG|DCMPL|DCONST_0|DCONST_1|DDIV|DLOAD_0|DLOAD_1|DLOAD_2|DLOAD_3|DLOAD|DMUL|DNEG|DREM|DRETURN|DSTORE_0|DSTORE_1|DSTORE_2|DSTORE_3|DSTORE|DSUB|DUP_X1|DUP_X2|DUP2|DUP2_X1|DUP2_X2|DUP|F2D|F2I|F2L|FADD|FALOAD|FASTORE|FCMPG|FCMPL|FCONST_0|FCONST_1|FCONST_2|FDIV|FLOAD_0|FLOAD_1|FLOAD_2|FLOAD_3|FLOAD|FMUL|FNEG|FREM|FRETURN|FSTORE_0|FSTORE_1|FSTORE_2|FSTORE_3|FSTORE|FSUB|GOTO|GOTO_W|I2B|I2C|I2D|I2F|I2L|I2S|IADD|IALOAD|IAND|IASTORE|ICONST_M1|ICONST_0|ICONST_1|ICONST_2|ICONST_3|ICONST_4|ICONST_5|IDIV|IF_ACMPEQ|IF_ACMPNE|IF_ICMPEQ|IF_ICMPGE|IF_ICMPGT|IF_ICMPLE|IF_ICMPLT|IF_ICMPNE|IFEQ|IFGE|IFGT|IFLE|IFLT|IFNE|IFNONNULL|IFNULL|IINC|ILOAD_0|ILOAD_1|ILOAD_2|ILOAD_3|ILOAD|IMPDEP1|IMPDEP2|IMUL|INEG|INSTANCEOF|INVOKEDYNAMIC|INVOKEINTERFACE|INVOKESPECIAL|INVOKESTATIC|INVOKEVIRTUAL|IOR|IREM|IRETURN|ISHL|ISHR|ISTORE_0|ISTORE_1|ISTORE_2|ISTORE_3|ISTORE|ISUB|IUSHR|IXOR|JSR|JSR_W|L2D|L2F|L2I|LADD|LALOAD|LAND|LASTORE|LCMP|LCONST_0|LCONST_1|LDC_W|LDC2_W|LDC|LDIV|LLOAD_0|LLOAD_1|LLOAD_2|LLOAD_3|LLOAD|LMUL|LNEG|LOOKUPSWITCH|LOR|LREM|LRETURN|LSHL|LSHR|LSTORE_0|LSTORE_1|LSTORE_2|LSTORE_3|LSTORE|LSUB|LUSHR|LXOR|MONITORENTER|MONITOREXIT|MULTIANEWARRAY|NEWARRAY|NEW|NOP|POP|POP2|RETURN|RET|SALOAD|SASTORE|SIPUSH|SWAP|TABLESWITCH|WIDE|GETFIELD|GETSTATIC|GET|PUTFIELD|PUTSTATIC|PUT"
   WHITE_SPACE="regexp:\s+"
   COMMA=","
   DOT="."
@@ -29,8 +28,6 @@
   SWITCH="⤼"
   LBRACKET="regexp:\(|\{|\[|[«]"
   RBRACKET="regexp:\)|\}|\]|[»]"
-  //CONSTMETHODNAMES = "regexp:<(cl)?init>"
-  //JAVACONST
   JAVATYPEHEAD='regexp:class|enum|interface'
   EXTENDS='extends'
   IMPLEMENTS='implements'
@@ -43,9 +40,8 @@
   INSTRUCTIONHEAD="regexp:PC\s+Line\s+Instruction"
   LVINDEX = "lvIndex="
   TABLENAME='regexp:LocalVariableTable|StackMapTable|ExceptionTable|LocalVariableTypeTable'
-  // TYPES
+  BOOLS='regexp:true|false'
   PRIMITIVETYPE="regexp:void|boolean|byte|char|short|int|long|float|double"
-  // TODO: default out?
   MODIFIER="regexp:public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient"
   STRINGVAR = "regexp:<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?"
   ]
@@ -54,18 +50,36 @@
 }
 jbcFile ::=  item_
 
+// this item is the complete text output from beginning to end
 private item_ ::= Annotation* ClassHead AttributesArea? FieldArea? MethodArea?
 
+// the @ can occur for annotations; Java classes can implement several interfaces, hence the comma at the end
 ClassHead ::= ModifierV? (AT?) JAVATYPEHEAD JType (EXTENDS JType)? (IMPLEMENTS (JType(COMMA)?)+)?
 
 // generic stuff
 
-Annotation ::= AT JType
+// this rule is used to handle cases were some of our tokens can occur in a (e.g.) FQN
+// ... use this where a STRINGVAR can occur (unless that STRINGVAR is unique),
+// e.g. someRule ::= STRINGVAR* should become someRule ::= (STRINGVAR | JbcTokens)*
+private JbcTokens ::= MNEMONIC | TABLES | ATTRIBUTES | METHODS | FIELDS | JAVATYPEHEAD | INSTRUCTIONHEAD | TABLENAME
+
+// e.g. @Contract (pure = true) or @Contract ("_, null -> null")
+Annotation ::= AT JType [LBRACKET
+                            (
+                                STRING COMMA?
+                              | STRINGVAR EQ STRING COMMA?
+                              | STRINGVAR EQ BOOLS COMMA?
+                              | STRINGVAR EQ JType COMMA?
+                              | STRINGVAR EQ NUMBER COMMA?
+                              | STRINGVAR EQ LBRACKET ((STRING | BOOLS | JType | NUMBER) COMMA?)* RBRACKET COMMA?
+                              | LBRACKET? Annotation RBRACKET? COMMA?
+                            )*
+                         RBRACKET]
 
 ModifierV ::= MODIFIER*
 
 Type ::= (LambdaType | JType | PRIMITIVETYPE)('[]')*
-JType ::= (STRINGVAR DOT)*(STRINGVAR | JAVATYPEHEAD | TABLENAME | MNEMONIC)
+JType ::= ((STRINGVAR | JbcTokens) DOT)*(STRINGVAR | JbcTokens)
 {
  mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
  implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
@@ -73,15 +87,15 @@ JType ::= (STRINGVAR DOT)*(STRINGVAR | JAVATYPEHEAD | TABLENAME | MNEMONIC)
 }
 
 // lambda.InnerVsLambdaThis$<init>()V:5$Lambda{ lambda.InnerVsLambdaThis$<init>()V:5$Lambda $newInstance(lambda.InnerVsLambdaThis) }
-LambdaType ::= (STRINGVAR DOT)*STRINGVAR lambdaParams STRINGVAR COLON* NUMBER STRINGVAR
-lambdaParams ::= (LBRACKET( ("]")* STRINGVAR COLON*)*RBRACKET)
+LambdaType ::= ((STRINGVAR | JbcTokens) DOT)*(STRINGVAR | JbcTokens) lambdaParams (STRINGVAR | JbcTokens) COLON* NUMBER (STRINGVAR | JbcTokens)
+lambdaParams ::= (LBRACKET( ("]")* (STRINGVAR | JbcTokens) COLON*)*RBRACKET)
 
 // attributes
 
 AttributesArea ::= ATTRIBUTES LBRACKET InnerTable? RBRACKET
 
 InnerTable ::= STRINGVAR LBRACKET
-                    (Type LBRACKET ModifierV JAVATYPEHEAD? STRINGVAR RBRACKET)*
+                    (Type LBRACKET ModifierV (AT?) JAVATYPEHEAD? STRINGVAR RBRACKET)*
                RBRACKET
 
 // fields
@@ -99,10 +113,9 @@ FieldsDeclaration ::= ModifierV? Type DefMethodName
 
 MethodArea ::= METHODS LBRACKET MethodDeclaration* RBRACKET
 
-// method body is optional (in case of abstract methods
 MethodDeclaration ::= Annotation* MethodHead LBRACKET
         (INSTRUCTIONHEAD
-         InstructionBody*
+         InstructionBody*   // method body is optional (in case of abstract methods)
          TableArea?)*
         RBRACKET
 {
@@ -111,7 +124,8 @@ MethodDeclaration ::= Annotation* MethodHead LBRACKET
  methods=[getName getNameIdentifier getPresentation navigate]
 }
 
-MethodHead ::= ModifierV? Type MethodName  // JAVA
+// e.g. public void someMethod(int) throws SomeException
+MethodHead ::= ModifierV? Type MethodName
 
 MethodName ::=  DefMethodName params exceptionList*
 DefMethodName ::= STRINGVAR
@@ -128,10 +142,10 @@ private exceptionList ::= THROWS (JType COMMA?)*
 InstructionBody ::= TAB* PcNumber LineNumber Instr
 PcNumber ::= NUMBER
 LineNumber ::= NUMBER
-Instr ::= (MNEMONIC (LBRACKET JType COLON Type RBRACKET                       // put someFQN : someFQN
-                          | LBRACKET NUMBER RBRACKET
-                          | LBRACKET STRING RBRACKET
-                          | LBRACKET ((JavaOP|NUMBER|STRING)COMMA?)* RBRACKET   // LDC("someString") or ALOAD(5) or ...
+Instr ::= (MNEMONIC (       LBRACKET JType COLON Type RBRACKET                       // e.g. PUT(someFQN : someFQN)
+                          | LBRACKET NUMBER RBRACKET                                 // e.g. GOTO(5)
+                          | LBRACKET STRING RBRACKET                                 // e.g. LDC("someString")
+                          | LBRACKET ((JavaOP|NUMBER|STRING)COMMA?)* RBRACKET        // e.g. INVOKEVIRTUAL(byte[] { java.lang.Object clone() })
                           // TABLESWITCH
                           | LBRACKET NUMBER TO NUMBER SEMICOLON
                                      (NUMBER SWITCH NUMBER COMMA?)* SEMICOLON?
@@ -142,11 +156,12 @@ Instr ::= (MNEMONIC (LBRACKET JType COLON Type RBRACKET                       //
                                 LBRACKET
                                   (LBRACKET CASE COLON NUMBER COMMA NUMBER RBRACKET)*
                                 RBRACKET
-                            RBRACKET
-                          | JavaOP)?)
-                                                                // INVOKEVIRTUAL(byte[] { java.lang.Object clone() })
+                            RBRACKET)?)
+                         // | LBRACKET JavaOP RBRACKET)?)
 
-JavaOP ::= "lvIndex=" NUMBER|((Type|STRINGVAR)(LBRACKET Type MethodName RBRACKET)?)+
+
+
+JavaOP ::= "lvIndex=" NUMBER | ((Type| STRINGVAR | JbcTokens)(LBRACKET Type MethodName RBRACKET)?)+
 
 
 // tables
@@ -158,15 +173,17 @@ TableArea ::= TABLES LBRACKET
                   StackMapTableDeclaration?
               RBRACKET
 
+// exception table
 ExceptionTableDeclaration ::= TABLENAME LBRACKET ExceptionTableBody* RBRACKET
 {
  mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
  implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
  methods=[getName getNameIdentifier getPresentation navigate]
 }
-private ExceptionTableBody ::= "try" LBRACKET NUMBER COMMA NUMBER RBRACKET "catch" NUMBER (Type|STRINGVAR)
+ExceptionTableBody ::= "try" LBRACKET NUMBER COMMA NUMBER RBRACKET "catch" NUMBER (Type|STRINGVAR)
 
 
+// local variable table
 LocVarTableDeclaration ::= TABLENAME LBRACKET LocVarTableBody* RBRACKET
 {
  mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
@@ -176,6 +193,7 @@ LocVarTableDeclaration ::= TABLENAME LBRACKET LocVarTableBody* RBRACKET
 private LocVarTableBody ::= "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET SLASH "lv" EQ NUMBER TO Type (this | STRINGVAR) // NOT RIGHT
 
 
+// stack map table
 StackMapTableDeclaration ::= TABLENAME LBRACKET StackMapTableBody* RBRACKET
 {
  mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
@@ -188,6 +206,7 @@ private StackMapTableBody ::= NUMBER Type NUMBER NUMBER
      ("Stack:"? ((((STRINGVAR LBRACKET NUMBER RBRACKET|Type)) COMMA?)*))?]
 
 
+// local variable type table
 LocVarTypeTableDeclaration ::= TABLENAME LBRACKET LocVarTypeTableBody* RBRACKET
 {
  mixin="JavaByteCodeLanguage.psi.impl.JavaByteCodeNamedElementImpl"
