@@ -83,7 +83,7 @@
             <keyboard-shortcut first-keystroke="alt shift 1"  keymap="$default"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action id="jumptosource" class="Actions.JumpToSource" text="Jump To Sourcecode" icon="/icons/jar-gray.png">
+        <action id="jumptosource" class="Actions.JumpToSource" text="Jump To Line" icon="/icons/jar-gray.png">
             <keyboard-shortcut first-keystroke="alt shift 2"  keymap="$default"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
