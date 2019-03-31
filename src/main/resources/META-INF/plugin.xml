@@ -79,27 +79,21 @@
             <mouse-shortcut keymap="$default" keystroke="control alt button3"/>
         </action>
 
-        <action id="jumptoline" class="Actions.JumpToProgramCounter" text="Test">
+        <action id="jumptoline" class="Actions.JumpToProgramCounter" text="Jump To PC" icon="/icons/jar-gray.png">
             <keyboard-shortcut first-keystroke="alt shift 1"  keymap="$default"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-
-        <action id="jumptosource" class="Actions.JumpToSource" text="Test">
+        <action id="jumptosource" class="Actions.JumpToSource" text="Jump To Sourcecode" icon="/icons/jar-gray.png">
             <keyboard-shortcut first-keystroke="alt shift 2"  keymap="$default"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-
-        <!--<action class="Actions.JumpToTac" id="jumptotac" text="Jump To TAC">-->
-            <!--<mouse-shortcut keymap="$default" keystroke="control button2"/>-->
-        <!--</action>-->
-
-        <!--<action class="Actions.TacToBytecode" id="tactobytecode" text="Jump To JBC">-->
-            <!--<mouse-shortcut keymap="$default" keystroke="control alt button2"/>-->
-        <!--</action>-->
-
-        <action class="Actions.JumpBetweenEditors" id="BetweenTacAndJbc">
+        <action class="Actions.JumpBetweenEditors" id="BetweenTacAndJbc" text="Jump Between TAC/Bytecode" icon="/icons/jar-gray.png">
             <mouse-shortcut keymap="$default" keystroke="control button2"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action class="Actions.ExceptionMarkerAction" id="exceptionmarker" text="Exception">
+        <action class="Actions.ExceptionMarkerAction" id="exceptionmarker" text="Highlight Exception" icon="/icons/jar-gray.png">
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift 3"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
     </actions>
 

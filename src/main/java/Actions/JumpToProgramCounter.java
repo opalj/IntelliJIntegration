@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ScrollType;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -18,7 +19,19 @@ import com.intellij.psi.util.PsiTreeUtil;
  * 523.
  */
 public class JumpToProgramCounter extends AnAction {
-
+  @Override
+  public void update(AnActionEvent e) {
+    final VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
+    Editor editor = e.getData(CommonDataKeys.EDITOR);
+    PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
+    final String extension = virtualFile != null ? virtualFile.getExtension() : "";
+    PsiElement element = psiFile.findElementAt(editor.getCaretModel().getOffset());
+    JavaByteCodeInstructionBody parent =
+            PsiTreeUtil.getParentOfType(element, JavaByteCodeInstructionBody.class);
+    e.getPresentation().setEnabledAndVisible(parent != null
+            && (parent.getInstr().getMnemonic().getText().contains("GOTO")
+            || parent.getInstr().getMnemonic().getText().contains("IF"))&& "jbc".equals(extension));
+  }
   @Override
   public void actionPerformed(AnActionEvent e) {
     Editor editor = e.getData(CommonDataKeys.EDITOR);
