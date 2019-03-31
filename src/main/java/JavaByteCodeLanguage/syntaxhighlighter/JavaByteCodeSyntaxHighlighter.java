@@ -32,6 +32,8 @@ class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
       createTextAttributesKey("JBC_THROWS", DefaultLanguageHighlighterColors.KEYWORD);
   private static final TextAttributesKey CASE =
       createTextAttributesKey("JBC_CASE", DefaultLanguageHighlighterColors.KEYWORD);
+  private static final TextAttributesKey BOOLS =
+      createTextAttributesKey("JBC_BOOLS", DefaultLanguageHighlighterColors.KEYWORD);
 
   // comments (includes block comments)
   public static final TextAttributesKey COMMENT =
@@ -56,7 +58,7 @@ class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
   private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[] {STRING};
   private static final TextAttributesKey[] MNEMONIC_KEYS = new TextAttributesKey[] {MNEMONIC};
   private static final TextAttributesKey[] JAVA_KEYWORD_KEYS =
-      new TextAttributesKey[] {TYPE, MODIFIER, JAVATYPEHEAD, EXTENDS, IMPLEMENTS, THROWS, CASE};
+      new TextAttributesKey[] {TYPE, MODIFIER, JAVATYPEHEAD, EXTENDS, IMPLEMENTS, THROWS, CASE, BOOLS};
   private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
   private static final TextAttributesKey[] ANNOTATION_KEYS = new TextAttributesKey[] {ANNOTATION};
 
@@ -88,7 +90,8 @@ class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
         || tokenType.equals(JavaByteCodeTypes.EXTENDS)
         || tokenType.equals(JavaByteCodeTypes.IMPLEMENTS)
         || tokenType.equals(JavaByteCodeTypes.THROWS)
-        || tokenType.equals(JavaByteCodeTypes.CASE)) {
+        || tokenType.equals(JavaByteCodeTypes.CASE)
+        || tokenType.equals(JavaByteCodeTypes.BOOLS)) {
       return JAVA_KEYWORD_KEYS;
     } else {
       return EMPTY_KEYS;

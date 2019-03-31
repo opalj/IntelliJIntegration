@@ -36,6 +36,7 @@ RBRACKET=\)|\}|\]|[»]
 JAVATYPEHEAD=class|enum|interface
 INSTRUCTIONHEAD=PC[ \t\n\x0B\f\r]+Line[ \t\n\x0B\f\r]+Instruction
 TABLENAME=LocalVariableTable|StackMapTable|ExceptionTable|LocalVariableTypeTable
+BOOLS=true|false
 PRIMITIVETYPE=void|boolean|byte|char|short|int|long|float|double
 MODIFIER=public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient
 STRINGVAR=<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?
@@ -75,6 +76,7 @@ STRINGVAR=<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?
   {JAVATYPEHEAD}         { return JAVATYPEHEAD; }
   {INSTRUCTIONHEAD}      { return INSTRUCTIONHEAD; }
   {TABLENAME}            { return TABLENAME; }
+  {BOOLS}                { return BOOLS; }
   {PRIMITIVETYPE}        { return PRIMITIVETYPE; }
   {MODIFIER}             { return MODIFIER; }
   {STRINGVAR}            { return STRINGVAR; }
