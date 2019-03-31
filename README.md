@@ -4,8 +4,8 @@ Bytecode Disassembler Plugin for IntelliJ
 This plugin integrates OPAL into IntelliJ to ease the analysis of Java bytecode. In particular,
 if offers two new views (bytecode and three-address code) for a class file alongside the standard view which IntelliJ provides.
 
-![The bytecode of a class file](images_readme/editor_bytecode_scaled.png "The bytecode of a class file")
-![The three-address code of a class file](images_readme/editor_tac_scaled.png "The three-address code of a class file")
+![The bytecode of a class file](images_readme/editor_bytecode.png "The bytecode of a class file")
+![The three-address code of a class file](images_readme/editor_tac.png "The three-address code of a class file")
 
 OPAL is an extensible, Java bytecode processing, engineering, manipulation and analysis library written in Scala 2.12.x.
 OPAL supports Java 10 Bytecode and has preliminary support for Java 11; OPAL in particular provides support to facilitate
