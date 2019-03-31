@@ -79,20 +79,26 @@
             <mouse-shortcut keymap="$default" keystroke="control alt button3"/>
         </action>
 
-        <action id="jumptoline" class="Actions.JumpToProgramCounter" text="Jump To PC" icon="/icons/jar-gray.png">
+        <action id="Actions.JumpToProgramCounter" class="Actions.JumpToProgramCounter" text="Jump To PC" icon="/icons/jar-gray.png">
             <keyboard-shortcut first-keystroke="alt shift 1"  keymap="$default"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action id="jumptosource" class="Actions.JumpToSource" text="Jump To Sourcecode" icon="/icons/jar-gray.png">
+        <action id="Actions.JumpToSource" class="Actions.JumpToSource" text="Jump To Sourcecode" icon="/icons/jar-gray.png">
             <keyboard-shortcut first-keystroke="alt shift 2"  keymap="$default"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action class="Actions.JumpBetweenEditors" id="BetweenTacAndJbc" text="Jump Between TAC/Bytecode" icon="/icons/jar-gray.png">
+        <action class="Actions.JumpBetweenEditors" id="Actions.JumpBetweenEditors" text="Jump Between TAC/Bytecode" icon="/icons/jar-gray.png">
             <mouse-shortcut keymap="$default" keystroke="control button2"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action class="Actions.ExceptionMarkerAction" id="exceptionmarker" text="Highlight Exception" icon="/icons/jar-gray.png">
+        <action class="Actions.ExceptionMarkerAction" id="Actions.ExceptionMarkerAction" text="Highlight Exception" icon="/icons/jar-gray.png">
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift 3"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+        <action id="Actions.JumpToResolveJBC" class="Actions.JumpToResolveJBC" text="Show Bytecode" icon="/icons/jar-gray.png">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+        <action id="Actions.JumpToResolveTAC" class="Actions.JumpToResolveTAC" text="Show Bytecode" icon="/icons/jar-gray.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
     </actions>
