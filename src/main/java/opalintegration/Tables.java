@@ -12,7 +12,7 @@ import org.opalj.collection.IntIterator;
 import org.opalj.collection.immutable.RefArray;
 import scala.Option;
 
-public final class Tables {
+final class Tables {
 
   private static final Logger LOGGER = Logger.getLogger(Tables.class.getName());
 

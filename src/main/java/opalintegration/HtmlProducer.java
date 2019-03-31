@@ -15,6 +15,7 @@ import org.opalj.da.ClassFileReader;
 import scala.Some;
 
 @Deprecated
+@SuppressWarnings("all")
 public class HtmlProducer {
   private static String classPath;
 

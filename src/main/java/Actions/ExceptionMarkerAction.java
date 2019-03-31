@@ -21,7 +21,9 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.JBColor;
 import java.awt.*;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /** An Action for marking the try-catch-blocks for a given exception */
 public class ExceptionMarkerAction extends AnAction {
@@ -80,15 +82,15 @@ public class ExceptionMarkerAction extends AnAction {
       JavaByteCodeMethodDeclaration methodDeclaration =
           PsiTreeUtil.getParentOfType(elementAt, JavaByteCodeMethodDeclaration.class);
       // ... and iterate over all instructions until the jump target has been found...
-      return PsiTreeUtil.findChildrenOfType(methodDeclaration, JavaByteCodePcNumber.class)
-          .stream()
-          .filter(pcNumber -> psiElementList.contains(pcNumber.getText()))
-          .limit(3)
-          .mapToInt(PsiElement::getTextOffset)
-          .toArray();
+      Map<String, Integer> collect = PsiTreeUtil.findChildrenOfType(methodDeclaration, JavaByteCodePcNumber.class)
+              .stream()
+              .filter(pcNumber -> psiElementList.contains(pcNumber.getText()))
+              .limit(3).collect(Collectors.toMap(JavaByteCodePcNumber::getText, JavaByteCodePcNumber::getTextOffset));
+      return psiElementList.stream().mapToInt(collect::get).toArray();
     }
     return null;
   }
+
 
   private void setMarker(
       Editor editor, int startOffset, int endOffset, int catchOffset, PsiElement sourceElement) {
