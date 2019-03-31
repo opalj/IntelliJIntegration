@@ -17,9 +17,10 @@ public class TacReferenceContributor extends PsiReferenceContributor {
   public void registerReferenceProviders(@NotNull PsiReferenceRegistrar registrar) {
     PsiReferenceProvider psiReferenceProvider =
         new PsiReferenceProvider() {
+          @NotNull
           @Override
           public PsiReference[] getReferencesByElement(
-              @NotNull PsiElement element, @NotNull ProcessingContext context) {
+                  PsiElement element, @NotNull ProcessingContext context) {
             TacMethodAndFieldReference methodReference;
 
             // the element is guaranteed to be of type JavaByteCodeDefMethodName (see below)
@@ -57,8 +58,8 @@ public class TacReferenceContributor extends PsiReferenceContributor {
                   methodReference =
                       new TacMethodAndFieldReference(element, range, typeOfClass.getText());
                   System.out.println(methodReference);
-                } else return null;
-              } else return null;
+                } else return PsiReference.EMPTY_ARRAY;
+              } else return PsiReference.EMPTY_ARRAY;
             }
 
             return new PsiReference[] {methodReference};
