@@ -1,26 +1,26 @@
 Bytecode Disassembler Plugin for IntelliJ
 ======
 
-This plugin integrates OPAL into IntelliJ to ease the analysis of Java bytecode. In particular, 
+This plugin integrates OPAL into IntelliJ to ease the analysis of Java bytecode. In particular,
 if offers two new views (bytecode and three-address code) for a class file alongside the standard view which IntelliJ provides.
 
 ![The bytecode of a class file](images_readme/editor_bytecode_scaled.png "The bytecode of a class file")
 ![The three-address code of a class file](images_readme/editor_tac_scaled.png "The three-address code of a class file")
 
-OPAL is an extensible, Java bytecode processing, engineering, manipulation and analysis library written in Scala 2.12.x. 
-OPAL supports Java 10 Bytecode and has preliminary support for Java 11; OPAL in particular provides support to facilitate 
+OPAL is an extensible, Java bytecode processing, engineering, manipulation and analysis library written in Scala 2.12.x.
+OPAL supports Java 10 Bytecode and has preliminary support for Java 11; OPAL in particular provides support to facilitate
 the analysis of Java 8 lambda expressions (Invokedynamic instructions). See [OPAL Project](http://www.opal-project.de/) for further details.
 
 ## Install
 
-To install the plugin, please follow the instructions provided by JetBrains: 
+To install the plugin, please follow the instructions provided by JetBrains:
 https://www.jetbrains.com/help/idea/managing-plugins.html
 
 ## Features
 
 ### Viewing The Output
 
-To view the bytecode or three-address code (TAC), you need to open a class file. Once opened, you can change between the views 
+To view the bytecode or three-address code (TAC), you need to open a class file. Once opened, you can change between the views
 by navigating through the tabs at the bottom of the editor.
 
 ![The different editor tabs for a class file](images_readme/editor_tabs_2.png)
@@ -41,16 +41,17 @@ You can also view class files that are contained within an external library simp
 ### Going To A Declaration
 
 The editors provide functionality to jump to a declaration via [Ctrl + B] or [Ctrl + Left Click], as is standard in IntelliJ.
-This works for 
+This works for
 
 - any fully qualified name apart from lambdas
 - for invoked methods
-- as well as for methods and fields  that belong to the file that is currently being viewed. 
+- as well as for methods and fields  that belong to the file that is currently being viewed.
 
 It, however, does not work for <clinit>().
 
 Everything that is marked can be jumped to. The red arrow shows to which class the method belongs to.
 ![Places to jump in methods.](images_readme/jumping_methods.png)
+
 You can also jump to the fields of "this" class file.
 ![Places to jump in fields.](images_readme/jumping_fields.png)
 
@@ -63,8 +64,8 @@ the key combination [Ctrl + Middle Mouse Button] on a method name, or via the co
 
 ### Even More Jumps (Bytecode Editor)
 
-You can also jump between instructions within the bytecode editor. This is possible for the if and goto instructions, 
-e.g. *GOTO*, *IFGT*, and *IFNULL*. These take the jump destination (a program counter value) as input, 
+You can also jump between instructions within the bytecode editor. This is possible for the if and goto instructions,
+e.g. *GOTO*, *IFGT*, and *IFNULL*. These take the jump destination (a program counter value) as input,
 thus the caret will be placed at that program counter value. To do this, press [Alt + Shift + 1] on one such instruction.
 
 ![Jump to program counter.](images_readme/jump_program_counter_v2.gif "Jump to program counter")
@@ -82,12 +83,12 @@ Then, the key combination [Alt Shift 3] will create a highlighted range in the g
 covers all instructions in a try (red) and catch (green) block. Hovering over the highlighted area will display the name of the exception.
 Pressing on the highlighted area will bring you back to the exception table. A context menu entry is also provided.
 
-[!Exception Area.](images_readme/exception_marker.gif "Mark Exception Area")
+![Exception Area.](images_readme/exception_marker.gif "Mark Exception Area")
 
 
 ### Structure View (Bytecode Editor)
 
-The structure view has, for the most part, the same look and feel as a normal java file. Additionally though, 
+The structure view has, for the most part, the same look and feel as a normal java file. Additionally though,
 it's possible to jump to the various tables (e.g. the local variable table) in the bytecode editor, if present:
 
 ![Some tables that can be navigated to.](images_readme/structure_view_tables.png)
