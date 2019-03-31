@@ -9,6 +9,8 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.*;
 import com.intellij.openapi.vfs.*;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import java.util.ArrayList;
@@ -34,32 +36,32 @@ class OpenClassFileAction extends AnAction {
 
   @Override
   public void update(AnActionEvent e) {
-    final Project project = e.getProject();
     final VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
+    PsiElement element = e.getData(CommonDataKeys.PSI_ELEMENT);
     final String extension = virtualFile != null ? virtualFile.getExtension() : "";
     // show Action only for java,class & scala files
     e.getPresentation()
         .setEnabledAndVisible(
-            project != null
-                && ("java".equals(extension)
-                    || "scala".equals(extension)
-                    || "class".equals(extension)));
+            (element instanceof PsiClass)
+                && ("java".equals(extension) || "class".equals(extension)));
   }
 
   /**
-   * performed after a clickevent to open a the specified editor
+   * performed after a click event to open a the specified editor
    *
-   * @param event the event fired if action is peformed
+   * @param e the event fired if action is performed
    */
   @Override
-  public void actionPerformed(AnActionEvent event) {
+  public void actionPerformed(AnActionEvent e) {
     // Load the file
-    Project project = event.getData(CommonDataKeys.PROJECT);
+    Project project = e.getData(CommonDataKeys.PROJECT);
+    final PsiElement element = e.getData(CommonDataKeys.PSI_ELEMENT);
     // currently selected file in the project view
-    VirtualFile virtualFile = event.getData(CommonDataKeys.VIRTUAL_FILE);
-    if (virtualFile == null || project == null) {
+    VirtualFile virtualFile;
+    if (!(element instanceof PsiClass) || project == null) {
       return;
     }
+    virtualFile = element.getNavigationElement().getContainingFile().getVirtualFile();
     String extension = virtualFile.getExtension();
     VirtualFile classFile = null;
     if (!StdFileTypes.CLASS.getDefaultExtension().equals(extension)) {

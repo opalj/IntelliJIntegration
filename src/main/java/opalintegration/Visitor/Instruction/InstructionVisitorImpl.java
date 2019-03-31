@@ -17,6 +17,11 @@ import org.opalj.collection.immutable.IntIntPair;
  */
 public class InstructionVisitorImpl extends ElementAcceptor<Instruction, String>
     implements InstructionVisitor {
+
+  public String visit(NEW mnemonicNew) {
+    return mnemonicNew.mnemonic().toUpperCase() + "(" + mnemonicNew.objectType().toJava() + ")";
+  }
+
   @Override
   public String visit(LoadInt l) {
     return l.mnemonic().toUpperCase() + "(" + l.value() + ")";
@@ -93,6 +98,15 @@ public class InstructionVisitorImpl extends ElementAcceptor<Instruction, String>
 
   public String visit(ANEWARRAY anewarray) {
     return anewarray.mnemonic().toUpperCase() + "(" + anewarray.componentType().toJava() + ")";
+  }
+
+  public String visit(MULTIANEWARRAY multianewarray) {
+    return multianewarray.mnemonic().toUpperCase()
+        + "("
+        + multianewarray.arrayType().toJava()
+        + ", "
+        + multianewarray.dimensions()
+        + ")";
   }
 
   public String visit(GETSTATIC getstatic) {

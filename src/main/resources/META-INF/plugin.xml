@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>23.bytecode-disassembler</id>
-    <name>OPAL Integration</name>
+    <name>Bytecode Disassembler</name>
     <vendor email="marcel.dieter@stud.tu-darmstadt.de" >Kollektiv 23</vendor>
 
     <description><![CDATA[
@@ -53,12 +53,16 @@
         <colorSettingsPage implementation="JavaByteCodeLanguage.syntaxhighlighter.JavaByteCodeColorSettingPage"/>
 
         <psi.referenceContributor implementation="JavaByteCodeLanguage.psi.JbcReferenceContributor"/>
+        <psi.referenceContributor implementation="taclanguage.psi.TacReferenceContributor"/>
 
         <lang.psiStructureViewFactory language="jbc" implementationClass="JavaByteCodeLanguage.StructureView.JavaByteCodeStructureViewFactory"/>
         <lang.psiStructureViewFactory language="TAC" implementationClass="taclanguage.structurview.TAC_structureViewFactory"/>
         <lang.foldingBuilder language="jbc" implementationClass="JavaByteCodeLanguage.folding.JbcFoldingBuilder"/>
         <lang.foldingBuilder language="TAC" implementationClass="taclanguage.folding.TACFoldingBuilder"/>
         <lang.findUsagesProvider language="jbc" implementationClass="com.intellij.lang.java.JavaFindUsagesProvider"/>
+        <lang.findUsagesProvider language="TAC" implementationClass="com.intellij.lang.java.JavaFindUsagesProvider"/>
+
+        <!--<codeInsight.lineMarkerProvider language="jbc" implementationClass="JavaByteCodeLanguage.psi.JbcLineMarkerProvider"/>-->
     </extensions>
 
     <actions>
@@ -68,16 +72,34 @@
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             <mouse-shortcut keymap="$default" keystroke="control button3"/>
         </action>
+
         <action id="JumpToTACFromRMB" class="Actions.OpenClassFileTACAction" text="Show Three-Address-Code" icon="/icons/jar-gray.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             <mouse-shortcut keymap="$default" keystroke="control alt button3"/>
         </action>
-        <action id="jumptoline" class="Actions.JumpToProgramCounter" text="Test">
+
+        <action id="jumptoline" class="Actions.JumpToProgramCounter" text="Jump To PC" icon="/icons/jar-gray.png">
             <keyboard-shortcut first-keystroke="alt shift 1"  keymap="$default"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action id="jumptosource" class="Actions.JumpToSource" text="Test">
+        <action id="jumptosource" class="Actions.JumpToSource" text="Jump To Line" icon="/icons/jar-gray.png">
             <keyboard-shortcut first-keystroke="alt shift 2"  keymap="$default"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+        <action class="Actions.JumpBetweenEditors" id="BetweenTacAndJbc" text="Jump Between TAC/Bytecode" icon="/icons/jar-gray.png">
+            <mouse-shortcut keymap="$default" keystroke="control button2"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+        <action class="Actions.ExceptionMarkerAction" id="exceptionmarker" text="Highlight Exception" icon="/icons/jar-gray.png">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift 3"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+        <action id="Actions.JumpToResolveJBC" class="Actions.JumpToResolveJBC" text="Show Bytecode" icon="/icons/jar-gray.png">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+        <action id="Actions.JumpToResolveTAC" class="Actions.JumpToResolveTAC" text="Show Bytecode" icon="/icons/jar-gray.png">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
     </actions>
 

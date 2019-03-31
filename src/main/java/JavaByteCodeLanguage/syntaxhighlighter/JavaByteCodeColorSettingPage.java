@@ -23,12 +23,12 @@ import org.jetbrains.annotations.Nullable;
 public class JavaByteCodeColorSettingPage implements ColorSettingsPage {
   private static final AttributesDescriptor[] DESCRIPTORS =
       new AttributesDescriptor[] {
-        new AttributesDescriptor("Keyword", JavaByteCodeSyntaxHighlighter.TYPE),
-        new AttributesDescriptor("Number", JavaByteCodeSyntaxHighlighter.NUMBER),
-        new AttributesDescriptor("Instruction", JavaByteCodeSyntaxHighlighter.MNEMONIC),
-        new AttributesDescriptor("Comment", JavaByteCodeSyntaxHighlighter.COMMENT),
-        new AttributesDescriptor("String", JavaByteCodeSyntaxHighlighter.STRING),
-        new AttributesDescriptor("Annotation", JavaByteCodeSyntaxHighlighter.ANNOTATION),
+        new AttributesDescriptor("Keyword", JbcSyntaxHighlighter.TYPE),
+        new AttributesDescriptor("Number", JbcSyntaxHighlighter.NUMBER),
+        new AttributesDescriptor("Instruction", JbcSyntaxHighlighter.MNEMONIC),
+        new AttributesDescriptor("Comment", JbcSyntaxHighlighter.COMMENT),
+        new AttributesDescriptor("String", JbcSyntaxHighlighter.STRING),
+        new AttributesDescriptor("Annotation", JbcSyntaxHighlighter.ANNOTATION),
       };
 
   @Nullable
@@ -40,7 +40,7 @@ public class JavaByteCodeColorSettingPage implements ColorSettingsPage {
   @NotNull
   @Override
   public SyntaxHighlighter getHighlighter() {
-    return new JavaByteCodeSyntaxHighlighter();
+    return new JbcSyntaxHighlighter();
   }
 
   @NotNull
