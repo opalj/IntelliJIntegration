@@ -22,7 +22,7 @@ public class JumpToResolveTAC extends JumpToResolve {
     PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
     final String extension = virtualFile != null ? virtualFile.getExtension() : "";
     PsiElement element =
-        Objects.requireNonNull(psiFile).findElementAt(editor.getCaretModel().getOffset());
+        Objects.requireNonNull(psiFile).findElementAt(Objects.requireNonNull(editor).getCaretModel().getOffset());
     element = PsiTreeUtil.getParentOfType(element, TACJType.class);
     e.getPresentation().setEnabledAndVisible(element != null && "tac".equals(extension));
   }

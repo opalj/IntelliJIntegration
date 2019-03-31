@@ -12,15 +12,15 @@ public class JbcLineMarkerRenderer implements ActiveGutterRenderer {
   private static final int THICKNESS = 6;
   private final PsiElement sourceElement;
 
-  private int thickness;
-  private Color color;
+  private final int thickness;
+  private final Color color;
   private String tooltipText;
 
   public JbcLineMarkerRenderer(Color color, PsiElement sourceElement) {
     this(color, THICKNESS, sourceElement);
   }
 
-  public JbcLineMarkerRenderer(Color color, int thickness, PsiElement sourceElement) {
+  private JbcLineMarkerRenderer(Color color, int thickness, PsiElement sourceElement) {
     this.color = color;
     this.thickness = thickness;
     this.tooltipText = "";
