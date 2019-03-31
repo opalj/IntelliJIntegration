@@ -10,6 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
+import java.util.Objects;
 
 /**
  * had caused severe issues)
@@ -25,13 +26,19 @@ public class JumpToProgramCounter extends AnAction {
     Editor editor = e.getData(CommonDataKeys.EDITOR);
     PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
     final String extension = virtualFile != null ? virtualFile.getExtension() : "";
-    PsiElement element = psiFile.findElementAt(editor.getCaretModel().getOffset());
+    PsiElement element =
+        Objects.requireNonNull(psiFile)
+            .findElementAt(Objects.requireNonNull(editor).getCaretModel().getOffset());
     JavaByteCodeInstructionBody parent =
-            PsiTreeUtil.getParentOfType(element, JavaByteCodeInstructionBody.class);
-    e.getPresentation().setEnabledAndVisible(parent != null
-            && (parent.getInstr().getMnemonic().getText().contains("GOTO")
-            || parent.getInstr().getMnemonic().getText().contains("IF"))&& "jbc".equals(extension));
+        PsiTreeUtil.getParentOfType(element, JavaByteCodeInstructionBody.class);
+    e.getPresentation()
+        .setEnabledAndVisible(
+            parent != null
+                && (parent.getInstr().getMnemonic().getText().contains("GOTO")
+                    || parent.getInstr().getMnemonic().getText().contains("IF"))
+                && "jbc".equals(extension));
   }
+
   @Override
   public void actionPerformed(AnActionEvent e) {
     Editor editor = e.getData(CommonDataKeys.EDITOR);

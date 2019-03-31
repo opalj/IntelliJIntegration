@@ -19,7 +19,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.JBColor;
-
 import java.awt.*;
 import java.util.LinkedList;
 import java.util.Objects;
@@ -27,16 +26,18 @@ import java.util.Objects;
 /** An Action for marking the try-catch-blocks for a given exception */
 public class ExceptionMarkerAction extends AnAction {
 
-      @Override
-      public void update(AnActionEvent e) {
-          final VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
-        Editor editor = e.getData(CommonDataKeys.EDITOR);
-        PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
-        final String extension = virtualFile != null ? virtualFile.getExtension() : "";
-        PsiElement element = psiFile.findElementAt(editor.getCaretModel().getOffset());
-        element = PsiTreeUtil.getParentOfType(element,JavaByteCodeExceptionTableBody.class);
-          e.getPresentation().setEnabledAndVisible(element!= null  && "jbc".equals(extension));
-      }
+  @Override
+  public void update(AnActionEvent e) {
+    final VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
+    Editor editor = e.getData(CommonDataKeys.EDITOR);
+    PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
+    final String extension = virtualFile != null ? virtualFile.getExtension() : "";
+    PsiElement element =
+        Objects.requireNonNull(psiFile)
+            .findElementAt(Objects.requireNonNull(editor).getCaretModel().getOffset());
+    element = PsiTreeUtil.getParentOfType(element, JavaByteCodeExceptionTableBody.class);
+    e.getPresentation().setEnabledAndVisible(element != null && "jbc".equals(extension));
+  }
 
   @Override
   public void actionPerformed(AnActionEvent e) {
@@ -49,33 +50,46 @@ public class ExceptionMarkerAction extends AnAction {
     }
     PsiElement elementAt = psiFile.findElementAt(editor.getCaretModel().getOffset());
     JavaByteCodeExceptionTableBody parent =
-            PsiTreeUtil.getParentOfType(elementAt, JavaByteCodeExceptionTableBody.class);
+        PsiTreeUtil.getParentOfType(elementAt, JavaByteCodeExceptionTableBody.class);
     if (parent == null) {
       return;
     }
-    int[] lines = getNumber(elementAt,parent);
-    if(lines != null)
-      setMarker(editor,lines[0],lines[1],lines[2] , parent);
-    } // jumpTargetPC
+    int[] lines = getNumber(elementAt, parent);
+    if (lines != null) setMarker(editor, lines[0], lines[1], lines[2], parent);
+  } // jumpTargetPC
 
- private int[] getNumber(PsiElement elementAt, JavaByteCodeExceptionTableBody parent) {
-   LinkedList<String> psiElementList = new LinkedList<>();
-   psiElementList.add(
-           Objects.requireNonNull(PsiTreeUtil.findSiblingForward(parent.getLbracket(), JavaByteCodeTypes.NUMBER, null)).getText());
-   psiElementList.add(
-           Objects.requireNonNull(PsiTreeUtil.findSiblingBackward(parent.getRbracket(), JavaByteCodeTypes.NUMBER, null)).getText());
-   psiElementList.add(
-           Objects.requireNonNull(PsiTreeUtil.findSiblingForward(parent.getRbracket(), JavaByteCodeTypes.NUMBER, null)).getText());
-   if (psiElementList.size() == 3) {
-     // take the method to which this instruction belongs to...
-     JavaByteCodeMethodDeclaration methodDeclaration =
-             PsiTreeUtil.getParentOfType(elementAt, JavaByteCodeMethodDeclaration.class);
-     // ... and iterate over all instructions until the jump target has been found...
-     return PsiTreeUtil.findChildrenOfType(methodDeclaration,
-             JavaByteCodePcNumber.class).stream().filter(pcNumber -> psiElementList.contains(pcNumber.getText())).limit(3).mapToInt(PsiElement::getTextOffset).toArray();
-   }
-   return null;
- }
+  private int[] getNumber(PsiElement elementAt, JavaByteCodeExceptionTableBody parent) {
+    LinkedList<String> psiElementList = new LinkedList<>();
+    psiElementList.add(
+        Objects.requireNonNull(
+                PsiTreeUtil.findSiblingForward(
+                    parent.getLbracket(), JavaByteCodeTypes.NUMBER, null))
+            .getText());
+    psiElementList.add(
+        Objects.requireNonNull(
+                PsiTreeUtil.findSiblingBackward(
+                    parent.getRbracket(), JavaByteCodeTypes.NUMBER, null))
+            .getText());
+    psiElementList.add(
+        Objects.requireNonNull(
+                PsiTreeUtil.findSiblingForward(
+                    parent.getRbracket(), JavaByteCodeTypes.NUMBER, null))
+            .getText());
+    if (psiElementList.size() == 3) {
+      // take the method to which this instruction belongs to...
+      JavaByteCodeMethodDeclaration methodDeclaration =
+          PsiTreeUtil.getParentOfType(elementAt, JavaByteCodeMethodDeclaration.class);
+      // ... and iterate over all instructions until the jump target has been found...
+      return PsiTreeUtil.findChildrenOfType(methodDeclaration, JavaByteCodePcNumber.class)
+          .stream()
+          .filter(pcNumber -> psiElementList.contains(pcNumber.getText()))
+          .limit(3)
+          .mapToInt(PsiElement::getTextOffset)
+          .toArray();
+    }
+    return null;
+  }
+
   private void setMarker(
       Editor editor, int startOffset, int endOffset, int catchOffset, PsiElement sourceElement) {
     MarkupModel markupModel = editor.getMarkupModel();
@@ -97,10 +111,12 @@ public class ExceptionMarkerAction extends AnAction {
         null,
         HighlighterTargetArea.LINES_IN_RANGE);
     markupModel.getAllHighlighters()[0].setLineMarkerRenderer(
-        new JbcLineMarkerRenderer(new JBColor(new Color(255, 0, 0, 50),new Color(255, 0, 0, 80)), sourceElement)
+        new JbcLineMarkerRenderer(
+                new JBColor(new Color(255, 0, 0, 50), new Color(255, 0, 0, 80)), sourceElement)
             .setTooltipText("try : " + name));
     markupModel.getAllHighlighters()[1].setLineMarkerRenderer(
-        new JbcLineMarkerRenderer(new JBColor(new Color(0, 255, 0, 50), new Color(0, 255, 0, 80)), sourceElement)
+        new JbcLineMarkerRenderer(
+                new JBColor(new Color(0, 255, 0, 50), new Color(0, 255, 0, 80)), sourceElement)
             .setTooltipText("catch : " + name));
     editor.getCaretModel().moveToOffset(startOffset, true);
     editor.getScrollingModel().scrollToCaret(ScrollType.CENTER_UP);
