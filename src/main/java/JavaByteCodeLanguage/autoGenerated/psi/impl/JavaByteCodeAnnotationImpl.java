@@ -29,14 +29,8 @@ public class JavaByteCodeAnnotationImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @NotNull
-  public List<JavaByteCodeAnnotation> getAnnotationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeAnnotation.class);
-  }
-
-  @Override
-  @NotNull
-  public List<JavaByteCodeJType> getJTypeList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeJType.class);
+  public JavaByteCodeJType getJType() {
+    return findNotNullChildByClass(JavaByteCodeJType.class);
   }
 
 }

@@ -30,8 +30,20 @@ public class JavaByteCodeExceptionTableDeclarationImpl extends JavaByteCodeNamed
 
   @Override
   @NotNull
-  public List<JavaByteCodeType> getTypeList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeType.class);
+  public List<JavaByteCodeExceptionTableBody> getExceptionTableBodyList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, JavaByteCodeExceptionTableBody.class);
+  }
+
+  @Override
+  @NotNull
+  public PsiElement getLbracket() {
+    return findNotNullChildByType(LBRACKET);
+  }
+
+  @Override
+  @NotNull
+  public PsiElement getRbracket() {
+    return findNotNullChildByType(RBRACKET);
   }
 
   @Override

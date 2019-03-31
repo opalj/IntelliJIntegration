@@ -1,8 +1,23 @@
 package opalintegration;
 
+import java.awt.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.markup.HighlighterLayer;
+import com.intellij.openapi.editor.markup.HighlighterTargetArea;
+import com.intellij.openapi.editor.markup.LineMarkerRenderer;
+import com.intellij.openapi.editor.markup.RangeHighlighter;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import opalintegration.Visitor.Instruction.InstructionVisitorImpl;
 import org.opalj.br.*;
 import org.opalj.br.instructions.Instruction;
@@ -59,8 +74,9 @@ class JbcProducer extends DecompiledTextProducer {
         methodBodyText.append(Tables.stackMapTable(methodBody));
         methodBodyText.append("  } // Tables\n");
       }
-    } // if(body.defined)
 
+    } // if(body.defined)
     return methodBodyText.toString();
   }
+
 }

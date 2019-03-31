@@ -6,6 +6,7 @@ import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
+
 import java.util.Objects;
 import opalintegration.OpalUtil;
 import org.jetbrains.annotations.NonNls;
@@ -31,7 +32,6 @@ public class DisTextEditorProvider extends PsiAwareTextEditorProvider {
     }
     return new DisTextEditor(project, file, this);
   }
-
   @NotNull
   @Override
   public String getEditorTypeId() {

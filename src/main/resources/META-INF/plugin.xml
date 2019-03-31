@@ -36,8 +36,6 @@
                             <fileEditorProvider implementation="Editors.HTMLEditor.HTMLEditorProvider"
                             id="OpalHTMLEditorProvider"/>
          -->
-        <fileEditorProvider implementation="Editors.HTMLEditor.HTMLEditorProvider"
-                            id="OpalHTMLEditorProvider"/>
         <fileEditorProvider implementation="Editors.FileEditor.TacTextEditorProvider"
                             id="OpalTACEditorProvider"/>
         <fileEditorProvider implementation="Editors.disEditor.DisTextEditorProvider"
@@ -63,6 +61,8 @@
         <lang.foldingBuilder language="TAC" implementationClass="taclanguage.folding.TACFoldingBuilder"/>
         <lang.findUsagesProvider language="jbc" implementationClass="com.intellij.lang.java.JavaFindUsagesProvider"/>
         <lang.findUsagesProvider language="TAC" implementationClass="com.intellij.lang.java.JavaFindUsagesProvider"/>
+
+        <!--<codeInsight.lineMarkerProvider language="jbc" implementationClass="JavaByteCodeLanguage.psi.JbcLineMarkerProvider"/>-->
     </extensions>
 
     <actions>
@@ -97,6 +97,9 @@
 
         <action class="Actions.JumpBetweenEditors" id="BetweenTacAndJbc">
             <mouse-shortcut keymap="$default" keystroke="control button2"/>
+        </action>
+        <action class="Actions.ExceptionMarkerAction" id="exceptionmarker" text="Exception">
+            <keyboard-shortcut keymap="$default" first-keystroke="X"/>
         </action>
     </actions>
 

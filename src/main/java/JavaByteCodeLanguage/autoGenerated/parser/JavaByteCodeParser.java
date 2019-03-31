@@ -35,6 +35,9 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     else if (t == DEF_METHOD_NAME) {
       r = DefMethodName(b, 0);
     }
+    else if (t == EXCEPTION_TABLE_BODY) {
+      r = ExceptionTableBody(b, 0);
+    }
     else if (t == EXCEPTION_TABLE_DECLARATION) {
       r = ExceptionTableDeclaration(b, 0);
     }
@@ -118,16 +121,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // AT JType [LBRACKET
-  //                             (
-  //                                 STRINGVAR EQ STRING COMMA?
-  //                               | STRINGVAR EQ BOOLS COMMA?
-  //                               | STRINGVAR EQ JType COMMA?
-  //                               | STRINGVAR EQ NUMBER COMMA?
-  //                               | STRINGVAR EQ LBRACKET ((STRING | BOOLS | JType | NUMBER) COMMA?)* RBRACKET COMMA?
-  //                               | LBRACKET? Annotation RBRACKET? COMMA?
-  //                             )*
-  //                          RBRACKET]
+  // AT JType
   public static boolean Annotation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "Annotation")) return false;
     if (!nextTokenIs(b, AT)) return false;
@@ -135,251 +129,8 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, AT);
     r = r && JType(b, l + 1);
-    r = r && Annotation_2(b, l + 1);
     exit_section_(b, m, ANNOTATION, r);
     return r;
-  }
-
-  // [LBRACKET
-  //                             (
-  //                                 STRINGVAR EQ STRING COMMA?
-  //                               | STRINGVAR EQ BOOLS COMMA?
-  //                               | STRINGVAR EQ JType COMMA?
-  //                               | STRINGVAR EQ NUMBER COMMA?
-  //                               | STRINGVAR EQ LBRACKET ((STRING | BOOLS | JType | NUMBER) COMMA?)* RBRACKET COMMA?
-  //                               | LBRACKET? Annotation RBRACKET? COMMA?
-  //                             )*
-  //                          RBRACKET]
-  private static boolean Annotation_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2")) return false;
-    Annotation_2_0(b, l + 1);
-    return true;
-  }
-
-  // LBRACKET
-  //                             (
-  //                                 STRINGVAR EQ STRING COMMA?
-  //                               | STRINGVAR EQ BOOLS COMMA?
-  //                               | STRINGVAR EQ JType COMMA?
-  //                               | STRINGVAR EQ NUMBER COMMA?
-  //                               | STRINGVAR EQ LBRACKET ((STRING | BOOLS | JType | NUMBER) COMMA?)* RBRACKET COMMA?
-  //                               | LBRACKET? Annotation RBRACKET? COMMA?
-  //                             )*
-  //                          RBRACKET
-  private static boolean Annotation_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, LBRACKET);
-    r = r && Annotation_2_0_1(b, l + 1);
-    r = r && consumeToken(b, RBRACKET);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // (
-  //                                 STRINGVAR EQ STRING COMMA?
-  //                               | STRINGVAR EQ BOOLS COMMA?
-  //                               | STRINGVAR EQ JType COMMA?
-  //                               | STRINGVAR EQ NUMBER COMMA?
-  //                               | STRINGVAR EQ LBRACKET ((STRING | BOOLS | JType | NUMBER) COMMA?)* RBRACKET COMMA?
-  //                               | LBRACKET? Annotation RBRACKET? COMMA?
-  //                             )*
-  private static boolean Annotation_2_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!Annotation_2_0_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "Annotation_2_0_1", c)) break;
-    }
-    return true;
-  }
-
-  // STRINGVAR EQ STRING COMMA?
-  //                               | STRINGVAR EQ BOOLS COMMA?
-  //                               | STRINGVAR EQ JType COMMA?
-  //                               | STRINGVAR EQ NUMBER COMMA?
-  //                               | STRINGVAR EQ LBRACKET ((STRING | BOOLS | JType | NUMBER) COMMA?)* RBRACKET COMMA?
-  //                               | LBRACKET? Annotation RBRACKET? COMMA?
-  private static boolean Annotation_2_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = Annotation_2_0_1_0_0(b, l + 1);
-    if (!r) r = Annotation_2_0_1_0_1(b, l + 1);
-    if (!r) r = Annotation_2_0_1_0_2(b, l + 1);
-    if (!r) r = Annotation_2_0_1_0_3(b, l + 1);
-    if (!r) r = Annotation_2_0_1_0_4(b, l + 1);
-    if (!r) r = Annotation_2_0_1_0_5(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // STRINGVAR EQ STRING COMMA?
-  private static boolean Annotation_2_0_1_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, STRINGVAR, EQ, STRING);
-    r = r && Annotation_2_0_1_0_0_3(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // COMMA?
-  private static boolean Annotation_2_0_1_0_0_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_0_3")) return false;
-    consumeToken(b, COMMA);
-    return true;
-  }
-
-  // STRINGVAR EQ BOOLS COMMA?
-  private static boolean Annotation_2_0_1_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, STRINGVAR, EQ, BOOLS);
-    r = r && Annotation_2_0_1_0_1_3(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // COMMA?
-  private static boolean Annotation_2_0_1_0_1_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_1_3")) return false;
-    consumeToken(b, COMMA);
-    return true;
-  }
-
-  // STRINGVAR EQ JType COMMA?
-  private static boolean Annotation_2_0_1_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_2")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, STRINGVAR, EQ);
-    r = r && JType(b, l + 1);
-    r = r && Annotation_2_0_1_0_2_3(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // COMMA?
-  private static boolean Annotation_2_0_1_0_2_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_2_3")) return false;
-    consumeToken(b, COMMA);
-    return true;
-  }
-
-  // STRINGVAR EQ NUMBER COMMA?
-  private static boolean Annotation_2_0_1_0_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_3")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, STRINGVAR, EQ, NUMBER);
-    r = r && Annotation_2_0_1_0_3_3(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // COMMA?
-  private static boolean Annotation_2_0_1_0_3_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_3_3")) return false;
-    consumeToken(b, COMMA);
-    return true;
-  }
-
-  // STRINGVAR EQ LBRACKET ((STRING | BOOLS | JType | NUMBER) COMMA?)* RBRACKET COMMA?
-  private static boolean Annotation_2_0_1_0_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_4")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, STRINGVAR, EQ, LBRACKET);
-    r = r && Annotation_2_0_1_0_4_3(b, l + 1);
-    r = r && consumeToken(b, RBRACKET);
-    r = r && Annotation_2_0_1_0_4_5(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // ((STRING | BOOLS | JType | NUMBER) COMMA?)*
-  private static boolean Annotation_2_0_1_0_4_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_4_3")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!Annotation_2_0_1_0_4_3_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "Annotation_2_0_1_0_4_3", c)) break;
-    }
-    return true;
-  }
-
-  // (STRING | BOOLS | JType | NUMBER) COMMA?
-  private static boolean Annotation_2_0_1_0_4_3_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_4_3_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = Annotation_2_0_1_0_4_3_0_0(b, l + 1);
-    r = r && Annotation_2_0_1_0_4_3_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // STRING | BOOLS | JType | NUMBER
-  private static boolean Annotation_2_0_1_0_4_3_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_4_3_0_0")) return false;
-    boolean r;
-    r = consumeToken(b, STRING);
-    if (!r) r = consumeToken(b, BOOLS);
-    if (!r) r = JType(b, l + 1);
-    if (!r) r = consumeToken(b, NUMBER);
-    return r;
-  }
-
-  // COMMA?
-  private static boolean Annotation_2_0_1_0_4_3_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_4_3_0_1")) return false;
-    consumeToken(b, COMMA);
-    return true;
-  }
-
-  // COMMA?
-  private static boolean Annotation_2_0_1_0_4_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_4_5")) return false;
-    consumeToken(b, COMMA);
-    return true;
-  }
-
-  // LBRACKET? Annotation RBRACKET? COMMA?
-  private static boolean Annotation_2_0_1_0_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_5")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = Annotation_2_0_1_0_5_0(b, l + 1);
-    r = r && Annotation(b, l + 1);
-    r = r && Annotation_2_0_1_0_5_2(b, l + 1);
-    r = r && Annotation_2_0_1_0_5_3(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // LBRACKET?
-  private static boolean Annotation_2_0_1_0_5_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_5_0")) return false;
-    consumeToken(b, LBRACKET);
-    return true;
-  }
-
-  // RBRACKET?
-  private static boolean Annotation_2_0_1_0_5_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_5_2")) return false;
-    consumeToken(b, RBRACKET);
-    return true;
-  }
-
-  // COMMA?
-  private static boolean Annotation_2_0_1_0_5_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "Annotation_2_0_1_0_5_3")) return false;
-    consumeToken(b, COMMA);
-    return true;
   }
 
   /* ********************************************************** */
@@ -516,16 +267,16 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // "try" LBRACKET NUMBER COMMA NUMBER RBRACKET "catch" NUMBER (Type|STRINGVAR)
-  static boolean ExceptionTableBody(PsiBuilder b, int l) {
+  public static boolean ExceptionTableBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ExceptionTableBody")) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, EXCEPTION_TABLE_BODY, "<exception table body>");
     r = consumeToken(b, "try");
     r = r && consumeTokens(b, 0, LBRACKET, NUMBER, COMMA, NUMBER, RBRACKET);
     r = r && consumeToken(b, "catch");
     r = r && consumeToken(b, NUMBER);
     r = r && ExceptionTableBody_8(b, l + 1);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 

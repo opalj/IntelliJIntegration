@@ -10,7 +10,13 @@ import com.intellij.navigation.ItemPresentation;
 public interface JavaByteCodeExceptionTableDeclaration extends JavaByteCodeNamedElement {
 
   @NotNull
-  List<JavaByteCodeType> getTypeList();
+  List<JavaByteCodeExceptionTableBody> getExceptionTableBodyList();
+
+  @NotNull
+  PsiElement getLbracket();
+
+  @NotNull
+  PsiElement getRbracket();
 
   @NotNull
   PsiElement getTablename();

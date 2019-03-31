@@ -175,7 +175,7 @@ ExceptionTableDeclaration ::= TABLENAME LBRACKET ExceptionTableBody* RBRACKET
  implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
  methods=[getName getNameIdentifier getPresentation navigate]
 }
-private ExceptionTableBody ::= "try" LBRACKET NUMBER COMMA NUMBER RBRACKET "catch" NUMBER (Type|STRINGVAR)
+ExceptionTableBody ::= "try" LBRACKET NUMBER COMMA NUMBER RBRACKET "catch" NUMBER (Type|STRINGVAR)
 
 
 LocVarTableDeclaration ::= TABLENAME LBRACKET LocVarTableBody* RBRACKET

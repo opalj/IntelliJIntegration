@@ -24,6 +24,10 @@ public class JavaByteCodeVisitor extends PsiElementVisitor {
     visitNamedElement(o);
   }
 
+  public void visitExceptionTableBody(@NotNull JavaByteCodeExceptionTableBody o) {
+    visitPsiElement(o);
+  }
+
   public void visitExceptionTableDeclaration(@NotNull JavaByteCodeExceptionTableDeclaration o) {
     visitNamedElement(o);
   }
