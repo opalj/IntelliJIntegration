@@ -1,0 +1,27 @@
+FREM 			// TODO ... judging from source code doesn't seem to have any "input", e.g. (PC Line Instruction): 23 99 FREM
+INVOKEDYNAMIC 	// TODO ... can this even appear in BR? Seems to make use of bootstraptable
+SWAP 			// TODO
+
+PUTFIELD  		// is PUT
+GETFIELD 		// is GET
+GOTO_W 			// @see GOTO
+JSR_W 			// @see JSR
+
+IMPDEP1  		// Wikipedia: "reserved for implementation-dependent operations within debuggers; should not appear in any class file"
+IMPDEP2 		// Wikipedia: "reserved for implementation-dependent operations within debuggers; should not appear in any class file"
+BREAKPOINT 		// Wikipedia: "reserved for breakpoints in Java debuggers; should not appear in any class file"
+
+
+### Regarding IMPDEP1, IMPDEP2, and BREAKPOINT: from https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-6.html, 6.2:
+ 
+In addition to the opcodes of the instructions specified later in this chapter, which are used in class files (§4 (The class File Format)), 
+three opcodes are reserved for internal use by a Java Virtual Machine implementation. If the instruction set of the Java Virtual Machine 
+is extended in the future, these reserved opcodes are guaranteed not to be used.
+
+Two of the reserved opcodes, numbers 254 (0xfe) and 255 (0xff), have the mnemonics impdep1 and impdep2, respectively. These instructions are intended 
+to provide "back doors" or traps to implementation-specific functionality implemented in software and hardware, respectively. The third reserved opcode, 
+number 202 (0xca), has the mnemonic breakpoint and is intended to be used by debuggers to implement breakpoints.
+
+Although these opcodes have been reserved, they may be used only inside a Java Virtual Machine implementation. They cannot appear in valid class files. 
+Tools such as debuggers or JIT code generators (§2.13) that might directly interact with Java Virtual Machine code that has been already loaded 
+and executed may encounter these opcodes. Such tools should attempt to behave gracefully if they encounter any of these reserved instructions.

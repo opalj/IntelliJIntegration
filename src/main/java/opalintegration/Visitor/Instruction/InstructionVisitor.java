@@ -15,7 +15,11 @@ import org.opalj.br.instructions.*;
 // unused because there is no accepting methods for given element
 // unused warning happens because method call looks like this (passed as string): this.getClass().getMethod("visit", in);
 interface InstructionVisitor {
+  String visit(NEW mnemonicNew);
+
   String visit(ANEWARRAY anewarray);
+
+  String visit(MULTIANEWARRAY anewarray);
 
   String visit(GETSTATIC getstatic);
 

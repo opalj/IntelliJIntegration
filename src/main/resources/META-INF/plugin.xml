@@ -36,6 +36,8 @@
                             <fileEditorProvider implementation="Editors.HTMLEditor.HTMLEditorProvider"
                             id="OpalHTMLEditorProvider"/>
          -->
+        <fileEditorProvider implementation="Editors.HTMLEditor.HTMLEditorProvider"
+                            id="OpalHTMLEditorProvider"/>
         <fileEditorProvider implementation="Editors.FileEditor.TacTextEditorProvider"
                             id="OpalTACEditorProvider"/>
         <fileEditorProvider implementation="Editors.disEditor.DisTextEditorProvider"
