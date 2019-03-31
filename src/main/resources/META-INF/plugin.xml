@@ -1,6 +1,6 @@
 <idea-plugin>
     <id>23.bytecode-disassembler</id>
-    <name>OPAL Integration</name>
+    <name>Bytecode Disassembler</name>
     <vendor email="marcel.dieter@stud.tu-darmstadt.de" >Kollektiv 23</vendor>
 
     <description><![CDATA[
@@ -99,7 +99,7 @@
             <mouse-shortcut keymap="$default" keystroke="control button2"/>
         </action>
         <action class="Actions.ExceptionMarkerAction" id="exceptionmarker" text="Exception">
-            <keyboard-shortcut keymap="$default" first-keystroke="X"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift 3"/>
         </action>
     </actions>
 

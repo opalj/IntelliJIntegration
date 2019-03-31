@@ -33,56 +33,63 @@ public class JumpToTac extends AnAction {
 
     PsiElement elementAt = jbcFile.findElementAt(editor.getCaretModel().getOffset());
     if (elementAt.getParent().getParent() instanceof JavaByteCodeMethodName) {
-        String fileNameWithoutExtension = jbcFile.getVirtualFile().getNameWithoutExtension();
+      String fileNameWithoutExtension = jbcFile.getVirtualFile().getNameWithoutExtension();
 
-        FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
-        VirtualFile classFile = null;
-        for (VirtualFile vf : fileEditorManager.getOpenFiles()) {
-            if (vf.getNameWithoutExtension().equals(fileNameWithoutExtension)) {
-                classFile = vf;
-                break;
-            }
+      FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+      VirtualFile classFile = null;
+      for (VirtualFile vf : fileEditorManager.getOpenFiles()) {
+        if (vf.getNameWithoutExtension().equals(fileNameWithoutExtension)) {
+          classFile = vf;
+          break;
         }
+      }
 
-        FileEditor[] fileEditors = fileEditorManager.getAllEditors(classFile);
-        for (FileEditor fileEditor : fileEditors) {
-            if (fileEditor.getName().equals("TAC")) {
-                fileEditorManager.openFile(classFile, true);
-                fileEditorManager.setSelectedEditor(classFile, "OPAL-TAC");
+      FileEditor[] fileEditors = fileEditorManager.getAllEditors(classFile);
+      for (FileEditor fileEditor : fileEditors) {
+        if (fileEditor.getName().equals("TAC")) {
+          fileEditorManager.openFile(classFile, true);
+          fileEditorManager.setSelectedEditor(classFile, "OPAL-TAC");
 
-                FileEditor tacEditor = fileEditorManager.getSelectedEditor();
+          FileEditor tacEditor = fileEditorManager.getSelectedEditor();
 
-                PsiFile tacFile = PsiManager.getInstance(project).findFile(tacEditor.getFile());
+          PsiFile tacFile = PsiManager.getInstance(project).findFile(tacEditor.getFile());
 
-                tacFile.accept(new PsiElementVisitor() {
-                    @Override
-                    public void visitElement(PsiElement element) {
-                        super.visitElement(element);
-                        if(element instanceof TACMethodName) {
-                            if(element.getText().equals(elementAt.getParent().getParent().getText())) {
-                                fileEditorManager.getSelectedTextEditor().getCaretModel().moveToOffset(element.getTextOffset());
-                                fileEditorManager.getSelectedTextEditor().getScrollingModel().scrollToCaret(ScrollType.CENTER);
-                            }
-                        } else {
-                            for(PsiElement child : element.getChildren()) {
-                                visitElement(child);
-                            }
-                        }
+          tacFile.accept(
+              new PsiElementVisitor() {
+                @Override
+                public void visitElement(PsiElement element) {
+                  super.visitElement(element);
+                  if (element instanceof TACMethodName) {
+                    if (element.getText().equals(elementAt.getParent().getParent().getText())) {
+                      fileEditorManager
+                          .getSelectedTextEditor()
+                          .getCaretModel()
+                          .moveToOffset(element.getTextOffset());
+                      fileEditorManager
+                          .getSelectedTextEditor()
+                          .getScrollingModel()
+                          .scrollToCaret(ScrollType.CENTER);
                     }
-                }); // tacFile.accept()
+                  } else {
+                    for (PsiElement child : element.getChildren()) {
+                      visitElement(child);
+                    }
+                  }
+                }
+              }); // tacFile.accept()
 
-                return;
-            } // if(name.equals("TAC))
-        } // for(fileEditors)
+          return;
+        } // if(name.equals("TAC))
+      } // for(fileEditors)
     } // if(instanceof)
 
     notifyOnFail("Can't find editor");
   }
 
   private void notifyOnFail(String message) {
-      Notifications.Bus.notify(
-              new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
-                      .createNotification()
-                      .setContent(message));
+    Notifications.Bus.notify(
+        new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
+            .createNotification()
+            .setContent(message));
   }
 }

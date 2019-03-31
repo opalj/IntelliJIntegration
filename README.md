@@ -1,4 +1,4 @@
-OPAL Integration Plugin for IntelliJ
+Bytecode Disassembler Plugin for IntelliJ
 ======
 
 This plugin integrates OPAL into IntelliJ to ease the analysis of Java bytecode. In particular, 

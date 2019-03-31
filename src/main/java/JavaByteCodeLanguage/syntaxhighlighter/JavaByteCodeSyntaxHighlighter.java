@@ -58,7 +58,9 @@ class JavaByteCodeSyntaxHighlighter extends SyntaxHighlighterBase {
   private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[] {STRING};
   private static final TextAttributesKey[] MNEMONIC_KEYS = new TextAttributesKey[] {MNEMONIC};
   private static final TextAttributesKey[] JAVA_KEYWORD_KEYS =
-      new TextAttributesKey[] {TYPE, MODIFIER, JAVATYPEHEAD, EXTENDS, IMPLEMENTS, THROWS, CASE, BOOLS};
+      new TextAttributesKey[] {
+        TYPE, MODIFIER, JAVATYPEHEAD, EXTENDS, IMPLEMENTS, THROWS, CASE, BOOLS
+      };
   private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
   private static final TextAttributesKey[] ANNOTATION_KEYS = new TextAttributesKey[] {ANNOTATION};
 

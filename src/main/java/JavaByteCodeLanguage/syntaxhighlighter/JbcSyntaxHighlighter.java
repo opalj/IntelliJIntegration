@@ -10,50 +10,50 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 
 public class JbcSyntaxHighlighter extends SyntaxHighlighterBase {
 
-    private static final Map<IElementType, TextAttributesKey> ourMap;
+  private static final Map<IElementType, TextAttributesKey> ourMap;
 
-    static {
-        ourMap = new HashMap<>();
+  static {
+    ourMap = new HashMap<>();
 
-        // TODO: doesn't work for annotations, because they're not TokenTypes...
-        TokenSet annotationSet = TokenSet.create(JavaByteCodeTypes.ANNOTATION);
-        fillMap(ourMap, annotationSet, DefaultLanguageHighlighterColors.METADATA);
+    // TODO: doesn't work for annotations, because they're not TokenTypes...
+    TokenSet annotationSet = TokenSet.create(JavaByteCodeTypes.ANNOTATION);
+    fillMap(ourMap, annotationSet, DefaultLanguageHighlighterColors.METADATA);
 
-        TokenSet keywords = TokenSet.create(
+    TokenSet keywords =
+        TokenSet.create(
             JavaByteCodeTypes.PRIMITIVETYPE,
             JavaByteCodeTypes.MODIFIER,
             JavaByteCodeTypes.JAVATYPEHEAD,
             JavaByteCodeTypes.EXTENDS,
             JavaByteCodeTypes.IMPLEMENTS,
             JavaByteCodeTypes.THROWS,
-            JavaByteCodeTypes.CASE // TODO: bools
-        );
-        fillMap(ourMap, keywords, DefaultLanguageHighlighterColors.KEYWORD);
+            JavaByteCodeTypes.CASE,
+            JavaByteCodeTypes.BOOLS
+            );
+    fillMap(ourMap, keywords, DefaultLanguageHighlighterColors.KEYWORD);
 
+    ourMap.put(JavaByteCodeTypes.COMMENT, DefaultLanguageHighlighterColors.LINE_COMMENT);
+    ourMap.put(JavaByteCodeTypes.MNEMONIC, DefaultLanguageHighlighterColors.CONSTANT);
+    ourMap.put(JavaByteCodeTypes.NUMBER, DefaultLanguageHighlighterColors.NUMBER);
+    ourMap.put(JavaByteCodeTypes.STRING, DefaultLanguageHighlighterColors.STRING);
+    ourMap.put(TokenType.BAD_CHARACTER, HighlighterColors.BAD_CHARACTER);
+  }
 
-        ourMap.put(JavaByteCodeTypes.COMMENT, DefaultLanguageHighlighterColors.LINE_COMMENT);
-        ourMap.put(JavaByteCodeTypes.MNEMONIC, DefaultLanguageHighlighterColors.CONSTANT);
-        ourMap.put(JavaByteCodeTypes.NUMBER, DefaultLanguageHighlighterColors.NUMBER);
-        ourMap.put(JavaByteCodeTypes.STRING, DefaultLanguageHighlighterColors.STRING);
-        ourMap.put(TokenType.BAD_CHARACTER, HighlighterColors.BAD_CHARACTER);
-    }
+  @NotNull
+  @Override
+  public Lexer getHighlightingLexer() {
+    return new JavaByteCodeLexerAdapter();
+  }
 
-    @NotNull
-    @Override
-    public Lexer getHighlightingLexer() {
-        return new JavaByteCodeLexerAdapter();
-    }
-
-    @NotNull
-    @Override
-    public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
-        return pack(ourMap.get(tokenType));
-    }
+  @NotNull
+  @Override
+  public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
+    return pack(ourMap.get(tokenType));
+  }
 }

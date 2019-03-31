@@ -102,11 +102,11 @@ public class InstructionVisitorImpl extends ElementAcceptor<Instruction, String>
 
   public String visit(MULTIANEWARRAY multianewarray) {
     return multianewarray.mnemonic().toUpperCase()
-            + "("
-            + multianewarray.arrayType().toJava()
-            + ", "
-            + multianewarray.dimensions()
-            + ")";
+        + "("
+        + multianewarray.arrayType().toJava()
+        + ", "
+        + multianewarray.dimensions()
+        + ")";
   }
 
   public String visit(GETSTATIC getstatic) {

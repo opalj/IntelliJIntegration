@@ -15,7 +15,8 @@ public interface JavaByteCodeTypes {
   IElementType CLASS_HEAD = new JavaByteCodeElementType("CLASS_HEAD");
   IElementType DEF_METHOD_NAME = new JavaByteCodeElementType("DEF_METHOD_NAME");
   IElementType EXCEPTION_TABLE_BODY = new JavaByteCodeElementType("EXCEPTION_TABLE_BODY");
-  IElementType EXCEPTION_TABLE_DECLARATION = new JavaByteCodeElementType("EXCEPTION_TABLE_DECLARATION");
+  IElementType EXCEPTION_TABLE_DECLARATION =
+      new JavaByteCodeElementType("EXCEPTION_TABLE_DECLARATION");
   IElementType FIELDS_DECLARATION = new JavaByteCodeElementType("FIELDS_DECLARATION");
   IElementType FIELD_AREA = new JavaByteCodeElementType("FIELD_AREA");
   IElementType INNER_TABLE = new JavaByteCodeElementType("INNER_TABLE");
@@ -44,6 +45,7 @@ public interface JavaByteCodeTypes {
 
   IElementType AT = new JavaByteCodeTokenType("@");
   IElementType ATTRIBUTES = new JavaByteCodeTokenType("Attributes");
+  IElementType BOOLS = new JavaByteCodeTokenType("BOOLS");
   IElementType CASE = new JavaByteCodeTokenType("case");
   IElementType COLON = new JavaByteCodeTokenType(":");
   IElementType COMMA = new JavaByteCodeTokenType(",");
@@ -86,11 +88,9 @@ public interface JavaByteCodeTypes {
         return new JavaByteCodeClassHeadImpl(node);
       } else if (type == DEF_METHOD_NAME) {
         return new JavaByteCodeDefMethodNameImpl(node);
-      }
-      else if (type == EXCEPTION_TABLE_BODY) {
+      } else if (type == EXCEPTION_TABLE_BODY) {
         return new JavaByteCodeExceptionTableBodyImpl(node);
-      }
-      else if (type == EXCEPTION_TABLE_DECLARATION) {
+      } else if (type == EXCEPTION_TABLE_DECLARATION) {
         return new JavaByteCodeExceptionTableDeclarationImpl(node);
       } else if (type == FIELDS_DECLARATION) {
         return new JavaByteCodeFieldsDeclarationImpl(node);
