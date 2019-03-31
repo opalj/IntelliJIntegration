@@ -95,6 +95,12 @@
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift 3"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
+        <action id="Actions.JumpToResolveJBC" class="Actions.JumpToResolveJBC" text="Show Bytecode" icon="/icons/jar-gray.png">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+        <action id="Actions.JumpToResolveTAC" class="Actions.JumpToResolveTAC" text="Show Bytecode" icon="/icons/jar-gray.png">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
     </actions>
 
     <application-components>
