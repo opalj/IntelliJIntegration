@@ -9,7 +9,7 @@
 
     <change-notes>First non beta Version. Ready to enjoy. See Readme or Source Code for further information.</change-notes>
 
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <!-- until-build version is looking into the future might be wrong!! -->
     <idea-version since-build="181" until-build="183.*"/>
 
