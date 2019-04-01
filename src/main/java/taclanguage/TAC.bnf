@@ -53,7 +53,7 @@
 }
 jbcFile ::=  item_
 
-private item_ ::= Annotation* ClassHead AttributesArea? FieldArea? MethodArea?
+private item_ ::= Annotation* ClassHead LBRACKET AttributesArea? FieldArea? MethodArea? RBRACKET
 
 ClassHead ::= ModifierV? (AT?) JAVATYPEHEAD JType (EXTENDS JType)? (IMPLEMENTS (JType(COMMA)?)+)?
 

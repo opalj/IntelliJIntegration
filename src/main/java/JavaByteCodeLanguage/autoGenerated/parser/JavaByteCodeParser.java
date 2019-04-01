@@ -1183,7 +1183,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET SLASH "lv" EQ NUMBER TO Type (this | STRINGVAR)
+  // "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET SLASH "lv" EQ NUMBER TO Type (this | STRINGVAR | MODIFIER)
   static boolean LocVarTableBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "LocVarTableBody")) return false;
     boolean r;
@@ -1198,12 +1198,13 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // this | STRINGVAR
+  // this | STRINGVAR | MODIFIER
   private static boolean LocVarTableBody_13(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "LocVarTableBody_13")) return false;
     boolean r;
     r = consumeToken(b, THIS);
     if (!r) r = consumeToken(b, STRINGVAR);
+    if (!r) r = consumeToken(b, MODIFIER);
     return r;
   }
 

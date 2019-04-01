@@ -190,7 +190,7 @@ LocVarTableDeclaration ::= TABLENAME LBRACKET LocVarTableBody* RBRACKET
  implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
  methods=[getName getNameIdentifier getPresentation navigate]
 }
-private LocVarTableBody ::= "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET SLASH "lv" EQ NUMBER TO Type (this | STRINGVAR) // NOT RIGHT
+private LocVarTableBody ::= "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET SLASH "lv" EQ NUMBER TO Type (this | STRINGVAR | MODIFIER) // NOT RIGHT
 
 
 // stack map table
