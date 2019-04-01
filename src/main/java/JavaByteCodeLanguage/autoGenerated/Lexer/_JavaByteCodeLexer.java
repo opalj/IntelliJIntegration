@@ -74,18 +74,17 @@ public class _JavaByteCodeLexer implements FlexLexer {
                   "\2\1\20\6\1\7\1\10\1\11\10\6\1\1\1\12"+
                   "\1\13\1\14\1\15\1\16\1\17\2\0\1\20\2\4"+
                   "\31\6\1\0\1\21\3\0\72\6\2\0\10\6\1\22"+
-                  "\24\6\1\23\14\6\1\22\3\6\1\22\2\6\1\24"+
-                  "\1\6\1\22\2\6\1\22\2\6\1\22\1\6\1\22"+
-                  "\1\0\5\6\1\22\23\6\1\17\1\0\26\6\1\25"+
-                  "\1\26\15\6\1\22\13\6\1\0\6\6\1\27\1\23"+
-                  "\5\6\1\30\5\6\1\0\3\6\1\22\11\6\1\31"+
-                  "\26\6\1\0\17\6\1\0\14\6\1\32\7\6\1\33"+
-                  "\6\6\1\0\1\34\14\6\1\0\27\6\1\0\2\6"+
-                  "\1\35\3\6\1\36\1\6\1\0\1\4\20\6\1\0"+
-                  "\1\6\1\37\2\6\1\4\13\6\1\0\7\6\1\40"+
-                  "\1\41\2\6\1\0\5\6\1\0\3\6\1\0\2\6"+
-                  "\1\42\1\0\1\6\1\0\1\6\1\0\1\6\3\0"+
-                  "\1\43";
+                  "\24\6\1\23\14\6\1\22\3\6\1\22\4\6\1\22"+
+                  "\2\6\1\22\2\6\1\22\1\6\1\22\1\0\5\6"+
+                  "\1\22\23\6\1\17\1\0\26\6\1\24\1\25\15\6"+
+                  "\1\22\13\6\1\0\6\6\1\26\1\23\5\6\1\27"+
+                  "\5\6\1\0\3\6\1\22\11\6\1\30\26\6\1\0"+
+                  "\17\6\1\0\14\6\1\31\7\6\1\32\6\6\1\0"+
+                  "\1\33\14\6\1\0\27\6\1\0\2\6\1\34\3\6"+
+                  "\1\35\1\6\1\0\1\4\20\6\1\0\1\6\1\36"+
+                  "\2\6\1\4\13\6\1\0\7\6\1\37\1\40\2\6"+
+                  "\1\0\5\6\1\0\3\6\1\0\2\6\1\41\1\0"+
+                  "\1\6\1\0\1\6\1\0\1\6\3\0\1\42";
 
   private static int [] zzUnpackAction() {
     int [] result = new int[501];
@@ -1357,177 +1356,172 @@ public class _JavaByteCodeLexer implements FlexLexer {
           { return BAD_CHARACTER;
           }
           // fall through
-          case 36: break;
+          case 35: break;
           case 2:
           { return WHITE_SPACE;
           }
           // fall through
-          case 37: break;
+          case 36: break;
           case 3:
           { return SLASH;
           }
           // fall through
-          case 38: break;
+          case 37: break;
           case 4:
           { return NUMBER;
           }
           // fall through
-          case 39: break;
+          case 38: break;
           case 5:
           { return DOT;
           }
           // fall through
-          case 40: break;
+          case 39: break;
           case 6:
           { return STRINGVAR;
           }
           // fall through
-          case 41: break;
+          case 40: break;
           case 7:
           { return EQ;
           }
           // fall through
-          case 42: break;
+          case 41: break;
           case 8:
           { return LBRACKET;
           }
           // fall through
-          case 43: break;
+          case 42: break;
           case 9:
           { return RBRACKET;
           }
           // fall through
-          case 44: break;
+          case 43: break;
           case 10:
           { return COMMA;
           }
           // fall through
-          case 45: break;
+          case 44: break;
           case 11:
           { return COLON;
           }
           // fall through
-          case 46: break;
+          case 45: break;
           case 12:
           { return SEMICOLON;
           }
           // fall through
-          case 47: break;
+          case 46: break;
           case 13:
           { return AT;
           }
           // fall through
-          case 48: break;
+          case 47: break;
           case 14:
           { return SWITCH;
           }
           // fall through
-          case 49: break;
+          case 48: break;
           case 15:
           { return COMMENT;
           }
           // fall through
-          case 50: break;
+          case 49: break;
           case 16:
           { return TO;
           }
           // fall through
-          case 51: break;
+          case 50: break;
           case 17:
           { return STRING;
           }
           // fall through
-          case 52: break;
+          case 51: break;
           case 18:
           { return MNEMONIC;
           }
           // fall through
-          case 53: break;
+          case 52: break;
           case 19:
           { return PRIMITIVETYPE;
           }
           // fall through
-          case 54: break;
+          case 53: break;
           case 20:
-          { return TAB;
-          }
-          // fall through
-          case 55: break;
-          case 21:
           { return BOOLS;
           }
           // fall through
-          case 56: break;
-          case 22:
+          case 54: break;
+          case 21:
           { return THIS;
           }
           // fall through
-          case 57: break;
-          case 23:
+          case 55: break;
+          case 22:
           { return CASE;
           }
           // fall through
-          case 58: break;
-          case 24:
+          case 56: break;
+          case 23:
           { return JAVATYPEHEAD;
           }
           // fall through
-          case 59: break;
-          case 25:
+          case 57: break;
+          case 24:
           { return MODIFIER;
           }
           // fall through
-          case 60: break;
-          case 26:
+          case 58: break;
+          case 25:
           { return THROWS;
           }
           // fall through
-          case 61: break;
-          case 27:
+          case 59: break;
+          case 26:
           { return TABLES;
           }
           // fall through
-          case 62: break;
-          case 28:
+          case 60: break;
+          case 27:
           { return FIELDS;
           }
           // fall through
-          case 63: break;
-          case 29:
+          case 61: break;
+          case 28:
           { return METHODS;
           }
           // fall through
-          case 64: break;
-          case 30:
+          case 62: break;
+          case 29:
           { return EXTENDS;
           }
           // fall through
-          case 65: break;
-          case 31:
+          case 63: break;
+          case 30:
           { return LVINDEX;
           }
           // fall through
-          case 66: break;
-          case 32:
+          case 64: break;
+          case 31:
           { return IMPLEMENTS;
           }
           // fall through
-          case 67: break;
-          case 33:
+          case 65: break;
+          case 32:
           { return ATTRIBUTES;
           }
           // fall through
-          case 68: break;
-          case 34:
+          case 66: break;
+          case 33:
           { return TABLENAME;
           }
           // fall through
-          case 69: break;
-          case 35:
+          case 67: break;
+          case 34:
           { return INSTRUCTIONHEAD;
           }
           // fall through
-          case 70: break;
+          case 68: break;
           default:
             zzScanError(ZZ_NO_MATCH);
         }

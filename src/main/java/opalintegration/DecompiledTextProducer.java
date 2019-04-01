@@ -25,7 +25,7 @@ abstract class DecompiledTextProducer {
     decompiledText += attributes(classFile);
     decompiledText += fields(classFile);
     decompiledText += methods(classFile); // contains the template method
-    decompiledText += "\n}";
+    decompiledText += "\n}";              // end of class file
 
     return decompiledText;
   }
@@ -51,11 +51,17 @@ abstract class DecompiledTextProducer {
     if (classFile.interfaceTypes().length() > 0) {
       classHeader.append(" implements ");
       for (int j = 0; j < classFile.interfaceTypes().length(); j++) {
-        classHeader.append(classFile.interfaceTypes().apply(j).toJava()).append(" ");
+        // no comma at the end
+        if(j == classFile.interfaceTypes().length() - 1) {
+          classHeader.append(classFile.interfaceTypes().apply(j).toJava()).append(" ");
+          break;
+        }
+
+        classHeader.append(classFile.interfaceTypes().apply(j).toJava()).append(", ");
       }
     }
     classHeader
-            .append(" {")
+        .append(" {")
         .append("\n// Source File: ")
         .append(classFile.sourceFile().isDefined() ? classFile.sourceFile().get() : "")
         .append(" -- Version: (")

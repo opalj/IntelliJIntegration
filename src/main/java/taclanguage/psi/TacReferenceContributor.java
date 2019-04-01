@@ -36,7 +36,6 @@ public class TacReferenceContributor extends PsiReferenceContributor {
             }
             // or be part of "this" file (for which the bytecode has been generated)
             else {
-              System.out.println("here");
               PsiElement file = element.getContainingFile();
               // example: classHead = public class io.ChainedReader extends java.lang.Object
               PsiElement classHead;
@@ -54,10 +53,8 @@ public class TacReferenceContributor extends PsiReferenceContributor {
                         .findFirst()
                         .orElse(null);
                 if (typeOfClass != null) {
-                  System.out.println(typeOfClass.getText());
                   methodReference =
                       new TacMethodAndFieldReference(element, range, typeOfClass.getText());
-                  System.out.println(methodReference);
                 } else return PsiReference.EMPTY_ARRAY;
               } else return PsiReference.EMPTY_ARRAY;
             }

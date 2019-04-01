@@ -139,7 +139,7 @@ private exceptionList ::= THROWS (JType COMMA?)*
 
 // instructions (part of method body)
 
-InstructionBody ::= TAB* PcNumber LineNumber Instr
+InstructionBody ::= PcNumber LineNumber Instr
 PcNumber ::= NUMBER
 LineNumber ::= NUMBER
 Instr ::= (MNEMONIC (       LBRACKET JType COLON Type RBRACKET                       // e.g. PUT(someFQN : someFQN)
@@ -190,7 +190,7 @@ LocVarTableDeclaration ::= TABLENAME LBRACKET LocVarTableBody* RBRACKET
  implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
  methods=[getName getNameIdentifier getPresentation navigate]
 }
-private LocVarTableBody ::= "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET SLASH "lv" EQ NUMBER TO Type (this | STRINGVAR) // NOT RIGHT
+private LocVarTableBody ::= "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET SLASH "lv" EQ NUMBER TO Type (this | STRINGVAR | MODIFIER) // NOT RIGHT
 
 
 // stack map table
@@ -213,5 +213,7 @@ LocVarTypeTableDeclaration ::= TABLENAME LBRACKET LocVarTypeTableBody* RBRACKET
  implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
  methods=[getName getNameIdentifier getPresentation navigate]
 }
-LocVarTypeTableBody ::= "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET SLASH "lv" EQ NUMBER TO STRINGVAR COLON
-        ((STRINGVAR SLASH?)* SEMICOLON)*
+// pc=[57 => 72) / lv=6 => psiType: Ljava/lang/Class<+Lcom/intellij/psi/PsiElement>;
+LocVarTypeTableBody ::= "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET  // pc=[57 => 72)
+                        SLASH "lv" EQ NUMBER TO STRINGVAR COLON     // / lv=6 => psiType:
+                        ((STRINGVAR SLASH?)* SEMICOLON)*            // Ljava/lang/Class<+Lcom/intellij/psi/PsiElement>;

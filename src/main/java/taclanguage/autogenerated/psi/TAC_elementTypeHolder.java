@@ -53,7 +53,6 @@ public interface TAC_elementTypeHolder {
   IElementType L_ARROW = new TAC_tokenType("L_ARROW");
   IElementType METHODS = new TAC_tokenType("Methods");
   IElementType MINUS = new TAC_tokenType("MINUS");
-  IElementType MNEMONIC = new TAC_tokenType("MNEMONIC");
   IElementType MODIFIER = new TAC_tokenType("MODIFIER");
   IElementType NUMBER = new TAC_tokenType("NUMBER");
   IElementType OPERATORS = new TAC_tokenType("OPERATORS");
@@ -65,8 +64,6 @@ public interface TAC_elementTypeHolder {
   IElementType STRING = new TAC_tokenType("STRING");
   IElementType STRINGVAR = new TAC_tokenType("STRINGVAR");
   IElementType SWITCH = new TAC_tokenType("?");
-  IElementType TABLENAME = new TAC_tokenType("TABLENAME");
-  IElementType TABLES = new TAC_tokenType("TABLES");
   IElementType THIS = new TAC_tokenType("THIS");
   IElementType THROW = new TAC_tokenType("THROW");
   IElementType THROWS = new TAC_tokenType("throws");
