@@ -53,7 +53,6 @@ public interface TAC_elementTypeHolder {
   IElementType L_ARROW = new TAC_tokenType("L_ARROW");
   IElementType METHODS = new TAC_tokenType("Methods");
   IElementType MINUS = new TAC_tokenType("MINUS");
-  IElementType MNEMONIC = new TAC_tokenType("MNEMONIC");
   IElementType MODIFIER = new TAC_tokenType("MODIFIER");
   IElementType NUMBER = new TAC_tokenType("NUMBER");
   IElementType OPERATORS = new TAC_tokenType("OPERATORS");

@@ -923,29 +923,17 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAB* PcNumber LineNumber Instr
+  // PcNumber LineNumber Instr
   public static boolean InstructionBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "InstructionBody")) return false;
-    if (!nextTokenIs(b, "<instruction body>", NUMBER, TAB)) return false;
+    if (!nextTokenIs(b, NUMBER)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, INSTRUCTION_BODY, "<instruction body>");
-    r = InstructionBody_0(b, l + 1);
-    r = r && PcNumber(b, l + 1);
+    Marker m = enter_section_(b);
+    r = PcNumber(b, l + 1);
     r = r && LineNumber(b, l + 1);
     r = r && Instr(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
+    exit_section_(b, m, INSTRUCTION_BODY, r);
     return r;
-  }
-
-  // TAB*
-  private static boolean InstructionBody_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "InstructionBody_0")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!consumeToken(b, TAB)) break;
-      if (!empty_element_parsed_guard_(b, "InstructionBody_0", c)) break;
-    }
-    return true;
   }
 
   /* ********************************************************** */
@@ -1234,8 +1222,9 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET SLASH "lv" EQ NUMBER TO STRINGVAR COLON
-  //         ((STRINGVAR SLASH?)* SEMICOLON)*
+  // "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET  // pc=[57 => 72)
+  //                         SLASH "lv" EQ NUMBER TO STRINGVAR COLON     // / lv=6 => psiType:
+  //                         ((STRINGVAR SLASH?)* SEMICOLON)*
   public static boolean LocVarTypeTableBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "LocVarTypeTableBody")) return false;
     boolean r;

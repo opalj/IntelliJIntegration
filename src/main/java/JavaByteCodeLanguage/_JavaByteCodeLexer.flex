@@ -62,7 +62,6 @@ STRINGVAR=<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?
   "Methods"              { return METHODS; }
   "Tables"               { return TABLES; }
   "lvIndex="             { return LVINDEX; }
-  "TAB"                  { return TAB; }
   "this"                 { return THIS; }
 
   {COMMENT}              { return COMMENT; }

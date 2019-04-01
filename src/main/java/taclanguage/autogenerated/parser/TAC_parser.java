@@ -944,12 +944,11 @@ public class TAC_parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // MNEMONIC | TABLES | ATTRIBUTES | METHODS | FIELDS | JAVATYPEHEAD | INSTRUCTIONHEAD | TABLENAME
+  // TABLES | ATTRIBUTES | METHODS | FIELDS | JAVATYPEHEAD | INSTRUCTIONHEAD | TABLENAME
   static boolean TacTokens(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "TacTokens")) return false;
     boolean r;
-    r = consumeToken(b, MNEMONIC);
-    if (!r) r = consumeToken(b, TABLES);
+    r = consumeToken(b, TABLES);
     if (!r) r = consumeToken(b, ATTRIBUTES);
     if (!r) r = consumeToken(b, METHODS);
     if (!r) r = consumeToken(b, FIELDS);
