@@ -51,7 +51,7 @@
 jbcFile ::=  item_
 
 // this item is the complete text output from beginning to end
-private item_ ::= Annotation* ClassHead AttributesArea? FieldArea? MethodArea?
+private item_ ::= Annotation* ClassHead LBRACKET AttributesArea? FieldArea? MethodArea? RBRACKET
 
 // the @ can occur for annotations; Java classes can implement several interfaces, hence the comma at the end
 ClassHead ::= ModifierV? (AT?) JAVATYPEHEAD JType (EXTENDS JType)? (IMPLEMENTS (JType(COMMA)?)+)?

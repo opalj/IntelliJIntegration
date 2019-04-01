@@ -1823,16 +1823,18 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // Annotation* ClassHead AttributesArea? FieldArea? MethodArea?
+  // Annotation* ClassHead LBRACKET AttributesArea? FieldArea? MethodArea? RBRACKET
   static boolean item_(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "item_")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = item__0(b, l + 1);
     r = r && ClassHead(b, l + 1);
-    r = r && item__2(b, l + 1);
+    r = r && consumeToken(b, LBRACKET);
     r = r && item__3(b, l + 1);
     r = r && item__4(b, l + 1);
+    r = r && item__5(b, l + 1);
+    r = r && consumeToken(b, RBRACKET);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1849,22 +1851,22 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   // AttributesArea?
-  private static boolean item__2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item__2")) return false;
+  private static boolean item__3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item__3")) return false;
     AttributesArea(b, l + 1);
     return true;
   }
 
   // FieldArea?
-  private static boolean item__3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item__3")) return false;
+  private static boolean item__4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item__4")) return false;
     FieldArea(b, l + 1);
     return true;
   }
 
   // MethodArea?
-  private static boolean item__4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item__4")) return false;
+  private static boolean item__5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item__5")) return false;
     MethodArea(b, l + 1);
     return true;
   }
