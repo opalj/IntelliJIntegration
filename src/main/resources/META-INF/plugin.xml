@@ -9,7 +9,7 @@
 
     <change-notes>Lots of added functionality. See Readme.</change-notes>
 
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <!-- until-build version is looking into the future might be wrong!! -->
     <!--<idea-version since-build="181" until-build="183.*"/>-->
     <idea-version since-build="181"/>
