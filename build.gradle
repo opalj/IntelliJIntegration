@@ -44,7 +44,7 @@ intellij {
 }
 patchPluginXml {
     changeNotes """
-      First non beta Version. Ready to enjoy. See Readme or Source Code fot further informations."""
+      First non beta Version. Ready to enjoy. See Readme or Source Code for further information."""
 }
 
 // ================
