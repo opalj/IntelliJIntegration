@@ -7,9 +7,9 @@
     OPAL Framework integration for IntelliJ IDEA.<br>
     ]]></description>
 
-    <change-notes>Lots of added functionality. See Readme.</change-notes>
+    <change-notes>First non beta Version. Ready to enjoy. See Readme or Source Code fot further informations.</change-notes>
 
-    <version>0.2.0</version>
+    <version>1.0.0</version>
     <!-- until-build version is looking into the future might be wrong!! -->
     <idea-version since-build="181" until-build="183.*"/>
 
