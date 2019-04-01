@@ -25,6 +25,7 @@ abstract class DecompiledTextProducer {
     decompiledText += attributes(classFile);
     decompiledText += fields(classFile);
     decompiledText += methods(classFile); // contains the template method
+    decompiledText += "\n}";
 
     return decompiledText;
   }
@@ -54,6 +55,7 @@ abstract class DecompiledTextProducer {
       }
     }
     classHeader
+            .append(" {")
         .append("\n// Source File: ")
         .append(classFile.sourceFile().isDefined() ? classFile.sourceFile().get() : "")
         .append(" -- Version: (")
