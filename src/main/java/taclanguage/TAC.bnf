@@ -39,6 +39,7 @@
   METHODS='Methods'
   INSTRUCTIONHEAD="regexp:PC\s+Line\s+Instruction"
   LVLINDEX = "lvIndex="
+  BOOLS='regexp:true|false'
   PRIMITIVETYPE="regexp:void|boolean|byte|char|short|int|long|float|double"
   KEYWORDS="regexp:new|goto|if|else|throw|throws|catch|caught|return"
   MODIFIER="regexp:public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient"
@@ -60,7 +61,7 @@ ClassHead ::= ModifierV? (AT?) JAVATYPEHEAD JType (EXTENDS JType)? (IMPLEMENTS (
 // generic stuff
 
 // not as critical as for JBC
-private TacTokens ::= MNEMONIC | TABLES | ATTRIBUTES | METHODS | FIELDS | JAVATYPEHEAD | INSTRUCTIONHEAD | TABLENAME
+private TacTokens ::=  TABLES | ATTRIBUTES | METHODS | FIELDS | JAVATYPEHEAD | INSTRUCTIONHEAD | TABLENAME
 
 // e.g. @Contract (pure = true) or @Contract ("_, null -> null")
 Annotation ::= AT JType [LBRACKET
