@@ -61,7 +61,7 @@ ClassHead ::= ModifierV? (AT?) JAVATYPEHEAD JType (EXTENDS JType)? (IMPLEMENTS (
 // generic stuff
 
 // not as critical as for JBC
-private TacTokens ::=  TABLES | ATTRIBUTES | METHODS | FIELDS | JAVATYPEHEAD | INSTRUCTIONHEAD | TABLENAME
+private TacTokens ::=  ATTRIBUTES | METHODS | FIELDS
 
 // e.g. @Contract (pure = true) or @Contract ("_, null -> null")
 Annotation ::= AT JType [LBRACKET

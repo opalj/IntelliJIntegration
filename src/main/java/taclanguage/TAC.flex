@@ -62,8 +62,6 @@ STRINGVAR=<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?
   "Methods"              { return METHODS; }
   "lvIndex="             { return LVLINDEX; }
   "/"                    { return DIVID; }
-  "TABLES"               { return TABLES; }
-  "TABLENAME"            { return TABLENAME; }
   "THROW"                { return THROW; }
   "VOID"                 { return VOID; }
   "THIS"                 { return THIS; }
