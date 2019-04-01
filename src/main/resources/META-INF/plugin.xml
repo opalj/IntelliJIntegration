@@ -9,9 +9,10 @@
 
     <change-notes>Lots of added functionality. See Readme.</change-notes>
 
-    <version>0.2.0</version>
+    <version>1.0.4</version>
     <!-- until-build version is looking into the future might be wrong!! -->
-    <idea-version since-build="181" until-build="183.*"/>
+    <!--<idea-version since-build="181" until-build="183.*"/>-->
+    <idea-version since-build="181"/>
 
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html

@@ -944,18 +944,13 @@ public class TAC_parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // MNEMONIC | TABLES | ATTRIBUTES | METHODS | FIELDS | JAVATYPEHEAD | INSTRUCTIONHEAD | TABLENAME
+  // ATTRIBUTES | METHODS | FIELDS
   static boolean TacTokens(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "TacTokens")) return false;
     boolean r;
-    r = consumeToken(b, MNEMONIC);
-    if (!r) r = consumeToken(b, TABLES);
-    if (!r) r = consumeToken(b, ATTRIBUTES);
+    r = consumeToken(b, ATTRIBUTES);
     if (!r) r = consumeToken(b, METHODS);
     if (!r) r = consumeToken(b, FIELDS);
-    if (!r) r = consumeToken(b, JAVATYPEHEAD);
-    if (!r) r = consumeToken(b, INSTRUCTIONHEAD);
-    if (!r) r = consumeToken(b, TABLENAME);
     return r;
   }
 
@@ -1045,16 +1040,18 @@ public class TAC_parser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // Annotation* ClassHead AttributesArea? FieldArea? MethodArea?
+  // Annotation* ClassHead LBRACKET AttributesArea? FieldArea? MethodArea? RBRACKET
   static boolean item_(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "item_")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = item__0(b, l + 1);
     r = r && ClassHead(b, l + 1);
-    r = r && item__2(b, l + 1);
+    r = r && consumeToken(b, LBRACKET);
     r = r && item__3(b, l + 1);
     r = r && item__4(b, l + 1);
+    r = r && item__5(b, l + 1);
+    r = r && consumeToken(b, RBRACKET);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1071,22 +1068,22 @@ public class TAC_parser implements PsiParser, LightPsiParser {
   }
 
   // AttributesArea?
-  private static boolean item__2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item__2")) return false;
+  private static boolean item__3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item__3")) return false;
     AttributesArea(b, l + 1);
     return true;
   }
 
   // FieldArea?
-  private static boolean item__3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item__3")) return false;
+  private static boolean item__4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item__4")) return false;
     FieldArea(b, l + 1);
     return true;
   }
 
   // MethodArea?
-  private static boolean item__4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item__4")) return false;
+  private static boolean item__5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item__5")) return false;
     MethodArea(b, l + 1);
     return true;
   }

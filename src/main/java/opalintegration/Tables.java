@@ -211,7 +211,8 @@ final class Tables {
                 LocalVariableType localVariableType = locVarTypeRefArray.apply(i);
                 String localVariableTypeEntry =
                     String.format(
-                        "\t\tpc=[%d => %d) / lv=%d => %s: %s\n",
+                            // TODO: in future try to fix grammar, for now just rely on comment
+                        "\t\t// pc=[%d => %d) / lv=%d => %s: %s\n",
                         localVariableType.startPC(),
                         localVariableType.startPC() + localVariableType.length(),
                         localVariableType.index(),

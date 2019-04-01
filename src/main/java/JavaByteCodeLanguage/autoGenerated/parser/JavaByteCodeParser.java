@@ -923,29 +923,17 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAB* PcNumber LineNumber Instr
+  // PcNumber LineNumber Instr
   public static boolean InstructionBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "InstructionBody")) return false;
-    if (!nextTokenIs(b, "<instruction body>", NUMBER, TAB)) return false;
+    if (!nextTokenIs(b, NUMBER)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, INSTRUCTION_BODY, "<instruction body>");
-    r = InstructionBody_0(b, l + 1);
-    r = r && PcNumber(b, l + 1);
+    Marker m = enter_section_(b);
+    r = PcNumber(b, l + 1);
     r = r && LineNumber(b, l + 1);
     r = r && Instr(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
+    exit_section_(b, m, INSTRUCTION_BODY, r);
     return r;
-  }
-
-  // TAB*
-  private static boolean InstructionBody_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "InstructionBody_0")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!consumeToken(b, TAB)) break;
-      if (!empty_element_parsed_guard_(b, "InstructionBody_0", c)) break;
-    }
-    return true;
   }
 
   /* ********************************************************** */
@@ -1183,7 +1171,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET SLASH "lv" EQ NUMBER TO Type (this | STRINGVAR)
+  // "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET SLASH "lv" EQ NUMBER TO Type (this | STRINGVAR | MODIFIER)
   static boolean LocVarTableBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "LocVarTableBody")) return false;
     boolean r;
@@ -1198,12 +1186,13 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // this | STRINGVAR
+  // this | STRINGVAR | MODIFIER
   private static boolean LocVarTableBody_13(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "LocVarTableBody_13")) return false;
     boolean r;
     r = consumeToken(b, THIS);
     if (!r) r = consumeToken(b, STRINGVAR);
+    if (!r) r = consumeToken(b, MODIFIER);
     return r;
   }
 
@@ -1233,8 +1222,9 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET SLASH "lv" EQ NUMBER TO STRINGVAR COLON
-  //         ((STRINGVAR SLASH?)* SEMICOLON)*
+  // "pc" EQ LBRACKET NUMBER TO NUMBER RBRACKET  // pc=[57 => 72)
+  //                         SLASH "lv" EQ NUMBER TO STRINGVAR COLON     // / lv=6 => psiType:
+  //                         ((STRINGVAR SLASH?)* SEMICOLON)*
   public static boolean LocVarTypeTableBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "LocVarTypeTableBody")) return false;
     boolean r;
@@ -1823,16 +1813,18 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // Annotation* ClassHead AttributesArea? FieldArea? MethodArea?
+  // Annotation* ClassHead LBRACKET AttributesArea? FieldArea? MethodArea? RBRACKET
   static boolean item_(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "item_")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = item__0(b, l + 1);
     r = r && ClassHead(b, l + 1);
-    r = r && item__2(b, l + 1);
+    r = r && consumeToken(b, LBRACKET);
     r = r && item__3(b, l + 1);
     r = r && item__4(b, l + 1);
+    r = r && item__5(b, l + 1);
+    r = r && consumeToken(b, RBRACKET);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1849,22 +1841,22 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   // AttributesArea?
-  private static boolean item__2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item__2")) return false;
+  private static boolean item__3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item__3")) return false;
     AttributesArea(b, l + 1);
     return true;
   }
 
   // FieldArea?
-  private static boolean item__3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item__3")) return false;
+  private static boolean item__4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item__4")) return false;
     FieldArea(b, l + 1);
     return true;
   }
 
   // MethodArea?
-  private static boolean item__4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item__4")) return false;
+  private static boolean item__5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item__5")) return false;
     MethodArea(b, l + 1);
     return true;
   }
