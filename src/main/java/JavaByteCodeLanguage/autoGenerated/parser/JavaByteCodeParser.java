@@ -1946,7 +1946,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (LBRACKET(Annotation? Type COMMA?)*RBRACKET)?
+  // (LBRACKET(Annotation* Type COMMA?)*RBRACKET)?
   public static boolean params(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "params")) return false;
     Marker m = enter_section_(b, l, _NONE_, PARAMS, "<params>");
@@ -1955,7 +1955,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // LBRACKET(Annotation? Type COMMA?)*RBRACKET
+  // LBRACKET(Annotation* Type COMMA?)*RBRACKET
   private static boolean params_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "params_0")) return false;
     boolean r;
@@ -1967,7 +1967,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // (Annotation? Type COMMA?)*
+  // (Annotation* Type COMMA?)*
   private static boolean params_0_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "params_0_1")) return false;
     while (true) {
@@ -1978,7 +1978,7 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // Annotation? Type COMMA?
+  // Annotation* Type COMMA?
   private static boolean params_0_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "params_0_1_0")) return false;
     boolean r;
@@ -1990,10 +1990,14 @@ public class JavaByteCodeParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // Annotation?
+  // Annotation*
   private static boolean params_0_1_0_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "params_0_1_0_0")) return false;
-    Annotation(b, l + 1);
+    while (true) {
+      int c = current_position_(b);
+      if (!Annotation(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "params_0_1_0_0", c)) break;
+    }
     return true;
   }
 
