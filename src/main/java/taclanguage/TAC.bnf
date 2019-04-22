@@ -132,7 +132,7 @@ DefMethodName ::= STRINGVAR
  implements="taclanguage.psi.TACNamedElement"
  methods=[getStringVar getName getNameIdentifier getReferences]
 }
-params ::= (LBRACKET((Annotation? Type | LEVEL ) COMMA?)*RBRACKET)?
+params ::= (LBRACKET((Annotation* Type | LEVEL ) COMMA?)*RBRACKET)?
 private exceptionList ::= THROWS (JType COMMA?)*
 
 // instructions (part of method body)
