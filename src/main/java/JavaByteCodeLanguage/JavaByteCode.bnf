@@ -134,7 +134,7 @@ DefMethodName ::= STRINGVAR
  implements="JavaByteCodeLanguage.psi.JavaByteCodeNamedElement"
  methods=[getStringVar getName getNameIdentifier getReferences]
 }
-params ::= (LBRACKET(Annotation? Type COMMA?)*RBRACKET)?
+params ::= (LBRACKET(Annotation* Type COMMA?)*RBRACKET)?
 private exceptionList ::= THROWS (JType COMMA?)*
 
 // instructions (part of method body)
