@@ -9,7 +9,7 @@
 
     <change-notes>Lots of added functionality. See Readme.</change-notes>
 
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <!-- until-build version is looking into the future might be wrong!! -->
     <!--<idea-version since-build="181" until-build="183.*"/>-->
     <idea-version since-build="181"/>
@@ -24,19 +24,6 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
 
-        <!--
-        <toolWindow id="Outline"
-                    factoryClass="toolWindows.OutlineToolWindowFactory"
-                    anchor="left"
-                    secondary="true"/>
-
-        <toolWindow id="Disassembler"
-                    factoryClass="toolWindows.DisassemblerToolWindowFactory"
-                    anchor="right"
-                    secondary="true"/>
-                            <fileEditorProvider implementation="Editors.HTMLEditor.HTMLEditorProvider"
-                            id="OpalHTMLEditorProvider"/>
-         -->
         <fileEditorProvider implementation="Editors.FileEditor.TacTextEditorProvider"
                             id="OpalTACEditorProvider"/>
         <fileEditorProvider implementation="Editors.disEditor.DisTextEditorProvider"
@@ -62,8 +49,9 @@
         <lang.foldingBuilder language="TAC" implementationClass="taclanguage.folding.TACFoldingBuilder"/>
         <lang.findUsagesProvider language="jbc" implementationClass="com.intellij.lang.java.JavaFindUsagesProvider"/>
         <lang.findUsagesProvider language="TAC" implementationClass="com.intellij.lang.java.JavaFindUsagesProvider"/>
-
         <!--<codeInsight.lineMarkerProvider language="jbc" implementationClass="JavaByteCodeLanguage.psi.JbcLineMarkerProvider"/>-->
+<!--        <psi.classFileDecompiler implementation=" org.jetbrains.java." order="last"/>-->
+        <applicationConfigurable groupId="tools" provider="config.BytecodeConfigProvider" id="bytecodedissassembler.config"/>
     </extensions>
 
     <actions>
@@ -80,12 +68,16 @@
             <mouse-shortcut keymap="$default" keystroke="control alt button3"/>
         </action>
 
-        <action id="jumptoline" class="Actions.JumpToProgramCounter" text="Jump To PC" icon="/icons/jar-gray.png">
+        <action id="jumptolinejbc" class="Actions.JumpToPcJbc" text="Jump To PC" icon="/icons/jar-gray.png">
             <keyboard-shortcut first-keystroke="alt shift 1"  keymap="$default"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
+        <action id="jumptolinetac" class="Actions.JumpToPcTac" text="Jump To PC tac" icon="/icons/jar-gray.png">
+        <keyboard-shortcut first-keystroke="alt shift 2"  keymap="$default"/>
+        <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+    </action>
         <action id="jumptosource" class="Actions.JumpToSource" text="Jump To Line" icon="/icons/jar-gray.png">
-            <keyboard-shortcut first-keystroke="alt shift 2"  keymap="$default"/>
+            <keyboard-shortcut first-keystroke="alt shift 3"  keymap="$default"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
         <action class="Actions.JumpBetweenEditors" id="BetweenTacAndJbc" text="Jump Between TAC/Bytecode" icon="/icons/jar-gray.png">
@@ -96,10 +88,10 @@
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift 3"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action id="Actions.JumpToResolveJBC" class="Actions.JumpToResolveJBC" text="Show Bytecode" icon="/icons/jar-gray.png">
+        <action id="Actions.resolve.JumpToResolveJBC" class="Actions.resolve.JumpToResolveJBC" text="Show Bytecode" icon="/icons/jar-gray.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action id="Actions.JumpToResolveTAC" class="Actions.JumpToResolveTAC" text="Show Bytecode" icon="/icons/jar-gray.png">
+        <action id="Actions.resolve.JumpToResolveTAC" class="Actions.resolve.JumpToResolveTAC" text="Show Bytecode" icon="/icons/jar-gray.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
     </actions>
@@ -110,7 +102,6 @@
     <project-components>
         <component>
             <implementation-class>Components.OpalVirtualFileListener</implementation-class>
-            <interface-class>Components.OpalVirtualFileListener</interface-class>
         </component>
     </project-components>
 </idea-plugin>

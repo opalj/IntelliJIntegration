@@ -1,8 +1,13 @@
+/*
+ *  BSD 2-Clause License - see ./LICENSE for details.
+ */
+
 package Actions;
 
 import Compile.Compiler;
 import com.intellij.notification.*;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.module.Module;
@@ -20,7 +25,9 @@ import java.util.Objects;
 import opalintegration.OpalUtil;
 import org.jetbrains.annotations.NotNull;
 
-/** The type Open class file action performs to open a specified editor (tac/bytecode) */
+/**
+ * The type Open class file action performs to open a specified editor (tac/bytecode)
+ */
 class OpenClassFileAction extends AnAction {
   private final String editorName;
 
@@ -42,8 +49,7 @@ class OpenClassFileAction extends AnAction {
     // show Action only for java,class & scala files
     e.getPresentation()
         .setEnabledAndVisible(
-            (element instanceof PsiClass)
-                && ("java".equals(extension) || "class".equals(extension)));
+            (element instanceof PsiClass) && ("java".equals(extension) || "class".equals(extension) || "scala".equals(extension)));
   }
 
   /**
@@ -61,7 +67,8 @@ class OpenClassFileAction extends AnAction {
     if (!(element instanceof PsiClass) || project == null) {
       return;
     }
-    virtualFile = element.getNavigationElement().getContainingFile().getVirtualFile();
+    //virtualFile = element.getNavigationElement().getContainingFile().getVirtualFile();
+    virtualFile = e.getData(CommonDataKeys.PSI_FILE).getVirtualFile();
     String extension = virtualFile.getExtension();
     VirtualFile classFile = null;
     if (!StdFileTypes.CLASS.getDefaultExtension().equals(extension)) {
@@ -89,8 +96,10 @@ class OpenClassFileAction extends AnAction {
           new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
               .createNotification()
               .setContent("decompiling : " + classFile.getName()));
-      FileEditorManager.getInstance(project).openFile(classFile, true);
-      FileEditorManager.getInstance(project).setSelectedEditor(classFile, editorName);
+          if(ApplicationManager.getApplication().isDispatchThread()) {
+            FileEditorManager.getInstance(project).openFile(classFile, true);
+            FileEditorManager.getInstance(project).setSelectedEditor(classFile, editorName);
+          }
     } else {
 
       Notifications.Bus.notify(

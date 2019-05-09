@@ -1,3 +1,7 @@
+/*
+ *  BSD 2-Clause License - see ./LICENSE for details.
+ */
+
 package Compile;
 
 import com.intellij.openapi.compiler.CompileScope;
@@ -16,20 +20,6 @@ public final class Compiler {
 
   private static final Logger LOGGER = Logger.getLogger(Compiler.class.getName());
 
-  /**
-   * compiles an whole project
-   *
-   * @param project the actual project
-   */
-  public static void make(@NotNull final Project project) {
-    CompilerManager compManager = CompilerManager.getInstance(project);
-    CompileScope projectCompileScope = compManager.createProjectCompileScope(project);
-    boolean uptoDate = compManager.isUpToDate(projectCompileScope);
-    if (!uptoDate) {
-      compManager.make(projectCompileScope, null);
-      asyncCompiling(CompilerManager.getInstance(project));
-    }
-  }
   /**
    * compiles an a specific java file for a given project if the java file contains in the given the
    * project

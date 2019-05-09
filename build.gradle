@@ -1,23 +1,22 @@
-import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
-import com.github.spotbugs.SpotBugsTask
-
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.3.12'
+    id 'scala' // maybe helping
+    // check allways for updates https://github.com/JetBrains/gradle-intellij-plugin/releases
+    id 'org.jetbrains.intellij' version '0.4.8'
     id 'checkstyle'
     id 'pmd'
     id "com.github.spotbugs" version "1.6.6"
     id 'com.github.sherter.google-java-format' version '0.8'
-    id 'com.github.johnrengelman.shadow' version '4.0.3'
+    id 'com.github.johnrengelman.shadow'  version '4.0.3'
 }
 
 shadowJar {
-    transform(AppendingTransformer) {
+    transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
         resource = 'reference.conf'
     }
 }
 group 'Kollektiv 23'
-version '1.0.4'
+version '1.0.5'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -39,8 +38,13 @@ dependencies {
 }
 
 intellij {
-    version '2018.2.2' // maybe need to be changed to latest eap snapshot
+    //version 'IC-LATEST-EAP-SNAPSHOT'
+    //version '2018.3'
+    //plugins 'org.intellij.scala:2018.3.6'
     intellij.updateSinceUntilBuild false //Disables updating since-build attribute in plugin.xml
+    plugins 'org.intellij.scala:2019.1.7' // load the the scala-plugin
+    plugins 'PsiViewer:191.4212'
+    pluginName 'bytecode disassembler'
 }
 patchPluginXml {
     changeNotes """
@@ -63,7 +67,7 @@ check {
 }
 
 
-tasks.withType(SpotBugsTask) {
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
     reports {
         xml.enabled = false
         html.enabled = true
@@ -89,5 +93,5 @@ pmd{
 
 }
 runIde {
-    maxHeapSize = "2g"
+    maxHeapSize = "4g"
 }

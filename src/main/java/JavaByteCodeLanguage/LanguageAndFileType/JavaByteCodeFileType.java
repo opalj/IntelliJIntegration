@@ -1,3 +1,7 @@
+/*
+ *  BSD 2-Clause License - see ./LICENSE for details.
+ */
+
 package JavaByteCodeLanguage.LanguageAndFileType;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;

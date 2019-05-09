@@ -1,3 +1,7 @@
+/*
+ *  BSD 2-Clause License - see ./LICENSE for details.
+ */
+
 package Editors.disEditor;
 
 import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorImpl;

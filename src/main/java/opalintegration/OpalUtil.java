@@ -1,3 +1,7 @@
+/*
+ *  BSD 2-Clause License - see ./LICENSE for details.
+ */
+
 package opalintegration;
 
 import Compile.Compiler;
@@ -162,11 +166,9 @@ public class OpalUtil {
     if (virtualClassFile.getExtension() == null) {
       return;
     }
-    if (VFL
-        || (!virtualClassFile.equals(currentWorkingVF)
+    if (VFL || (!virtualClassFile.equals(currentWorkingVF)
             && virtualClassFile.getExtension().equals(StdFileTypes.CLASS.getDefaultExtension()))) {
       currentWorkingVF = virtualClassFile;
-      if (!VFL) Compiler.make(project);
       if (virtualClassFile.getCanonicalPath() != null
           && !virtualClassFile.getCanonicalPath().contains("!")) {
         projectPath = virtualClassFile.getPath();
