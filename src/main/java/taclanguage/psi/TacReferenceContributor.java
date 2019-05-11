@@ -24,7 +24,7 @@ public class TacReferenceContributor extends PsiReferenceContributor {
           @NotNull
           @Override
           public PsiReference[] getReferencesByElement(
-                  PsiElement element, @NotNull ProcessingContext context) {
+              PsiElement element, @NotNull ProcessingContext context) {
             TacMethodAndFieldReference methodReference;
 
             // the element is guaranteed to be of type JavaByteCodeDefMethodName (see below)

@@ -24,7 +24,8 @@ public class JbcReferenceContributor extends PsiReferenceContributor {
         new PsiReferenceProvider() {
           @NotNull
           @Override
-          public PsiReference[] getReferencesByElement(PsiElement element, @NotNull ProcessingContext context) {
+          public PsiReference[] getReferencesByElement(
+              PsiElement element, @NotNull ProcessingContext context) {
             JbcMethodAndFieldReference methodReference;
 
             // the element is guaranteed to be of type JavaByteCodeDefMethodName (see below)

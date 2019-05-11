@@ -7,7 +7,7 @@
     OPAL Framework integration for IntelliJ IDEA.<br>
     ]]></description>
 
-    <change-notes>Lots of added functionality. See Readme.</change-notes>
+    <change-notes>This version Works now with the Scala-plugin. new TAC-Editor Actions</change-notes>
 
     <version>1.0.5</version>
     <!-- until-build version is looking into the future might be wrong!! -->
@@ -56,13 +56,13 @@
 
     <actions>
         <!-- Add your actions here -->
-        <action id="JumpToJBCEID" class="Actions.OpenClassFileJBCAction" text="Show Bytecode" icon="/icons/jar-gray.png">
+        <action id="JumpToJBCEID" class="Actions.openclass.OpenClassFileJBCAction" text="Show Bytecode" icon="/icons/jar-gray.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             <mouse-shortcut keymap="$default" keystroke="control button3"/>
         </action>
 
-        <action id="JumpToTACFromRMB" class="Actions.OpenClassFileTACAction" text="Show Three-Address-Code" icon="/icons/jar-gray.png">
+        <action id="JumpToTACFromRMB" class="Actions.openclass.OpenClassFileTACAction" text="Show Three-Address-Code" icon="/icons/jar-gray.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             <mouse-shortcut keymap="$default" keystroke="control alt button3"/>
@@ -72,7 +72,7 @@
             <keyboard-shortcut first-keystroke="alt shift 1"  keymap="$default"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action id="jumptolinetac" class="Actions.JumpToPcTac" text="Jump To PC tac" icon="/icons/jar-gray.png">
+        <action id="jumptolinetac" class="Actions.JumpToPcTac" text="Jump To PC" icon="/icons/jar-gray.png">
         <keyboard-shortcut first-keystroke="alt shift 2"  keymap="$default"/>
         <add-to-group group-id="EditorPopupMenu" anchor="last"/>
     </action>

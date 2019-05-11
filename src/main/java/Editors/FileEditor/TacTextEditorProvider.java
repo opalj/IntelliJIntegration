@@ -4,6 +4,8 @@
 
 package Editors.FileEditor;
 
+import static globalData.GlobalData.TAC_EDITOR_ID;
+
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;
 import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorProvider;
@@ -14,8 +16,6 @@ import java.util.Objects;
 import opalintegration.OpalUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-
-import static globalData.GlobalData.TAC_EDITOR_ID;
 
 public class TacTextEditorProvider extends PsiAwareTextEditorProvider {
   @NonNls private static final String EDITOR_TYPE_ID = TAC_EDITOR_ID;
@@ -33,7 +33,10 @@ public class TacTextEditorProvider extends PsiAwareTextEditorProvider {
   @Override
   public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
     if (!Objects.equals(file.getExtension(), GlobalData.DISASSEMBLED_FILE_ENDING_TAC)) {
-      return new TacTextEditor(project,  OpalUtil.prepare(project, GlobalData.DISASSEMBLED_FILE_ENDING_TAC, file, null), this);
+      return new TacTextEditor(
+          project,
+          OpalUtil.prepare(project, GlobalData.DISASSEMBLED_FILE_ENDING_TAC, file, null),
+          this);
     }
     return new TacTextEditor(project, file, this);
   }

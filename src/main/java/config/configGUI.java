@@ -33,19 +33,19 @@ package config;
 import javax.swing.*;
 
 public class configGUI {
-    private JTabbedPane tabbedPane1;
-    private JPanel rootPanel;
-    private JRadioButton besteEinstellungRadioButton;
-    private JRadioButton zweitBesteEinstellungRadioButton;
-    private JTree tree1;
-    private JList list1;
-    private JSpinner spinner1;
+  private JTabbedPane tabbedPane1;
+  private JPanel rootPanel;
+  private JRadioButton besteEinstellungRadioButton;
+  private JRadioButton zweitBesteEinstellungRadioButton;
+  private JTree tree1;
+  private JList list1;
+  private JSpinner spinner1;
 
-    public JPanel getRootPanel() {
-        return rootPanel;
-    }
+  public JPanel getRootPanel() {
+    return rootPanel;
+  }
 
-    public void setRootPanel(JPanel rootPanel) {
-        this.rootPanel = rootPanel;
-    }
+  public void setRootPanel(JPanel rootPanel) {
+    this.rootPanel = rootPanel;
+  }
 }

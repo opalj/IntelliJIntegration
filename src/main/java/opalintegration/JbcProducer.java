@@ -21,7 +21,6 @@ class JbcProducer extends DecompiledTextProducer {
   String methodBody(Method method) {
     StringBuilder methodBodyText = new StringBuilder();
 
-
     if (method.body().isDefined()) {
       Code methodBody = method.body().get();
 
@@ -50,7 +49,6 @@ class JbcProducer extends DecompiledTextProducer {
     return methodBodyText.toString();
   }
 
-
   /**
    * Creates the string for the instructions in the method body, nicely formatted
    *
@@ -77,11 +75,11 @@ class JbcProducer extends DecompiledTextProducer {
           instruction = opalStringBugFixer(instruction);
 
           String formattedInstrLine =
-                  String.format(
-                          "\t%-6d %-6s %s\n",
-                          pc,
-                          methodBody.lineNumber(pc).isDefined() ? methodBody.lineNumber(pc).get() : 0,
-                          instruction);
+              String.format(
+                  "\t%-6d %-6s %s\n",
+                  pc,
+                  methodBody.lineNumber(pc).isDefined() ? methodBody.lineNumber(pc).get() : 0,
+                  instruction);
           instructionsText.append(formattedInstrLine);
         } catch (NoSuchElementException e) {
           LOGGER.log(Level.SEVERE, e.toString(), e);
@@ -91,5 +89,4 @@ class JbcProducer extends DecompiledTextProducer {
 
     return instructionsText.toString();
   }
-
 }

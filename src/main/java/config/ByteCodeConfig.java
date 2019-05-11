@@ -32,41 +32,40 @@ package config;
 
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
+import javax.swing.*;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-
 public class ByteCodeConfig implements SearchableConfigurable {
-    @NotNull
-    @Override
-    public String getId() {
-        return "bytecodedissassembler.config";
-    }
+  @NotNull
+  @Override
+  public String getId() {
+    return "bytecodedissassembler.config";
+  }
 
-    @Nls(capitalization = Nls.Capitalization.Title)
-    @Override
-    public String getDisplayName() {
-        return "Bytecode Disassembler";
-    }
+  @Nls(capitalization = Nls.Capitalization.Title)
+  @Override
+  public String getDisplayName() {
+    return "Bytecode Disassembler";
+  }
 
-    @Nullable
-    @Override
-    public JComponent createComponent() {
-        return new configGUI().getRootPanel();
-    }
+  @Nullable
+  @Override
+  public JComponent createComponent() {
+    return new configGUI().getRootPanel();
+  }
 
-    @Override
-    public boolean isModified() {
-        //TODO
-        return false;
-    }
+  @Override
+  public boolean isModified() {
+    // TODO
+    return false;
+  }
 
-    @Override
-    public void apply() throws ConfigurationException {
-        if(isModified()){
-            //TODO
-        }
+  @Override
+  public void apply() throws ConfigurationException {
+    if (isModified()) {
+      // TODO
     }
+  }
 }

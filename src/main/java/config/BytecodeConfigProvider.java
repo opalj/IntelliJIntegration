@@ -35,14 +35,14 @@ import com.intellij.openapi.options.ConfigurableProvider;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * the bytecodecode-config-window-provider to load the
- * for more information {@link ConfigurableProvider}
+ * the bytecodecode-config-window-provider to load the for more information {@link
+ * ConfigurableProvider}
  */
 public class BytecodeConfigProvider extends ConfigurableProvider {
 
-    @Nullable
-    @Override
-    public Configurable createConfigurable() {
-        return new ByteCodeConfig();
-    }
+  @Nullable
+  @Override
+  public Configurable createConfigurable() {
+    return new ByteCodeConfig();
+  }
 }

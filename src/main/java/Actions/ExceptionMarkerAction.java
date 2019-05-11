@@ -34,10 +34,9 @@ public class ExceptionMarkerAction extends AnAction {
 
   @Override
   public void update(AnActionEvent e) {
-    final VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
     Editor editor = e.getData(CommonDataKeys.EDITOR);
     PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
-    final String extension = virtualFile != null ? virtualFile.getExtension() : "";
+    String extension = ActionUtil.ExtString(e);
     PsiElement element =
         Objects.requireNonNull(psiFile)
             .findElementAt(Objects.requireNonNull(editor).getCaretModel().getOffset());
@@ -86,15 +85,18 @@ public class ExceptionMarkerAction extends AnAction {
       JavaByteCodeMethodDeclaration methodDeclaration =
           PsiTreeUtil.getParentOfType(elementAt, JavaByteCodeMethodDeclaration.class);
       // ... and iterate over all instructions until the jump target has been found...
-      Map<String, Integer> collect = PsiTreeUtil.findChildrenOfType(methodDeclaration, JavaByteCodePcNumber.class)
+      Map<String, Integer> collect =
+          PsiTreeUtil.findChildrenOfType(methodDeclaration, JavaByteCodePcNumber.class)
               .stream()
               .filter(pcNumber -> psiElementList.contains(pcNumber.getText()))
-              .limit(3).collect(Collectors.toMap(JavaByteCodePcNumber::getText, JavaByteCodePcNumber::getTextOffset));
+              .limit(3)
+              .collect(
+                  Collectors.toMap(
+                      JavaByteCodePcNumber::getText, JavaByteCodePcNumber::getTextOffset));
       return psiElementList.stream().mapToInt(collect::get).toArray();
     }
     return null;
   }
-
 
   private void setMarker(
       Editor editor, int startOffset, int endOffset, int catchOffset, PsiElement sourceElement) {

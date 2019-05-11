@@ -38,7 +38,7 @@ PRIMITIVETYPE=void|boolean|byte|char|short|int|long|float|double
 KEYWORDS=new|goto|if|else|throw|throws|catch|caught|return
 MODIFIER=public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient
 LEVEL=\{?((lv|param|exception(\[VM\])?@)([A-Za-z0-9])*(,[ \t\n\x0B\f\r])?)*\}?
-OPERATORS=\+|\-|\*|\&|\||\^|<<|>>
+OPERATORS=\+|\-|\*|\&|\||\^|<<|>>|%|"/"|cmp
 COMPARATORS=<=|>=|==|\!=|<|>
 STRINGVAR=<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?
 
@@ -50,7 +50,6 @@ STRINGVAR=<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?
   "."                    { return DOT; }
   ":"                    { return COLON; }
   ";"                    { return SEMICOLON; }
-  "/"                    { return SLASH; }
   "@"                    { return AT; }
   "="                    { return EQ; }
   "⤼"                    { return SWITCH; }
@@ -61,16 +60,6 @@ STRINGVAR=<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?
   "Fields"               { return FIELDS; }
   "Methods"              { return METHODS; }
   "lvIndex="             { return LVLINDEX; }
-  "/"                    { return DIVID; }
-  "THROW"                { return THROW; }
-  "VOID"                 { return VOID; }
-  "THIS"                 { return THIS; }
-  "R_ARROW"              { return R_ARROW; }
-  "L_ARROW"              { return L_ARROW; }
-  "CONSTMETHODNAMES"     { return CONSTMETHODNAMES; }
-  "UEQ"                  { return UEQ; }
-  "PLUS"                 { return PLUS; }
-  "MINUS"                { return MINUS; }
 
   {WHITE_SPACE}          { return WHITE_SPACE; }
   {COMMENT}              { return COMMENT; }

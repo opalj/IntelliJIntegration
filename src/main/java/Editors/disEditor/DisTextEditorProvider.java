@@ -4,11 +4,14 @@
 
 package Editors.disEditor;
 
-import com.intellij.openapi.actionSystem.CommonDataKeys;
+import static globalData.GlobalData.BYTECODE_EDITOR_ID;
+
+import com.intellij.notification.NotificationDisplayType;
+import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;
 import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorProvider;
-import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import globalData.GlobalData;
@@ -16,8 +19,6 @@ import java.util.Objects;
 import opalintegration.OpalUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-
-import static globalData.GlobalData.BYTECODE_EDITOR_ID;
 
 public class DisTextEditorProvider extends PsiAwareTextEditorProvider {
   @NonNls private static final String EDITOR_TYPE_ID = BYTECODE_EDITOR_ID;
@@ -35,7 +36,14 @@ public class DisTextEditorProvider extends PsiAwareTextEditorProvider {
   @Override
   public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
     if (!Objects.equals(file.getExtension(), GlobalData.DISASSEMBLED_FILE_ENDING_JBC)) {
-      return new DisTextEditor(project,OpalUtil.prepare(project, GlobalData.DISASSEMBLED_FILE_ENDING_JBC, file, null),this);
+      Notifications.Bus.notify(
+          new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
+              .createNotification()
+              .setContent("decompiling : " + file.getName()));
+      return new DisTextEditor(
+          project,
+          OpalUtil.prepare(project, GlobalData.DISASSEMBLED_FILE_ENDING_JBC, file, null),
+          this);
     }
     return new DisTextEditor(project, file, this);
   }

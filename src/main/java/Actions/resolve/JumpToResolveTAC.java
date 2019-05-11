@@ -34,8 +34,6 @@ import static globalData.GlobalData.TAC_EDITOR_ID;
 
 public class JumpToResolveTAC extends JumpToResolve {
   public JumpToResolveTAC() {
-    super(TAC_EDITOR_ID,"tac");
+    super(TAC_EDITOR_ID, "tac");
   }
-
-
 }

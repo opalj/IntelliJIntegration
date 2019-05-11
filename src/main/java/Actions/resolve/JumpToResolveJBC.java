@@ -30,11 +30,10 @@
 
 package Actions.resolve;
 
-
 import static globalData.GlobalData.BYTECODE_EDITOR_ID;
 
 public class JumpToResolveJBC extends JumpToResolve {
   private JumpToResolveJBC() {
-    super(BYTECODE_EDITOR_ID,"jbc");
+    super(BYTECODE_EDITOR_ID, "jbc");
   }
 }

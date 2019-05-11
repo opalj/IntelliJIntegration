@@ -10,7 +10,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ScrollType;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -25,19 +24,17 @@ import org.jetbrains.annotations.NotNull;
  */
 public class JumpToPcJbc extends AnAction {
   private Editor editor;
-  private PsiFile psiFile;
   private PsiElement elementAt;
   private JavaByteCodeInstructionBody parent;
 
   @Override
-  public void update(@NotNull  AnActionEvent e) {
+  public void update(@NotNull AnActionEvent e) {
     editor = e.getData(CommonDataKeys.EDITOR);
-     psiFile = e.getData(CommonDataKeys.PSI_FILE);
+    PsiFile psiFile = e.getData(CommonDataKeys.PSI_FILE);
     if (editor == null || psiFile == null) {
       return;
     }
-    final VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
-    final String extension = virtualFile != null ? virtualFile.getExtension() : "";
+    String extension = ActionUtil.ExtString(e);
     elementAt = psiFile.findElementAt(editor.getCaretModel().getOffset());
     // the parent is the current instruction line, e.g. 40 223 GOTO(523),
     // where 40 is the PC and 223 is the Line
@@ -52,21 +49,21 @@ public class JumpToPcJbc extends AnAction {
   }
 
   @Override
-  public void actionPerformed(@NotNull  AnActionEvent e) {
-      PsiElement jumpTargetPC = parent.getInstr().getNumber();
-      if (jumpTargetPC != null) {
-        // take the method to which this instruction belongs to...
-        JavaByteCodeMethodDeclaration methodDeclaration =
-            PsiTreeUtil.getParentOfType(elementAt, JavaByteCodeMethodDeclaration.class);
-        // ... and iterate over all instructions until the jump target has been found...
-        for (JavaByteCodePcNumber javaByteCodePcNumber :
-            PsiTreeUtil.findChildrenOfType(methodDeclaration, JavaByteCodePcNumber.class)) {
-          // ... and set the caret accordingly
-          if (javaByteCodePcNumber.getNumber().getText().equals(jumpTargetPC.getText())) {
-            editor.getCaretModel().moveToOffset(javaByteCodePcNumber.getTextOffset(), true);
-            editor.getScrollingModel().scrollToCaret(ScrollType.CENTER_UP);
-          }
-        } // for()
-      } // jumpTargetPC
-    } // GOTO/IF
+  public void actionPerformed(@NotNull AnActionEvent e) {
+    PsiElement jumpTargetPC = parent.getInstr().getNumber();
+    if (jumpTargetPC != null) {
+      // take the method to which this instruction belongs to...
+      JavaByteCodeMethodDeclaration methodDeclaration =
+          PsiTreeUtil.getParentOfType(elementAt, JavaByteCodeMethodDeclaration.class);
+      // ... and iterate over all instructions until the jump target has been found...
+      for (JavaByteCodePcNumber javaByteCodePcNumber :
+          PsiTreeUtil.findChildrenOfType(methodDeclaration, JavaByteCodePcNumber.class)) {
+        // ... and set the caret accordingly
+        if (javaByteCodePcNumber.getNumber().getText().equals(jumpTargetPC.getText())) {
+          editor.getCaretModel().moveToOffset(javaByteCodePcNumber.getTextOffset(), true);
+          editor.getScrollingModel().scrollToCaret(ScrollType.CENTER_UP);
+        }
+      } // for()
+    } // jumpTargetPC
+  } // GOTO/IF
 }

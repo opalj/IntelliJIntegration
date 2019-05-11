@@ -28,7 +28,7 @@
   DOT="."
   COLON=":"
   SEMICOLON=";"
-  SLASH="/"
+  //SLASH="/"
   AT="@"
   EQ="="
   SWITCH="⤼"
@@ -48,8 +48,7 @@
   KEYWORDS="regexp:new|goto|if|else|throw|throws|catch|caught|return"
   MODIFIER="regexp:public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient"
   LEVEL="regexp:\{?((lv|param|exception(\[VM\])?@)([A-Za-z0-9])*(,\s)?)*\}?"
-  OPERATORS="regexp:\+|\-|\*|\&|\||\^|<<|>>"
-  DIVID="/"
+  OPERATORS="regexp:\+|\-|\*|\&|\||\^|<<|>>|%|/|cmp" // added % and /
   COMPARATORS="regexp:<=|>=|==|\!=|<|>"
   STRINGVAR = "regexp:<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?"
   ]
@@ -83,7 +82,7 @@ Annotation ::= AT JType [LBRACKET
 ModifierV ::= MODIFIER*
 
 Type ::= (LambdaType | JType | PRIMITIVETYPE)('[]')*
-JType ::= ((STRINGVAR | TacTokens) DOT)*(STRINGVAR | TacTokens)
+JType ::= ((STRINGVAR | TacTokens) DOT)*(STRINGVAR | TacTokens|'class')
 {
  mixin="taclanguage.psi.impl.TACNamedElementImpl"
  implements="taclanguage.psi.TACNamedElement"
@@ -142,10 +141,22 @@ private exceptionList ::= THROWS (JType COMMA?)*
 // instructions (part of method body)
 InstructionBody ::= InstNumber COLON Instr
 InstNumber ::= NUMBER
-Instr ::=(STRING|NUMBER|ifInst|switchInst|gotoInst|KEYWORDS|PRIMITIVETYPE|MODIFIER|EXTENDS|IMPLEMENTS|JAVATYPEHEAD|THROW|THROWS|VOID|THIS|LEVEL|COMMA|DOT|SEMICOLON|COLON|AT|R_ARROW|L_ARROW|"[]"|"("|")"|"["|"]"|"%"|COMPARATORS|DIVID|OPERATORS|CONSTMETHODNAMES|EQ|UEQ|STRINGVAR|PLUS|MINUS)*
+//Instr ::=(STRING|NUMBER|ifInst|switchInst|gotoInst|KEYWORDS|PRIMITIVETYPE|MODIFIER|EXTENDS|IMPLEMENTS|JAVATYPEHEAD|THROW|THROWS|VOID|THIS|LEVEL|COMMA|DOT|SEMICOLON|COLON|AT|R_ARROW|L_ARROW|"[]"|"("|")"|"["|"]"|"%"|COMPARATORS|DIVID|OPERATORS|CONSTMETHODNAMES|EQ|UEQ|STRINGVAR|PLUS|MINUS)*
+Instr::= ifInst|switchInst|gotoInst|MonitorInst|EQInstr|MethodCallOrNEWInstr|CastIntr|CaughtInst|KEYWORDS[LEVEL]|";"
+EQInstr ::= LeftSide EQ RightSide [(OPERATORS) RightSide]
+LeftSide ::=  Levels| JType
+RightSide ::= (MethodCallOrNEWInstr| Levels |CastIntr| STRING | NUMBER )
+Levels ::= LEVEL [DOT JType|"instanceof" JType] ArrayOrBracket
+MethodCallOrNEWInstr ::=  [KEYWORDS|LEVEL DOT] (JType|PRIMITIVETYPE) ArrayOrBracket LambdaSuffix // get better name
+CastIntr::= LBRACKET (JType ["[]"]|PRIMITIVETYPE) RBRACKET  LEVEL
+CaughtInst ::= KEYWORDS JType
+MonitorInst ::= ("monitorenter"|"monitorexit") Levels
+LambdaSuffix ::= [JType"::"NUMBER?JType ArrayOrBracket]
+ArrayOrBracket ::= [LBRACKET ((LEVEL|JType ":") COMMA?)* RBRACKET]
+
 switchInst ::= "switch" LBRACKET LEVEL RBRACKET LBRACKET((NUMBER|"default") COLON gotoInst SEMICOLON?)* RBRACKET
 //Instr ::= ifInst| gotoInst|LBRACKET LeftSideInstr RBRACKET RightSideInstr |SEMICOLON|LeftSideInstr (EQ  RightSideInstr)? |
-ifInst ::= "if" LBRACKET LEVEL ("<="|">="|"<"|">"|"=="|"!=") (NUMBER|LEVEL) RBRACKET gotoInst
+ifInst ::= "if" LBRACKET LEVEL ("<="|">="|"<"|">"|"=="|"!=") (NUMBER|LEVEL|"null") RBRACKET gotoInst
 gotoInst ::= "goto" NUMBER
 //newInst ::= "new" Type LBRACKET LEVEL RBRACKET
 //LeftSideInstr ::=  ( LEVEL |Type | PRIMITIVETYPE | KEYWORDS) (LEVEL|JType| DOT? MethodName)?
