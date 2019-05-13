@@ -1,4 +1,10 @@
+/*
+ *  BSD 2-Clause License - see ./LICENSE for details.
+ */
+
 package Editors.FileEditor;
+
+import static globalData.GlobalData.TAC_EDITOR_ID;
 
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;
@@ -12,7 +18,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 public class TacTextEditorProvider extends PsiAwareTextEditorProvider {
-  @NonNls private static final String EDITOR_TYPE_ID = "OPAL-TAC";
+  @NonNls private static final String EDITOR_TYPE_ID = TAC_EDITOR_ID;
 
   @Override
   public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
@@ -27,7 +33,10 @@ public class TacTextEditorProvider extends PsiAwareTextEditorProvider {
   @Override
   public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
     if (!Objects.equals(file.getExtension(), GlobalData.DISASSEMBLED_FILE_ENDING_TAC)) {
-      file = OpalUtil.prepare(project, GlobalData.DISASSEMBLED_FILE_ENDING_TAC, file, null);
+      return new TacTextEditor(
+          project,
+          OpalUtil.prepare(project, GlobalData.DISASSEMBLED_FILE_ENDING_TAC, file, null),
+          this);
     }
     return new TacTextEditor(project, file, this);
   }

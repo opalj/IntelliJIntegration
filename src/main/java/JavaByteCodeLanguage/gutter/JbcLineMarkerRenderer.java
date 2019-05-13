@@ -1,3 +1,7 @@
+/*
+ *  BSD 2-Clause License - see ./LICENSE for details.
+ */
+
 package JavaByteCodeLanguage.gutter;
 
 import com.intellij.openapi.editor.Editor;

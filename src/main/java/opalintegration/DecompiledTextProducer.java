@@ -1,3 +1,7 @@
+/*
+ *  BSD 2-Clause License - see ./LICENSE for details.
+ */
+
 package opalintegration;
 
 import org.jetbrains.annotations.Contract;
@@ -25,7 +29,7 @@ abstract class DecompiledTextProducer {
     decompiledText += attributes(classFile);
     decompiledText += fields(classFile);
     decompiledText += methods(classFile); // contains the template method
-    decompiledText += "\n}";              // end of class file
+    decompiledText += "\n}"; // end of class file
 
     return decompiledText;
   }
@@ -52,7 +56,7 @@ abstract class DecompiledTextProducer {
       classHeader.append(" implements ");
       for (int j = 0; j < classFile.interfaceTypes().length(); j++) {
         // no comma at the end
-        if(j == classFile.interfaceTypes().length() - 1) {
+        if (j == classFile.interfaceTypes().length() - 1) {
           classHeader.append(classFile.interfaceTypes().apply(j).toJava()).append(" ");
           break;
         }
@@ -72,11 +76,12 @@ abstract class DecompiledTextProducer {
   }
 
   /**
-   * Creates the string representation of the attributes area of a class.
-   * The attributes area contains the table of the inner classes.
+   * Creates the string representation of the attributes area of a class. The attributes area
+   * contains the table of the inner classes.
    *
    * @param classFile The class file which contains the attributes
-   * @return Information about the attributes as a String, contained within an area: Attributes { ... }
+   * @return Information about the attributes as a String, contained within an area: Attributes {
+   *     ... }
    */
   @NotNull
   private String attributes(@NotNull ClassFile classFile) {
@@ -168,11 +173,12 @@ abstract class DecompiledTextProducer {
   }
 
   /**
-   * Creates the string representation of the method head (apart from exceptions), by linking together
-   * all necessary pieces (e.g. modifiers, return type, parameter list, etc.)
+   * Creates the string representation of the method head (apart from exceptions), by linking
+   * together all necessary pieces (e.g. modifiers, return type, parameter list, etc.)
    *
    * @param method The method for which the method head should be created
-   * @return The method head as a string, e.g.: public static void someMethod(int, @NotNull java.lang.String)
+   * @return The method head as a string, e.g.: public static void someMethod(int, @NotNull
+   *     java.lang.String)
    */
   @NotNull
   private String methodDescriptor(@NotNull Method method) {

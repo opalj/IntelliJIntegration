@@ -1,3 +1,7 @@
+/*
+ *  BSD 2-Clause License - see ./LICENSE for details.
+ */
+
 package opalintegration;
 
 import com.intellij.openapi.vfs.VirtualFile;

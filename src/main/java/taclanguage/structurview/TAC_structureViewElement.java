@@ -1,3 +1,7 @@
+/*
+ *  BSD 2-Clause License - see ./LICENSE for details.
+ */
+
 package taclanguage.structurview;
 
 import com.intellij.ide.projectView.PresentationData;

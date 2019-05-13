@@ -1,3 +1,7 @@
+/*
+ *  BSD 2-Clause License - see ./LICENSE for details.
+ */
+
 package JavaByteCodeLanguage.StructureView;
 
 import Editors.disEditor.DisTextEditor;

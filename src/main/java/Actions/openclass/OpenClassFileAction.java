@@ -1,8 +1,18 @@
-package Actions;
+/*
+ *  BSD 2-Clause License - see ./LICENSE for details.
+ */
 
+/*
+ *  BSD 2-Clause License - see ./LICENSE for details.
+ */
+
+package Actions.openclass;
+
+import Actions.ActionUtil;
 import Compile.Compiler;
 import com.intellij.notification.*;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.module.Module;
@@ -35,15 +45,16 @@ class OpenClassFileAction extends AnAction {
   }
 
   @Override
-  public void update(AnActionEvent e) {
-    final VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
-    PsiElement element = e.getData(CommonDataKeys.PSI_ELEMENT);
-    final String extension = virtualFile != null ? virtualFile.getExtension() : "";
+  public void update(@NotNull AnActionEvent e) {
     // show Action only for java,class & scala files
+    String extension = ActionUtil.ExtString(e);
+    PsiElement element = e.getData(CommonDataKeys.PSI_ELEMENT);
     e.getPresentation()
         .setEnabledAndVisible(
             (element instanceof PsiClass)
-                && ("java".equals(extension) || "class".equals(extension)));
+                && ("java".equals(extension)
+                    || "class".equals(extension)
+                    || "scala".equals(extension)));
   }
 
   /**
@@ -61,7 +72,8 @@ class OpenClassFileAction extends AnAction {
     if (!(element instanceof PsiClass) || project == null) {
       return;
     }
-    virtualFile = element.getNavigationElement().getContainingFile().getVirtualFile();
+    // virtualFile = element.getNavigationElement().getContainingFile().getVirtualFile();
+    virtualFile = Objects.requireNonNull(e.getData(CommonDataKeys.PSI_FILE)).getVirtualFile();
     String extension = virtualFile.getExtension();
     VirtualFile classFile = null;
     if (!StdFileTypes.CLASS.getDefaultExtension().equals(extension)) {
@@ -85,12 +97,10 @@ class OpenClassFileAction extends AnAction {
       classFile = virtualFile;
     }
     if (classFile != null) {
-      Notifications.Bus.notify(
-          new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
-              .createNotification()
-              .setContent("decompiling : " + classFile.getName()));
-      FileEditorManager.getInstance(project).openFile(classFile, true);
-      FileEditorManager.getInstance(project).setSelectedEditor(classFile, editorName);
+      if (ApplicationManager.getApplication().isDispatchThread()) {
+        FileEditorManager.getInstance(project).openFile(classFile, true);
+        FileEditorManager.getInstance(project).setSelectedEditor(classFile, editorName);
+      }
     } else {
 
       Notifications.Bus.notify(

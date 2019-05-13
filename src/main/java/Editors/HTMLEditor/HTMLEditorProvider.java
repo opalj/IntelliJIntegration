@@ -1,3 +1,7 @@
+/*
+ *  BSD 2-Clause License - see ./LICENSE for details.
+ */
+
 package Editors.HTMLEditor;
 
 import com.intellij.openapi.fileEditor.FileEditor;

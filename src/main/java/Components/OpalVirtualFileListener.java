@@ -1,3 +1,7 @@
+/*
+ *  BSD 2-Clause License - see ./LICENSE for details.
+ */
+
 package Components;
 
 import com.intellij.openapi.components.ProjectComponent;

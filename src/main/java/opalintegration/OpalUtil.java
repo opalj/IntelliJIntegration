@@ -1,6 +1,9 @@
+/*
+ *  BSD 2-Clause License - see ./LICENSE for details.
+ */
+
 package opalintegration;
 
-import Compile.Compiler;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
@@ -37,11 +40,12 @@ public class OpalUtil {
    */
   private static ClassFile classFile;
 
-  private static String projectPath;              //
-  private static String fqClassName;              // the qualified name of the class that is to be decompiled
-  private static File projectFile;                //
-  private static VirtualFile currentWorkingVF;    //
-  private static File tempDirectory;              // The (temporary) directory in which our files are to be stored in
+  private static String projectPath; //
+  private static String fqClassName; // the qualified name of the class that is to be decompiled
+  private static File projectFile; //
+  private static VirtualFile currentWorkingVF; //
+  private static File
+      tempDirectory; // The (temporary) directory in which our files are to be stored in
 
   private static final Logger LOGGER = Logger.getLogger(OpalUtil.class.getName());
 
@@ -166,7 +170,6 @@ public class OpalUtil {
         || (!virtualClassFile.equals(currentWorkingVF)
             && virtualClassFile.getExtension().equals(StdFileTypes.CLASS.getDefaultExtension()))) {
       currentWorkingVF = virtualClassFile;
-      if (!VFL) Compiler.make(project);
       if (virtualClassFile.getCanonicalPath() != null
           && !virtualClassFile.getCanonicalPath().contains("!")) {
         projectPath = virtualClassFile.getPath();
@@ -215,6 +218,7 @@ public class OpalUtil {
     // use the input stream instead
     else {
       try {
+
         FileInputStream inputStream = new FileInputStream(projectFile);
         Object classFileObj =
             org.opalj.br.analyses.Project.JavaClassFileReader(
@@ -233,8 +237,8 @@ public class OpalUtil {
   }
 
   /**
-   * Retrieves the necessary path information of a class from within a JAR,
-   * so that we can create an OPAL ClassFile from it.
+   * Retrieves the necessary path information of a class from within a JAR, so that we can create an
+   * OPAL ClassFile from it.
    *
    * @param virtualClassFile - a class file (assumed to be located in a JAR)
    * @return a 2D String array with a jar/zip path & a fully qualified class name

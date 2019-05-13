@@ -1,3 +1,7 @@
+/*
+ *  BSD 2-Clause License - see ./LICENSE for details.
+ */
+
 package opalintegration.Visitor.StackMap;
 
 import java.util.Arrays;
@@ -55,7 +59,6 @@ public class StackMapVisitorImpl extends ElementAcceptor<StackMapFrame, String>
 
   @Override
   public String visit(ChopFrame frame) {
-    // TODO StackFrame cast
     return String.format(
         "\t\t%d %s %d %d \n",
         pc[0],
