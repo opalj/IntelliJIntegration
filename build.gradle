@@ -22,7 +22,16 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 repositories {
-    mavenCentral()
+//    ivy{
+//        url "${System.properties['user.home']}/.ivy2/local"
+//        layout 'pattern',{
+//            artifact  "[organisation]/[module]/[revision]/jars/[artifact].[ext]"
+//            ivy  "[organisation]/[module]/[revision]/ivys/ivy.xml"
+//        }
+//    }
+    mavenLocal()
+    //mavenCentral()
+    jcenter()
     maven { url = 'http://maven.teamdev.com/repository/products' }
     maven { url = 'http://perfectjpattern.sourceforge.net/m2repo'}
 }
@@ -30,21 +39,21 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    // https://mvnrepository.com/artifact/de.opal-project/*
-    compile group: 'de.opal-project', name: 'abstract-interpretation-framework_2.12', version: '2.0.1'
-    compile group: 'de.opal-project', name:'bytecode-disassembler_2.12', version: '2.0.1'
-    compile group: 'de.opal-project', name: 'bytecode-representation_2.12', version: '2.0.1'
-
+    //https://mvnrepository.com/artifact/de.opal-project/
+    //compile group: 'de.opal-project', name: 'abstract-interpretation-framework_2.12', version: '3.0.0-SNAPSHOT'
+    compile group: 'de.opal-project', name:'bytecode-disassembler_2.12', version: '3.0.0-SNAPSHOT'
+    compile group: 'de.opal-project', name: 'bytecode-representation_2.12', version: '3.0.0-SNAPSHOT'
+    compile group: 'de.opal-project', name: 'three-address-code_2.12', version: '3.0.0-SNAPSHOT'
+    compile group: 'de.opal-project', name: 'common_2.12', version: '3.0.0-SNAPSHOT'
 }
 
 intellij {
-    //version 'IC-LATEST-EAP-SNAPSHOT'
+    version = 'IC-LATEST-EAP-SNAPSHOT' // IC Community Edition
     //version '2018.3'
     //plugins 'org.intellij.scala:2018.3.6'
     intellij.updateSinceUntilBuild false //Disables updating since-build attribute in plugin.xml
-    plugins 'org.intellij.scala:2019.1.7' // load the the scala-plugin
-    plugins 'PsiViewer:191.4212'
-    pluginName 'bytecode disassembler'
+    plugins = ['org.intellij.scala:2019.1.8' , 'PsiViewer:191.4212'] // load the the scala-plugin
+    pluginName = 'bytecode disassembler'
 }
 patchPluginXml {
     changeNotes """
