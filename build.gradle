@@ -1,3 +1,6 @@
+import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
+import com.github.spotbugs.SpotBugsTask
+
 plugins {
     id 'java'
     id 'scala' // maybe helping
@@ -11,12 +14,12 @@ plugins {
 }
 
 shadowJar {
-    transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
+    transform(AppendingTransformer) {
         resource = 'reference.conf'
     }
 }
 group 'Kollektiv 23'
-version '1.0.5'
+version '1.0.6'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -38,19 +41,30 @@ dependencies {
 }
 
 intellij {
-    //version 'IC-LATEST-EAP-SNAPSHOT'
+    version 'IC-LATEST-EAP-SNAPSHOT'
     //version '2018.3'
     //plugins 'org.intellij.scala:2018.3.6'
-    intellij.updateSinceUntilBuild false //Disables updating since-build attribute in plugin.xml
-    plugins 'org.intellij.scala:2019.1.7' // load the the scala-plugin
-    plugins 'PsiViewer:191.4212'
-    pluginName 'bytecode disassembler'
+    updateSinceUntilBuild false //Disables updating since-build attribute in plugin.xml
+    plugins = ['PsiViewer:192-SNAPSHOT','org.intellij.scala:2019.2.3'] // load the the scala-plugin
+    pluginName 'bytecode-disassembler'
 }
 patchPluginXml {
-    changeNotes """
-      First non beta Version. Ready to enjoy. See Readme or Source Code for further information."""
+    changeNotes """ new features jars have a open dialog.just rightclick on jar in the project-view."""
 }
 
+publishPlugin {
+    //dependsOn('check')
+    dependsOn('shadowJar')
+    // http://www.jetbrains.org/intellij/sdk/docs/plugin_repository/api/plugin_upload.html
+    username intellijPublishUsername
+    password intellijPublishPassword
+    //token intellijPublishToken
+    channels 'beta'
+    distributionFile "build/libs/${intellij.pluginName}-${version}-all.jar"
+}
+buildSearchableOptions{
+    enabled = false
+}
 // ================
 // Overriding tasks
 // ================
@@ -60,14 +74,13 @@ check {
     // googleJavaFormat will report "NO-SOURCE" if everything is properly formatted (-> not harmful in any way, can ignore)
     dependsOn 'googleJavaFormat'
     // dependsOn [checkstyle, pmd and spotbugsMain] per default
-
     tasks.findByName('checkstyleMain').mustRunAfter('googleJavaFormat')
     tasks.findByName('pmdMain').mustRunAfter('checkstyleMain')
     tasks.findByName('spotbugsMain').mustRunAfter('pmdMain')
 }
 
 
-tasks.withType(com.github.spotbugs.SpotBugsTask) {
+tasks.withType(SpotBugsTask) {
     reports {
         xml.enabled = false
         html.enabled = true
@@ -90,7 +103,6 @@ pmd{
     toolVersion = "6.11.0"
     ignoreFailures = true
     ruleSetFiles = files("config/pmd/myRuleSets.xml")
-
 }
 runIde {
     maxHeapSize = "4g"

@@ -205,7 +205,11 @@ public class OpalUtil {
     // first check the current project
     for (int i = 0; i < classFileConstArray.length(); i++) {
       ClassFile cf = classFileConstArray.apply(i);
-      if (cf.fqn().equals(fqClassName.replace(".class", ""))) {
+      if (cf.fqn()
+          .equals(
+              fqClassName.toUpperCase().endsWith(".CLASS")
+                  ? fqClassName.substring(0, fqClassName.toUpperCase().lastIndexOf(".CLASS"))
+                  : "")) {
         return cf;
       }
     }
@@ -268,7 +272,7 @@ public class OpalUtil {
       if (classFileList.size() == 1) {
         classFileFromJar = (ClassFile) classFileList.head();
       }
-    } catch (IOException e) {
+    } catch (Exception e) {
       LOGGER.log(Level.SEVERE, e.toString(), e);
     }
     return classFileFromJar;

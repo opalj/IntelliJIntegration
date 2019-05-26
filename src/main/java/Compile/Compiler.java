@@ -44,12 +44,14 @@ public final class Compiler {
    * @param compilerManager the manager for the current project
    */
   private static void asyncCompiling(CompilerManager compilerManager) {
+    int i = 50; // 50*0.2 s = 10 sek till end
     do {
       try {
         TimeUnit.MILLISECONDS.sleep(200);
       } catch (InterruptedException e) {
         LOGGER.log(Level.SEVERE, e.toString(), e);
       }
-    } while (compilerManager.isCompilationActive());
+      i--;
+    } while (compilerManager.isCompilationActive() && i > 0);
   }
 }

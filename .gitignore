@@ -68,3 +68,6 @@ fabric.properties
 
 #temporary
 .idea/misc.xml
+
+#passwords file
+gradle.properties

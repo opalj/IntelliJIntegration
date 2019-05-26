@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>23.bytecode-disassembler</id>
     <name>Bytecode Disassembler</name>
-    <vendor email="marcel.dieter@stud.tu-darmstadt.de" >Kollektiv 23</vendor>
+    <vendor url="">Kollektiv 23</vendor>
 
     <description><![CDATA[
     OPAL Framework integration for IntelliJ IDEA.<br>
@@ -9,7 +9,7 @@
 
     <change-notes>This version Works now with the Scala-plugin. new TAC-Editor Actions</change-notes>
 
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <!-- until-build version is looking into the future might be wrong!! -->
     <!--<idea-version since-build="181" until-build="183.*"/>-->
     <idea-version since-build="181"/>
@@ -56,6 +56,9 @@
 
     <actions>
         <!-- Add your actions here -->
+        <action class="Actions.OpenDialog" id="OpenJarDialog" text="open *jar">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last" />
+        </action>
         <action id="JumpToJBCEID" class="Actions.openclass.OpenClassFileJBCAction" text="Show Bytecode" icon="/icons/jar-gray.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
@@ -98,6 +101,11 @@
 
     <application-components>
         <!-- Add your application components here -->
+       <!--
+        <component>
+            <implementation-class>Components.DragDropJars</implementation-class>
+        </component>
+        -->
     </application-components>
     <project-components>
         <component>
