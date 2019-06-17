@@ -56,6 +56,12 @@
 
     <actions>
         <!-- Add your actions here -->
+        <action id="OpenFileInConsoleToolbarAction"
+                class="Actions.DnDJarAction"
+                text="Drag n Drop Jars"
+                description="Drag and drop to open jar file">
+        <add-to-group group-id="MainToolBar" anchor="last"/>
+        </action>
         <action class="Actions.OpenDialog" id="OpenJarDialog" text="open *jar">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last" />
         </action>
@@ -101,11 +107,6 @@
 
     <application-components>
         <!-- Add your application components here -->
-       <!--
-        <component>
-            <implementation-class>Components.DragDropJars</implementation-class>
-        </component>
-        -->
     </application-components>
     <project-components>
         <component>

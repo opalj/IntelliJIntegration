@@ -79,13 +79,15 @@ public class DialogPannel extends JFrame {
   }
 
   void decompile() {
-    JarEntry jarEntry = dlm.get(lastIndex);
-    // open the file
-    VirtualFile localVirtualFileByPath =
-        JarFileSystem.getInstance().findLocalVirtualFileByPath(file.getPath());
-    assert localVirtualFileByPath != null;
-    localVirtualFileByPath = localVirtualFileByPath.findFileByRelativePath(jarEntry.getName());
-    FileEditorManager.getInstance(project)
-        .openFile(Objects.requireNonNull(localVirtualFileByPath), true);
+    if(!dlm.isEmpty() &&  dlm.getSize() >= lastIndex) {
+        JarEntry jarEntry = dlm.get(lastIndex);
+        // open the file
+        VirtualFile localVirtualFileByPath =
+                JarFileSystem.getInstance().findLocalVirtualFileByPath(file.getPath());
+        assert localVirtualFileByPath != null;
+        localVirtualFileByPath = localVirtualFileByPath.findFileByRelativePath(jarEntry.getName());
+        FileEditorManager.getInstance(project)
+                .openFile(Objects.requireNonNull(localVirtualFileByPath), true);
+    }
   }
 }

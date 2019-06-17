@@ -41,11 +41,11 @@ dependencies {
 }
 
 intellij {
-    version 'IC-LATEST-EAP-SNAPSHOT'
-    //version '2018.3'
+    //version 'IC-LATEST-EAP-SNAPSHOT'
+    version 'IC-2019.1.3'
     //plugins 'org.intellij.scala:2018.3.6'
     updateSinceUntilBuild false //Disables updating since-build attribute in plugin.xml
-    plugins = ['PsiViewer:192-SNAPSHOT','org.intellij.scala:2019.2.3'] // load the the scala-plugin
+    plugins = ['PsiViewer:191.4212','org.intellij.scala:2019.1.8'] // load the the scala-plugin
     pluginName 'bytecode-disassembler'
 }
 patchPluginXml {

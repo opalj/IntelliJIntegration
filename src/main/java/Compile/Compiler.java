@@ -4,6 +4,7 @@
 
 package Compile;
 
+import com.intellij.compiler.CompilerManagerImpl;
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
