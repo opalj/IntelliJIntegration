@@ -1,5 +1,6 @@
 package Components;
 
+import Components.tree.DialogPannel;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.vfs.VirtualFile;

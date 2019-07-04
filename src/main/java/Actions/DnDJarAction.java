@@ -9,6 +9,9 @@ import com.intellij.ide.DataManager;
 import com.intellij.ide.dnd.FileCopyPasteUtil;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -25,22 +28,30 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import static com.intellij.util.ui.JBUI.CurrentTheme.ToolWindow.hoveredIconBackground;
 
 public class DnDJarAction extends AnAction implements CustomComponentAction {
+    private Project project;
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        final Project project = e.getProject();
+        project = e.getProject();
         //final VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
         if (project == null) return;
         openDialog(project,null);
     }
     private void openDialog(Project project, VirtualFile virtualFile){
-        SampleDialogWrapper sampleDialogWrapper = new SampleDialogWrapper(project, virtualFile);
-        sampleDialogWrapper.setSize(300, 500);
-        sampleDialogWrapper.show();
+        FileChooserDescriptor fileChooserDescriptor = new FileChooserDescriptor(true, false, false, false, true, false);
+        fileChooserDescriptor.withFileFilter(vf -> Pattern.matches(".*\\.(class|jar|zip)",vf.getName()));
+        FileChooser.chooseFile(fileChooserDescriptor,project,virtualFile,vf -> openAndDecompile(vf) );
+    }
+    private void openAndDecompile(VirtualFile selectedFile) {
+        if(selectedFile.getName().toUpperCase().endsWith(".CLASS"))
+            FileEditorManager.getInstance(project)
+                    .openFile(Objects.requireNonNull(selectedFile), true);
     }
     //todo versioncheck
     @NotNull

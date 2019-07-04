@@ -51,14 +51,16 @@
         <lang.findUsagesProvider language="TAC" implementationClass="com.intellij.lang.java.JavaFindUsagesProvider"/>
         <!--<codeInsight.lineMarkerProvider language="jbc" implementationClass="JavaByteCodeLanguage.psi.JbcLineMarkerProvider"/>-->
 <!--        <psi.classFileDecompiler implementation=" org.jetbrains.java." order="last"/>-->
-        <applicationConfigurable groupId="tools" provider="config.BytecodeConfigProvider" id="bytecodedissassembler.config"/>
+        <applicationConfigurable groupId="tools" provider="config.BytecodeConfigurableProvider" id="bytecodedissassembler.config"/>
+        <applicationService serviceInterface="config.BytecodeConfig" serviceImplementation="config.BytecodeConfig"/>
     </extensions>
 
     <actions>
         <!-- Add your actions here -->
         <action id="OpenFileInConsoleToolbarAction"
                 class="Actions.DnDJarAction"
-                text="Drag n Drop Jars"
+                text="DnD Jar"
+                icon="/icons/jar-gray.png"
                 description="Drag and drop to open jar file">
         <add-to-group group-id="MainToolBar" anchor="last"/>
         </action>
