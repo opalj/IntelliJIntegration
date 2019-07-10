@@ -56,12 +56,11 @@
     </extensions>
 
     <actions>
-        <!-- Add your actions here -->
+        <!-- Add your actions here-->
         <action id="OpenFileInConsoleToolbarAction"
                 class="Actions.DnDJarAction"
-                text="DnD Jar"
-                icon="/icons/jar-gray.png"
-                description="Drag and drop to open jar file">
+                description="Drag and drop to open jar file"
+                icon="/icons/jar-gray.png">
         <add-to-group group-id="MainToolBar" anchor="last"/>
         </action>
         <action class="Actions.OpenDialog" id="OpenJarDialog" text="open *jar">

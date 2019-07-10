@@ -16,11 +16,14 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.ColorUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.MouseDragHelper;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.plaf.ColorUIResource;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -60,6 +63,7 @@ public class DnDJarAction extends AnAction implements CustomComponentAction {
         final JPanel comp = new JPanel();
         comp.setTransferHandler(new MyTransferHandler());
         comp.add(new JLabel(getTemplatePresentation().getText()));
+        comp.add(new JLabel(getTemplatePresentation().getIcon()));
         comp.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -69,13 +73,13 @@ public class DnDJarAction extends AnAction implements CustomComponentAction {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                //comp.setBackground(hoveredIconBackground());
-                comp.setBackground(new JBColor(0x4C5052,0x4C5052));
+                comp.setBackground(JBUI.CurrentTheme.ToolWindow.tabHoveredBackground(true));
             }
 
             @Override
+            //JBColor
             public void mouseExited(MouseEvent e) {
-                comp.setBackground(JBColor.background());
+                comp.setBackground(JBUI.CurrentTheme.CustomFrameDecorations.paneBackground());
             }
         });
         comp.setToolTipText(getTemplatePresentation().getDescription());
