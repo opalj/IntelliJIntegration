@@ -10,7 +10,7 @@ import org.opalj.br.Method;
 import org.opalj.br.analyses.JavaProject;
 import org.opalj.br.analyses.Project;
 import org.opalj.tac.*;
-import org.opalj.value.KnownTypedValue;
+import org.opalj.value.ValueInformation;
 import scala.Function1;
 
 /**
@@ -19,13 +19,13 @@ import scala.Function1;
  */
 class TacProducer extends DecompiledTextProducer {
 
-  private final Function1<Method, TACode<TACMethodParameter, DUVar<KnownTypedValue>>>
+  private final Function1<Method, AITACode<TACMethodParameter, ValueInformation>>
       methodTACodeFunction;
 
   TacProducer(String filepath) {
     Project<URL> uriProject = Project.apply(new File(filepath));
     JavaProject javaProject = new JavaProject(uriProject);
-    methodTACodeFunction = javaProject.project().get(DefaultTACAIKey$.MODULE$);
+    methodTACodeFunction = javaProject.project().get(LazyDetachedTACAIKey$.MODULE$);
   }
 
   @Override
@@ -34,7 +34,7 @@ class TacProducer extends DecompiledTextProducer {
 
     if (method.body().isDefined()) {
       methodBody.append("\n");
-      TACode<TACMethodParameter, DUVar<KnownTypedValue>> TacCode =
+      TACode<TACMethodParameter, DUVar<ValueInformation>> TacCode =
           methodTACodeFunction.apply(method);
 
       String[] body = ToTxt.apply(TacCode).mkString("#newline#").split("#newline#");

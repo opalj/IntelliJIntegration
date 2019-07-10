@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.opalj.br.*;
 import org.opalj.collection.immutable.ConstArray;
+import scala.collection.Traversable;
 
 /**
  * A utility class that serves a couple of purposes:
@@ -187,6 +188,7 @@ public class OpalUtil {
       }
       projectFile = new File(projectPath);
       uriProject = org.opalj.br.analyses.Project.apply(projectFile);
+      //Traversable<ClassFile> classFileTraversable = org.opalj.br.analyses.Project.apply$default$4();
       classFile = getClassFile(virtualClassFile);
     }
   }
