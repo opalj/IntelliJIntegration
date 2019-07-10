@@ -30,7 +30,7 @@ repositories {
 //        }
 //    }
     mavenLocal()
-    //mavenCentral()
+    mavenCentral()
     jcenter()
     maven { url = 'http://maven.teamdev.com/repository/products' }
     maven { url = 'http://perfectjpattern.sourceforge.net/m2repo'}
@@ -46,12 +46,10 @@ dependencies {
     compile group: 'de.opal-project', name: 'three-address-code_2.12', version: '3.0.0-SNAPSHOT'
     compile group: 'de.opal-project', name: 'common_2.12', version: '3.0.0-SNAPSHOT'
 }
-
+//https://github.com/JetBrains/gradle-intellij-plugin#configuration
 intellij {
-    version = 'IC-LATEST-EAP-SNAPSHOT' // IC Community Edition
-    //version '2018.3'
-    //plugins 'org.intellij.scala:2018.3.6'
-    intellij.updateSinceUntilBuild false //Disables updating since-build attribute in plugin.xml
+    version = 'IC-2019.1.3' // IC Community Edition
+    updateSinceUntilBuild false //Disables updating since-build attribute in plugin.xml
     plugins = ['org.intellij.scala:2019.1.8' , 'PsiViewer:191.4212'] // load the the scala-plugin
     pluginName = 'bytecode disassembler'
 }
