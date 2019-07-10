@@ -75,7 +75,7 @@ class OpenClassFileAction extends AnAction {
     // virtualFile = element.getNavigationElement().getContainingFile().getVirtualFile();
     virtualFile = Objects.requireNonNull(e.getData(CommonDataKeys.PSI_FILE)).getVirtualFile();
     String extension = virtualFile.getExtension();
-    if (!StdFileTypes.CLASS.getDefaultExtension().equals(extension)) {
+    if (!StdFileTypes.CLASS.getDefaultExtension().equals(extension)) { // if you clicked on class-file
       if (ProjectFileIndex.getInstance(project).isInLibrary(virtualFile)) {
         String FileName = OpalUtil.getJarFileRootAndFileName(virtualFile.getParent())[1];
         Collection<VirtualFile> virtualFilesByName =
@@ -96,7 +96,7 @@ class OpenClassFileAction extends AnAction {
                         .setContent("can't open the class file : " + virtualFile.getName()));
         }
 
-      }//else
+      }//else build a class file
       new Compiler().make(project,virtualFile,editorName);
       }
   } // actionPerformed

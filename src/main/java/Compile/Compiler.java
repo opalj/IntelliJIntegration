@@ -17,14 +17,13 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.CompilerModuleExtension;
+import com.intellij.openapi.roots.CompilerProjectExtension;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Queue;
+import java.io.FileNotFoundException;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
@@ -112,19 +111,28 @@ public class Compiler {
     // get the current module
     ProjectFileIndex projectFileIndex = ProjectFileIndex.getInstance(project);
     Module module = projectFileIndex.getModuleForFile(javaFile);
+    LinkedList<VirtualFile> vfList = new LinkedList<>();
     // get the output directory
+    if (Objects.requireNonNull(CompilerProjectExtension.getInstance(project)).getCompilerOutput() != null) {
+      vfList.add(Objects.requireNonNull(CompilerProjectExtension.getInstance(project)).getCompilerOutput());
+    }
     if (module != null) {
-      VirtualFile outputPath =
-              Objects.requireNonNull(CompilerModuleExtension.getInstance(module))
-                      .getCompilerOutputPath();
-      if (outputPath == null) {
-        return null;
+      if (Objects.requireNonNull(CompilerModuleExtension.getInstance(module)).getCompilerOutputPath() != null) {
+        vfList.add(Objects.requireNonNull(CompilerModuleExtension.getInstance(module)).getCompilerOutputPath());
       }
+      if (Objects.requireNonNull(CompilerModuleExtension.getInstance(module)).getCompilerOutputPathForTests()!= null) {
+        vfList.add(Objects.requireNonNull(CompilerModuleExtension.getInstance(module)).getCompilerOutputPathForTests());
+      }
+    }
+    if (vfList.isEmpty()) {
+      return null;
+    }
+    List<VirtualFile> classFiles = new ArrayList<>();
+    for (VirtualFile outputPath : vfList) {
       outputPath.refresh(true, true);
       // the name of the class file we are looking for
       String classFileName = javaFile.getNameWithoutExtension() + ".class";
       // collect all classFiles in the output directory
-      List<VirtualFile> classFiles = new ArrayList<>();
       VfsUtilCore.visitChildrenRecursively(
               outputPath,
               new VirtualFileVisitor<VirtualFile>() {
@@ -133,19 +141,18 @@ public class Compiler {
                 public Result visitFileEx(@NotNull VirtualFile file) {
                   if (!file.isDirectory() && file.getName().equals(classFileName)) {
                     classFiles.add(file);
-                    // VirtualFileVisitor.limit(0);
                     return VirtualFileVisitor.SKIP_CHILDREN;
                   }
                   return CONTINUE;
                 }
               });
-      VirtualFile classFile = null;
-      if (!classFiles.isEmpty()) {
-        classFile = classFiles.get(0);
-      }
-      return classFile;
     }
-    return null;
+      if (!classFiles.isEmpty()) {
+        return classFiles.get(0);
+      }else{
+        //TODO
+        return null;
+      }
   }
 
 }
