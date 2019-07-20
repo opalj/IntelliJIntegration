@@ -48,14 +48,14 @@ public class Compiler {
 
   public void make(@NotNull final Project project, CompileScope scope, CompileStatusNotification compilingNotifaction) {
     CompilerManager compilerManager = CompilerManager.getInstance(project);
-    //if (!compilerManager.isUpToDate(scope)) {
+    if (!compilerManager.isUpToDate(scope)) {
       compilerManager.makeWithModalProgress(scope, compilingNotifaction);
       Notifications.Bus.notify(
               new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
                       .createNotification()
                       .setContent("building "+scope.toString()+" to show "));
       //compilerManager.make(scope, compilingNotifaction);
-    //}
+    }
   }
 
   /**
@@ -77,7 +77,6 @@ public class Compiler {
     }
     VirtualFile[] virtualFiles = new VirtualFile[]{virtualFile};
     CompileScope filesCompileScope = compilerManager.createFilesCompileScope(virtualFiles);
-//    compilerManager.addCompiler();
     compilingNotifaction = (aborted, errors, warnings, compileContext) -> {
       if (aborted) { // do nothing if manually channeled
         return;
@@ -129,6 +128,8 @@ public class Compiler {
     }
     List<VirtualFile> classFiles = new ArrayList<>();
     for (VirtualFile outputPath : vfList) {
+      if(!classFiles.isEmpty())
+        break;
       outputPath.refresh(true, true);
       // the name of the class file we are looking for
       String classFileName = javaFile.getNameWithoutExtension() + ".class";

@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile;
 import org.opalj.br.*;
 import org.opalj.collection.immutable.ConstArray;
 import scala.collection.Traversable;
@@ -174,13 +175,14 @@ public class OpalUtil {
       if (virtualClassFile.getCanonicalPath() != null
           && !virtualClassFile.getCanonicalPath().contains("!")) {
         projectPath = virtualClassFile.getPath();
-        PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualClassFile);
-        if (psiFile instanceof PsiJavaFile) {
-          PsiJavaFile psiJavaFile = (PsiJavaFile) psiFile;
-          final PsiClass[] classes = psiJavaFile.getClasses();
-          fqClassName = classes[0].getQualifiedName();
-          fqClassName = fqClassName != null ? fqClassName.replace('.', '/') : null;
-        }
+//         PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualClassFile);
+//        if (psiFile instanceof PsiJavaFile) {
+//          PsiJavaFile psiJavaFile = (PsiJavaFile) psiFile;
+//          final PsiClass[] classes = psiJavaFile.getClasses();
+//          fqClassName = classes[0].getQualifiedName();
+//          fqClassName = fqClassName != null ? fqClassName.replace('.', '/') : null;
+//        }else {
+//        }
       } else {
         String[] jarPath = getJarFileRootAndFileName(virtualClassFile);
         projectPath = jarPath[0];
@@ -202,19 +204,19 @@ public class OpalUtil {
    */
   @Nullable
   private static ClassFile getClassFile(@NotNull VirtualFile virtualClassFile) {
-    ConstArray<ClassFile> classFileConstArray = uriProject.allProjectClassFiles();
-
+    //ConstArray<ClassFile> classFileConstArray = uriProject.allProjectClassFiles();
     // first check the current project
-    for (int i = 0; i < classFileConstArray.length(); i++) {
-      ClassFile cf = classFileConstArray.apply(i);
-      if (cf.fqn()
-          .equals(
-              fqClassName.toUpperCase().endsWith(".CLASS")
-                  ? fqClassName.substring(0, fqClassName.toUpperCase().lastIndexOf(".CLASS"))
-                  : "")) {
-        return cf;
-      }
-    }
+    //for (int i = 0; i < classFileConstArray.length(); i++) {
+    //  ClassFile cf = classFileConstArray.apply(i);
+    //  System.out.println(cf.fqn());
+//      if (cf.fqn()
+//          .equals(
+//              fqClassName.toUpperCase().endsWith(".CLASS")
+//                  ? fqClassName.substring(0, fqClassName.toUpperCase().lastIndexOf(".CLASS"))
+//                  : "")) {
+//        return cf;
+//      }
+ //   }
 
     // (might be) a JAR
     if (virtualClassFile.getCanonicalPath() != null
@@ -229,8 +231,7 @@ public class OpalUtil {
         Object classFileObj =
             org.opalj.br.analyses.Project.JavaClassFileReader(
                     uriProject.logContext(), uriProject.config())
-                .ClassFile(() -> inputStream)
-                .head();
+                .ClassFile(() -> inputStream).head();
         if (classFileObj instanceof ClassFile) {
           return (ClassFile) classFileObj;
         }
