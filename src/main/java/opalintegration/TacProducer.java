@@ -6,6 +6,7 @@ package opalintegration;
 
 import java.io.File;
 import java.net.URL;
+import java.util.HashSet;
 
 import config.BytecodeConfig;
 import org.opalj.ai.domain.l0.PrimitiveTACAIDomain;
@@ -18,9 +19,8 @@ import org.opalj.br.analyses.Project;
 import org.opalj.tac.*;
 import org.opalj.value.ValueInformation;
 import scala.Function1;
-import scala.collection.Seq$;
-import scala.collection.Set;
-import scala.collection.Set$;
+import scala.collection.JavaConverters;
+import scala.collection.mutable.Set;
 
 /**
  * Is responsible for creating and providing the three-address-code (TAC) representation of a class
@@ -44,18 +44,14 @@ class TacProducer extends DecompiledTextProducer {
         // <URL> urlDefaultDomainWithCFGAndDefUse = new DefaultDomainWithCFGAndDefUse<>(uriProject, );
         break;
      default:
-        domain = DefaultPerformInvocationsDomainWithCFGAndDefUse.class;//<URL> urlDefaultPerformInvocationsDomainWithCFGAndDefUse = new DefaultPerformInvocationsDomainWithCFGAndDefUse<>(uriProject, );
-        break;
+       domain = DefaultPerformInvocationsDomainWithCFGAndDefUse.class;//<URL> urlDefaultPerformInvocationsDomainWithCFGAndDefUse = new DefaultPerformInvocationsDomainWithCFGAndDefUse<>(uriProject, );
+       break;
     }
-    uriProject.updateProjectInformationKeyInitializationData(AIDomainFactoryKey$.MODULE$,(x) -> {
-      if (x.isDefined()) {
-        Set<?> objectSet = Set$.MODULE$.empty().$plus(domain);
-
-        return ;
-      } else {
-        return x.get().$plus(domain);
-      }
-    });
+    HashSet<Class<?>> classes = new HashSet<>();
+    classes.add(domain);
+    Set<Class<?>> setAsScala = JavaConverters.<Class<?>>asScalaSet(classes);
+    //uriProject.updateProjectInformationKeyInitializationData(AIDomainFactoryKey$.MODULE$, (x)-> {if(x.isDefined()) return setAsScala.<Class<?>>toSet();else return x.get().$plus(domain).<Class<?>>toSet();});
+    uriProject.updateProjectInformationKeyInitializationData(AIDomainFactoryKey$.MODULE$, (x)-> setAsScala.<Class<?>>toSet());
     JavaProject javaProject = new JavaProject(uriProject);
     methodTACodeFunction = javaProject.project().get(LazyDetachedTACAIKey$.MODULE$);
   }
