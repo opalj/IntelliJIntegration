@@ -75,11 +75,8 @@ class OpenClassFileAction extends AnAction {
     // virtualFile = element.getNavigationElement().getContainingFile().getVirtualFile();
     virtualFile = Objects.requireNonNull(e.getData(CommonDataKeys.PSI_FILE)).getVirtualFile();
     String extension = virtualFile.getExtension();
-    VirtualFile classFile = null;
-    if (!StdFileTypes.CLASS.getDefaultExtension().equals(extension)) {
-      if (Compiler.make(project, virtualFile)) {
-        classFile = getCorrespondingClassFile(project, virtualFile);
-      } else if (ProjectFileIndex.getInstance(project).isInLibrary(virtualFile)) {
+    //if (StdFileTypes.CLASS.getDefaultExtension().equals(extension)) { // if you clicked on class-file
+      if (ProjectFileIndex.getInstance(project).isInLibrary(virtualFile)) {
         String FileName = OpalUtil.getJarFileRootAndFileName(virtualFile.getParent())[1];
         Collection<VirtualFile> virtualFilesByName =
             FilenameIndex.getVirtualFilesByName(
@@ -88,73 +85,18 @@ class OpenClassFileAction extends AnAction {
                 GlobalSearchScope.allScope(project));
         for (VirtualFile vf : virtualFilesByName) {
           if (vf.getPath().contains(FileName)) {
-            classFile = vf;
-            break;
+            FileEditorManager.getInstance(project).openFile(vf, true);
+            FileEditorManager.getInstance(project).setSelectedEditor(vf, editorName);
+            return;
           }
-        }
+          }
+        Notifications.Bus.notify(
+                new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
+                        .createNotification()
+                        .setContent("can't open the class file : " + virtualFile.getName()));
+        }else
+      //}//else build a class file
+      new Compiler().make(project,virtualFile,editorName);
       }
-    } else {
-      classFile = virtualFile;
-    }
-    if (classFile != null) {
-      if (ApplicationManager.getApplication().isDispatchThread()) {
-        FileEditorManager.getInstance(project).openFile(classFile, true);
-        FileEditorManager.getInstance(project).setSelectedEditor(classFile, editorName);
-      }
-    } else {
-
-      Notifications.Bus.notify(
-          new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
-              .createNotification()
-              .setContent("can't find or create a class file for : " + virtualFile.getName()));
-    }
   } // actionPerformed
 
-  /**
-   * Will look for the corresponding .class-file of the passed in .java-file in the output directory
-   * of the module, and return it
-   *
-   * @param project the current project (needed to determine the current module)
-   * @param javaFile the .java-file whose corresponding .class-file we're looking for
-   * @return the .class-File corresponding to javaFile
-   */
-  private VirtualFile getCorrespondingClassFile(Project project, VirtualFile javaFile) {
-    // get the current module
-    ProjectFileIndex projectFileIndex = ProjectFileIndex.getInstance(project);
-    Module module = projectFileIndex.getModuleForFile(javaFile);
-    // get the output directory
-    if (module != null) {
-      VirtualFile outputPath =
-          Objects.requireNonNull(CompilerModuleExtension.getInstance(module))
-              .getCompilerOutputPath();
-      if (outputPath == null) {
-        return null;
-      }
-      outputPath.refresh(false, true);
-      // the name of the class file we are looking for
-      String classFileName = javaFile.getNameWithoutExtension() + ".class";
-      // collect all classFiles in the output directory
-      List<VirtualFile> classFiles = new ArrayList<>();
-      VfsUtilCore.visitChildrenRecursively(
-          outputPath,
-          new VirtualFileVisitor<VirtualFile>() {
-            @NotNull
-            @Override
-            public Result visitFileEx(@NotNull VirtualFile file) {
-              if (!file.isDirectory() && file.getName().equals(classFileName)) {
-                classFiles.add(file);
-                // VirtualFileVisitor.limit(0);
-                return VirtualFileVisitor.SKIP_CHILDREN;
-              }
-              return CONTINUE;
-            }
-          });
-      VirtualFile classFile = null;
-      if (!classFiles.isEmpty()) {
-        classFile = classFiles.get(0);
-      }
-      return classFile;
-    }
-    return null;
-  } // getCorrespondingClassFile()
-}

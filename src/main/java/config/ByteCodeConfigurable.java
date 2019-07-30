@@ -30,19 +30,40 @@
 
 package config;
 
-import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurableProvider;
+import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.options.SearchableConfigurable;
+import javax.swing.*;
+import org.jetbrains.annotations.Nls;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * the bytecodecode-config-window-provider to load the for more information {@link
- * ConfigurableProvider}
- */
-public class BytecodeConfigProvider extends ConfigurableProvider {
+public class ByteCodeConfigurable implements SearchableConfigurable {
+  private configGUI configGui;
+  @NotNull
+  @Override
+  public String getId() {
+    return "bytecodedissassembler.config";
+  }
+  @Nls(capitalization = Nls.Capitalization.Title)
+  @Override
+  public String getDisplayName() {
+    return "Bytecode Disassembler";
+  }
 
   @Nullable
   @Override
-  public Configurable createConfigurable() {
-    return new ByteCodeConfig();
+  public JComponent createComponent() {
+    configGui = new configGUI();
+    return configGui.getRootPanel();
+  }
+
+  @Override
+  public boolean isModified() {
+    return this.configGui.isModified();
+  }
+
+  @Override
+  public void apply() throws ConfigurationException {
+    this.configGui.apply();
   }
 }

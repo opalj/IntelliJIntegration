@@ -48,7 +48,7 @@
   KEYWORDS="regexp:new|goto|if|else|throw|throws|catch|caught|return"
   MODIFIER="regexp:public|private|protected|default|static|final|abstract|synchronized|native|strictfp|volatile|transient"
   LEVEL="regexp:\{?((lv|param|exception(\[VM\])?@)([A-Za-z0-9])*(,\s)?)*\}?"
-  OPERATORS="regexp:\+|\-|\*|\&|\||\^|<<|>>|%|/|cmp" // added % and /
+  OPERATORS="regexp:\+|\-|\*|\&|\||\^|<<|>>|%|/|cmpl|cmp" // added % and /
   COMPARATORS="regexp:<=|>=|==|\!=|<|>"
   STRINGVAR = "regexp:<?[a-zA-Z$_][a-zA-Z0-9$_<>]*>?"
   ]
@@ -59,7 +59,8 @@ jbcFile ::=  item_
 
 private item_ ::= Annotation* ClassHead LBRACKET AttributesArea? FieldArea? MethodArea? RBRACKET
 
-ClassHead ::= ModifierV? (AT?) JAVATYPEHEAD JType (EXTENDS JType)? (IMPLEMENTS (JType(COMMA)?)+)?
+ClassHead ::= ModifierV? (AT?) JAVATYPEHEAD JType (LBRACKET JType COLON RBRACKET JType COLON COLON (NUMBER)? JType)? (EXTENDS JType)? (IMPLEMENTS (JType(COMMA)?)+)?
+
 
 // generic stuff
 

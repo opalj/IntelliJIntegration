@@ -6,12 +6,21 @@ package opalintegration;
 
 import java.io.File;
 import java.net.URL;
+import java.util.HashSet;
+
+import config.BytecodeConfig;
+import org.opalj.ai.domain.l0.PrimitiveTACAIDomain;
+import org.opalj.ai.domain.l1.DefaultDomainWithCFGAndDefUse;
+import org.opalj.ai.domain.l2.DefaultPerformInvocationsDomainWithCFGAndDefUse;
+import org.opalj.ai.fpcf.properties.AIDomainFactoryKey$;
 import org.opalj.br.Method;
 import org.opalj.br.analyses.JavaProject;
 import org.opalj.br.analyses.Project;
 import org.opalj.tac.*;
-import org.opalj.value.KnownTypedValue;
+import org.opalj.value.ValueInformation;
 import scala.Function1;
+import scala.collection.JavaConverters;
+import scala.collection.mutable.Set;
 
 /**
  * Is responsible for creating and providing the three-address-code (TAC) representation of a class
@@ -19,13 +28,32 @@ import scala.Function1;
  */
 class TacProducer extends DecompiledTextProducer {
 
-  private final Function1<Method, TACode<TACMethodParameter, DUVar<KnownTypedValue>>>
+  private final Function1<Method, AITACode<TACMethodParameter, ValueInformation>>
       methodTACodeFunction;
 
   TacProducer(String filepath) {
     Project<URL> uriProject = Project.apply(new File(filepath));
+    Class<?> domain;
+    switch(BytecodeConfig.getInstance().getTacKey()){
+      case ONE:
+        domain = PrimitiveTACAIDomain.class;
+        //PrimitiveTACAIDomain primitiveTACAIDomain = new PrimitiveTACAIDomain(uriProject, );
+        break;
+      case TWO:
+        domain = DefaultDomainWithCFGAndDefUse.class;
+        // <URL> urlDefaultDomainWithCFGAndDefUse = new DefaultDomainWithCFGAndDefUse<>(uriProject, );
+        break;
+     default:
+       domain = DefaultPerformInvocationsDomainWithCFGAndDefUse.class;//<URL> urlDefaultPerformInvocationsDomainWithCFGAndDefUse = new DefaultPerformInvocationsDomainWithCFGAndDefUse<>(uriProject, );
+       break;
+    }
+    HashSet<Class<?>> classes = new HashSet<>();
+    classes.add(domain);
+    Set<Class<?>> setAsScala = JavaConverters.<Class<?>>asScalaSet(classes);
+    //uriProject.updateProjectInformationKeyInitializationData(AIDomainFactoryKey$.MODULE$, (x)-> {if(x.isDefined()) return setAsScala.<Class<?>>toSet();else return x.get().$plus(domain).<Class<?>>toSet();});
+    uriProject.updateProjectInformationKeyInitializationData(AIDomainFactoryKey$.MODULE$, (x)-> setAsScala.<Class<?>>toSet());
     JavaProject javaProject = new JavaProject(uriProject);
-    methodTACodeFunction = javaProject.project().get(DefaultTACAIKey$.MODULE$);
+    methodTACodeFunction = javaProject.project().get(LazyDetachedTACAIKey$.MODULE$);
   }
 
   @Override
@@ -34,7 +62,7 @@ class TacProducer extends DecompiledTextProducer {
 
     if (method.body().isDefined()) {
       methodBody.append("\n");
-      TACode<TACMethodParameter, DUVar<KnownTypedValue>> TacCode =
+      TACode<TACMethodParameter, DUVar<ValueInformation>> TacCode =
           methodTACodeFunction.apply(method);
 
       String[] body = ToTxt.apply(TacCode).mkString("#newline#").split("#newline#");

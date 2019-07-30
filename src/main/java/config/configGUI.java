@@ -30,7 +30,11 @@
 
 package config;
 
+import globalData.TACKey;
+
 import javax.swing.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 public class configGUI {
   private JTabbedPane tabbedPane1;
@@ -39,8 +43,21 @@ public class configGUI {
   private JRadioButton zweitBesteEinstellungRadioButton;
   private JTree tree1;
   private JList list1;
-  private JSpinner spinner1;
-
+  private JRadioButton TacRadioButton3;
+  private JRadioButton TacRadioButton1;
+  private JRadioButton TacRadioButton2;
+  //####################
+  private final BytecodeConfig BCConfig = BytecodeConfig.getInstance();
+  public configGUI(){
+    TacRadioButton1.addItemListener(listener);
+    TacRadioButton2.addItemListener(listener);
+    TacRadioButton3.addItemListener(listener);
+    switch (BCConfig.getTacKey()){
+      case ONE: TacRadioButton1.setSelected(true);TacConfig=TACKey.ONE;break;
+      case TWO: TacRadioButton2.setSelected(true);TacConfig=TACKey.TWO;break;
+      case THREE: TacRadioButton3.setSelected(true);TacConfig=TACKey.THREE;break;
+    }
+  }
   public JPanel getRootPanel() {
     return rootPanel;
   }
@@ -48,4 +65,28 @@ public class configGUI {
   public void setRootPanel(JPanel rootPanel) {
     this.rootPanel = rootPanel;
   }
+
+  public boolean isModified(){
+    boolean modified = false;
+    modified |= !(BCConfig.getTacKey().compareTo(TacConfig) == 0);
+    return modified;
+  }
+  public void apply(){
+    BCConfig.setTacKey(TacConfig);
+  }
+
+  private TACKey TacConfig;
+
+  private ItemListener listener = e -> {
+    if(e.getStateChange() == ItemEvent.SELECTED) {
+      JRadioButton jRadioButton = (JRadioButton) e.getSource();
+      if (jRadioButton == TacRadioButton1) {
+        TacConfig = TACKey.ONE;
+      } else if (jRadioButton == TacRadioButton2) {
+        TacConfig = TACKey.TWO;
+      } else if (jRadioButton == TacRadioButton3) {
+        TacConfig = TACKey.THREE;
+      }
+    }
+  };
 }
