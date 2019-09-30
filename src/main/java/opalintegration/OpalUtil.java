@@ -4,17 +4,22 @@
 
 package opalintegration;
 
+import com.google.gson.Gson;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.*;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiJavaFile;
-import com.intellij.psi.PsiManager;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import com.typesafe.config.ConfigRenderOptions;
+import com.typesafe.config.ConfigValue;
+import config.BytecodeConfig;
 import globalData.GlobalData;
 import java.io.*;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +46,7 @@ public class OpalUtil {
    * (e.g. fields, methods, access flags, FQN of the class, etc.)
    */
   private static ClassFile classFile;
-
+  private static BytecodeConfig BCConfig = BytecodeConfig.getInstance();
   private static String projectPath; //
   private static String fqClassName; // the qualified name of the class that is to be decompiled
   private static File projectFile; //
@@ -175,21 +180,22 @@ public class OpalUtil {
       if (virtualClassFile.getCanonicalPath() != null
           && !virtualClassFile.getCanonicalPath().contains("!")) {
         projectPath = virtualClassFile.getPath();
-//         PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualClassFile);
-//        if (psiFile instanceof PsiJavaFile) {
-//          PsiJavaFile psiJavaFile = (PsiJavaFile) psiFile;
-//          final PsiClass[] classes = psiJavaFile.getClasses();
-//          fqClassName = classes[0].getQualifiedName();
-//          fqClassName = fqClassName != null ? fqClassName.replace('.', '/') : null;
-//        }else {
-//        }
       } else {
         String[] jarPath = getJarFileRootAndFileName(virtualClassFile);
         projectPath = jarPath[0];
         fqClassName = jarPath[1];
       }
+
       projectFile = new File(projectPath);
       uriProject = org.opalj.br.analyses.Project.apply(projectFile);
+      if(BCConfig.getProjectConfigString().length() == 0) {
+        ConfigRenderOptions configRenderOptions = ConfigRenderOptions.defaults().setOriginComments(true).setComments(true).setFormatted(true).setJson(false);
+        String render = uriProject.config().root().render(configRenderOptions);
+        BCConfig.setProjectConfigString(render);
+      }else{
+        Config mergedConfig = uriProject.config().withFallback(ConfigFactory.parseString(BCConfig.getProjectConfigString()));
+        uriProject = uriProject.apply(projectFile, uriProject.logContext(), mergedConfig);
+      }
       //Traversable<ClassFile> classFileTraversable = org.opalj.br.analyses.Project.apply$default$4();
       classFile = getClassFile(virtualClassFile);
     }
@@ -204,20 +210,6 @@ public class OpalUtil {
    */
   @Nullable
   private static ClassFile getClassFile(@NotNull VirtualFile virtualClassFile) {
-    //ConstArray<ClassFile> classFileConstArray = uriProject.allProjectClassFiles();
-    // first check the current project
-    //for (int i = 0; i < classFileConstArray.length(); i++) {
-    //  ClassFile cf = classFileConstArray.apply(i);
-    //  System.out.println(cf.fqn());
-//      if (cf.fqn()
-//          .equals(
-//              fqClassName.toUpperCase().endsWith(".CLASS")
-//                  ? fqClassName.substring(0, fqClassName.toUpperCase().lastIndexOf(".CLASS"))
-//                  : "")) {
-//        return cf;
-//      }
- //   }
-
     // (might be) a JAR
     if (virtualClassFile.getCanonicalPath() != null
         && virtualClassFile.getCanonicalPath().contains("!")) {

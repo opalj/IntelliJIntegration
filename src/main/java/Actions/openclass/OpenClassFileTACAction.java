@@ -11,7 +11,7 @@ package Actions.openclass;
 import static globalData.GlobalData.TAC_EDITOR_ID;
 
 /** {@link OpenClassFileAction} */
-public class OpenClassFileTACAction extends OpenClassFileAction {
+public class OpenClassFileTACAction extends PsiClassAction {
   public OpenClassFileTACAction() {
     super(TAC_EDITOR_ID);
   }

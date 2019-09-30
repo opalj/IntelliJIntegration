@@ -28,12 +28,22 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.ClassUtil;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
-import globalData.GlobalData;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
 public class PsiClassAction extends AnAction {
+    private final String editorName;
+    /**
+     * Instantiates a new Open class file action.
+     *
+     * @param editorName the editor name witch will be opened
+     */
+    PsiClassAction(String editorName) {
+        super();
+        this.editorName = editorName;
+    }
+
     @Override
     public void update(@NotNull AnActionEvent e) {
         String extension = ActionUtil.ExtString(e);
@@ -50,7 +60,8 @@ public class PsiClassAction extends AnAction {
         VirtualFile virtualFile = containingClass.getContainingFile().getVirtualFile();
         if(classFile != null){
             FileEditorManager.getInstance(project).openFile(classFile, true);
-            FileEditorManager.getInstance(project).setSelectedEditor(classFile, globalData.GlobalData.TAC_EDITOR_ID);
+            FileEditorManager.getInstance(project).setSelectedEditor(classFile, editorName);
+            return;
         }else{
             CompilerManager compilerManager = CompilerManager.getInstance(project);
             CompileScope filesCompileScope = compilerManager.createFilesCompileScope(new VirtualFile[]{virtualFile});
@@ -61,15 +72,16 @@ public class PsiClassAction extends AnAction {
                 if (errors == 0) {
                     VirtualFile lclassFile = LoadClassFileBytes(containingClass);
                    // ApplicationManager.getApplication().invokeLater(() -> FileEditorManager.getInstance(compileContext.getProject()).openFile(classFile, true), ModalityState.NON_MODAL);
-                    FileEditorManager.getInstance(compileContext.getProject()).setSelectedEditor(lclassFile, GlobalData.BYTECODE_EDITOR_ID);
+                    FileEditorManager.getInstance(compileContext.getProject()).setSelectedEditor(lclassFile, editorName);
+                }else {
+                    Notifications.Bus.notify(
+                            new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
+                                    .createNotification()
+                                    .setContent("cant find classfile for"+psiElement.getContainingFile().getName()+" \n YOU COULD BUILD THE WHOLE PROJECT AND RETRY IT"));
                 }
             };
             new Compiler().make(e.getProject(),filesCompileScope,compilingNotifaction);
         }
-        Notifications.Bus.notify(
-                new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
-                        .createNotification()
-                        .setContent("cant find classfile for"+psiElement.getContainingFile().getName()));
     }
     public static PsiClass getContainingClass(@NotNull PsiElement psiElement) {
 

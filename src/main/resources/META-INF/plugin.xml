@@ -57,9 +57,6 @@
 
     <actions>
         <!-- Add your actions here-->
-        <action class="Actions.openclass.PsiClassAction" text="Show Bytecode (PSI)" icon="/icons/jar-gray.png">
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-        </action>
         <action id="OpenFileInConsoleToolbarAction"
                 class="Actions.DnDJarAction"
                 description="Drag and drop to open jar file"

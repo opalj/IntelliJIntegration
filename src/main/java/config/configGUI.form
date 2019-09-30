@@ -59,10 +59,10 @@
               </splitpane>
             </children>
           </grid>
-          <grid id="98ac7" layout-manager="GridLayoutManager" row-count="4" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+          <grid id="98ac7" layout-manager="GridLayoutManager" row-count="3" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
-              <tabbedpane title="Bytecode"/>
+              <tabbedpane title="Project Config File"/>
             </constraints>
             <properties/>
             <border type="none"/>
@@ -72,28 +72,30 @@
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Hier könnten "/>
+                  <text value="Configfiles are written in HAVOC notation"/>
                 </properties>
               </component>
-              <vspacer id="f6a69">
+              <scrollpane id="f971">
                 <constraints>
-                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                 </constraints>
-              </vspacer>
-              <component id="8c0b4" class="javax.swing.JRadioButton" binding="besteEinstellungRadioButton" default-binding="true">
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="dde32" class="javax.swing.JTextArea" binding="ConfigTextArea">
+                    <constraints/>
+                    <properties>
+                      <text value="Testtext"/>
+                    </properties>
+                  </component>
+                </children>
+              </scrollpane>
+              <component id="12858" class="javax.swing.JRadioButton" binding="loadLastUsedProjectConfigRadioButton" default-binding="true">
                 <constraints>
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="beste Einstellung "/>
-                </properties>
-              </component>
-              <component id="48490" class="javax.swing.JRadioButton" binding="zweitBesteEinstellungRadioButton" default-binding="true">
-                <constraints>
-                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value="zweit beste Einstellung"/>
+                  <text value="load last used ProjectConfig"/>
                 </properties>
               </component>
             </children>

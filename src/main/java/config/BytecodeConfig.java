@@ -19,12 +19,22 @@ import org.jetbrains.annotations.Nullable;
 public class BytecodeConfig implements PersistentStateComponent<BytecodeConfig> {
     //fields to save into xml should be public
     // http://www.jetbrains.org/intellij/sdk/docs/basics/persisting_state_of_components.html
+    // TAC-Configs
     public TACKey tacKey = TACKey.ONE;
     public TACKey getTacKey() {
         return tacKey;
     }
     public void setTacKey(TACKey tacKey) {
         this.tacKey = tacKey;
+    }
+    // Project-Config
+    public String ProjectConfigString = "";
+    public String getProjectConfigString() {
+        return ProjectConfigString;
+    }
+
+    public void setProjectConfigString(String projectConfigString) {
+        ProjectConfigString = projectConfigString;
     }
 
     @Nullable

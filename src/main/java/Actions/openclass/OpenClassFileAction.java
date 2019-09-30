@@ -27,10 +27,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+
+import cucumber.api.java.hu.De;
 import opalintegration.OpalUtil;
 import org.jetbrains.annotations.NotNull;
 
 /** The type Open class file action performs to open a specified editor (tac/bytecode) */
+@Deprecated
 class OpenClassFileAction extends AnAction {
   private final String editorName;
 
