@@ -39,11 +39,13 @@ import org.jetbrains.annotations.Nullable;
 
 public class ByteCodeConfigurable implements SearchableConfigurable {
   private configGUI configGui;
+
   @NotNull
   @Override
   public String getId() {
     return "bytecodedissassembler.config";
   }
+
   @Nls(capitalization = Nls.Capitalization.Title)
   @Override
   public String getDisplayName() {

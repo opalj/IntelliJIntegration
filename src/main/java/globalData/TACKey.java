@@ -3,7 +3,9 @@
  */
 
 package globalData;
-//todo DomainFactory
+// todo DomainFactory
 public enum TACKey {
-    ONE, TWO,THREE
+  ONE,
+  TWO,
+  THREE
 }

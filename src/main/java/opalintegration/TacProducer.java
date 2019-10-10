@@ -4,11 +4,10 @@
 
 package opalintegration;
 
+import config.BytecodeConfig;
 import java.io.File;
 import java.net.URL;
 import java.util.HashSet;
-
-import config.BytecodeConfig;
 import org.opalj.ai.domain.l0.PrimitiveTACAIDomain;
 import org.opalj.ai.domain.l1.DefaultDomainWithCFGAndDefUse;
 import org.opalj.ai.domain.l2.DefaultPerformInvocationsDomainWithCFGAndDefUse;
@@ -34,26 +33,31 @@ class TacProducer extends DecompiledTextProducer {
   TacProducer(String filepath) {
     Project<URL> uriProject = Project.apply(new File(filepath));
     Class<?> domain;
-    switch(BytecodeConfig.getInstance().getTacKey()){
+    switch (BytecodeConfig.getInstance().getTacKey()) {
       case ONE:
         domain = PrimitiveTACAIDomain.class;
-        //PrimitiveTACAIDomain primitiveTACAIDomain = new PrimitiveTACAIDomain(uriProject, );
+        // PrimitiveTACAIDomain primitiveTACAIDomain = new PrimitiveTACAIDomain(uriProject, );
         break;
       case TWO:
         domain = DefaultDomainWithCFGAndDefUse.class;
-        // <URL> urlDefaultDomainWithCFGAndDefUse = new DefaultDomainWithCFGAndDefUse<>(uriProject, );
+        // <URL> urlDefaultDomainWithCFGAndDefUse = new DefaultDomainWithCFGAndDefUse<>(uriProject,
+        // );
         break;
       case THREE:
-       domain = DefaultPerformInvocationsDomainWithCFGAndDefUse.class;//<URL> urlDefaultPerformInvocationsDomainWithCFGAndDefUse = new DefaultPerformInvocationsDomainWithCFGAndDefUse<>(uriProject, );
-       break;
-       default:
-         domain = PrimitiveTACAIDomain.class;
-         break;
+        domain =
+            DefaultPerformInvocationsDomainWithCFGAndDefUse
+                .class; // <URL> urlDefaultPerformInvocationsDomainWithCFGAndDefUse = new
+                        // DefaultPerformInvocationsDomainWithCFGAndDefUse<>(uriProject, );
+        break;
+      default:
+        domain = PrimitiveTACAIDomain.class;
+        break;
     }
     HashSet<Class<?>> classes = new HashSet<>();
     classes.add(domain);
     Set<Class<?>> setAsScala = JavaConverters.<Class<?>>asScalaSet(classes);
-    uriProject.updateProjectInformationKeyInitializationData(AIDomainFactoryKey$.MODULE$, (x)-> setAsScala.<Class<?>>toSet());
+    uriProject.updateProjectInformationKeyInitializationData(
+        AIDomainFactoryKey$.MODULE$, (x) -> setAsScala.<Class<?>>toSet());
     JavaProject javaProject = new JavaProject(uriProject);
     methodTACodeFunction = javaProject.project().get(LazyDetachedTACAIKey$.MODULE$);
   }

@@ -28,8 +28,8 @@ public class DialogPannel extends JFrame {
   private JScrollPane scrollable;
   private JList jlist;
   private JButton durchsuchenButton;
-    private JTree tree1;
-    private int lastIndex;
+  private JTree tree1;
+  private int lastIndex;
   private File file;
   private Project project;
 
@@ -84,19 +84,19 @@ public class DialogPannel extends JFrame {
   }
 
   public void decompile() {
-    if(!dlm.isEmpty() &&  dlm.getSize() >= lastIndex) {
-        JarEntry jarEntry = dlm.get(lastIndex);
-        // open the file
-        VirtualFile localVirtualFileByPath =
-                JarFileSystem.getInstance().findLocalVirtualFileByPath(file.getPath());
-        assert localVirtualFileByPath != null;
-        localVirtualFileByPath = localVirtualFileByPath.findFileByRelativePath(jarEntry.getName());
-        FileEditorManager.getInstance(project)
-                .openFile(Objects.requireNonNull(localVirtualFileByPath), true);
+    if (!dlm.isEmpty() && dlm.getSize() >= lastIndex) {
+      JarEntry jarEntry = dlm.get(lastIndex);
+      // open the file
+      VirtualFile localVirtualFileByPath =
+          JarFileSystem.getInstance().findLocalVirtualFileByPath(file.getPath());
+      assert localVirtualFileByPath != null;
+      localVirtualFileByPath = localVirtualFileByPath.findFileByRelativePath(jarEntry.getName());
+      FileEditorManager.getInstance(project)
+          .openFile(Objects.requireNonNull(localVirtualFileByPath), true);
     }
   }
 
-    private void createUIComponents() {
-        panel1 = new JPanel();
-    }
+  private void createUIComponents() {
+    panel1 = new JPanel();
+  }
 }

@@ -4,7 +4,6 @@
 
 package opalintegration;
 
-import com.google.gson.Gson;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
@@ -12,22 +11,15 @@ import com.intellij.openapi.vfs.*;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import com.typesafe.config.ConfigRenderOptions;
-import com.typesafe.config.ConfigValue;
 import config.BytecodeConfig;
 import globalData.GlobalData;
 import java.io.*;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile;
 import org.opalj.br.*;
-import org.opalj.collection.immutable.ConstArray;
-import scala.collection.Traversable;
 
 /**
  * A utility class that serves a couple of purposes:
@@ -46,6 +38,7 @@ public class OpalUtil {
    * (e.g. fields, methods, access flags, FQN of the class, etc.)
    */
   private static ClassFile classFile;
+
   private static BytecodeConfig BCConfig = BytecodeConfig.getInstance();
   private static String projectPath; //
   private static String fqClassName; // the qualified name of the class that is to be decompiled
@@ -188,13 +181,23 @@ public class OpalUtil {
 
       projectFile = new File(projectPath);
       uriProject = org.opalj.br.analyses.Project.apply(projectFile);
-      if(BCConfig.getProjectConfigString().length() == 0) {
-        ConfigRenderOptions configRenderOptions = ConfigRenderOptions.defaults().setOriginComments(true).setComments(true).setFormatted(true).setJson(false);
-        String render = BCConfig.isProjectConfigJustOpal()? uriProject.config().atKey("org.opalj").root().render(configRenderOptions):
-        uriProject.config().root().render(configRenderOptions);
+      if (BCConfig.getProjectConfigString().length() == 0) {
+        ConfigRenderOptions configRenderOptions =
+            ConfigRenderOptions.defaults()
+                .setOriginComments(true)
+                .setComments(true)
+                .setFormatted(true)
+                .setJson(false);
+        String render =
+            BCConfig.isProjectConfigJustOpal()
+                ? uriProject.config().atKey("org.opalj").root().render(configRenderOptions)
+                : uriProject.config().root().render(configRenderOptions);
         BCConfig.setProjectConfigString(render);
-      }else{
-        Config mergedConfig = uriProject.config().withFallback(ConfigFactory.parseString(BCConfig.getProjectConfigString()));
+      } else {
+        Config mergedConfig =
+            uriProject
+                .config()
+                .withFallback(ConfigFactory.parseString(BCConfig.getProjectConfigString()));
         uriProject = uriProject.apply(projectFile, uriProject.logContext(), mergedConfig);
       }
       classFile = getClassFile(virtualClassFile);
@@ -223,7 +226,8 @@ public class OpalUtil {
         Object classFileObj =
             org.opalj.br.analyses.Project.JavaClassFileReader(
                     uriProject.logContext(), uriProject.config())
-                .ClassFile(() -> inputStream).head();
+                .ClassFile(() -> inputStream)
+                .head();
         if (classFileObj instanceof ClassFile) {
           return (ClassFile) classFileObj;
         }

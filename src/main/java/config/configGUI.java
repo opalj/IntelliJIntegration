@@ -31,13 +31,12 @@
 package config;
 
 import globalData.TACKey;
-
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 public class configGUI {
   private JTabbedPane tabbedPane1;
@@ -47,25 +46,36 @@ public class configGUI {
   private JRadioButton TacRadioButton2;
   private JTextArea ConfigTextArea;
   private JRadioButton justLoadOrgOpalRadioButton;
-  //####################
+  // ####################
   private final BytecodeConfig BCConfig = BytecodeConfig.getInstance();
-  public configGUI(){
+
+  public configGUI() {
     // TAC-Configs
     TacRadioButton1.addItemListener(tacButtonListener);
     TacRadioButton2.addItemListener(tacButtonListener);
     TacRadioButton3.addItemListener(tacButtonListener);
-    switch (BCConfig.getTacKey()){
-      case ONE: TacRadioButton1.setSelected(true);TacConfig=TACKey.ONE;break;
-      case TWO: TacRadioButton2.setSelected(true);TacConfig=TACKey.TWO;break;
-      case THREE: TacRadioButton3.setSelected(true);TacConfig=TACKey.THREE;break;
+    switch (BCConfig.getTacKey()) {
+      case ONE:
+        TacRadioButton1.setSelected(true);
+        TacConfig = TACKey.ONE;
+        break;
+      case TWO:
+        TacRadioButton2.setSelected(true);
+        TacConfig = TACKey.TWO;
+        break;
+      case THREE:
+        TacRadioButton3.setSelected(true);
+        TacConfig = TACKey.THREE;
+        break;
     }
     // Project Load Configs
-    justLoadOrgOpalRadioButton.setSelected( BCConfig.isProjectConfigJustOpal());
+    justLoadOrgOpalRadioButton.setSelected(BCConfig.isProjectConfigJustOpal());
     ProjectConfigTextChanged = false;
     ProjectConfigString = BCConfig.getProjectConfigString();
     ConfigTextArea.setText(ProjectConfigString);
     ConfigTextArea.getDocument().addDocumentListener(projectConfigLisener);
   }
+
   public JPanel getRootPanel() {
     return rootPanel;
   }
@@ -74,63 +84,67 @@ public class configGUI {
     this.rootPanel = rootPanel;
   }
 
-  public boolean isModified(){
+  public boolean isModified() {
     boolean modified = false;
     modified |= !(BCConfig.getTacKey().compareTo(TacConfig) == 0);
     modified |= !(BCConfig.isProjectConfigJustOpal() == justLoadOrgOpalRadioButton.isSelected());
     modified |= ProjectConfigTextChanged;
     return modified;
   }
-  public void apply(){
+
+  public void apply() {
     BCConfig.setTacKey(TacConfig);
-    //Project-Config
+    // Project-Config
     BCConfig.setProjectConfigJustOpal(justLoadOrgOpalRadioButton.isSelected());
     ProjectConfigTextChanged = false;
     BCConfig.setProjectConfigString(ProjectConfigString);
   }
-// TAC-Config-Lisener
+  // TAC-Config-Lisener
   private TACKey TacConfig;
 
-  private ItemListener tacButtonListener = e -> {
-    if(e.getStateChange() == ItemEvent.SELECTED) {
-      JRadioButton jRadioButton = (JRadioButton) e.getSource();
-      if (jRadioButton == TacRadioButton1) {
-        TacConfig = TACKey.ONE;
-      } else if (jRadioButton == TacRadioButton2) {
-        TacConfig = TACKey.TWO;
-      } else if (jRadioButton == TacRadioButton3) {
-        TacConfig = TACKey.THREE;
-      }
-    }
-  };
+  private ItemListener tacButtonListener =
+      e -> {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+          JRadioButton jRadioButton = (JRadioButton) e.getSource();
+          if (jRadioButton == TacRadioButton1) {
+            TacConfig = TACKey.ONE;
+          } else if (jRadioButton == TacRadioButton2) {
+            TacConfig = TACKey.TWO;
+          } else if (jRadioButton == TacRadioButton3) {
+            TacConfig = TACKey.THREE;
+          }
+        }
+      };
   // Project-Config-Lisener
   private boolean ProjectConfigTextChanged;
   private String ProjectConfigString;
-  private DocumentListener projectConfigLisener = new DocumentListener() {
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-      changedModfied(e);
-    }
-    @Override
-    public void removeUpdate(DocumentEvent e) {
-      changedModfied(e);
-    }
+  private DocumentListener projectConfigLisener =
+      new DocumentListener() {
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+          changedModfied(e);
+        }
 
-    @Override
-    public void changedUpdate(DocumentEvent e) {
-      changedModfied(e);
-    }
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+          changedModfied(e);
+        }
 
-    private void changedModfied(DocumentEvent e) {
-      int intEndPosition = e.getDocument().getEndPosition().getOffset();
-      ProjectConfigString = BCConfig.getProjectConfigString();
-      try {
-        ProjectConfigString = e.getDocument().getText(0,intEndPosition).trim();
-      } catch (BadLocationException ex) {
-        //TODO
-        ex.printStackTrace();
-      }
-      ProjectConfigTextChanged=true;
-    }
-  };
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+          changedModfied(e);
+        }
+
+        private void changedModfied(DocumentEvent e) {
+          int intEndPosition = e.getDocument().getEndPosition().getOffset();
+          ProjectConfigString = BCConfig.getProjectConfigString();
+          try {
+            ProjectConfigString = e.getDocument().getText(0, intEndPosition).trim();
+          } catch (BadLocationException ex) {
+            // TODO
+            ex.printStackTrace();
+          }
+          ProjectConfigTextChanged = true;
+        }
+      };
 }

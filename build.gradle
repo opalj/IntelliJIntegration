@@ -19,7 +19,7 @@ shadowJar {
     }
 }
 group 'Kollektiv 23'
-version '1.0.7'
+version '1.0.8'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -59,8 +59,8 @@ publishPlugin {
     dependsOn('shadowJar')
     // http://www.jetbrains.org/intellij/sdk/docs/plugin_repository/api/plugin_upload.html
     username intellijPublishUsername
-    password intellijPublishPassword
-    //token intellijPublishToken
+    //password intellijPublishPassword
+    token intellijPublishToken
     //channels 'beta'
     distributionFile "build/libs/${intellij.pluginName}-${version}-all.jar"
 }

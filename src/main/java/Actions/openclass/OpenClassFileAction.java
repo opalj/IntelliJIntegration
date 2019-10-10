@@ -12,10 +12,7 @@ import Actions.ActionUtil;
 import Compile.Compiler;
 import com.intellij.notification.*;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileTypes.StdFileTypes;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.*;
 import com.intellij.openapi.vfs.*;
@@ -23,12 +20,8 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
-
-import cucumber.api.java.hu.De;
 import opalintegration.OpalUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -78,28 +71,28 @@ class OpenClassFileAction extends AnAction {
     // virtualFile = element.getNavigationElement().getContainingFile().getVirtualFile();
     virtualFile = Objects.requireNonNull(e.getData(CommonDataKeys.PSI_FILE)).getVirtualFile();
     String extension = virtualFile.getExtension();
-    //if (StdFileTypes.CLASS.getDefaultExtension().equals(extension)) { // if you clicked on class-file
-      if (ProjectFileIndex.getInstance(project).isInLibrary(virtualFile)) {
-        String FileName = OpalUtil.getJarFileRootAndFileName(virtualFile.getParent())[1];
-        Collection<VirtualFile> virtualFilesByName =
-            FilenameIndex.getVirtualFilesByName(
-                project,
-                virtualFile.getNameWithoutExtension() + ".class",
-                GlobalSearchScope.allScope(project));
-        for (VirtualFile vf : virtualFilesByName) {
-          if (vf.getPath().contains(FileName)) {
-            FileEditorManager.getInstance(project).openFile(vf, true);
-            FileEditorManager.getInstance(project).setSelectedEditor(vf, editorName);
-            return;
-          }
-          }
-        Notifications.Bus.notify(
-                new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
-                        .createNotification()
-                        .setContent("can't open the class file : " + virtualFile.getName()));
-        }else
-      //}//else build a class file
-      new Compiler().make(project,virtualFile,editorName);
+    // if (StdFileTypes.CLASS.getDefaultExtension().equals(extension)) { // if you clicked on
+    // class-file
+    if (ProjectFileIndex.getInstance(project).isInLibrary(virtualFile)) {
+      String FileName = OpalUtil.getJarFileRootAndFileName(virtualFile.getParent())[1];
+      Collection<VirtualFile> virtualFilesByName =
+          FilenameIndex.getVirtualFilesByName(
+              project,
+              virtualFile.getNameWithoutExtension() + ".class",
+              GlobalSearchScope.allScope(project));
+      for (VirtualFile vf : virtualFilesByName) {
+        if (vf.getPath().contains(FileName)) {
+          FileEditorManager.getInstance(project).openFile(vf, true);
+          FileEditorManager.getInstance(project).setSelectedEditor(vf, editorName);
+          return;
+        }
       }
-  } // actionPerformed
-
+      Notifications.Bus.notify(
+          new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
+              .createNotification()
+              .setContent("can't open the class file : " + virtualFile.getName()));
+    } else
+      // }//else build a class file
+      new Compiler().make(project, virtualFile, editorName);
+  }
+} // actionPerformed
