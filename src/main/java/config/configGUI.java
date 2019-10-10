@@ -42,13 +42,11 @@ import java.awt.event.ItemListener;
 public class configGUI {
   private JTabbedPane tabbedPane1;
   private JPanel rootPanel;
-  private JTree tree1;
-  private JList list1;
   private JRadioButton TacRadioButton3;
   private JRadioButton TacRadioButton1;
   private JRadioButton TacRadioButton2;
   private JTextArea ConfigTextArea;
-  private JRadioButton loadLastUsedProjectConfigRadioButton;
+  private JRadioButton justLoadOrgOpalRadioButton;
   //####################
   private final BytecodeConfig BCConfig = BytecodeConfig.getInstance();
   public configGUI(){
@@ -62,6 +60,7 @@ public class configGUI {
       case THREE: TacRadioButton3.setSelected(true);TacConfig=TACKey.THREE;break;
     }
     // Project Load Configs
+    justLoadOrgOpalRadioButton.setSelected( BCConfig.isProjectConfigJustOpal());
     ProjectConfigTextChanged = false;
     ProjectConfigString = BCConfig.getProjectConfigString();
     ConfigTextArea.setText(ProjectConfigString);
@@ -78,12 +77,14 @@ public class configGUI {
   public boolean isModified(){
     boolean modified = false;
     modified |= !(BCConfig.getTacKey().compareTo(TacConfig) == 0);
+    modified |= !(BCConfig.isProjectConfigJustOpal() == justLoadOrgOpalRadioButton.isSelected());
     modified |= ProjectConfigTextChanged;
     return modified;
   }
   public void apply(){
     BCConfig.setTacKey(TacConfig);
     //Project-Config
+    BCConfig.setProjectConfigJustOpal(justLoadOrgOpalRadioButton.isSelected());
     ProjectConfigTextChanged = false;
     BCConfig.setProjectConfigString(ProjectConfigString);
   }

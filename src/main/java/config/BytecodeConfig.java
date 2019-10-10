@@ -28,6 +28,15 @@ public class BytecodeConfig implements PersistentStateComponent<BytecodeConfig> 
         this.tacKey = tacKey;
     }
     // Project-Config
+    public boolean ProjectConfigJustOpal = true;
+
+    public boolean isProjectConfigJustOpal() {
+        return ProjectConfigJustOpal;
+    }
+    public void setProjectConfigJustOpal(boolean projectConfigJustOpal) {
+        ProjectConfigJustOpal = projectConfigJustOpal;
+    }
+
     public String ProjectConfigString = "";
     public String getProjectConfigString() {
         return ProjectConfigString;

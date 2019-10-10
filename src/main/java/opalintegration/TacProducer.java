@@ -43,14 +43,16 @@ class TacProducer extends DecompiledTextProducer {
         domain = DefaultDomainWithCFGAndDefUse.class;
         // <URL> urlDefaultDomainWithCFGAndDefUse = new DefaultDomainWithCFGAndDefUse<>(uriProject, );
         break;
-     default:
+      case THREE:
        domain = DefaultPerformInvocationsDomainWithCFGAndDefUse.class;//<URL> urlDefaultPerformInvocationsDomainWithCFGAndDefUse = new DefaultPerformInvocationsDomainWithCFGAndDefUse<>(uriProject, );
        break;
+       default:
+         domain = PrimitiveTACAIDomain.class;
+         break;
     }
     HashSet<Class<?>> classes = new HashSet<>();
     classes.add(domain);
     Set<Class<?>> setAsScala = JavaConverters.<Class<?>>asScalaSet(classes);
-    //uriProject.updateProjectInformationKeyInitializationData(AIDomainFactoryKey$.MODULE$, (x)-> {if(x.isDefined()) return setAsScala.<Class<?>>toSet();else return x.get().$plus(domain).<Class<?>>toSet();});
     uriProject.updateProjectInformationKeyInitializationData(AIDomainFactoryKey$.MODULE$, (x)-> setAsScala.<Class<?>>toSet());
     JavaProject javaProject = new JavaProject(uriProject);
     methodTACodeFunction = javaProject.project().get(LazyDetachedTACAIKey$.MODULE$);

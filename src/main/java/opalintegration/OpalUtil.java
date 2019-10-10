@@ -190,13 +190,13 @@ public class OpalUtil {
       uriProject = org.opalj.br.analyses.Project.apply(projectFile);
       if(BCConfig.getProjectConfigString().length() == 0) {
         ConfigRenderOptions configRenderOptions = ConfigRenderOptions.defaults().setOriginComments(true).setComments(true).setFormatted(true).setJson(false);
-        String render = uriProject.config().root().render(configRenderOptions);
+        String render = BCConfig.isProjectConfigJustOpal()? uriProject.config().atKey("org.opalj").root().render(configRenderOptions):
+        uriProject.config().root().render(configRenderOptions);
         BCConfig.setProjectConfigString(render);
       }else{
         Config mergedConfig = uriProject.config().withFallback(ConfigFactory.parseString(BCConfig.getProjectConfigString()));
         uriProject = uriProject.apply(projectFile, uriProject.logContext(), mergedConfig);
       }
-      //Traversable<ClassFile> classFileTraversable = org.opalj.br.analyses.Project.apply$default$4();
       classFile = getClassFile(virtualClassFile);
     }
   }
