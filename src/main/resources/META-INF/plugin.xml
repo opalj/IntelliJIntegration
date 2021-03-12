@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>23.bytecode-disassembler</id>
     <name>Bytecode Disassembler</name>
-    <vendor url="">Kollektiv 23</vendor>
+    <vendor url="">OpalJ</vendor>
 
     <description><![CDATA[
     OPAL Framework integration for IntelliJ IDEA.<br>
@@ -12,14 +12,15 @@
     <version>1.0.6</version>
     <!-- until-build version is looking into the future might be wrong!! -->
     <!--<idea-version since-build="181" until-build="183.*"/>-->
-    <idea-version since-build="181"/>
+    <idea-version since-build="191"/>
 
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
-    <!-- uncomment to enable plugin in all products
+
+    <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
-    -->
+    <depends>com.intellij.modules.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
