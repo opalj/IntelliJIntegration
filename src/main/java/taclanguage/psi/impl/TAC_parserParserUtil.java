@@ -16,7 +16,10 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.util.Iconable;
 import com.intellij.pom.Navigatable;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementFactory;
+import com.intellij.psi.PsiNameIdentifierOwner;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.impl.source.resolve.reference.impl.providers.JavaClassReferenceProvider;
 import java.util.Objects;
@@ -127,11 +130,12 @@ public class TAC_parserParserUtil extends GeneratedParserUtilBase {
       return null;
     }
   }
+
   /**
-   * @see PsiElement#getReferences() for further details
-   * @see com.intellij.psi.PsiReferenceRegistrar for further details
    * @param element a class type (as FQN, e.g. java.lang.String)
    * @return the references to each element in the FQN (e.g. ["java", "lang", "String"])
+   * @see PsiElement#getReferences() for further details
+   * @see com.intellij.psi.PsiReferenceRegistrar for further details
    */
   public static PsiReference[] getReferences(TACJType element) {
     JavaClassReferenceProvider provider = new JavaClassReferenceProvider();
@@ -148,9 +152,9 @@ public class TAC_parserParserUtil extends GeneratedParserUtilBase {
   }
 
   /**
-   * @see PsiElement#getReferences() for further details
    * @param element an invoked method in our TAC-Editor
    * @return the Java-references to this method
+   * @see PsiElement#getReferences() for further details
    */
   @NotNull
   public static PsiReference[] getReferences(TACDefMethodName element) {
@@ -181,8 +185,7 @@ public class TAC_parserParserUtil extends GeneratedParserUtilBase {
               Objects.requireNonNull(methodHead.getModifierV()).getText().length() == 0
                   ? methodHead.getType().getText()
                   : methodHead.getModifierV().getText() + " " + methodHead.getType().getText();
-          return PsiElementFactory.SERVICE
-              .getInstance(element.getProject())
+          return PsiElementFactory.getInstance(element.getProject())
               .createMethodFromText(helpinger + " method()", null)
               .getIcon(flags);
         } catch (Exception e) {
@@ -215,8 +218,7 @@ public class TAC_parserParserUtil extends GeneratedParserUtilBase {
       public Icon getIcon(boolean unused) {
         int flags = Iconable.ICON_FLAG_READ_STATUS | Iconable.ICON_FLAG_VISIBILITY;
         try {
-          return PsiElementFactory.SERVICE
-              .getInstance(element.getProject())
+          return PsiElementFactory.getInstance(element.getProject())
               .createFieldFromText(element.getText(), null)
               .getIcon(flags);
         } catch (Exception e) {

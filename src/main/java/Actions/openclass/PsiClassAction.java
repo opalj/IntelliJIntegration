@@ -7,7 +7,7 @@ import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.compiler.CompileScope;
 import com.intellij.openapi.compiler.CompileStatusNotification;
 import com.intellij.openapi.compiler.CompilerManager;
@@ -144,15 +144,16 @@ public class PsiClassAction extends AnAction {
     // need to be changed
     e.getPresentation()
         .setEnabledAndVisible(
-            e.getData(DataKeys.PSI_ELEMENT) != null && e.getData(DataKeys.PROJECT) != null);
+            e.getData(CommonDataKeys.PSI_ELEMENT) != null
+                && e.getData(CommonDataKeys.PROJECT) != null);
   }
 
   @Override
   public void actionPerformed(@NotNull AnActionEvent e) {
-    PsiElement psiElement = e.getData(DataKeys.PSI_ELEMENT);
+    PsiElement psiElement = e.getData(CommonDataKeys.PSI_ELEMENT);
     PsiClass containingClass = getContainingClass(psiElement);
     VirtualFile classFile = LoadClassFileBytes(containingClass);
-    Project project = e.getData(DataKeys.PROJECT);
+    Project project = e.getData(CommonDataKeys.PROJECT);
     VirtualFile virtualFile = containingClass.getContainingFile().getVirtualFile();
     if (classFile != null) {
       FileEditorManager.getInstance(project).openFile(classFile, true);

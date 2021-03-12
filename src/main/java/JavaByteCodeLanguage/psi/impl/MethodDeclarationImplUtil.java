@@ -86,8 +86,7 @@ class MethodDeclarationImplUtil {
                   .map(PsiElement::getText)
                   .collect(Collectors.joining(" "));
           helpinger = prehelpinger.length() > 0 ? prehelpinger + " " + helpinger : helpinger;
-          return PsiElementFactory.SERVICE
-              .getInstance(element.getProject())
+          return PsiElementFactory.getInstance(element.getProject())
               .createMethodFromText(helpinger + " method()", null)
               .getIcon(flags);
         } catch (Exception e) {

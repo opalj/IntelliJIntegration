@@ -63,7 +63,7 @@ public class JavaByteCodeParserDefinition implements ParserDefinition {
     return new JavaByteCodeFile(viewProvider);
   }
 
-  public SpaceRequirements spaceExistanceTypeBetweenTokens(ASTNode left, ASTNode right) {
+  public SpaceRequirements spaceExistenceTypeBetweenTokens(ASTNode left, ASTNode right) {
     return SpaceRequirements.MAY;
   }
 

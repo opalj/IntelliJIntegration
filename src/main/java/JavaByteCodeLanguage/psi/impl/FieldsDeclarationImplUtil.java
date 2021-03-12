@@ -64,8 +64,7 @@ class FieldsDeclarationImplUtil {
       public Icon getIcon(boolean unused) {
         int flags = Iconable.ICON_FLAG_READ_STATUS | Iconable.ICON_FLAG_VISIBILITY;
         try {
-          return PsiElementFactory.SERVICE
-              .getInstance(element.getProject())
+          return PsiElementFactory.getInstance(element.getProject())
               .createFieldFromText(element.getText(), null)
               .getIcon(flags);
         } catch (Exception e) {
