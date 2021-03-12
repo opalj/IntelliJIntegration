@@ -5,7 +5,6 @@
 package listeners;
 
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.newvfs.BulkFileListener;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
@@ -31,13 +30,18 @@ public class OpalVirtualFileListener implements BulkFileListener {
           if (event.getFile().getExtension() == null) {
             return;
           }
-          if (event.getFile().getExtension().equals(StdFileTypes.CLASS.getDefaultExtension())) {
+          if (event
+              .getFile()
+              .getExtension()
+              .equals(
+                  com.intellij.ide.highlighter.JavaClassFileType.INSTANCE.getDefaultExtension())) {
             Arrays.stream(FileEditorManager.getInstance(project).getEditors(event.getFile()))
                 .filter(
                     (e) ->
                         !Objects.equals(
                             Objects.requireNonNull(e.getFile()).getExtension(),
-                            StdFileTypes.CLASS.getDefaultExtension()))
+                            com.intellij.ide.highlighter.JavaClassFileType.INSTANCE
+                                .getDefaultExtension()))
                 .forEach(
                     e -> {
                       OpalUtil.prepare(

@@ -13,7 +13,6 @@ import com.intellij.openapi.compiler.CompileStatusNotification;
 import com.intellij.openapi.compiler.CompilerManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.FileTypeRegistry;
-import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.CompilerModuleExtension;
@@ -84,15 +83,14 @@ public class PsiClassAction extends AnAction {
       VirtualFile file = fileClass.getOriginalElement().getContainingFile().getVirtualFile();
       if (file != null) {
         ProjectFileIndex index = ProjectFileIndex.SERVICE.getInstance(aClass.getProject());
-        if (FileTypeRegistry.getInstance().isFileOfType(file, StdFileTypes.CLASS)) {
+        if (FileTypeRegistry.getInstance()
+            .isFileOfType(file, com.intellij.ide.highlighter.JavaClassFileType.INSTANCE)) {
           // compiled class; looking for the right .class file (inner class 'A.B' is "contained" in
           // 'A.class', but we need 'A$B.class')
           String classFileName = StringUtil.getShortName(jvmClassName) + ".class";
           if (index.isInLibraryClasses(file)) {
             VirtualFile classFile = file.getParent().findChild(classFileName);
-            if (classFile != null) {
-              return classFile;
-            }
+            return classFile;
           } else {
             File classFile = new File(file.getParent().getPath(), classFileName);
             if (classFile.isFile()) {
