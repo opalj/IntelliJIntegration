@@ -86,19 +86,10 @@ gradle.projectsEvaluated {
         options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
     }
 }
-//spotbugs {
-//    reports {
-//        xml.enabled = false
-//        html.enabled = true
-//    }
-//    ignoreFailures = true
-//}
-//tasks.withType(Pmd){
-//    reports{
-//        xml.enabled=false
-//        html.enabled=true
-//    }
-//}
+spotbugs {
+    ignoreFailures = true
+    extraArgs = ['-html:fancy-hist.xsl']
+}
 
 checkstyle {
     toolVersion "8.10.1"
