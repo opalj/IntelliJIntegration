@@ -122,9 +122,8 @@
     <application-components>
         <!-- Add your application components here -->
     </application-components>
-    <project-components>
-        <component>
-            <implementation-class>Components.OpalVirtualFileListener</implementation-class>
-        </component>
-    </project-components>
+
+    <projectListeners>
+        <listener class="listeners.OpalVirtualFileListener" topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+    </projectListeners>
 </idea-plugin>
