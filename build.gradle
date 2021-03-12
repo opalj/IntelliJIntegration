@@ -1,10 +1,11 @@
+import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 
 plugins {
     id 'java'
     id 'scala' // maybe helping
     // check allways for updates https://github.com/JetBrains/gradle-intellij-plugin/releases
     id 'org.jetbrains.intellij' version '0.7.2'
-    id 'org.openjfx.javafxplugin' version '0.0.8'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
     id 'org.jetbrains.changelog' version "1.1.2"
     id 'checkstyle'
     id 'pmd'
@@ -16,8 +17,8 @@ plugins {
 group 'opalj'
 version '1.0.9'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 repositories {
     //mavenLocal()
@@ -38,7 +39,7 @@ dependencies {
 }
 //https://github.com/JetBrains/gradle-intellij-plugin#configuration
 intellij {
-    version = 'IC-2020.3.3' // IC Community Edition
+    version = 'IC-2020.3.2' // IC Community Edition
     updateSinceUntilBuild false //Disables updating since-build attribute in plugin.xml
     plugins = ['com.intellij.java', 'org.intellij.scala:2020.3.21' , 'PsiViewer:203-SNAPSHOT'] // load the the scala-plugin
     pluginName = 'bytecode-disassembler'
@@ -77,7 +78,7 @@ check {
 }
 
 javafx {
-    version = "11"
+    version = "16"
     modules = [ 'javafx.web', 'javafx.graphics', 'javafx.swing' ]
 }
 
@@ -97,10 +98,16 @@ checkstyle {
 //    maxErrors 20
 }
 pmd {
-    toolVersion = "6.11.0"
+    toolVersion = "6.32.0"
     ignoreFailures = true
     ruleSetFiles = files("config/pmd/myRuleSets.xml")
 }
 runIde {
     maxHeapSize = "4g"
+}
+
+shadowJar {
+    transform(AppendingTransformer) {
+        resource = 'reference.conf'
+    }
 }

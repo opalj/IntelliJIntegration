@@ -9,7 +9,7 @@
 
     <change-notes>drop'down added , some new functionality added</change-notes>
 
-    <version>1.0.6</version>
+    <version>WillBeSetByBuild</version>
     <!-- until-build version is looking into the future might be wrong!! -->
     <!--<idea-version since-build="181" until-build="183.*"/>-->
     <idea-version since-build="191"/>
