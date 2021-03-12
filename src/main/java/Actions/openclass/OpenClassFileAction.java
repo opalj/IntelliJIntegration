@@ -10,12 +10,15 @@ package Actions.openclass;
 
 import Actions.ActionUtil;
 import Compile.Compiler;
-import com.intellij.notification.*;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.notification.NotificationGroupManager;
+import com.intellij.notification.Notifications;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.*;
-import com.intellij.openapi.vfs.*;
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.FilenameIndex;
@@ -88,7 +91,8 @@ class OpenClassFileAction extends AnAction {
         }
       }
       Notifications.Bus.notify(
-          new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
+          NotificationGroupManager.getInstance()
+              .getNotificationGroup("OpalPlugin")
               .createNotification()
               .setContent("can't open the class file : " + virtualFile.getName()));
     } else

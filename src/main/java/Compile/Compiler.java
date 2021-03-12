@@ -4,8 +4,7 @@
 
 package Compile;
 
-import com.intellij.notification.NotificationDisplayType;
-import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -29,6 +28,10 @@ import org.jetbrains.annotations.NotNull;
 public class Compiler {
 
   //  private static final Logger LOGGER = Logger.getLogger(Compiler.class.getName());
+
+  private CompileStatusNotification compilingNotifaction;
+  private Queue<Runnable> queue;
+
   /**
    * compiles an whole project
    *
@@ -48,7 +51,8 @@ public class Compiler {
     if (!compilerManager.isUpToDate(scope)) {
       compilerManager.makeWithModalProgress(scope, compilingNotifaction);
       Notifications.Bus.notify(
-          new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
+          NotificationGroupManager.getInstance()
+              .getNotificationGroup("OpalPlugin")
               .createNotification()
               .setContent("building " + scope.toString() + " to show "));
       // compilerManager.make(scope, compilingNotifaction);
@@ -67,7 +71,8 @@ public class Compiler {
     CompilerManager compilerManager = CompilerManager.getInstance(project);
     if (!compilerManager.isCompilableFileType(virtualFile.getFileType())) {
       Notifications.Bus.notify(
-          new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
+          NotificationGroupManager.getInstance()
+              .getNotificationGroup("OpalPlugin")
               .createNotification()
               .setContent(
                   "can't find a registered compiler in given project for: "
@@ -102,9 +107,6 @@ public class Compiler {
     ApplicationManager.getApplication()
         .invokeLater(() -> compilerManager.compile(virtualFiles, compilingNotifaction));
   }
-
-  private CompileStatusNotification compilingNotifaction;
-  private Queue<Runnable> queue;
 
   /**
    * Will look for the corresponding .class-file of the passed in .java-file in the output directory

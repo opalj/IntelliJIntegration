@@ -3,8 +3,7 @@ package Actions.openclass;
 import Actions.ActionUtil;
 import Compile.Compiler;
 import com.intellij.ide.util.JavaAnonymousClassesHelper;
-import com.intellij.notification.NotificationDisplayType;
-import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -32,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class PsiClassAction extends AnAction {
   private final String editorName;
+
   /**
    * Instantiates a new Open class file action.
    *
@@ -40,56 +40,6 @@ public class PsiClassAction extends AnAction {
   PsiClassAction(String editorName) {
     super();
     this.editorName = editorName;
-  }
-
-  @Override
-  public void update(@NotNull AnActionEvent e) {
-    String extension = ActionUtil.ExtString(e);
-    // need to be changed
-    e.getPresentation()
-        .setEnabledAndVisible(
-            e.getData(DataKeys.PSI_ELEMENT) != null && e.getData(DataKeys.PROJECT) != null);
-  }
-
-  @Override
-  public void actionPerformed(@NotNull AnActionEvent e) {
-    PsiElement psiElement = e.getData(DataKeys.PSI_ELEMENT);
-    PsiClass containingClass = getContainingClass(psiElement);
-    VirtualFile classFile = LoadClassFileBytes(containingClass);
-    Project project = e.getData(DataKeys.PROJECT);
-    VirtualFile virtualFile = containingClass.getContainingFile().getVirtualFile();
-    if (classFile != null) {
-      FileEditorManager.getInstance(project).openFile(classFile, true);
-      FileEditorManager.getInstance(project).setSelectedEditor(classFile, editorName);
-      return;
-    } else {
-      CompilerManager compilerManager = CompilerManager.getInstance(project);
-      CompileScope filesCompileScope =
-          compilerManager.createFilesCompileScope(new VirtualFile[] {virtualFile});
-      CompileStatusNotification compilingNotifaction =
-          (aborted, errors, warnings, compileContext) -> {
-            if (aborted) { // do nothing if manually channeled
-              return;
-            }
-            if (errors == 0) {
-              VirtualFile lclassFile = LoadClassFileBytes(containingClass);
-              // ApplicationManager.getApplication().invokeLater(() ->
-              // FileEditorManager.getInstance(compileContext.getProject()).openFile(classFile,
-              // true), ModalityState.NON_MODAL);
-              FileEditorManager.getInstance(compileContext.getProject())
-                  .setSelectedEditor(lclassFile, editorName);
-            } else {
-              Notifications.Bus.notify(
-                  new NotificationGroup("OpalPlugin", NotificationDisplayType.BALLOON, false)
-                      .createNotification()
-                      .setContent(
-                          "cant find classfile for"
-                              + psiElement.getContainingFile().getName()
-                              + " \n YOU COULD BUILD THE WHOLE PROJECT AND RETRY IT"));
-            }
-          };
-      new Compiler().make(e.getProject(), filesCompileScope, compilingNotifaction);
-    }
   }
 
   public static PsiClass getContainingClass(@NotNull PsiElement psiElement) {
@@ -188,5 +138,56 @@ public class PsiClassAction extends AnAction {
     }
 
     return null;
+  }
+
+  @Override
+  public void update(@NotNull AnActionEvent e) {
+    String extension = ActionUtil.ExtString(e);
+    // need to be changed
+    e.getPresentation()
+        .setEnabledAndVisible(
+            e.getData(DataKeys.PSI_ELEMENT) != null && e.getData(DataKeys.PROJECT) != null);
+  }
+
+  @Override
+  public void actionPerformed(@NotNull AnActionEvent e) {
+    PsiElement psiElement = e.getData(DataKeys.PSI_ELEMENT);
+    PsiClass containingClass = getContainingClass(psiElement);
+    VirtualFile classFile = LoadClassFileBytes(containingClass);
+    Project project = e.getData(DataKeys.PROJECT);
+    VirtualFile virtualFile = containingClass.getContainingFile().getVirtualFile();
+    if (classFile != null) {
+      FileEditorManager.getInstance(project).openFile(classFile, true);
+      FileEditorManager.getInstance(project).setSelectedEditor(classFile, editorName);
+      return;
+    } else {
+      CompilerManager compilerManager = CompilerManager.getInstance(project);
+      CompileScope filesCompileScope =
+          compilerManager.createFilesCompileScope(new VirtualFile[] {virtualFile});
+      CompileStatusNotification compilingNotifaction =
+          (aborted, errors, warnings, compileContext) -> {
+            if (aborted) { // do nothing if manually channeled
+              return;
+            }
+            if (errors == 0) {
+              VirtualFile lclassFile = LoadClassFileBytes(containingClass);
+              // ApplicationManager.getApplication().invokeLater(() ->
+              // FileEditorManager.getInstance(compileContext.getProject()).openFile(classFile,
+              // true), ModalityState.NON_MODAL);
+              FileEditorManager.getInstance(compileContext.getProject())
+                  .setSelectedEditor(lclassFile, editorName);
+            } else {
+              Notifications.Bus.notify(
+                  NotificationGroupManager.getInstance()
+                      .getNotificationGroup("OpalPlugin")
+                      .createNotification()
+                      .setContent(
+                          "cant find classfile for"
+                              + psiElement.getContainingFile().getName()
+                              + " \n YOU COULD BUILD THE WHOLE PROJECT AND RETRY IT"));
+            }
+          };
+      new Compiler().make(e.getProject(), filesCompileScope, compilingNotifaction);
+    }
   }
 }
