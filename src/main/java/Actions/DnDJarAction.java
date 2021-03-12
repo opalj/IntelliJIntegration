@@ -15,7 +15,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ui.JBUI;
-import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.MouseAdapter;
@@ -51,6 +50,7 @@ public class DnDJarAction extends AnAction implements CustomComponentAction {
     if (selectedFile.getName().toUpperCase().endsWith(".CLASS"))
       FileEditorManager.getInstance(project).openFile(Objects.requireNonNull(selectedFile), true);
   }
+
   // todo versioncheck
   @NotNull
   @Override
@@ -65,12 +65,16 @@ public class DnDJarAction extends AnAction implements CustomComponentAction {
           @Override
           public void mousePressed(MouseEvent e) {
             actionPerformed(
-                AnActionEvent.createFromInputEvent(DnDJarAction.this, e, ActionPlaces.UNKNOWN));
+                AnActionEvent.createFromInputEvent(
+                    e,
+                    ActionPlaces.UNKNOWN,
+                    null,
+                    DataManager.getInstance().getDataContext(e.getComponent())));
           }
 
           @Override
           public void mouseEntered(MouseEvent e) {
-            comp.setBackground(JBUI.CurrentTheme.ToolWindow.tabHoveredBackground(true));
+            comp.setBackground(JBUI.CurrentTheme.ToolWindow.hoverBackground());
           }
 
           @Override
