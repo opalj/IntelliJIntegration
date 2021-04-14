@@ -3,7 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransfor
 plugins {
     id 'java'
     id 'scala' // maybe helping
-    // check allways for updates https://github.com/JetBrains/gradle-intellij-plugin/releases
+    // check always for updates https://github.com/JetBrains/gradle-intellij-plugin/releases
     id 'org.jetbrains.intellij' version '0.7.2'
     id 'org.openjfx.javafxplugin' version '0.0.9'
     id 'org.jetbrains.changelog' version "1.1.2"
@@ -24,24 +24,24 @@ repositories {
     //mavenLocal()
     mavenCentral()
     jcenter()
-    maven { url = 'https://mvnrepository.com/artifact/de.opal-project/'} //opal version 2.0.1
+    maven { url = 'https://mvnrepository.com/artifact/de.opal-project/'} //opal stable
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' } // opal snapshot
 }
 
 
 dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
-    implementation group: 'de.opal-project', name: 'abstract-interpretation-framework_2.12', version: '3.0.0-SNAPSHOT' // version:'2.0.1'
-    implementation group: 'de.opal-project', name:'bytecode-disassembler_2.12', version: '3.0.0-SNAPSHOT' // version:'2.0.1'
-    implementation group: 'de.opal-project', name: 'bytecode-representation_2.12', version: '3.0.0-SNAPSHOT'// version:'2.0.1'
+    implementation group: 'de.opal-project', name: 'abstract-interpretation-framework_2.12', version: '3.0.0-SNAPSHOT'
+    implementation group: 'de.opal-project', name:'bytecode-disassembler_2.12', version: '3.0.0-SNAPSHOT'
+    implementation group: 'de.opal-project', name: 'bytecode-representation_2.12', version: '3.0.0-SNAPSHOT'
     implementation group: 'de.opal-project', name: 'three-address-code_2.12', version: '3.0.0-SNAPSHOT'
     implementation group: 'de.opal-project', name: 'common_2.12', version: '3.0.0-SNAPSHOT'
 }
 //https://github.com/JetBrains/gradle-intellij-plugin#configuration
 intellij {
-    version = 'IC-2020.3.2' // IC Community Edition
+    version = 'IC-2021.1' // IC Community Edition
     updateSinceUntilBuild false //Disables updating since-build attribute in plugin.xml
-    plugins = ['com.intellij.java', 'org.intellij.scala:2020.3.21' , 'PsiViewer:203-SNAPSHOT'] // load the the scala-plugin
+    plugins = ['com.intellij.java', 'org.intellij.scala:2021.1.16' , 'PsiViewer:211.6305.21-EAP-SNAPSHOT'] // load the the scala-plugin
     pluginName = 'bytecode-disassembler'
 }
 
