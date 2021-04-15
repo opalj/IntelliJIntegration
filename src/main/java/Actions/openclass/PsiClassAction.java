@@ -2,7 +2,10 @@ package Actions.openclass;
 
 import Actions.ActionUtil;
 import Compile.Compiler;
+import JavaByteCodeLanguage.LanguageAndFileType.JavaByteCode;
 import com.intellij.ide.util.JavaAnonymousClassesHelper;
+import com.intellij.lang.Language;
+import com.intellij.lang.java.JavaLanguage;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -27,6 +30,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import java.io.File;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.plugins.scala.ScalaLanguage;
+import taclanguage.languageandfiletype.TAC;
 
 public class PsiClassAction extends AnAction {
   private final String editorName;
@@ -140,12 +145,18 @@ public class PsiClassAction extends AnAction {
 
   @Override
   public void update(@NotNull AnActionEvent e) {
-    String extension = ActionUtil.ExtString(e);
-    // need to be changed
+    PsiElement element = e.getData(CommonDataKeys.PSI_ELEMENT);
+    boolean isValidLang = false;
+    if (element != null) {
+      Language l = element.getLanguage();
+      isValidLang = l == TAC.INSTANCE
+              || l == JavaByteCode.INSTANCE
+              || l == JavaLanguage.INSTANCE
+              || l == ScalaLanguage.INSTANCE;
+    }
     e.getPresentation()
         .setEnabledAndVisible(
-            e.getData(CommonDataKeys.PSI_ELEMENT) != null
-                && e.getData(CommonDataKeys.PROJECT) != null);
+            isValidLang && e.getData(CommonDataKeys.PROJECT) != null);
   }
 
   @Override
