@@ -25,7 +25,7 @@ public class JavaByteCodeFileType extends LanguageFileType {
   @NotNull
   @Override
   public String getName() {
-    return "Javabytecode file";
+    return "Java Bytecode";
   }
 
   @NotNull

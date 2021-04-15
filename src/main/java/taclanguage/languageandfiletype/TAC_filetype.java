@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class TAC_filetype extends LanguageFileType {
 
-  public static final Icon ICON = new ImageIcon("C:/Users/Oskar/Desktop/red.png");
+  public static final Icon ICON = new ImageIcon("icons/opal.png");
   public static final TAC_filetype INSTANCE = new TAC_filetype();
 
   private TAC_filetype() {
@@ -22,7 +22,7 @@ public class TAC_filetype extends LanguageFileType {
   @NotNull
   @Override
   public String getName() {
-    return "TAC file";
+    return "TAC";
   }
 
   @NotNull

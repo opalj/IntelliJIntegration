@@ -71,6 +71,7 @@
                 description="Drag and drop to open jar file"
                 icon="/icons/jar-gray.png">
             <add-to-group group-id="MainToolBar" anchor="last"/>
+            <add-to-group group-id="NavBarToolBarOthers" anchor="last"/>
         </action>
         <action class="Actions.OpenDialog" id="OpenJarDialog" text="open *jar">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
