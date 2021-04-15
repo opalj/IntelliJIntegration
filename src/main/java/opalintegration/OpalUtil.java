@@ -4,6 +4,7 @@
 
 package opalintegration;
 
+import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.*;
@@ -167,11 +168,7 @@ public class OpalUtil {
     }
     if (VFL
         || (!virtualClassFile.equals(currentWorkingVF)
-            && virtualClassFile
-                .getExtension()
-                .equals(
-                    com.intellij.ide.highlighter.JavaClassFileType.INSTANCE
-                        .getDefaultExtension()))) {
+            && virtualClassFile.getExtension().equals(JavaClassFileType.INSTANCE.getDefaultExtension()))) {
       currentWorkingVF = virtualClassFile;
       if (virtualClassFile.getCanonicalPath() != null
           && !virtualClassFile.getCanonicalPath().contains("!")) {
