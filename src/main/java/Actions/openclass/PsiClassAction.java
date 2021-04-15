@@ -2,6 +2,7 @@ package Actions.openclass;
 
 import Actions.ActionUtil;
 import Compile.Compiler;
+import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.ide.util.JavaAnonymousClassesHelper;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.Notifications;
@@ -84,7 +85,7 @@ public class PsiClassAction extends AnAction {
       if (file != null) {
         ProjectFileIndex index = ProjectFileIndex.SERVICE.getInstance(aClass.getProject());
         if (FileTypeRegistry.getInstance()
-            .isFileOfType(file, com.intellij.ide.highlighter.JavaClassFileType.INSTANCE)) {
+            .isFileOfType(file, JavaClassFileType.INSTANCE)) {
           // compiled class; looking for the right .class file (inner class 'A.B' is "contained" in
           // 'A.class', but we need 'A$B.class')
           String classFileName = StringUtil.getShortName(jvmClassName) + ".class";
