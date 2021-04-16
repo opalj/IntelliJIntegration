@@ -22,15 +22,13 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.compiled.ClsFileImpl;
 import com.intellij.psi.util.ClassUtil;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import java.io.File;
 import org.jetbrains.annotations.NotNull;
 import org.opalj.intellijintegration.Compile.Compiler;
-import org.opalj.intellijintegration.Editors.FileEditor.TacTextEditor;
-import org.opalj.intellijintegration.globalData.GlobalData;
-import org.opalj.intellijintegration.opalintegration.OpalUtil;
 
 public class PsiClassAction extends AnAction {
   private final String editorName;
@@ -165,7 +163,9 @@ public class PsiClassAction extends AnAction {
     if (psiElement instanceof PsiBinaryFile) {
       String name = ((PsiBinaryFile) psiElement).getOriginalFile().getName();
       if(name.endsWith(".class")){
-        classFile = ((PsiBinaryFile) psiElement).getVirtualFile();
+        PsiFile newFile = new ClsFileImpl(((PsiBinaryFile) psiElement).getViewProvider());
+        classFile = newFile.getVirtualFile();
+        ((SingleRootFileViewProvider)((PsiBinaryFile) psiElement).getViewProvider()).forceCachedPsi(newFile);
       }
     } else {
       containingClass = getContainingClass(psiElement);
@@ -174,7 +174,6 @@ public class PsiClassAction extends AnAction {
     if (classFile != null) {
       FileEditorManager.getInstance(project).openFile(classFile, true);
       FileEditorManager.getInstance(project).setSelectedEditor(classFile, editorName);
-      return;
     } else {
       VirtualFile virtualFile = containingClass.getContainingFile().getVirtualFile();
       CompilerManager compilerManager = CompilerManager.getInstance(project);
