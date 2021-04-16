@@ -3,7 +3,6 @@ package org.opalj.intellijintegration.Actions.openclass;
 import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.ide.util.JavaAnonymousClassesHelper;
 import com.intellij.lang.Language;
-import com.intellij.lang.java.JavaLanguage;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -29,8 +28,9 @@ import com.intellij.psi.util.PsiUtil;
 import java.io.File;
 import org.jetbrains.annotations.NotNull;
 import org.opalj.intellijintegration.Compile.Compiler;
-import org.opalj.intellijintegration.JavaByteCodeLanguage.LanguageAndFileType.JavaByteCode;
-import org.opalj.intellijintegration.taclanguage.languageandfiletype.TAC;
+import org.opalj.intellijintegration.Editors.FileEditor.TacTextEditor;
+import org.opalj.intellijintegration.globalData.GlobalData;
+import org.opalj.intellijintegration.opalintegration.OpalUtil;
 
 public class PsiClassAction extends AnAction {
   private final String editorName;
@@ -128,7 +128,7 @@ public class PsiClassAction extends AnAction {
   }
 
   private static String getJVMClassName(PsiClass aClass) {
-    if (!(aClass instanceof PsiAnonymousClass)) {
+    if (aClass != null && !(aClass instanceof PsiAnonymousClass)) {
       return ClassUtil.getJVMClassName(aClass);
     }
 
@@ -144,61 +144,66 @@ public class PsiClassAction extends AnAction {
   @Override
   public void update(@NotNull AnActionEvent e) {
     PsiElement element = e.getData(CommonDataKeys.PSI_ELEMENT);
-    boolean isValidLang = false;
     if (element != null) {
-      Language l = element.getLanguage();
-      isValidLang =
-          l == TAC.INSTANCE
-              || l == JavaByteCode.INSTANCE
-              || l == JavaLanguage.INSTANCE
-              || l.getDisplayName()
-                  .equals("Scala"); // We cannot be sure that the Scala language is defined
-      if (element instanceof PsiBinaryFile) {
-        isValidLang |= ((PsiBinaryFile) element).getOriginalFile().getName().endsWith(".jar");
-      }
+      boolean isValidFile = element.getLanguage() != Language.ANY || isSupportedBinaryFile(element);
+      e.getPresentation().setEnabledAndVisible(isValidFile && e.getData(CommonDataKeys.PROJECT) != null);
     }
-    e.getPresentation()
-        .setEnabledAndVisible(isValidLang && e.getData(CommonDataKeys.PROJECT) != null);
+  }
+
+  private boolean isSupportedBinaryFile(PsiElement element){
+    if(!(element instanceof PsiBinaryFile)) return false;
+    String name = ((PsiBinaryFile) element).getOriginalFile().getName();
+    return name.endsWith(".class") || name.endsWith(".jar");
   }
 
   @Override
   public void actionPerformed(@NotNull AnActionEvent e) {
     PsiElement psiElement = e.getData(CommonDataKeys.PSI_ELEMENT);
-    PsiClass containingClass = getContainingClass(psiElement);
-    VirtualFile classFile = LoadClassFileBytes(containingClass);
     Project project = e.getData(CommonDataKeys.PROJECT);
-    VirtualFile virtualFile = containingClass.getContainingFile().getVirtualFile();
+    VirtualFile classFile = null;
+    PsiClass containingClass = null;
+    if (psiElement instanceof PsiBinaryFile) {
+      String name = ((PsiBinaryFile) psiElement).getOriginalFile().getName();
+      if(name.endsWith(".class")){
+        classFile = ((PsiBinaryFile) psiElement).getVirtualFile();
+      }
+    } else {
+      containingClass = getContainingClass(psiElement);
+      classFile = LoadClassFileBytes(containingClass);
+    }
     if (classFile != null) {
       FileEditorManager.getInstance(project).openFile(classFile, true);
       FileEditorManager.getInstance(project).setSelectedEditor(classFile, editorName);
       return;
     } else {
+      VirtualFile virtualFile = containingClass.getContainingFile().getVirtualFile();
       CompilerManager compilerManager = CompilerManager.getInstance(project);
       CompileScope filesCompileScope =
-          compilerManager.createFilesCompileScope(new VirtualFile[] {virtualFile});
+              compilerManager.createFilesCompileScope(new VirtualFile[]{virtualFile});
+      final PsiClass containingClassFinal = containingClass;
       CompileStatusNotification compilingNotifaction =
-          (aborted, errors, warnings, compileContext) -> {
-            if (aborted) { // do nothing if manually channeled
-              return;
-            }
-            if (errors == 0) {
-              VirtualFile lclassFile = LoadClassFileBytes(containingClass);
-              // ApplicationManager.getApplication().invokeLater(() ->
-              // FileEditorManager.getInstance(compileContext.getProject()).openFile(classFile,
-              // true), ModalityState.NON_MODAL);
-              FileEditorManager.getInstance(compileContext.getProject())
-                  .setSelectedEditor(lclassFile, editorName);
-            } else {
-              Notifications.Bus.notify(
-                  NotificationGroupManager.getInstance()
-                      .getNotificationGroup("OpalPlugin")
-                      .createNotification()
-                      .setContent(
-                          "cant find classfile for"
-                              + psiElement.getContainingFile().getName()
-                              + " \n YOU COULD BUILD THE WHOLE PROJECT AND RETRY IT"));
-            }
-          };
+              (aborted, errors, warnings, compileContext) -> {
+                if (aborted) { // do nothing if manually channeled
+                  return;
+                }
+                if (errors == 0) {
+                  VirtualFile lclassFile = LoadClassFileBytes(containingClassFinal);
+                  // ApplicationManager.getApplication().invokeLater(() ->
+                  // FileEditorManager.getInstance(compileContext.getProject()).openFile(classFile,
+                  // true), ModalityState.NON_MODAL);
+                  FileEditorManager.getInstance(compileContext.getProject())
+                          .setSelectedEditor(lclassFile, editorName);
+                } else {
+                  Notifications.Bus.notify(
+                          NotificationGroupManager.getInstance()
+                                  .getNotificationGroup("OpalPlugin")
+                                  .createNotification()
+                                  .setContent(
+                                          "cant find classfile for"
+                                                  + psiElement.getContainingFile().getName()
+                                                  + " \n YOU COULD BUILD THE WHOLE PROJECT AND RETRY IT"));
+                }
+              };
       new Compiler().make(e.getProject(), filesCompileScope, compilingNotifaction);
     }
   }
