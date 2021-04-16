@@ -116,7 +116,7 @@
                 icon="/icons/jar-gray.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action id="Actions.resolve.JumpToResolveTAC" class="Actions.resolve.JumpToResolveTAC" text="Show Bytecode"
+        <action id="Actions.resolve.JumpToResolveTAC" class="Actions.resolve.JumpToResolveTAC" text="Show TAC"
                 icon="/icons/jar-gray.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>

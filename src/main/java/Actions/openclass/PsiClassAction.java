@@ -153,7 +153,10 @@ public class PsiClassAction extends AnAction {
       isValidLang = l == TAC.INSTANCE
               || l == JavaByteCode.INSTANCE
               || l == JavaLanguage.INSTANCE
-              || l == ScalaLanguage.INSTANCE;
+              || l.getDisplayName().equals("Scala"); // We cannot be sure that the Scala language is defined
+      if (element instanceof PsiBinaryFile) {
+        isValidLang |= ((PsiBinaryFile) element).getOriginalFile().getName().endsWith(".jar");
+      }
     }
     e.getPresentation()
         .setEnabledAndVisible(
