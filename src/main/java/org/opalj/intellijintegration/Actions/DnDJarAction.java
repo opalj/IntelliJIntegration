@@ -8,9 +8,6 @@ import com.intellij.ide.DataManager;
 import com.intellij.ide.dnd.FileCopyPasteUtil;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
-import com.intellij.openapi.fileChooser.FileChooser;
-import com.intellij.openapi.fileChooser.FileChooserDescriptor;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -21,34 +18,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 
-public class DnDJarAction extends AnAction implements CustomComponentAction {
-  private Project project;
+import static org.opalj.intellijintegration.globalData.GlobalData.TAC_EDITOR_ID;
 
+public class DnDJarAction extends AnAction implements CustomComponentAction {
   @Override
   public void actionPerformed(@NotNull AnActionEvent e) {
-    project = e.getProject();
-    // final VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
+    Project project = e.getProject();
     if (project == null) return;
-    openDialog(project, null);
-  }
-
-  private void openDialog(Project project, VirtualFile virtualFile) {
-    FileChooserDescriptor fileChooserDescriptor =
-        new FileChooserDescriptor(true, false, false, false, true, false);
-    fileChooserDescriptor.withFileFilter(
-        vf -> Pattern.matches(".*\\.(class|jar|zip)", vf.getName()));
-    FileChooser.chooseFile(fileChooserDescriptor, project, virtualFile, vf -> openAndDecompile(vf));
-  }
-
-  private void openAndDecompile(VirtualFile selectedFile) {
-    if (selectedFile.getName().toUpperCase().endsWith(".CLASS"))
-      FileEditorManager.getInstance(project).openFile(Objects.requireNonNull(selectedFile), true);
+    DecompileFromJar.openDialog(project, null, TAC_EDITOR_ID);
   }
 
   // todo versioncheck
@@ -100,7 +81,7 @@ public class DnDJarAction extends AnAction implements CustomComponentAction {
       if (canImport(comp, t.getTransferDataFlavors())) {
         List<File> fileList = FileCopyPasteUtil.getFileList(t);
         DataContext context = DataManager.getInstance().getDataContext(comp);
-        project = CommonDataKeys.PROJECT.getData(context);
+        Project project = CommonDataKeys.PROJECT.getData(context);
         if (project != null && fileList != null) {
           Optional<File> firstJar =
               fileList
@@ -114,7 +95,7 @@ public class DnDJarAction extends AnAction implements CustomComponentAction {
           if (firstJar.isPresent()) {
             VirtualFile vFileJar =
                 LocalFileSystem.getInstance().refreshAndFindFileByIoFile(firstJar.get());
-            openDialog(project, vFileJar);
+            DecompileFromJar.openDialog(project, vFileJar, TAC_EDITOR_ID);
             return true;
           }
         }

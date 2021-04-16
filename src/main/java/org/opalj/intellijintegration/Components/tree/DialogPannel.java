@@ -18,6 +18,9 @@ import java.util.regex.Pattern;
 import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.opalj.intellijintegration.Actions.DecompileFromJar;
+
+import static org.opalj.intellijintegration.globalData.GlobalData.TAC_EDITOR_ID;
 
 public class DialogPannel extends JFrame {
   private Project project;
@@ -59,7 +62,6 @@ public class DialogPannel extends JFrame {
   public void decompile() {
     VirtualFile selectedFile = fileSystemTree.getSelectedFile();
     // open the file
-    if (selectedFile.getName().toUpperCase().endsWith(".CLASS"))
-      FileEditorManager.getInstance(project).openFile(Objects.requireNonNull(selectedFile), true);
+    DecompileFromJar.openAndDecompile(project, selectedFile, TAC_EDITOR_ID);
   }
 }

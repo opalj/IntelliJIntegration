@@ -27,7 +27,10 @@ import com.intellij.psi.util.ClassUtil;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import java.io.File;
+import java.util.Locale;
+
 import org.jetbrains.annotations.NotNull;
+import org.opalj.intellijintegration.Actions.DecompileFromJar;
 import org.opalj.intellijintegration.Compile.Compiler;
 
 public class PsiClassAction extends AnAction {
@@ -161,11 +164,14 @@ public class PsiClassAction extends AnAction {
     VirtualFile classFile = null;
     PsiClass containingClass = null;
     if (psiElement instanceof PsiBinaryFile) {
-      String name = ((PsiBinaryFile) psiElement).getOriginalFile().getName();
-      if(name.endsWith(".class")){
+      String name = ((PsiBinaryFile) psiElement).getOriginalFile().getName().toUpperCase();
+      if(name.endsWith(".CLASS")){
         PsiFile newFile = new ClsFileImpl(((PsiBinaryFile) psiElement).getViewProvider());
         classFile = newFile.getVirtualFile();
         ((SingleRootFileViewProvider)((PsiBinaryFile) psiElement).getViewProvider()).forceCachedPsi(newFile);
+      } else if(name.endsWith(".JAR")) {
+        DecompileFromJar.openDialog(project, ((PsiBinaryFile) psiElement).getVirtualFile(), editorName);
+        return;
       }
     } else {
       containingClass = getContainingClass(psiElement);
