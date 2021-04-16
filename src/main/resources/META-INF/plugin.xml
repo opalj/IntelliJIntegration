@@ -69,7 +69,7 @@
         <action id="OpenFileInConsoleToolbarAction"
                 class="org.opalj.intellijintegration.Actions.DnDJarAction"
                 description="Drag and drop to open jar file"
-                icon="/icons/jar-gray.png">
+                icon="/icons/opal.png">
             <add-to-group group-id="MainToolBar" anchor="last"/>
             <add-to-group group-id="NavBarToolBarOthers" anchor="last"/>
         </action>
@@ -77,47 +77,47 @@
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </action>
         <action id="JumpToJBCEID" class="org.opalj.intellijintegration.Actions.openclass.OpenClassFileJBCAction" text="Show Bytecode"
-                icon="/icons/jar-gray.png">
+                icon="/icons/opal.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             <mouse-shortcut keymap="$default" keystroke="control button3"/>
         </action>
 
         <action id="JumpToTACFromRMB" class="org.opalj.intellijintegration.Actions.openclass.OpenClassFileTACAction" text="Show Three-Address-Code"
-                icon="/icons/jar-gray.png">
+                icon="/icons/opal.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             <mouse-shortcut keymap="$default" keystroke="control alt button3"/>
         </action>
 
-        <action id="jumptolinejbc" class="org.opalj.intellijintegration.Actions.JumpToPcJbc" text="Jump To PC" icon="/icons/jar-gray.png">
+        <action id="jumptolinejbc" class="org.opalj.intellijintegration.Actions.JumpToPcJbc" text="Jump To PC" icon="/icons/opal.png">
             <keyboard-shortcut first-keystroke="alt shift 1" keymap="$default"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action id="jumptolinetac" class="org.opalj.intellijintegration.Actions.JumpToPcTac" text="Jump To PC" icon="/icons/jar-gray.png">
+        <action id="jumptolinetac" class="org.opalj.intellijintegration.Actions.JumpToPcTac" text="Jump To PC" icon="/icons/opal.png">
             <keyboard-shortcut first-keystroke="alt shift 2" keymap="$default"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
-        <action id="jumptosource" class="org.opalj.intellijintegration.Actions.JumpToSource" text="Jump To Line" icon="/icons/jar-gray.png">
+        <action id="jumptosource" class="org.opalj.intellijintegration.Actions.JumpToSource" text="Jump To Line" icon="/icons/opal.png">
             <keyboard-shortcut first-keystroke="alt shift 3" keymap="$default"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
         <action class="org.opalj.intellijintegration.Actions.JumpBetweenEditors" id="BetweenTacAndJbc" text="Jump Between TAC/Bytecode"
-                icon="/icons/jar-gray.png">
+                icon="/icons/opal.png">
             <mouse-shortcut keymap="$default" keystroke="control button2"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
         <action class="org.opalj.intellijintegration.Actions.ExceptionMarkerAction" id="exceptionmarker" text="Highlight Exception"
-                icon="/icons/jar-gray.png">
+                icon="/icons/opal.png">
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift 3"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
         <action id="org.opalj.intellijintegration.Actions.resolve.JumpToResolveJBC" class="org.opalj.intellijintegration.Actions.resolve.JumpToResolveJBC" text="Show Bytecode"
-                icon="/icons/jar-gray.png">
+                icon="/icons/opal.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
         <action id="org.opalj.intellijintegration.Actions.resolve.JumpToResolveTAC" class="org.opalj.intellijintegration.Actions.resolve.JumpToResolveTAC" text="Show TAC"
-                icon="/icons/jar-gray.png">
+                icon="/icons/opal.png">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
     </actions>
