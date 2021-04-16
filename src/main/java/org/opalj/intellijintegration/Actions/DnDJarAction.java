@@ -100,8 +100,8 @@ public class DnDJarAction extends AnAction implements CustomComponentAction {
       if (canImport(comp, t.getTransferDataFlavors())) {
         List<File> fileList = FileCopyPasteUtil.getFileList(t);
         DataContext context = DataManager.getInstance().getDataContext(comp);
-        final Project project = CommonDataKeys.PROJECT.getData(context);
-        if (fileList != null) {
+        project = CommonDataKeys.PROJECT.getData(context);
+        if (project != null && fileList != null) {
           Optional<File> firstJar =
               fileList
                   .stream()
