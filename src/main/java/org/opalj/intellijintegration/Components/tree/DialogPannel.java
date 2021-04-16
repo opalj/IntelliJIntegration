@@ -4,23 +4,21 @@
 
 package org.opalj.intellijintegration.Components.tree;
 
+import static org.opalj.intellijintegration.globalData.GlobalData.TAC_EDITOR_ID;
+
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.ex.FileSystemTreeImpl;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.JarFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import java.awt.event.ActionListener;
-import java.util.Objects;
 import java.util.regex.Pattern;
 import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.opalj.intellijintegration.Actions.DecompileFromJar;
-
-import static org.opalj.intellijintegration.globalData.GlobalData.TAC_EDITOR_ID;
 
 public class DialogPannel extends JFrame {
   private Project project;

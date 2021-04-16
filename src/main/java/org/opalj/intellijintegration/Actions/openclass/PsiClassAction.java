@@ -27,8 +27,6 @@ import com.intellij.psi.util.ClassUtil;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import java.io.File;
-import java.util.Locale;
-
 import org.jetbrains.annotations.NotNull;
 import org.opalj.intellijintegration.Actions.DecompileFromJar;
 import org.opalj.intellijintegration.Compile.Compiler;
@@ -147,12 +145,13 @@ public class PsiClassAction extends AnAction {
     PsiElement element = e.getData(CommonDataKeys.PSI_ELEMENT);
     if (element != null) {
       boolean isValidFile = element.getLanguage() != Language.ANY || isSupportedBinaryFile(element);
-      e.getPresentation().setEnabledAndVisible(isValidFile && e.getData(CommonDataKeys.PROJECT) != null);
+      e.getPresentation()
+          .setEnabledAndVisible(isValidFile && e.getData(CommonDataKeys.PROJECT) != null);
     }
   }
 
-  private boolean isSupportedBinaryFile(PsiElement element){
-    if(!(element instanceof PsiBinaryFile)) return false;
+  private boolean isSupportedBinaryFile(PsiElement element) {
+    if (!(element instanceof PsiBinaryFile)) return false;
     String name = ((PsiBinaryFile) element).getOriginalFile().getName();
     return name.endsWith(".class") || name.endsWith(".jar");
   }
@@ -165,12 +164,14 @@ public class PsiClassAction extends AnAction {
     PsiClass containingClass = null;
     if (psiElement instanceof PsiBinaryFile) {
       String name = ((PsiBinaryFile) psiElement).getOriginalFile().getName().toUpperCase();
-      if(name.endsWith(".CLASS")){
+      if (name.endsWith(".CLASS")) {
         PsiFile newFile = new ClsFileImpl(((PsiBinaryFile) psiElement).getViewProvider());
         classFile = newFile.getVirtualFile();
-        ((SingleRootFileViewProvider)((PsiBinaryFile) psiElement).getViewProvider()).forceCachedPsi(newFile);
-      } else if(name.endsWith(".JAR")) {
-        DecompileFromJar.openDialog(project, ((PsiBinaryFile) psiElement).getVirtualFile(), editorName);
+        ((SingleRootFileViewProvider) ((PsiBinaryFile) psiElement).getViewProvider())
+            .forceCachedPsi(newFile);
+      } else if (name.endsWith(".JAR")) {
+        DecompileFromJar.openDialog(
+            project, ((PsiBinaryFile) psiElement).getVirtualFile(), editorName);
         return;
       }
     } else {
@@ -184,31 +185,31 @@ public class PsiClassAction extends AnAction {
       VirtualFile virtualFile = containingClass.getContainingFile().getVirtualFile();
       CompilerManager compilerManager = CompilerManager.getInstance(project);
       CompileScope filesCompileScope =
-              compilerManager.createFilesCompileScope(new VirtualFile[]{virtualFile});
+          compilerManager.createFilesCompileScope(new VirtualFile[] {virtualFile});
       final PsiClass containingClassFinal = containingClass;
       CompileStatusNotification compilingNotifaction =
-              (aborted, errors, warnings, compileContext) -> {
-                if (aborted) { // do nothing if manually channeled
-                  return;
-                }
-                if (errors == 0) {
-                  VirtualFile lclassFile = LoadClassFileBytes(containingClassFinal);
-                  // ApplicationManager.getApplication().invokeLater(() ->
-                  // FileEditorManager.getInstance(compileContext.getProject()).openFile(classFile,
-                  // true), ModalityState.NON_MODAL);
-                  FileEditorManager.getInstance(compileContext.getProject())
-                          .setSelectedEditor(lclassFile, editorName);
-                } else {
-                  Notifications.Bus.notify(
-                          NotificationGroupManager.getInstance()
-                                  .getNotificationGroup("OpalPlugin")
-                                  .createNotification()
-                                  .setContent(
-                                          "cant find classfile for"
-                                                  + psiElement.getContainingFile().getName()
-                                                  + " \n YOU COULD BUILD THE WHOLE PROJECT AND RETRY IT"));
-                }
-              };
+          (aborted, errors, warnings, compileContext) -> {
+            if (aborted) { // do nothing if manually channeled
+              return;
+            }
+            if (errors == 0) {
+              VirtualFile lclassFile = LoadClassFileBytes(containingClassFinal);
+              // ApplicationManager.getApplication().invokeLater(() ->
+              // FileEditorManager.getInstance(compileContext.getProject()).openFile(classFile,
+              // true), ModalityState.NON_MODAL);
+              FileEditorManager.getInstance(compileContext.getProject())
+                  .setSelectedEditor(lclassFile, editorName);
+            } else {
+              Notifications.Bus.notify(
+                  NotificationGroupManager.getInstance()
+                      .getNotificationGroup("OpalPlugin")
+                      .createNotification()
+                      .setContent(
+                          "cant find classfile for"
+                              + psiElement.getContainingFile().getName()
+                              + " \n YOU COULD BUILD THE WHOLE PROJECT AND RETRY IT"));
+            }
+          };
       new Compiler().make(e.getProject(), filesCompileScope, compilingNotifaction);
     }
   }

@@ -4,6 +4,8 @@
 
 package org.opalj.intellijintegration.Actions;
 
+import static org.opalj.intellijintegration.globalData.GlobalData.TAC_EDITOR_ID;
+
 import com.intellij.ide.DataManager;
 import com.intellij.ide.dnd.FileCopyPasteUtil;
 import com.intellij.openapi.actionSystem.*;
@@ -21,8 +23,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
-
-import static org.opalj.intellijintegration.globalData.GlobalData.TAC_EDITOR_ID;
 
 public class DnDJarAction extends AnAction implements CustomComponentAction {
   @Override
