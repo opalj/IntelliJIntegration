@@ -31,11 +31,11 @@ repositories {
 
 dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
-    implementation group: 'de.opal-project', name: 'abstract-interpretation-framework_2.12', version: '3.0.0-SNAPSHOT'
-    implementation group: 'de.opal-project', name:'bytecode-disassembler_2.12', version: '3.0.0-SNAPSHOT'
-    implementation group: 'de.opal-project', name: 'bytecode-representation_2.12', version: '3.0.0-SNAPSHOT'
-    implementation group: 'de.opal-project', name: 'three-address-code_2.12', version: '3.0.0-SNAPSHOT'
-    implementation group: 'de.opal-project', name: 'common_2.12', version: '3.0.0-SNAPSHOT'
+    implementation group: 'de.opal-project', name: 'abstract-interpretation-framework_2.12', version: '4.0.0'
+    implementation group: 'de.opal-project', name:'bytecode-disassembler_2.12', version: '4.0.0'
+    implementation group: 'de.opal-project', name: 'bytecode-representation_2.12', version: '4.0.0'
+    implementation group: 'de.opal-project', name: 'three-address-code_2.12', version: '4.0.0'
+    implementation group: 'de.opal-project', name: 'common_2.12', version: '4.0.0'
 }
 //https://github.com/JetBrains/gradle-intellij-plugin#configuration
 intellij {
