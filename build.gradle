@@ -41,7 +41,7 @@ dependencies {
 intellij {
     version = 'IC-2021.1' // IC Community Edition
     updateSinceUntilBuild false //Disables updating since-build attribute in plugin.xml
-    plugins = ['com.intellij.java', 'org.intellij.scala:2021.1.16' , 'PsiViewer:211.6305.21-EAP-SNAPSHOT'] // load the the scala-plugin
+    plugins = ['com.intellij.java', 'org.intellij.scala:2021.1.21' , 'PsiViewer:211-SNAPSHOT'] // load the the scala-plugin
     pluginName = 'bytecode-disassembler'
 }
 
