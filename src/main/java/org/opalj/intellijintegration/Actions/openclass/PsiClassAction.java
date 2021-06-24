@@ -58,14 +58,26 @@ public class PsiClassAction extends AnAction {
         if (classes.length == 1) return classes[0];
 
         TextRange textRange = psiElement.getTextRange();
+        PsiClass largestClass = classes[0];
+        int largestSize = 0;
         if (textRange != null) {
           for (PsiClass aClass : classes) {
             PsiElement navigationElement = aClass.getNavigationElement();
             TextRange classRange =
                 navigationElement != null ? navigationElement.getTextRange() : null;
-            if (classRange != null && classRange.contains(textRange)) return aClass;
+            if (classRange != null) {
+              if (classRange.contains(textRange)) return aClass;
+              int size = classRange.getEndOffset() - classRange.getStartOffset();
+              if (size > largestSize) {
+                largestClass = aClass;
+                largestSize = size;
+              }
+            }
           }
         }
+
+        // If there are multiple classes in a file, return the largest class of the file
+        return largestClass;
       }
       return null;
     }
