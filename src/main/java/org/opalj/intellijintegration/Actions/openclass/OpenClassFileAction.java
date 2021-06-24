@@ -81,7 +81,7 @@ class OpenClassFileAction extends AnAction {
       String FileName = OpalUtil.getJarFileRootAndFileName(virtualFile.getParent())[1];
       Collection<VirtualFile> virtualFilesByName =
           FilenameIndex.getVirtualFilesByName(
-              project,
+              project, // this parameter is not used; with newer base lib we can just remove it
               virtualFile.getNameWithoutExtension() + ".class",
               GlobalSearchScope.allScope(project));
       for (VirtualFile vf : virtualFilesByName) {

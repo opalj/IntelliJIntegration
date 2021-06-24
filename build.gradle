@@ -23,7 +23,6 @@ targetCompatibility = 11
 repositories {
     //mavenLocal()
     mavenCentral()
-    jcenter()
     maven { url = 'https://mvnrepository.com/artifact/de.opal-project/'} //opal stable
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' } // opal snapshot
 }
@@ -39,10 +38,10 @@ dependencies {
 }
 //https://github.com/JetBrains/gradle-intellij-plugin#configuration
 intellij {
-    version = 'IC-2021.1' // IC Community Edition
-    updateSinceUntilBuild false //Disables updating since-build attribute in plugin.xml
-    plugins = ['com.intellij.java', 'org.intellij.scala:2021.1.21' , 'PsiViewer:211-SNAPSHOT'] // load the the scala-plugin
-    pluginName = 'bytecode-disassembler'
+    version.set('IC-2021.1') // IC Community Edition
+    updateSinceUntilBuild.set(false) //Disables updating since-build attribute in plugin.xml
+    plugins.set(['com.intellij.java', 'org.intellij.scala:2021.1.21' , 'PsiViewer:211-SNAPSHOT']) // load the the scala-plugin
+    pluginName.set('bytecode-disassembler')
 }
 
 patchPluginXml {
