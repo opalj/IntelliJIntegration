@@ -15,9 +15,13 @@ import java.io.*;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.typesafe.config.ConfigValueFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.opalj.br.*;
+import org.opalj.br.reader.DynamicConstantRewriting;
+import org.opalj.br.reader.InvokedynamicRewriting;
 import org.opalj.intellijintegration.config.BytecodeConfig;
 import org.opalj.intellijintegration.globalData.GlobalData;
 
@@ -190,16 +194,19 @@ public class OpalUtil {
                 .setComments(true)
                 .setFormatted(true)
                 .setJson(false);
+        Config config = uriProject.config()
+          .withValue(InvokedynamicRewriting.InvokedynamicRewritingConfigKey(), ConfigValueFactory.fromAnyRef(false))
+          .withValue(DynamicConstantRewriting.RewritingConfigKey(), ConfigValueFactory.fromAnyRef(false));
         String render =
             BCConfig.isProjectConfigJustOpal()
-                ? uriProject.config().atKey("org.opalj").root().render(configRenderOptions)
-                : uriProject.config().root().render(configRenderOptions);
+                ? config.atKey("org").atKey("opalj").root().render(configRenderOptions)
+                : config.root().render(configRenderOptions);
         BCConfig.setProjectConfigString(render);
       } else {
         Config mergedConfig =
-            uriProject
-                .config()
-                .withFallback(ConfigFactory.parseString(BCConfig.getProjectConfigString()));
+          ConfigFactory.parseString(BCConfig.getProjectConfigString()).withFallback(uriProject.config())
+            .withValue(InvokedynamicRewriting.InvokedynamicRewritingConfigKey(), ConfigValueFactory.fromAnyRef(false))
+            .withValue(DynamicConstantRewriting.RewritingConfigKey(), ConfigValueFactory.fromAnyRef(false));
         uriProject = uriProject.apply(projectFile, uriProject.logContext(), mergedConfig);
       }
       classFile = getClassFile(virtualClassFile);
