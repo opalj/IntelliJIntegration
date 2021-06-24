@@ -5,6 +5,7 @@
 package org.opalj.intellijintegration.Compile;
 
 import com.intellij.notification.NotificationGroupManager;
+import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -53,8 +54,7 @@ public class Compiler {
       Notifications.Bus.notify(
           NotificationGroupManager.getInstance()
               .getNotificationGroup("OpalPlugin")
-              .createNotification()
-              .setContent("building " + scope.toString() + " to show "));
+              .createNotification("building " + scope + " to show ", NotificationType.INFORMATION));
       // compilerManager.make(scope, compilingNotifaction);
     }
   }
@@ -73,10 +73,10 @@ public class Compiler {
       Notifications.Bus.notify(
           NotificationGroupManager.getInstance()
               .getNotificationGroup("OpalPlugin")
-              .createNotification()
-              .setContent(
+              .createNotification(
                   "can't find a registered compiler in given project for: "
-                      + virtualFile.getName()));
+                      + virtualFile.getName(),
+                      NotificationType.INFORMATION));
       return; // maybe more
     }
     VirtualFile[] virtualFiles = new VirtualFile[] {virtualFile};

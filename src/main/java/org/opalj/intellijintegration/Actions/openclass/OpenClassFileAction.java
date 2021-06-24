@@ -9,6 +9,7 @@
 package org.opalj.intellijintegration.Actions.openclass;
 
 import com.intellij.notification.NotificationGroupManager;
+import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -93,8 +94,7 @@ class OpenClassFileAction extends AnAction {
       Notifications.Bus.notify(
           NotificationGroupManager.getInstance()
               .getNotificationGroup("OpalPlugin")
-              .createNotification()
-              .setContent("can't open the class file : " + virtualFile.getName()));
+              .createNotification("can't open the class file : " + virtualFile.getName(), NotificationType.INFORMATION));
     } else
       // }//else build a class file
       new Compiler().make(project, virtualFile, editorName);

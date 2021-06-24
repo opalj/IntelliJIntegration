@@ -33,6 +33,7 @@ package org.opalj.intellijintegration.Actions.resolve;
 import static org.opalj.intellijintegration.globalData.GlobalData.BYTECODE_EDITOR_ID;
 
 import com.intellij.notification.NotificationGroupManager;
+import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -98,7 +99,6 @@ class JumpToResolve extends AnAction {
     Notifications.Bus.notify(
         NotificationGroupManager.getInstance()
             .getNotificationGroup("OpalPlugin")
-            .createNotification()
-            .setContent("can't find navigation path"));
+            .createNotification("Can't find navigation path", NotificationType.INFORMATION));
   }
 }

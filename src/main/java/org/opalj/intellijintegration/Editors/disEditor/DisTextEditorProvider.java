@@ -7,6 +7,7 @@ package org.opalj.intellijintegration.Editors.disEditor;
 import static org.opalj.intellijintegration.globalData.GlobalData.BYTECODE_EDITOR_ID;
 
 import com.intellij.notification.NotificationGroupManager;
+import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;
@@ -38,8 +39,8 @@ public class DisTextEditorProvider extends PsiAwareTextEditorProvider {
       Notifications.Bus.notify(
           NotificationGroupManager.getInstance()
               .getNotificationGroup("OpalPlugin")
-              .createNotification()
-              .setContent("decompiling : " + file.getName()));
+              .createNotification("decompiling : " + file.getName(),
+                      NotificationType.INFORMATION));
       return new DisTextEditor(
           project,
           OpalUtil.prepare(project, GlobalData.DISASSEMBLED_FILE_ENDING_JBC, file, null),

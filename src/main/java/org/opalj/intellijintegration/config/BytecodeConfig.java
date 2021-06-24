@@ -4,11 +4,15 @@
 
 package org.opalj.intellijintegration.config;
 
-import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ServiceManager;
-import com.intellij.openapi.components.State;
-import com.intellij.openapi.components.Storage;
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.*;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.project.ProjectUtil;
+import com.intellij.openapi.wm.WindowManager;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import javafx.application.Application;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.opalj.intellijintegration.globalData.TACKey;
@@ -22,6 +26,7 @@ public class BytecodeConfig implements PersistentStateComponent<BytecodeConfig> 
   // TAC-Configs
   public TACKey tacKey = TACKey.ONE;
 
+  @NotNull
   public TACKey getTacKey() {
     return tacKey;
   }
@@ -68,6 +73,6 @@ public class BytecodeConfig implements PersistentStateComponent<BytecodeConfig> 
 
   @Nullable
   public static BytecodeConfig getInstance() {
-    return ServiceManager.getService(BytecodeConfig.class);
+    return ApplicationManager.getApplication().getService(BytecodeConfig.class);
   }
 }

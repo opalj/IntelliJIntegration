@@ -4,6 +4,7 @@ import com.intellij.ide.highlighter.JavaClassFileType;
 import com.intellij.ide.util.JavaAnonymousClassesHelper;
 import com.intellij.lang.Language;
 import com.intellij.notification.NotificationGroupManager;
+import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -215,11 +216,11 @@ public class PsiClassAction extends AnAction {
               Notifications.Bus.notify(
                   NotificationGroupManager.getInstance()
                       .getNotificationGroup("OpalPlugin")
-                      .createNotification()
-                      .setContent(
+                      .createNotification(
                           "cant find classfile for"
                               + psiElement.getContainingFile().getName()
-                              + " \n YOU COULD BUILD THE WHOLE PROJECT AND RETRY IT"));
+                              + " \n YOU COULD BUILD THE WHOLE PROJECT AND RETRY IT",
+                              NotificationType.INFORMATION));
             }
           };
       new Compiler().make(e.getProject(), filesCompileScope, compilingNotifaction);

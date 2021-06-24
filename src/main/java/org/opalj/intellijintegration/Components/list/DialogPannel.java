@@ -26,7 +26,7 @@ public class DialogPannel extends JFrame {
   private final DefaultListModel<JarEntry> dlm;
   private JPanel panel1;
   private JScrollPane scrollable;
-  private JList jlist;
+  private JList<JarEntry> jlist;
   private JButton durchsuchenButton;
   private JTree tree1;
   private int lastIndex;
@@ -41,7 +41,7 @@ public class DialogPannel extends JFrame {
       file = new File(virtualFile.getPath());
       addList(file);
     }
-    jlist = new JBList(dlm);
+    jlist = new JBList<>(dlm);
     scrollable = new JBScrollPane(jlist);
     panel1.add(scrollable);
     jlist.getSelectionModel().addListSelectionListener(e -> lastIndex = e.getLastIndex());
